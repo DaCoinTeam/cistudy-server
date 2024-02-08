@@ -2,6 +2,7 @@ services:
   server:
     build:
       context: ..
+    image: cistudy-server:latest
     environment:
       MYSQL_USERNAME: ${MYSQL_USERNAME}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
