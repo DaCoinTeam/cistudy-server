@@ -2,7 +2,7 @@ services:
   server:
     build:
       context: .
-      dockerfile: ../services.Dockerfile
+      dockerfile: ../Dockerfile
     environment:
       MYSQL_USERNAME: ${MYSQL_USERNAME}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
