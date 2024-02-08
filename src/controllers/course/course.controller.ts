@@ -1,10 +1,10 @@
 import {
-	Controller,
-	Post,
-	UseInterceptors,
-	UseGuards,
-	UploadedFiles,
-	Body,
+    Controller,
+    Post,
+    UseInterceptors,
+    UseGuards,
+    UploadedFiles,
+    Body,
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery, ApiTags } from "@nestjs/swagger"
 import { CreateCourseData, createCourseSchema, CreateLectureData, createLectureSchema, CreateSectionData } from "./shared"
@@ -16,12 +16,12 @@ import { FileFieldsInterceptor } from "@nestjs/platform-express"
 
 @ApiTags("Course")
 @ApiQuery({
-	name: "clientId",
-	example: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
+    name: "clientId",
+    example: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
 })
 @Controller("api/course")
 export default class CourseController{
-	constructor(private readonly courseService: CourseService) { }
+    constructor(private readonly courseService: CourseService) { }
 
     @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
@@ -32,17 +32,17 @@ export default class CourseController{
         AuthInterceptor<UserMySqlEntity>,
         FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
     )
-	async createCourse(
+    async createCourse(
         @UserId() userId: string,
         @DataFromBody() data: CreateCourseData,
         @UploadedFiles() { files }: Files,
-	) {
-		return this.courseService.createCourse({
-			userId,
-			data,
-			files,
-		})
-	}
+    ) {
+        return this.courseService.createCourse({
+            userId,
+            data,
+            files,
+        })
+    }
 
     @ApiBearerAuth()
     @Post("create-section")

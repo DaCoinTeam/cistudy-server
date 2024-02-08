@@ -1,4 +1,4 @@
-import { Controller, NotFoundException } from "@nestjs/common"
+import { Injectable, NotFoundException } from "@nestjs/common"
 import { CourseMySqlEntity, LectureMySqlEntity, SectionMySqlEntity } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
@@ -6,7 +6,7 @@ import { SupabaseService } from "@global"
 import { CreateCourseInput, CreateSectionInput, CreateLectureInput } from "./shared"
 import { ProcessMpegDashProducer } from "@workers"
 
-@Controller()
+@Injectable()
 export default class CourseService {
     constructor(
 		@InjectRepository(CourseMySqlEntity)

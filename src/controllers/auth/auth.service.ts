@@ -1,4 +1,4 @@
-import { ConflictException, Controller, NotFoundException, UnauthorizedException } from "@nestjs/common"
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
 import { UserMySqlEntity } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
@@ -6,29 +6,29 @@ import { FirebaseService, MailerService, Sha256Service } from "@global"
 import { InitInput, SignInInput, SignUpInput, VerifyGoogleAccessTokenInput } from "./shared"
 import {  UserKind } from "@common"
 
-@Controller()
+@Injectable()
 export default class AuthService {
-	constructor(
+    constructor(
     @InjectRepository(UserMySqlEntity)
     private readonly userMySqlRepository: Repository<UserMySqlEntity>,
     private readonly sha256Service: Sha256Service,
     private readonly mailerService: MailerService,
     private readonly firebaseService: FirebaseService
-	) {}
+    ) {}
 
-	async signIn(input: SignInInput): Promise<UserMySqlEntity> {
-		const { data } = input
-		const found = await this.userMySqlRepository.findOneBy({
-			email: data.email,
-		})
-		if (!found) throw new NotFoundException("User not found.")
-		if (!this.sha256Service.verifyHash(data.password, found.password))
-			throw new UnauthorizedException("Invalid credentials.")
-		return found
-	}
+    async signIn(input: SignInInput): Promise<UserMySqlEntity> {
+        const { data } = input
+        const found = await this.userMySqlRepository.findOneBy({
+            email: data.email,
+        })
+        if (!found) throw new NotFoundException("User not found.")
+        if (!this.sha256Service.verifyHash(data.password, found.password))
+            throw new UnauthorizedException("Invalid credentials.")
+        return found
+    }
 
-	async signUp(input: SignUpInput): Promise<string> {
-		const { data } = input
+    async signUp(input: SignUpInput): Promise<string> {
+        const { data } = input
   	const found = await this.userMySqlRepository.findOne({
   		where: {
   			email: data.email,
@@ -44,17 +44,17 @@ export default class AuthService {
 
   	await this.mailerService.sendMail(created.userId, data.email)
   	return `An user with id ${created.userId} has been created`
-	}
+    }
 
-	async init(input: InitInput): Promise<UserMySqlEntity> {
-		const { data } = input
+    async init(input: InitInput): Promise<UserMySqlEntity> {
+        const { data } = input
   	return await this.userMySqlRepository.findOneBy({
   		userId: data,
   	})
-	}
+    }
 
-	async verifyGoogleAccessToken(input: VerifyGoogleAccessTokenInput): Promise<UserMySqlEntity> {
-		const { data } = input
+    async verifyGoogleAccessToken(input: VerifyGoogleAccessTokenInput): Promise<UserMySqlEntity> {
+        const { data } = input
   	const decoded = await this.firebaseService.verifyGoogleAccessToken(data)
   	if (!decoded)
   		throw new UnauthorizedException("Invalid Google access token.")
@@ -71,5 +71,5 @@ export default class AuthService {
   		})
   	}
   	return found
-	}
+    }
 }
