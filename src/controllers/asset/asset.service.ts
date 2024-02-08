@@ -10,7 +10,7 @@ export default class AssetService {
 
     async get(input: GetInput): Promise<StreamableFile> {
         const { data } = input
-        console.log(data)
+		
         const { filename, fileBody } = await this.supabaseService.get(data)
         const contentType = extnameConfig().extnameToContentType[extname(filename)]
     
