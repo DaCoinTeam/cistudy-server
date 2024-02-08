@@ -3,6 +3,7 @@ services:
     build:
       context: ..
     image: cistudy-server:latest
+    container_name: cistudy-server
     environment:
       MYSQL_USERNAME: ${MYSQL_USERNAME}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
