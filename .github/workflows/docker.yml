@@ -36,4 +36,4 @@ jobs:
         FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
         SUPABASE_URL: ${{ vars.SUPABASE_URL }}
         SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-      run: docker-compose -f docker/github-compose.yaml up --build
+      run: docker-compose -f docker/github-compose.yaml up --build -d
