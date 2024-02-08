@@ -15,7 +15,7 @@ jobs:
 
     - name: Run Docker compose command
       env:
-        MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+        MYSQL_USERNAME: root
         MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         MYSQL_SCHEMA: ${{ secrets.MYSQL_SCHEMA }}
         MYSQL_HOST: ${{ vars.MYSQL_HOST }}
