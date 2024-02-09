@@ -2,7 +2,7 @@ import SessionMySqlEntity from "./session.entity"
 import CourseMySqlEntity from "./course.entity"
 import UserMySqlEntity from "./user.entity"
 import PostMySqlEntity from "./post.entity"
-import PostLikeMySqlEntity from "./post-like.entity"
+import PostReactMySqlEntity from "./post-react.entity"
 import PostCommentMySqlEntity from "./post-comment.entity"
 import PostCommentLikeMySqlEntity from "./post-comment-like.entity"
 import PostContentMySqlEntity from "./post-content.entity"
@@ -16,7 +16,7 @@ import EnrolledInfoEntity from "./enrolled-info.entity"
 export {
 	UserMySqlEntity,
 	PostMySqlEntity,
-	PostLikeMySqlEntity,
+	PostReactMySqlEntity,
 	PostCommentMySqlEntity,
 	PostCommentLikeMySqlEntity,
 	PostContentMySqlEntity,

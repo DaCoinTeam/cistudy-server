@@ -3,7 +3,7 @@ import PostResolvers from "./post.resolvers"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
 	PostMySqlEntity,
-	PostLikeMySqlEntity,
+	PostReactMySqlEntity,
 	PostContentMySqlEntity,
 	PostCommentMySqlEntity,
 	PostCommentContentMySqlEntity,
@@ -15,7 +15,7 @@ import PostService from "./post.service"
 	imports: [
 		TypeOrmModule.forFeature([
 			PostMySqlEntity,
-			PostLikeMySqlEntity,
+			PostReactMySqlEntity,
 			PostContentMySqlEntity,
 			PostCommentMySqlEntity,
 			PostCommentContentMySqlEntity,

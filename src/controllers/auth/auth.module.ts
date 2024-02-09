@@ -13,7 +13,7 @@ import {
 	PostContentMySqlEntity,
 	PostCommentMySqlEntity,
 	PostCommentContentMySqlEntity,
-	PostLikeMySqlEntity,
+	PostReactMySqlEntity,
 	PostCommentLikeMySqlEntity,
 } from "@database"
 import AuthService from "./auth.service"
@@ -32,7 +32,7 @@ import AuthService from "./auth.service"
 			PostContentMySqlEntity,
 			PostCommentMySqlEntity,
 			PostCommentContentMySqlEntity,
-			PostLikeMySqlEntity,
+			PostReactMySqlEntity,
 			PostCommentLikeMySqlEntity,
 		]),
 	],

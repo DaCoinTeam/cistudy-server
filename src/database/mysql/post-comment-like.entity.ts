@@ -20,7 +20,7 @@ export default class PostCommentLikeEntity {
   })
   	createdAt: Date
 
-  @ManyToOne(() => UserEntity, (user) => user.postLikes)
+  @ManyToOne(() => UserEntity, (user) => user.postReacts)
   @JoinColumn({ name: "userId" })
       	user: UserEntity
 

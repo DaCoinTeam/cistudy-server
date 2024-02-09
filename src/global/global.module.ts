@@ -8,7 +8,7 @@ import {
     PostCommentLikeMySqlEntity,
     PostCommentMySqlEntity,
     PostContentMySqlEntity,
-    PostLikeMySqlEntity,
+    PostReactMySqlEntity,
     PostMySqlEntity,
     ResourceMySqlEntity,
     SectionMySqlEntity,
@@ -41,7 +41,7 @@ import {
             LectureMySqlEntity,
             ResourceMySqlEntity,
             PostContentMySqlEntity,
-            PostLikeMySqlEntity,
+            PostReactMySqlEntity,
             PostCommentMySqlEntity,
             PostCommentContentMySqlEntity,
             PostCommentLikeMySqlEntity

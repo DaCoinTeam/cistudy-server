@@ -13,7 +13,7 @@ import {
     PostContentMySqlEntity,
     PostCommentMySqlEntity,
     PostCommentContentMySqlEntity,
-    PostLikeMySqlEntity,
+    PostReactMySqlEntity,
     PostCommentLikeMySqlEntity,
 } from "@database"
 import CourseService from "./course.service"
@@ -32,7 +32,7 @@ import CourseService from "./course.service"
             PostContentMySqlEntity,
             PostCommentMySqlEntity,
             PostCommentContentMySqlEntity,
-            PostLikeMySqlEntity,
+            PostReactMySqlEntity,
             PostCommentLikeMySqlEntity,
         ]),
     ],

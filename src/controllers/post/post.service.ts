@@ -4,7 +4,7 @@ import { CreatePostInput, PostContentData, ReactPostInput, UpdatePostInput } fro
 import { ContentType, IndexFileAppended } from "@common"
 import {
     PostMySqlEntity,
-    PostLikeMySqlEntity,
+    PostReactMySqlEntity,
     PostCommentMySqlEntity,
     PostContentMySqlEntity,
     PostCommentContentMySqlEntity,
@@ -17,8 +17,8 @@ export default class PostService {
     constructor(
     @InjectRepository(PostMySqlEntity)
     private readonly postMySqlRepository: Repository<PostMySqlEntity>,
-    @InjectRepository(PostLikeMySqlEntity)
-    private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
+    @InjectRepository(PostReactMySqlEntity)
+    private readonly postReactMySqlRepository: Repository<PostReactMySqlEntity>,
     @InjectRepository(PostCommentMySqlEntity)
     private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
     @InjectRepository(PostContentMySqlEntity)
@@ -125,29 +125,29 @@ export default class PostService {
     async reactPost(input: ReactPostInput) {
         const { userId, data } = input
         const { postId } = data
-        const found = await this.postLikeMySqlRepository.findOneBy({
+        const found = await this.postReactMySqlRepository.findOneBy({
             userId,
             postId,
         })
 
-        let postLikeId : string
-        let isDeleted = false
+        let postReactId : string
+        let isLiked: boolean
 
         if (found === null)
         {
             // do claim rewards action
         } else {
-            postLikeId = found.postLikeId
-            isDeleted = !found.isDeleted
+            postReactId = found.postReactId
+            isLiked = !found.isLiked
         }
 
-        const postLike = await this.postLikeMySqlRepository.save({
-            postLikeId,
+        const postReact = await this.postReactMySqlRepository.save({
+            postReactId,
             userId,
             postId,
-            isDeleted
+            isLiked
         })
 
-        return `Successfully react the post with id ${postLike.postLikeId}.`
+        return `Successfully react the post with id ${postReact.postReactId}.`
     }
 }

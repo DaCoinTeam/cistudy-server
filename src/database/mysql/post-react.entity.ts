@@ -10,10 +10,10 @@ import {
 import UserEntity from "./user.entity"
 import PostEntity from "./post.entity"
 
-@Entity("post_like")
-export default class PostLikeEntity {
+@Entity("post_react")
+export default class PostReactEntity {
   @PrimaryGeneratedColumn("uuid")
-      postLikeId: string
+      postReactId: string
 
   @Column({ type: "uuid", length: 36 })
       userId: string
@@ -29,15 +29,15 @@ export default class PostLikeEntity {
 
   @Column({
       type: "boolean",
-      default: false,
+      default: true,
   })
-      isDeleted: boolean
+      isLiked: boolean
 
-  @ManyToOne(() => UserEntity, (user) => user.postLikes)
+  @ManyToOne(() => UserEntity, (user) => user.postReacts)
   @JoinColumn({ name: "userId" })
       user: UserEntity
 
-  @ManyToOne(() => PostEntity, (post) => post.postLikes)
+  @ManyToOne(() => PostEntity, (post) => post.postReacts)
   @JoinColumn({ name: "postId" })
       post: PostEntity
 }
