@@ -9,7 +9,7 @@ import {
 	PostCommentContentMySqlEntity,
 	PostCommentLikeMySqlEntity,
 } from "@database"
-import PostService from "./post.service"
+import PostsService from "./post.service"
 
 @Module({
 	imports: [
@@ -22,6 +22,6 @@ import PostService from "./post.service"
 			PostCommentLikeMySqlEntity,
 		]),
 	],
-	providers: [PostResolvers, PostService],
+	providers: [PostResolvers, PostsService],
 })
 export default class PostModule {}

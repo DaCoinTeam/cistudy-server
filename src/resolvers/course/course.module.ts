@@ -10,7 +10,7 @@ import {
 } from "@database"
 import CourseResolvers from "./course.resolvers"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import CourseService from "./course.service"
+import CoursesService from "./course.service"
 
 @Module({
     imports: [
@@ -24,6 +24,6 @@ import CourseService from "./course.service"
             SessionMySqlEntity
         ]),
     ],
-    providers: [CourseResolvers, CourseService],
+    providers: [CourseResolvers, CoursesService],
 })
 export default class CourseModule {}

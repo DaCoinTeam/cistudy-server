@@ -11,7 +11,7 @@ import { CreateCourseData, createCourseSchema, CreateLectureData, createLectureS
 import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import { UserMySqlEntity } from "@database"
 import { Files } from "@common"
-import CourseService from "./courses.service"
+import CoursesService from "./courses.service"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 
 @ApiTags("Courses")
@@ -21,7 +21,7 @@ import { FileFieldsInterceptor } from "@nestjs/platform-express"
 })
 @Controller("api/courses")
 export default class CoursesController{
-    constructor(private readonly courseService: CourseService) { }
+    constructor(private readonly coursesService: CoursesService) { }
 
     @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
@@ -37,7 +37,7 @@ export default class CoursesController{
         @DataFromBody() data: CreateCourseData,
         @UploadedFiles() { files }: Files,
     ) {
-        return this.courseService.createCourse({
+        return this.coursesService.createCourse({
             userId,
             data,
             files,
@@ -54,7 +54,7 @@ export default class CoursesController{
         @UserId() userId: string,
         @Body() body: CreateSectionData
     ) {
-    	return this.courseService.createSection({
+    	return this.coursesService.createSection({
     		userId,
     		data: body
     	})
@@ -74,7 +74,7 @@ export default class CoursesController{
         @DataFromBody() data: CreateLectureData,
         @UploadedFiles() { files }: Files,
     ) {     
-    	return this.courseService.createLecture({
+    	return this.coursesService.createLecture({
     		userId,
     		data,
     		files

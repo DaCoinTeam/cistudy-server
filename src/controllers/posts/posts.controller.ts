@@ -11,7 +11,7 @@ import {
     UseInterceptors,
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger"
-import PostService from "./posts.service"
+import PostsService from "./posts.service"
 import { UserMySqlEntity } from "@database"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { JwtAuthGuard, AuthInterceptor, UserId, DataFromBody } from "../shared"
@@ -31,7 +31,7 @@ import { Files } from "@common"
 @ApiTags("Posts")
 @Controller("api/posts")
 export default class PostsController {
-    constructor(private readonly postService: PostService) {}
+    constructor(private readonly postsService: PostsService) {}
 
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")
@@ -47,7 +47,7 @@ export default class PostsController {
     @DataFromBody() data: CreatePostData,
     @UploadedFiles() { files }: Files,
     ) {
-        return await this.postService.createPost({ userId, data, files })
+        return await this.postsService.createPost({ userId, data, files })
     }
 
   @ApiBearerAuth()
@@ -64,7 +64,7 @@ export default class PostsController {
     @DataFromBody() data: UpdatePostData,
     @UploadedFiles() { files }: Files,
   ) {
-      return await this.postService.updatePost({ userId, data, files })
+      return await this.postsService.updatePost({ userId, data, files })
   }
 
   @ApiBearerAuth()
@@ -80,7 +80,7 @@ export default class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor<UserMySqlEntity>)
   async reactPost(@UserId() userId: string, @Body() body: ReactPostData) {
-      return this.postService.reactPost({
+      return this.postsService.reactPost({
           userId,
           data: body,
       })
@@ -100,7 +100,7 @@ export default class PostsController {
     @DataFromBody() data: CreateCommentData,
     @UploadedFiles() { files }: Files,
   ) {
-      return await this.postService.createComment({ userId, data, files })
+      return await this.postsService.createComment({ userId, data, files })
   }
 
   @ApiBearerAuth()
@@ -117,7 +117,7 @@ export default class PostsController {
     @DataFromBody() data: UpdateCommentData,
     @UploadedFiles() { files }: Files,
   ) {
-      return await this.postService.updateComment({ userId, data, files })
+      return await this.postsService.updateComment({ userId, data, files })
   }
 
   @ApiBearerAuth()
