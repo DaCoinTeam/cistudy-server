@@ -28,8 +28,8 @@ import {
 } from "./shared"
 import { Files } from "@common"
 
-@ApiTags("Post")
-@Controller("api/post")
+@ApiTags("Posts")
+@Controller("api/posts")
 export default class PostController {
     constructor(private readonly postService: PostService) {}
 

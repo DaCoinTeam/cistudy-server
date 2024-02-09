@@ -6,8 +6,8 @@ import {
 import {  ApiTags } from "@nestjs/swagger"
 import AssetService from "./asset.service"
 
-@ApiTags("Asset")
-@Controller("api/asset")
+@ApiTags("Assets")
+@Controller("api/assets")
 export default class AssetController {
     constructor(private readonly assetService: AssetService){}
   @Get("get")

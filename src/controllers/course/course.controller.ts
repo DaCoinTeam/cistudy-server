@@ -14,12 +14,12 @@ import { Files } from "@common"
 import CourseService from "./course.service"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 
-@ApiTags("Course")
+@ApiTags("Courses")
 @ApiQuery({
     name: "clientId",
     example: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
 })
-@Controller("api/course")
+@Controller("api/courses")
 export default class CourseController{
     constructor(private readonly courseService: CourseService) { }
 
