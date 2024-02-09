@@ -1,6 +1,13 @@
 import { SupabaseService } from "@global"
 import { Injectable } from "@nestjs/common"
-import { CreatePostInput, PostContentData, ReactPostInput, UpdatePostInput } from "./shared"
+import {
+    CreateCommentInput,
+    CreatePostInput,
+    ReactPostInput,
+    UpdateCommentInput,
+    UpdatePostInput,
+    IContentData,
+} from "./shared"
 import { ContentType, IndexFileAppended } from "@common"
 import {
     PostMySqlEntity,
@@ -29,9 +36,9 @@ export default class PostService {
     private readonly supabaseService: SupabaseService,
     ) {}
 
-    private appendIndexFile(
-        postContents: Array<PostContentData>,
-    ): Array<IndexFileAppended<PostContentData>> {
+    private appendIndexFile<T extends IContentData>(
+        postContents: Array<T>,
+    ): Array<IndexFileAppended<T>> {
         let indexFile = 0
         return postContents.map((postContent) => {
             if (
@@ -90,14 +97,14 @@ export default class PostService {
 
         const post: DeepPartial<PostMySqlEntity> = {
             postId,
-            title
+            title,
         }
         await this.postMySqlRepository.update(postId, post)
 
         await this.postContentsMySqlRepository.delete({
-            postId
+            postId,
         })
-        
+
         const promises: Array<Promise<void>> = []
         const appendedPostContents = this.appendIndexFile(postContents)
 
@@ -130,24 +137,97 @@ export default class PostService {
             postId,
         })
 
-        let postReactId : string
-        let isLiked: boolean
+        let postReactId: string
+        let liked: boolean
 
-        if (found === null)
-        {
+        if (found === null) {
             // do claim rewards action
         } else {
             postReactId = found.postReactId
-            isLiked = !found.isLiked
+            liked = !found.liked
         }
 
         const postReact = await this.postReactMySqlRepository.save({
             postReactId,
             userId,
             postId,
-            isLiked
+            liked,
         })
 
         return `Successfully react the post with id ${postReact.postReactId}.`
+    }
+
+    async createComment(input: CreateCommentInput) {
+        const { userId, data, files } = input
+        const { postId, postCommentContents } = data
+
+        const promises: Array<Promise<void>> = []
+        const appendedPostCommentContents =
+      this.appendIndexFile(postCommentContents)
+
+        for (const appendedPostCommentContent of appendedPostCommentContents) {
+            if (
+                appendedPostCommentContent.contentType === ContentType.Image ||
+        appendedPostCommentContent.contentType === ContentType.Video
+            ) {
+                const promise = async () => {
+                    const file = files.at(appendedPostCommentContent.indexFile)
+                    const { assetId } = await this.supabaseService.upload(file)
+                    appendedPostCommentContent.content = assetId
+                }
+                promises.push(promise())
+            }
+        }
+        await Promise.all(promises)
+
+        const postComment: DeepPartial<PostCommentMySqlEntity> = {
+            ...data,
+            userId,
+            postId,
+            postCommentContents: appendedPostCommentContents.map(
+                (appendedPostContent, index) => ({
+                    ...appendedPostContent,
+                    index,
+                }),
+            ),
+        }
+
+        const created = await this.postCommentMySqlRepository.save(postComment)
+        return `A post comment with id ${created.postCommentId} has been created successfully.`
+    }
+
+    async updateComment(input: UpdateCommentInput) {
+        const { data, files } = input
+        const { postCommentContents, postCommentId } = data
+
+        await this.postCommentMySqlRepository.update(postCommentId, {})
+
+        await this.postCommentContentMySqlRepository.delete({
+            postCommentId,
+        })
+
+        const promises: Array<Promise<void>> = []
+        const appendedPostCommentContents =
+      this.appendIndexFile(postCommentContents)
+
+        for (const appendedPostCommentContent of appendedPostCommentContents) {
+            appendedPostCommentContent.postCommentId = postCommentId
+            if (
+                appendedPostCommentContent.contentType === ContentType.Image ||
+        appendedPostCommentContent.contentType === ContentType.Video
+            ) {
+                const promise = async () => {
+                    const file = files.at(appendedPostCommentContent.indexFile)
+                    const { assetId } = await this.supabaseService.upload(file)
+                    appendedPostCommentContent.postCommentId = assetId
+                }
+                promises.push(promise())
+            }
+        }
+        await Promise.all(promises)
+
+        await this.postCommentContentMySqlRepository.save(appendedPostCommentContents)
+
+        return `A post comment with id ${postCommentId} has been updated successfully.`
     }
 }

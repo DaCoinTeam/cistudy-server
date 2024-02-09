@@ -13,7 +13,7 @@ import PostService from "./post.service"
 import { UserMySqlEntity } from "@database"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { JwtAuthGuard, AuthInterceptor, UserId, DataFromBody } from "../shared"
-import { CreatePostData, ReactPostData, UpdatePostData, createPostSchema, updatePostSchema } from "./shared"
+import { CreateCommentData, CreatePostData, ReactPostData, UpdateCommentData, UpdatePostData, createCommentSchema, createPostSchema, updateCommentSchema, updatePostSchema } from "./shared"
 import { Files } from "@common"
 
 @ApiTags("Post")
@@ -69,5 +69,39 @@ export default class PostController {
             userId,
             data: body
         })
+    }
+
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: createCommentSchema })
+    @Post("create-comment")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+      AuthInterceptor<UserMySqlEntity>,
+      FileFieldsInterceptor([{ name: "files" }]),
+    )
+  async createComment(
+      @UserId() userId: string,
+      @DataFromBody() data: CreateCommentData,
+      @UploadedFiles() { files }: Files,
+  ) {
+      return await this.postService.createComment({ userId, data, files })
+  }
+
+  @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: updateCommentSchema })
+    @Put("update-comment")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+      AuthInterceptor<UserMySqlEntity>,
+      FileFieldsInterceptor([{ name: "files" }]),
+    )
+    async updateComment(
+      @UserId() userId: string,
+      @DataFromBody() data: UpdateCommentData,
+      @UploadedFiles() { files }: Files,
+    ) {
+        return await this.postService.updateComment({ userId, data, files })
     }
 }

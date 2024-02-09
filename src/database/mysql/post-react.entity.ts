@@ -21,17 +21,17 @@ export default class PostReactEntity {
   @Column({ type: "uuid", length: 36 })
       postId: string
 
+  @Column({
+      type: "boolean",
+      default: true,
+  })
+      liked: boolean
+  
   @CreateDateColumn()
       createdAt: Date
 
   @UpdateDateColumn()
       updatedAt: Date
-
-  @Column({
-      type: "boolean",
-      default: true,
-  })
-      isLiked: boolean
 
   @ManyToOne(() => UserEntity, (user) => user.postReacts)
   @JoinColumn({ name: "userId" })

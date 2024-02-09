@@ -1,10 +1,12 @@
 import {
-	Column,
-	Entity,
-	JoinColumn,
-	ManyToOne,
-	OneToMany,
-	PrimaryGeneratedColumn,
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    CreateDateColumn,
+    UpdateDateColumn
 } from "typeorm"
 import PostEntity from "./post.entity"
 import PostCommentContentEntity from "./post-comment-content.entity"
@@ -14,46 +16,53 @@ import PostCommentLikeEntity from "./post-comment-like.entity"
 @Entity("post_comment")
 export default class PostCommentEntity {
   @PrimaryGeneratedColumn("uuid")
-  	postCommentId: string
+      postCommentId: string
 
   @Column({ type: "uuid", length: 36 })
-  	userId: string
+      userId: string
 
   @Column({ type: "uuid", length: 36 })
-  	postId: string
+      postId: string
+
+  @CreateDateColumn()
+      createdAt: Date
+
+  @UpdateDateColumn()
+      updatedAt: Date
 
   @ManyToOne(
-  	() => PostCommentEntity,
-  	(postComment) => postComment.childComments,
+      () => PostCommentEntity,
+      (postComment) => postComment.childComments,
   )
   @JoinColumn({ name: "fatherCommentId" })
   @Column({ type: "uuid", default: null, length: 36 })
-  	fatherCommentId: string
+      fatherCommentId: string
 
   @ManyToOne(() => PostEntity, (post) => post.postComments)
   @JoinColumn({ name: "postId" })
-  	post: PostEntity
+      post: PostEntity
 
   @ManyToOne(() => UserEntity, (user) => user.postComments)
   @JoinColumn({ name: "userId" })
-  	user: UserEntity
+      user: UserEntity
 
   @OneToMany(
-  	() => PostCommentContentEntity,
-  	(postCommentContent) => postCommentContent.postComment,
-  	{ cascade: true },
+      () => PostCommentContentEntity,
+      (postCommentContent) => postCommentContent.postComment,
+      { cascade: true },
   )
-  	postCommentContents: Partial<PostCommentContentEntity>[]
+      postCommentContents: Partial<PostCommentContentEntity>[]
 
   @OneToMany(
-  	() => PostCommentLikeEntity,
-  	(postCommentLike) => postCommentLike.postComment,
+      () => PostCommentLikeEntity,
+      (postCommentLike) => postCommentLike.postComment,
   )
-  	postCommentLikes: PostCommentLikeEntity[]
+      postCommentLikes: PostCommentLikeEntity[]
 
   @OneToMany(
-  	() => PostCommentEntity,
-  	(postComment) => postComment.fatherCommentId, { cascade: true }
+      () => PostCommentEntity,
+      (postComment) => postComment.fatherCommentId,
+      { cascade: true },
   )
-  	childComments: PostCommentEntity[]
+      childComments: PostCommentEntity[]
 }

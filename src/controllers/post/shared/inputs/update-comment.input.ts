@@ -1,24 +1,21 @@
 import { IAuthInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID } from "class-validator"
-import { PostContentData } from "./shared"
+import { PostCommentContentData } from "./shared"
 
-export class CreatePostData {
-  @ApiProperty()
-      title: string
-
+export class UpdateCommentData {
   @IsUUID("4")
   @ApiProperty()
-      courseId: string
+      postCommentId: string
 
   @ApiProperty({ nullable: true })
-      postContents?: Array<PostContentData>
+      postCommentContents?: Array<PostCommentContentData>
 }
 
-export class CreatePostInput implements IAuthInput<CreatePostData> {
+export class UpdateCommentInput implements IAuthInput<UpdateCommentData> {
   @IsUUID("4")
   @ApiProperty()
       userId: string
-  data: CreatePostData
+  data: UpdateCommentData
   files: Array<Express.Multer.File>
 }
