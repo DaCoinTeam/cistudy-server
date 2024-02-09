@@ -1,6 +1,7 @@
 import {
     Controller,
     Post,
+    Put,
     UploadedFiles,
     UseGuards,
     UseInterceptors,
@@ -10,7 +11,7 @@ import PostService from "./post.service"
 import { UserMySqlEntity } from "@database"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { JwtAuthGuard, AuthInterceptor, UserId, DataFromBody } from "../shared"
-import { CreatePostData, createPostSchema } from "./shared"
+import { CreatePostData, UpdatePostData, createPostSchema, updatePostSchema } from "./shared"
 import { Files } from "@common"
 
 @ApiTags("Post")
@@ -34,4 +35,21 @@ export default class PostController {
     ) {
         return await this.postService.createPost({ userId, data, files })
     }
+
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: updatePostSchema })
+    @Put("update-post")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+      AuthInterceptor<UserMySqlEntity>,
+      FileFieldsInterceptor([{ name: "files" }]),
+    )
+  async updatePost(
+      @UserId() userId: string,
+      @DataFromBody() data: UpdatePostData,
+      @UploadedFiles() { files }: Files,
+  ) {
+      return await this.postService.updatePost({ userId, data, files })
+  }
 }

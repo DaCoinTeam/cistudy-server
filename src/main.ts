@@ -36,10 +36,10 @@ async function bootstrap() {
     app.enableCors()
 
     const config = new DocumentBuilder()
-        .setTitle("CiStudy API Gateway")
-        .setDescription("...")
+        .setTitle("CiStudy Server")
+        .setDescription("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhN2JiNTU4Zi04YTBjLTQzMGEtYTc0MS05ODZhNTBhZTE0NzMiLCJ0eXBlIjoiUmVmcmVzaCIsImlhdCI6MTcwNzQ2MjUxNSwiZXhwIjoxNzEwMDU0NTE1fQ.SsZFDKCHjn7i06L_j5WSkTEdGUu0tQ0txYyyl3l5oCc")
         .setVersion("1.0")
-        .addBearerAuth()
+        .addBearerAuth()    
         .build()
     const document = SwaggerModule.createDocument(app, config)
 

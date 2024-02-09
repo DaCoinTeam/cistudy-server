@@ -17,7 +17,6 @@ import {
     PostCommentLikeMySqlEntity,
 } from "@database"
 import PostService from "./post.service"
-import { JwtStrategy } from "../shared"
 
 @Module({
     imports: [
@@ -38,6 +37,6 @@ import { JwtStrategy } from "../shared"
         ]),
     ],
     controllers: [PostController],
-    providers: [PostService, JwtStrategy],
+    providers: [PostService],
 })
 export default class PostModule {}

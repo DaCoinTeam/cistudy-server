@@ -1,6 +1,6 @@
 import { SupabaseService } from "@global"
 import { Injectable } from "@nestjs/common"
-import { CreatePostInput, PostContentData } from "./shared"
+import { CreatePostInput, PostContentData, UpdatePostInput } from "./shared"
 import { ContentType, IndexFileAppended } from "@common"
 import {
     PostMySqlEntity,
@@ -53,7 +53,7 @@ export default class PostService {
         const { data, files, userId } = input
         const { postContents } = data
 
-        const promises: Promise<void>[] = []
+        const promises: Array<Promise<void>> = []
         const appendedPostContents = this.appendIndexFile(postContents)
 
         for (const appendedPostContent of appendedPostContents) {
@@ -62,7 +62,7 @@ export default class PostService {
         appendedPostContent.contentType === ContentType.Video
             ) {
                 const promise = async () => {
-                    const file = files[appendedPostContent.indexFile]
+                    const file = files.at(appendedPostContent.indexFile)
                     const { assetId } = await this.supabaseService.upload(file)
                     appendedPostContent.content = assetId
                 }
@@ -79,8 +79,46 @@ export default class PostService {
                 index,
             })),
         }
-        console.log(post)
+
         const created = await this.postMySqlRepository.save(post)
         return `A post with id ${created.postId} has been created successfully.`
+    }
+
+    async updatePost(input: UpdatePostInput): Promise<string> {
+        const { data, files } = input
+        const { postContents, postId, title } = data
+
+        const post: DeepPartial<PostMySqlEntity> = {
+            postId,
+            title
+        }
+        await this.postMySqlRepository.update(postId, post)
+
+        await this.postContentsMySqlRepository.delete({
+            postId
+        })
+        
+        const promises: Array<Promise<void>> = []
+        const appendedPostContents = this.appendIndexFile(postContents)
+
+        for (const appendedPostContent of appendedPostContents) {
+            appendedPostContent.postId = postId
+            if (
+                appendedPostContent.contentType === ContentType.Image ||
+        appendedPostContent.contentType === ContentType.Video
+            ) {
+                const promise = async () => {
+                    const file = files.at(appendedPostContent.indexFile)
+                    const { assetId } = await this.supabaseService.upload(file)
+                    appendedPostContent.content = assetId
+                }
+                promises.push(promise())
+            }
+        }
+        await Promise.all(promises)
+
+        await this.postContentsMySqlRepository.save(appendedPostContents)
+        
+        return `A post with id ${postId} has been updated successfully.`
     }
 }
