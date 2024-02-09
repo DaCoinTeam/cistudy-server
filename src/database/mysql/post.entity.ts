@@ -39,9 +39,9 @@ export default class PostEntity {
     	createdAt: Date
 
 	@Field(() => Date)
-    @UpdateDateColumn({ nullable: true })
+    @UpdateDateColumn()
     	updatedAt: Date
-		
+
     @ManyToOne(() => CourseEntity, (course) => course.posts)
     @JoinColumn({ name: "courseId" })
     	course: CourseEntity
