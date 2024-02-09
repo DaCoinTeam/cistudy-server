@@ -1,6 +1,6 @@
 import { SupabaseService } from "@global"
 import { Injectable } from "@nestjs/common"
-import { CreatePostInput, PostContentData, UpdatePostInput } from "./shared"
+import { CreatePostInput, PostContentData, ReactPostInput, UpdatePostInput } from "./shared"
 import { ContentType, IndexFileAppended } from "@common"
 import {
     PostMySqlEntity,
@@ -118,7 +118,36 @@ export default class PostService {
         await Promise.all(promises)
 
         await this.postContentsMySqlRepository.save(appendedPostContents)
-        
+
         return `A post with id ${postId} has been updated successfully.`
+    }
+
+    async reactPost(input: ReactPostInput) {
+        const { userId, data } = input
+        const { postId } = data
+        const found = await this.postLikeMySqlRepository.findOneBy({
+            userId,
+            postId,
+        })
+
+        let postLikeId : string
+        let isDeleted = false
+
+        if (found === null)
+        {
+            // do claim rewards action
+        } else {
+            postLikeId = found.postLikeId
+            isDeleted = !found.isDeleted
+        }
+
+        const postLike = await this.postLikeMySqlRepository.save({
+            postLikeId,
+            userId,
+            postId,
+            isDeleted
+        })
+
+        return `Successfully react the post with id ${postLike.postLikeId}.`
     }
 }

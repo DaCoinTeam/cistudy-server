@@ -1,5 +1,7 @@
 import {
+    Body,
     Controller,
+    Patch,
     Post,
     Put,
     UploadedFiles,
@@ -11,7 +13,7 @@ import PostService from "./post.service"
 import { UserMySqlEntity } from "@database"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { JwtAuthGuard, AuthInterceptor, UserId, DataFromBody } from "../shared"
-import { CreatePostData, UpdatePostData, createPostSchema, updatePostSchema } from "./shared"
+import { CreatePostData, ReactPostData, UpdatePostData, createPostSchema, updatePostSchema } from "./shared"
 import { Files } from "@common"
 
 @ApiTags("Post")
@@ -52,4 +54,20 @@ export default class PostController {
   ) {
       return await this.postService.updatePost({ userId, data, files })
   }
+
+  @ApiBearerAuth()
+  @Patch("react-post")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+      AuthInterceptor<UserMySqlEntity>,
+  )
+    async reactPost(
+      @UserId() userId: string,
+      @Body() body: ReactPostData
+    ) {
+        return this.postService.reactPost({
+            userId,
+            data: body
+        })
+    }
 }
