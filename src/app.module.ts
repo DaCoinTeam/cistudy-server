@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common"
+import { Module, ValidationPipe } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { appConfig, databaseConfig, jwtConfig, servicesConfig } from "./config"
 import { ConfigModule } from "@nestjs/config"
@@ -10,6 +10,7 @@ import { GraphQLModule } from "@nestjs/graphql"
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo"
 import { BullModule } from "@nestjs/bull"
 import WorkersModule from "./workers/workers.module"
+import { APP_PIPE } from "@nestjs/core"
 
 @Module({
     imports: [
@@ -57,6 +58,11 @@ import WorkersModule from "./workers/workers.module"
 
 
     controllers: [],
-    providers: [],
+    providers: [
+        {
+            provide: APP_PIPE,
+            useClass: ValidationPipe
+        }
+    ],
 })
 export default class AppModule { }
