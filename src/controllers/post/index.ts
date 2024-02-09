@@ -1,3 +1,3 @@
-import AssetModule from "./post.module"
+import PostModule from "./post.module"
 
-export { AssetModule }
+export { PostModule }

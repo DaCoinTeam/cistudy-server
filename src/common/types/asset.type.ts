@@ -34,3 +34,5 @@ export type FileAndSubdirectory = {
 export type Files = {
   files: Array<Express.Multer.File>;
 };
+
+export type IndexFileAppended<T extends object> = T & { indexFile?: number }

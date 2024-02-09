@@ -1,1 +1,2 @@
-export * from "./get.input"
+export * from "./create-post.input"
+export * from "./shared"

@@ -1,12 +1,12 @@
 import {
-	Column,
-	CreateDateColumn,
-	Entity,
-	JoinColumn,
-	ManyToOne,
-	OneToMany,
-	PrimaryGeneratedColumn,
-	UpdateDateColumn,
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from "typeorm"
 import CourseEntity from "./course.entity"
 import PostCommentEntity from "./post-comment.entity"
@@ -34,13 +34,14 @@ export default class PostEntity {
     @Column({ type: "uuid", length: 36 })
     	courseId: string
 
-    @Field(() => String)
+    @Field(() => Date)
     @CreateDateColumn()
     	createdAt: Date
 
+	@Field(() => Date)
     @UpdateDateColumn({ nullable: true })
     	updatedAt: Date
-
+		
     @ManyToOne(() => CourseEntity, (course) => course.posts)
     @JoinColumn({ name: "courseId" })
     	course: CourseEntity

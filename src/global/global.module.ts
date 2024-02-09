@@ -23,9 +23,9 @@ import {
     FirebaseService,
     MailerService,
     Sha256Service,
+    ShellService,
     SupabaseService
 } from "./services"
-import ShellService from "./services/shell.service"
 
 @Global()
 @Module({

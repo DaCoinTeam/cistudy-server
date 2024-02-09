@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common"
-import AssetController from "./post.controller"
+import PostController from "./post.controller"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     SessionMySqlEntity,
@@ -16,7 +16,8 @@ import {
     PostLikeMySqlEntity,
     PostCommentLikeMySqlEntity,
 } from "@database"
-import AssetService from "./post.service"
+import PostService from "./post.service"
+import { JwtStrategy } from "../shared"
 
 @Module({
     imports: [
@@ -36,7 +37,7 @@ import AssetService from "./post.service"
             PostCommentLikeMySqlEntity,
         ]),
     ],
-    controllers: [AssetController],
-    providers: [AssetService],
+    controllers: [PostController],
+    providers: [PostService, JwtStrategy],
 })
-export default class AssetModule {}
+export default class PostModule {}
