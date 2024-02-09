@@ -7,7 +7,7 @@ import { CreateCourseInput, CreateSectionInput, CreateLectureInput } from "./sha
 import { ProcessMpegDashProducer } from "@workers"
 
 @Injectable()
-export default class CourseService {
+export default class CoursesService {
     constructor(
 		@InjectRepository(CourseMySqlEntity)
 		private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,

@@ -20,7 +20,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DeepPartial } from "typeorm"
 
 @Injectable()
-export default class PostService {
+export default class PostsService {
     constructor(
     @InjectRepository(PostMySqlEntity)
     private readonly postMySqlRepository: Repository<PostMySqlEntity>,

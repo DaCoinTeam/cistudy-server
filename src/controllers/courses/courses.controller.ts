@@ -11,7 +11,7 @@ import { CreateCourseData, createCourseSchema, CreateLectureData, createLectureS
 import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import { UserMySqlEntity } from "@database"
 import { Files } from "@common"
-import CourseService from "./course.service"
+import CourseService from "./courses.service"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 
 @ApiTags("Courses")
@@ -20,7 +20,7 @@ import { FileFieldsInterceptor } from "@nestjs/platform-express"
     example: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
 })
 @Controller("api/courses")
-export default class CourseController{
+export default class CoursesController{
     constructor(private readonly courseService: CourseService) { }
 
     @ApiBearerAuth()

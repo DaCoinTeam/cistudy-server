@@ -11,7 +11,7 @@ import {
     UseInterceptors,
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger"
-import PostService from "./post.service"
+import PostService from "./posts.service"
 import { UserMySqlEntity } from "@database"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { JwtAuthGuard, AuthInterceptor, UserId, DataFromBody } from "../shared"
@@ -30,7 +30,7 @@ import { Files } from "@common"
 
 @ApiTags("Posts")
 @Controller("api/posts")
-export default class PostController {
+export default class PostsController {
     constructor(private readonly postService: PostService) {}
 
   @ApiBearerAuth()

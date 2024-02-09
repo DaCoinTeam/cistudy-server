@@ -1,17 +1,17 @@
 import { Module } from "@nestjs/common"
 
 import { AuthModule } from "./auth"
-import { CourseModule } from "./course"
-import { AssetModule } from "./asset"
-import { PostModule } from "./post"
+import { CoursesModule } from "./courses"
+import { AssetsModule } from "./assets"
+import { PostsModule } from "./posts"
 import { JwtStrategy } from "./shared"
 
 @Module({
     imports: [
-        AssetModule,
+        AssetsModule,
         AuthModule,
-        CourseModule,
-        PostModule
+        CoursesModule,
+        PostsModule
     ],
     providers: [
         JwtStrategy
