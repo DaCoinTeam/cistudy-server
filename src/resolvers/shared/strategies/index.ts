@@ -1,2 +1,1 @@
-import JwtStrategy from "./jwt.strategy"
-export { JwtStrategy }
+export * from "./jwt.strategy"

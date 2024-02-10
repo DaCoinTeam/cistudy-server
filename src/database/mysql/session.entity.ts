@@ -6,10 +6,10 @@ import {
     PrimaryGeneratedColumn,
 } from "typeorm"
 
-import UserEntity from "./user.entity"
+import { UserEntity } from "./user.entity"
 
 @Entity("session")
-export default class SessionEntity {
+export class SessionEntity {
   @PrimaryGeneratedColumn("uuid")
   	sessionId: string
 

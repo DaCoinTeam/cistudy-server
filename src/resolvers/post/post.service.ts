@@ -5,7 +5,7 @@ import { Repository } from "typeorm"
 import { FindManyPostsInput, FindOnePostInput } from "./shared"
 
 @Injectable()
-export default class PostsService {
+export class PostsService {
 	constructor(
     @InjectRepository(PostMySqlEntity)
     private readonly postMySqlRepository: Repository<PostMySqlEntity>,

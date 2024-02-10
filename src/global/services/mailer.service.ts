@@ -5,7 +5,7 @@ import { TokenType } from "@common"
 import { JwtService } from "@nestjs/jwt"
 
 @Injectable()
-export default class MailerService {
+export class MailerService {
     constructor(private readonly jwtService: JwtService) {}
 
     private transporter = createTransport({

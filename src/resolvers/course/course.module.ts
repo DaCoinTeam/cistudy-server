@@ -1,22 +1,22 @@
 import { Module } from "@nestjs/common"
 import {
     CourseMySqlEntity,
-    EnrolledInfoEntity,
+    EnrolledInfoMySqlEntity,
     SectionMySqlEntity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
     UserMySqlEntity,
     SessionMySqlEntity,
 } from "@database"
-import CourseResolvers from "./course.resolvers"
+import { CourseResolvers } from "./course.resolvers"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import CoursesService from "./course.service"
+import { CoursesService } from "./course.service"
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
             CourseMySqlEntity,
-            EnrolledInfoEntity,
+            EnrolledInfoMySqlEntity,
             SectionMySqlEntity,
             LectureMySqlEntity,
             ResourceMySqlEntity,
@@ -26,4 +26,4 @@ import CoursesService from "./course.service"
     ],
     providers: [CourseResolvers, CoursesService],
 })
-export default class CourseModule {}
+export class CourseModule {}

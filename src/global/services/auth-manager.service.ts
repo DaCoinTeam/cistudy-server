@@ -7,7 +7,7 @@ import { Payload, AuthTokens, UserRole, AuthTokenType, IOutput } from "@common"
 import { Repository } from "typeorm"
 
 @Injectable()
-export default class AuthManagerService {
+export class AuthManagerService {
     constructor(
     private readonly jwtService: JwtService,
     @InjectRepository(SessionMySqlEntity)

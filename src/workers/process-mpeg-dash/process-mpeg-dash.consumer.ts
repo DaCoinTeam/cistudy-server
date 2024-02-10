@@ -1,11 +1,11 @@
 import { Job } from "bull"
 import { OnQueueError, Process, Processor } from "@nestjs/bull"
 import { Metadata } from "@common"
-import ProcessMpegDashService from "./process-mpeg-dash.service"
+import { ProcessMpegDashService } from "./process-mpeg-dash.service"
 import { QUEUE_NAME } from "./process-mpeg-dash.constants"
 
 @Processor(QUEUE_NAME)
-export default class ProcessMpegDashConsumer {
+export class ProcessMpegDashConsumer {
     constructor(
     private readonly processMpegDashService: ProcessMpegDashService,
     ) {}

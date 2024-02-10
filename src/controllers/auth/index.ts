@@ -1,3 +1,1 @@
-import AuthModule from "./auth.module"
-
-export { AuthModule }
+export * from "./auth.module"

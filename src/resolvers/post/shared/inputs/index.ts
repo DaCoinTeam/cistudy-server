@@ -1,4 +1,2 @@
-import FindOnePostInput from "./find-one-post"
-import FindManyPostsInput from "./find-many-posts.input"
-
-export { FindManyPostsInput, FindOnePostInput}
+export *  from "./find-one-post"
+export * from "./find-many-posts.input"

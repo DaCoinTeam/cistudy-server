@@ -7,7 +7,7 @@ import { InitInput, SignInInput, SignUpInput, VerifyGoogleAccessTokenInput } fro
 import {  UserKind } from "@common"
 
 @Injectable()
-export default class AuthService {
+export class AuthService {
     constructor(
     @InjectRepository(UserMySqlEntity)
     private readonly userMySqlRepository: Repository<UserMySqlEntity>,

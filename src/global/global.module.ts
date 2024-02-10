@@ -2,7 +2,7 @@ import { Global, Module } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
 import {
     CourseMySqlEntity,
-    EnrolledInfoEntity,
+    EnrolledInfoMySqlEntity,
     LectureMySqlEntity,
     PostCommentContentMySqlEntity,
     PostCommentLikeMySqlEntity,
@@ -36,7 +36,7 @@ import {
             PostCommentMySqlEntity,
             PostMySqlEntity,
             CourseMySqlEntity,
-            EnrolledInfoEntity,
+            EnrolledInfoMySqlEntity,
             SectionMySqlEntity,
             LectureMySqlEntity,
             ResourceMySqlEntity,
@@ -70,4 +70,4 @@ import {
         SupabaseService,
     ],
 })
-export default class GlobalModule { }
+export class GlobalModule { }

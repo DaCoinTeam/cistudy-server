@@ -6,7 +6,7 @@ import { Auth } from "firebase-admin/lib/auth/auth"
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier"
 
 @Injectable()
-export default class FirebaseService {
+export class FirebaseService {
     auth: Auth
     constructor() {
         const adminConfig: ServiceAccount = {

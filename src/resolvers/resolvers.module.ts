@@ -5,4 +5,4 @@ import { PostModule } from "./post"
 @Module({
 	imports: [CourseModule, PostModule],
 })
-export default class ResolversModule {}
+export class ResolversModule {}

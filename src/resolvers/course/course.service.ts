@@ -5,7 +5,7 @@ import { Repository } from "typeorm"
 import { FindOneCourseInput, FindManyCoursesInput } from "./shared"
 
 @Injectable()
-export default class CoursesService {
+export class CoursesService {
     constructor(
     @InjectRepository(CourseMySqlEntity)
     private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,

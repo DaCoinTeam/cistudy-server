@@ -9,7 +9,7 @@ import { validate as validateUuidv4 } from "uuid"
 const MANIFEST_FILE_NAME = "manifest.mpd"
 
 @Injectable()
-export default class ProcessMpegDashService {
+export class ProcessMpegDashService {
     private readonly logger = new Logger(ProcessMpegDashService.name)
     constructor(
     private readonly supabaseService: SupabaseService,

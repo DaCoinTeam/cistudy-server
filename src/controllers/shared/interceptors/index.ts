@@ -1,4 +1,2 @@
-import AuthInterceptor from "./auth.interceptor"
-import GenerateAuthTokensInterceptor from "./generate-auth-tokens.interceptor"
-
-export { AuthInterceptor, GenerateAuthTokensInterceptor }
+export * from "./auth.interceptor"
+export * from "./generate-auth-tokens.interceptor"

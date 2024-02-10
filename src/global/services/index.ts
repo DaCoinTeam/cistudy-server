@@ -1,19 +1,8 @@
-import AuthManagerService from "./auth-manager.service"
-import Bento4Service from "./bento4.service"
-import FfmpegService from "./ffmpeg.service"
-import FirebaseService from "./firebase.service"
-import MailerService from "./mailer.service"
-import Sha256Service from "./sha256.service"
-import ShellService from "./shell.service"
-import SupabaseService from "./supabase.service"
-
-export {
-    AuthManagerService,
-    Bento4Service,
-    FfmpegService,
-    FirebaseService,
-    MailerService,
-    Sha256Service,
-    ShellService,
-    SupabaseService
-}
+export * from "./auth-manager.service"
+export *  from "./bento4.service"
+export *  from "./ffmpeg.service"
+export *  from "./firebase.service"
+export *  from "./mailer.service"
+export *  from "./sha256.service"
+export *  from "./shell.service"
+export * from "./supabase.service"

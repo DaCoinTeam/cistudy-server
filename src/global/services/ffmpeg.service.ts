@@ -4,7 +4,7 @@ import { join } from "path"
 import { pathsConfig, videoConfig } from "@config"
 
 @Injectable()
-export default class FfmpegService {
+export class FfmpegService {
     private encodeVideo(profile: EncodeProfile) {
         return new Promise((resolve, reject) => {
             ffmpeg(profile.inputPath)

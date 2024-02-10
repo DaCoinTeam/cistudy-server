@@ -1,16 +1,16 @@
 import {
-	Column,
-	Entity,
-	JoinColumn,
-	ManyToOne,
-	OneToMany,
-	PrimaryGeneratedColumn,
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
 } from "typeorm"
-import SectionEntity from "./section.entity"
-import ResourceEntity from "./resource.entity"
+import { SectionEntity } from "./section.entity"
+import { ResourceEntity } from "./resource.entity"
 
 @Entity("lecture")
-export default class LectureEntity {
+export class LectureEntity {
     @PrimaryGeneratedColumn("uuid")
     	lectureId: string
 

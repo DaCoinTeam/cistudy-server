@@ -3,13 +3,13 @@ import { TypeOrmModule } from "@nestjs/typeorm"
 import { appConfig, databaseConfig, jwtConfig, servicesConfig } from "./config"
 import { ConfigModule } from "@nestjs/config"
 import { GlobalModule } from "@global"
-import ControllersModule from "./controllers/controllers.module"
+import { ControllersModule } from "@controllers"
 import { ResolversModule } from "./resolvers"
 import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default"
 import { GraphQLModule } from "@nestjs/graphql"
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo"
 import { BullModule } from "@nestjs/bull"
-import WorkersModule from "./workers/workers.module"
+import { WorkersModule } from "./workers/workers.module"
 import { APP_PIPE } from "@nestjs/core"
 
 @Module({
@@ -17,21 +17,16 @@ import { APP_PIPE } from "@nestjs/core"
         ConfigModule.forRoot({
             isGlobal: true,
             expandVariables: true,
-            load: [
-                databaseConfig,
-                jwtConfig,
-                servicesConfig, 
-                appConfig
-            ]
+            load: [databaseConfig, jwtConfig, servicesConfig, appConfig],
         }),
 
         BullModule.forRoot({
             redis: {
                 host: databaseConfig().redis.host,
-                port: databaseConfig().redis.port
-            }
+                port: databaseConfig().redis.port,
+            },
         }),
-    
+
         TypeOrmModule.forRoot({
             type: "mysql",
             host: databaseConfig().mysql.host,
@@ -53,16 +48,15 @@ import { APP_PIPE } from "@nestjs/core"
         ResolversModule,
         GlobalModule,
         ControllersModule,
-        WorkersModule
+        WorkersModule,
     ],
-
 
     controllers: [],
     providers: [
         {
             provide: APP_PIPE,
-            useClass: ValidationPipe
-        }
+            useClass: ValidationPipe,
+        },
     ],
 })
-export default class AppModule { }
+export class AppModule {}

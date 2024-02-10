@@ -10,8 +10,8 @@ import {
     UseGuards,
     UseInterceptors,
 } from "@nestjs/common"
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger"
-import PostsService from "./posts.service"
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery, ApiTags } from "@nestjs/swagger"
+import { PostsService } from "./posts.service"
 import { UserMySqlEntity } from "@database"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { JwtAuthGuard, AuthInterceptor, UserId, DataFromBody } from "../shared"
@@ -29,8 +29,12 @@ import {
 import { Files } from "@common"
 
 @ApiTags("Posts")
+@ApiQuery({
+    name: "clientId",
+    example: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
+})
 @Controller("api/posts")
-export default class PostsController {
+export class PostsController {
     constructor(private readonly postsService: PostsService) {}
 
   @ApiBearerAuth()

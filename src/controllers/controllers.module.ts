@@ -17,4 +17,4 @@ import { JwtStrategy } from "./shared"
         JwtStrategy
     ]
 })
-export default class ControllersModule {}
+export class ControllersModule {}

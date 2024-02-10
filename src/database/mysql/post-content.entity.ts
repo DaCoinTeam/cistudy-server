@@ -6,13 +6,13 @@ import {
     PrimaryGeneratedColumn,
 } from "typeorm"
 
-import PostEntity from "./post.entity"
+import { PostEntity } from "./post.entity"
 import { ContentType } from "@common"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
 @Entity("post_content")
-export default class PostContentEntity {
+export class PostContentEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn("uuid")
   	postContentId: string

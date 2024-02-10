@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToMany } from "typeorm"
-import CourseEntity from "./course.entity"
+import { CourseEntity } from "./course.entity"
 
 @Entity()
 export class TopicEntity {

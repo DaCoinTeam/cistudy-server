@@ -4,4 +4,4 @@ import { ProcessMpegDashModule } from "./process-mpeg-dash"
 @Module({
     imports: [ProcessMpegDashModule],
 })
-export default class WorkersModule {}
+export class WorkersModule {}

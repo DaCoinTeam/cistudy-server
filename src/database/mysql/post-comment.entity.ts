@@ -8,13 +8,13 @@ import {
     CreateDateColumn,
     UpdateDateColumn
 } from "typeorm"
-import PostEntity from "./post.entity"
-import PostCommentContentEntity from "./post-comment-content.entity"
-import UserEntity from "./user.entity"
-import PostCommentLikeEntity from "./post-comment-like.entity"
+import { PostEntity } from "./post.entity"
+import { PostCommentContentEntity } from "./post-comment-content.entity"
+import { UserEntity } from "./user.entity"
+import { PostCommentLikeEntity } from "./post-comment-like.entity"
 
 @Entity("post_comment")
-export default class PostCommentEntity {
+export class PostCommentEntity {
   @PrimaryGeneratedColumn("uuid")
       postCommentId: string
 

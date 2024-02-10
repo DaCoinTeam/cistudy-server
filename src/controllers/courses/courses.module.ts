@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common"
-import CoursesController from "./courses.controller"
+import { CoursesController } from "./courses.controller"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     SessionMySqlEntity,
@@ -16,7 +16,7 @@ import {
     PostReactMySqlEntity,
     PostCommentLikeMySqlEntity,
 } from "@database"
-import CoursesService from "./courses.service"
+import { CoursesService } from "./courses.service"
 
 @Module({
     imports: [
@@ -39,4 +39,4 @@ import CoursesService from "./courses.service"
     controllers: [CoursesController],
     providers: [CoursesService],
 })
-export default class CourseModule {}
+export class CoursesModule {}

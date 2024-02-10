@@ -5,10 +5,10 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
 } from "typeorm"
-import LectureEntity from "./lecture.entity"
+import { LectureEntity } from "./lecture.entity"
 
 @Entity("resource")
-export default class ResourceEntity {
+export class ResourceEntity {
   @PrimaryGeneratedColumn("uuid")
   	resourceId: string
 

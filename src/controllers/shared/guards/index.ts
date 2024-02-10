@@ -1,2 +1,1 @@
-import JwtAuthGuard from "./jwt.guard"
-export { JwtAuthGuard }
+export * from "./jwt.guard"

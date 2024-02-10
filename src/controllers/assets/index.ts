@@ -1,3 +1,1 @@
-import AssetsModule from "./assets.module"
-
-export { AssetsModule }
+export * from "./assets.module"

@@ -3,7 +3,7 @@ import { getEnvValue } from "@utils"
 import { exec } from "child_process"
 
 @Injectable()
-export default class ShellService {
+export class ShellService {
     async execute(command: string): Promise<string> {
         return new Promise((resolve, reject) => {
             exec(

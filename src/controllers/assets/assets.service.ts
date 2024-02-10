@@ -5,7 +5,7 @@ import { extname } from "path"
 import { GetInput } from "./shared"
 
 @Injectable()
-export default class AssetsService {
+export class AssetsService {
     constructor(private readonly supabaseService: SupabaseService) {}
 
     async get(input: GetInput): Promise<StreamableFile> {

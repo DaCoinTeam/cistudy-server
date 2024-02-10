@@ -7,11 +7,11 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
 } from "typeorm"
-import UserEntity from "./user.entity"
-import PostEntity from "./post.entity"
+import { UserEntity } from "./user.entity"
+import { PostEntity } from "./post.entity"
 
 @Entity("post_react")
-export default class PostReactEntity {
+export class PostReactEntity {
   @PrimaryGeneratedColumn("uuid")
       postReactId: string
 

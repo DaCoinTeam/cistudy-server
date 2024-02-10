@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
-import UserEntity from "./user.entity"
-import PostCommentEntity from "./post-comment.entity"
+import { UserEntity } from "./user.entity"
+import { PostCommentEntity } from "./post-comment.entity"
 
 @Entity("post_comment_like")
-export default class PostCommentLikeEntity {
+export class PostCommentLikeEntity {
   @PrimaryGeneratedColumn("uuid")
   	postCommentLikeId: string
 

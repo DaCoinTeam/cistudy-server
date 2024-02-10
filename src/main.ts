@@ -1,5 +1,5 @@
 import { NestFactory } from "@nestjs/core"
-import AppModule from "./app.module"
+import { AppModule } from "./app.module"
 import appConfig from "./config/env/app.config"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 import { CourseResolvers, PostResolvers } from "@resolvers"

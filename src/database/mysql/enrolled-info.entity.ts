@@ -1,15 +1,15 @@
 import {
-	Column,
-	Entity,
-	JoinColumn,
-	ManyToOne,
-	PrimaryGeneratedColumn,
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
 } from "typeorm"
-import UserEntity from "./user.entity"
-import CourseEntity from "./course.entity"
+import { UserEntity } from "./user.entity"
+import { CourseEntity } from "./course.entity"
 
 @Entity("enrolled_info")
-export default class EnrolledInfoEntity {
+export class EnrolledInfoEntity {
   @PrimaryGeneratedColumn("uuid")
   	enrolledId: string
 

@@ -1,16 +1,16 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
 import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
 import { UserKind, UserRole } from "@common"
-import SessionEntity from "./session.entity"
-import PostCommentEntity from "./post-comment.entity"
-import PostReactEntity from "./post-react.entity"
-import EnrolledEntity from "./enrolled-info.entity"
-import PostEntity from "./post.entity"
-import CourseEntity from "./course.entity"
+import { SessionEntity } from "./session.entity"
+import { PostCommentEntity } from "./post-comment.entity"
+import { PostReactEntity } from "./post-react.entity"
+import { EnrolledInfoEntity } from "./enrolled-info.entity"
+import { PostEntity } from "./post.entity"
+import { CourseEntity } from "./course.entity"
 
 @ObjectType()
 @Entity("user")
-export default class UserEntity {
+export class UserEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn("uuid")
   	userId: string
@@ -92,8 +92,8 @@ export default class UserEntity {
   @OneToMany(() => PostReactEntity, (postReact) => postReact.user)
   	postReacts: PostReactEntity[]
 
-  @OneToMany(() => EnrolledEntity, (enrolled) => enrolled.user)
-  	enrolledInfos: EnrolledEntity[]
+  @OneToMany(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.user)
+  	enrolledInfos: EnrolledInfoEntity[]
 
   @OneToMany(() => PostEntity, (post) => post.creator)
   	posts: PostEntity[]

@@ -1,15 +1,15 @@
 import {
-	Column,
-	Entity,
-	JoinColumn,
-	ManyToOne,
-	PrimaryGeneratedColumn,
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
 } from "typeorm"
-import PostCommentEntity from "./post-comment.entity"
+import { PostCommentEntity } from "./post-comment.entity"
 import { ContentType } from "@common"
 
 @Entity("post_comment_content")
-export default class PostCommentContentEntity {
+export class PostCommentContentEntity {
   @PrimaryGeneratedColumn("uuid")
   	postCommentContentId: string
 

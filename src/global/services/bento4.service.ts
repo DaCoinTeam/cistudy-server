@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common"
 import { join } from "path"
 import { pathsConfig } from "@config"
-import ShellService from "./shell.service"
+import { ShellService } from "./shell.service"
 
 @Injectable()
-export default class Bento4Service {
+export class Bento4Service {
     constructor(private readonly shellService: ShellService) {}
 
     async checkFragments(assetId: string, videoName: string) {

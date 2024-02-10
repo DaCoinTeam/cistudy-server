@@ -9,7 +9,7 @@ import {
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger"
 import { SignInData, SignUpData, } from "./shared"
-import AuthService from "./auth.service"
+import { AuthService } from "./auth.service"
 import {
     UserId,
     AuthInterceptor,
@@ -24,7 +24,7 @@ import { UserMySqlEntity } from "@database"
     example: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
 })
 @Controller("api/auth")
-export default class AuthController {
+export class AuthController {
     constructor(private readonly authService: AuthService){}
   @Post("sign-in")
   @UseInterceptors(GenerateAuthTokensInterceptor<UserMySqlEntity>)

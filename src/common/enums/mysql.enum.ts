@@ -7,7 +7,7 @@ export enum UserKind {
 }
 
 registerEnumType(UserKind, {
-	name: "UserKind",
+    name: "UserKind",
 })
 
 export enum UserRole {
@@ -17,7 +17,7 @@ export enum UserRole {
 }
 
 registerEnumType(UserRole, {
-	name: "UserRole",
+    name: "UserRole",
 })
 
 
@@ -28,7 +28,7 @@ export enum VerifiedStatus {
   }
   
 registerEnumType(VerifiedStatus, {
-	name: "VerifiedStatus",
+    name: "VerifiedStatus",
 })
   
 export enum ContentType {
@@ -41,6 +41,6 @@ export enum ContentType {
   }
   
 registerEnumType(ContentType, {
-	name: "ContentType",
+    name: "ContentType",
 })
   

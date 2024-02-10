@@ -9,7 +9,7 @@ import { Observable, mergeMap } from "rxjs"
 import { AuthTokenType, Payload, IOutput } from "@common"
 
 @Injectable()
-export default class AuthInterceptor<T extends object>
+export class AuthInterceptor<T extends object>
 implements NestInterceptor<T, IOutput<T>>
 {
 	constructor(

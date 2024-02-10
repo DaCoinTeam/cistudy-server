@@ -15,7 +15,7 @@ import { extname, join, basename } from "path"
 const METADATA_FILE_NAME = "metadata.json"
 
 @Injectable()
-export default class SupabaseService implements OnModuleInit {
+export class SupabaseService implements OnModuleInit {
     constructor() {}
 
     private bucket: StorageFileApi

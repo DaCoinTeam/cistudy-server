@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common"
-import AssetsController from "./assets.controller"
+import { AssetsController } from "./assets.controller"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     SessionMySqlEntity,
@@ -16,7 +16,7 @@ import {
     PostReactMySqlEntity,
     PostCommentLikeMySqlEntity,
 } from "@database"
-import AssetsService from "./assets.service"
+import { AssetsService } from "./assets.service"
 
 @Module({
     imports: [
@@ -39,4 +39,4 @@ import AssetsService from "./assets.service"
     controllers: [AssetsController],
     providers: [AssetsService],
 })
-export default class AssetsModule {}
+export class AssetsModule {}

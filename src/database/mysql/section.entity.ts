@@ -6,11 +6,11 @@ import {
     OneToMany,
     PrimaryGeneratedColumn,
 } from "typeorm"
-import LectureEntity from "./lecture.entity"
-import CourseEntity from "./course.entity"
+import { LectureEntity } from "./lecture.entity"
+import { CourseEntity } from "./course.entity"
 
 @Entity("section")
-export default class SectionEntity {
+export class SectionEntity {
     @PrimaryGeneratedColumn("uuid")
     	sectionId: string
 

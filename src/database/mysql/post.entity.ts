@@ -8,16 +8,16 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm"
-import CourseEntity from "./course.entity"
-import PostCommentEntity from "./post-comment.entity"
-import PostContentEntity from "./post-content.entity"
-import PostReactEntity from "./post-react.entity"
-import UserEntity from "./user.entity"
+import { CourseEntity } from "./course.entity"
+import { PostCommentEntity } from "./post-comment.entity"
+import { PostContentEntity } from "./post-content.entity"
+import { PostReactEntity } from "./post-react.entity"
+import { UserEntity } from "./user.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
 @Entity("post")
-export default class PostEntity {
+export class PostEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
     	postId: string

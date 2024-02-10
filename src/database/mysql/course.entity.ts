@@ -1,10 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
 import { VerifiedStatus } from "@common"
-import PostEntity from "./post.entity"
-import EnrolledEntity from "./enrolled-info.entity"
-import SectionEntity from "./section.entity"
-import UserEntity from "./user.entity"
+import { PostEntity } from "./post.entity"
+import { EnrolledInfoEntity } from "./enrolled-info.entity"
+import { SectionEntity } from "./section.entity"
+import { UserEntity } from "./user.entity"
 
 interface CourseIncludes {
   time: number;
@@ -12,7 +12,7 @@ interface CourseIncludes {
 
 @ObjectType()
 @Entity("course")
-export default class Course {
+export class CourseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn("uuid")
   	courseId: string
@@ -73,8 +73,8 @@ export default class Course {
   @OneToMany(() => PostEntity, (post) => post.course)
   	posts: PostEntity[]
 
-  @OneToMany(() => EnrolledEntity, (enrolled) => enrolled.course)
-  	enrolledInfos: EnrolledEntity[]
+  @OneToMany(() => EnrolledInfoEntity, (enrolled) => enrolled.course)
+  	enrolledInfos: EnrolledInfoEntity[]
 
   @OneToMany(() => SectionEntity, (section) => section.course, {
   	onDelete: "CASCADE",

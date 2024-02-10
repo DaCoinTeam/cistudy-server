@@ -1,4 +1,4 @@
-type Course {
+type CourseEntity {
   courseId: ID!
   title: String!
   thumbnailId: String
@@ -63,8 +63,8 @@ enum UserKind {
 }
 
 type Query {
-  findOneCourse(input: FindOneCourseInput!): Course!
-  findManyCourses(input: FindManyCoursesInput): [Course!]!
+  findOneCourse(input: FindOneCourseInput!): CourseEntity!
+  findManyCourses(input: FindManyCoursesInput): [CourseEntity!]!
   findOnePost(input: FindOnePostInput!): PostEntity!
   findManyPosts(input: FindManyPostsInput!): [PostEntity!]!
 }
