@@ -43,7 +43,7 @@ export class AuthService {
   	const created = await this.userMySqlRepository.save(data)
 
         console.log(created)
-  	await this.mailerService.sendMail(created.userId, data.email)
+  	//await this.mailerService.sendMail(created.userId, data.email)
   	return `An user with id ${created.userId} has been created`
     }
 
