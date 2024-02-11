@@ -2,7 +2,7 @@ export default () => ({
     extnameToContentType,
 })
 
-type Extname = ".mpd" | ".json" | ".mkv" | ".mp4" | ".avi" | ".webm" | ".mov";
+type Extname = ".mpd" | ".json" | ".mkv" | ".mp4" | ".avi" | ".webm" | ".mov" | ".jpg";
 
 const extnameToContentType: Record<Extname, string> = {
     ".mpd": "application/dash+xml",
@@ -12,4 +12,5 @@ const extnameToContentType: Record<Extname, string> = {
     ".avi": "video/x-msvideo",
     ".webm": "video/webm",
     ".mov": "video/quicktime",
+    ".jpg": "image/jpeg"
 }

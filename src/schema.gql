@@ -37,7 +37,8 @@ type UserEntity {
   userId: ID!
   email: String!
   password: String
-  avatarUrl: String
+  avatarId: String
+  coverPhotoId: String
   phoneNumber: String
   balance: Float
   role: UserRole!

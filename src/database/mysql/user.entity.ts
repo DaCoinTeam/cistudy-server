@@ -24,8 +24,12 @@ export class UserEntity {
   	password: string
 
   @Field(() => String, { nullable: true })
-  @Column({ type: "varchar", length: 200, default: null })
-  	avatarUrl: string
+  @Column({ type: "uuid", length: 36, default: null })
+  	avatarId: string
+
+    @Field(() => String, { nullable: true })
+  @Column({ type: "uuid", length: 36, default: null })
+  	coverPhotoId: string
 
   @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 12, default: null })
