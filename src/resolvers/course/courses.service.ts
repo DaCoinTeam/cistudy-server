@@ -2,7 +2,7 @@ import { CourseMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
-import { FindOneCourseInput, FindManyCoursesInput } from "@resolvers"
+import { FindOneCourseInput, FindManyCoursesInput } from "../shared"
 
 @Injectable()
 export class CoursesService {

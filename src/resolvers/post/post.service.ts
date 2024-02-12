@@ -2,7 +2,7 @@ import { PostMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
-import { FindManyPostsInput, FindOnePostInput } from "@resolvers"
+import { FindManyPostsInput, FindOnePostInput } from "../shared"
 
 @Injectable()
 export class PostsService {
