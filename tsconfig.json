@@ -25,7 +25,6 @@
       "@controllers": ["src/controllers"],
       "@resolvers": ["src/resolvers"],
       "@workers": ["src/workers"],
-      "@utils": ["src/utils"],
       "@common": ["src/common"]
     }
   }

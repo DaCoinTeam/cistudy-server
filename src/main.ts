@@ -10,7 +10,7 @@ import {
 } from "@nestjs/graphql"
 import { printSchema } from "graphql"
 import { join } from "path"
-import { getEnvValue } from "@utils"
+import { getEnvValue } from "@common"
 
 const generateSchema = async () => {
     const app = await NestFactory.create(GraphQLSchemaBuilderModule)
