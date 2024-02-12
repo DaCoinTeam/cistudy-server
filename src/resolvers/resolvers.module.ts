@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common"
-import { CourseModule } from "./course"
+import { CoursesModule } from "./course"
 import { PostModule } from "./post"
 
 @Module({
-	imports: [CourseModule, PostModule],
+    imports: [CoursesModule, PostModule],
 })
 export class ResolversModule {}

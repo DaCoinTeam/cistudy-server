@@ -3,8 +3,8 @@ import { UserMySqlEntity } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { FirebaseService, MailerService, Sha256Service } from "@global"
-import { InitInput, SignInInput, SignUpInput, VerifyGoogleAccessTokenInput } from "./shared"
-import {  UserKind } from "@common"
+import { SignInInput, SignUpInput, VerifyGoogleAccessTokenInput } from "../shared"
+import {  UserKind } from "@definitions"
 
 @Injectable()
 export class AuthService {
@@ -44,13 +44,6 @@ export class AuthService {
 	
   	await this.mailerService.sendMail(created.userId, data.email)
   	return `An user with id ${created.userId} has been created`
-    }
-
-    async init(input: InitInput): Promise<UserMySqlEntity> {
-        const { data } = input
-  	return await this.userMySqlRepository.findOneBy({
-  		userId: data,
-  	})
     }
 
     async verifyGoogleAccessToken(input: VerifyGoogleAccessTokenInput): Promise<UserMySqlEntity> {

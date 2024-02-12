@@ -6,7 +6,7 @@ import {
     PrimaryGeneratedColumn,
 } from "typeorm"
 import { PostCommentEntity } from "./post-comment.entity"
-import { ContentType } from "@common"
+import { ContentType } from "@definitions"
 
 @Entity("post_comment_content")
 export class PostCommentContentEntity {

@@ -1,4 +1,4 @@
-import { IFileInput } from "@common"
+import { IFileInput } from "@definitions"
 import { IsUUID } from "class-validator"
 
 export class UpdateCoverPhotoInput implements IFileInput {

@@ -1,5 +1,5 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
-import { FindManyPostsInput, FindOnePostInput } from "./shared"
+import { FindManyPostsInput, FindOnePostInput } from "../shared"
 import { PostsService } from "./post.service"
 import { PostMySqlEntity } from "@database"
 

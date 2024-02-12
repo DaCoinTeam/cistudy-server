@@ -1,2 +1,2 @@
-export * from "./course.module"
-export * from "./course.resolvers"
+export * from "./courses.module"
+export * from "./courses.resolvers"

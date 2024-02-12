@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { SupabaseService } from "@global"
-import { UpdateAvatarInput, UpdateCoverPhotoInput } from "./shared"
+import { UpdateAvatarInput, UpdateCoverPhotoInput } from "../shared"
 import { UserEntity } from "src/database/mysql/user.entity"
 
 @Injectable()

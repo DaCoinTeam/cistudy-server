@@ -10,11 +10,16 @@ import {
     UseGuards,
     UseInterceptors,
 } from "@nestjs/common"
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery, ApiTags } from "@nestjs/swagger"
+import {
+    ApiBearerAuth,
+    ApiBody,
+    ApiConsumes,
+    ApiQuery,
+    ApiTags,
+} from "@nestjs/swagger"
 import { PostsService } from "./posts.service"
 import { UserMySqlEntity } from "@database"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
-import { JwtAuthGuard, AuthInterceptor, UserId, DataFromBody } from "../shared"
 import {
     CreateCommentData,
     CreatePostData,
@@ -25,8 +30,12 @@ import {
     createPostSchema,
     updateCommentSchema,
     updatePostSchema,
-} from "./shared"
-import { Files } from "@common"
+    JwtAuthGuard,
+    AuthInterceptor,
+    UserId,
+    DataFromBody,
+} from "../shared"
+import { Files } from "@definitions"
 
 @ApiTags("Posts")
 @ApiQuery({
@@ -128,7 +137,10 @@ export class PostsController {
   @Delete("delete-comment")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor<UserMySqlEntity>)
-  async deleteComment(@UserId() userId: string, @Param("commentId") postId: string) {
+  async deleteComment(
+    @UserId() userId: string,
+    @Param("commentId") postId: string,
+  ) {
       console.log(postId)
   }
 

@@ -2,7 +2,7 @@ import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
 import appConfig from "./config/env/app.config"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
-import { CourseResolvers, PostResolvers } from "@resolvers"
+import { CoursesResolvers, PostResolvers } from "@resolvers"
 import { promises as fsPromises } from "fs"
 import {
     GraphQLSchemaBuilderModule,
@@ -18,7 +18,7 @@ const generateSchema = async () => {
 
     const gqlSchemaFactory = app.get(GraphQLSchemaFactory)
     const schema = await gqlSchemaFactory.create([
-        CourseResolvers,
+        CoursesResolvers,
         PostResolvers,
     ])
     await fsPromises.writeFile(

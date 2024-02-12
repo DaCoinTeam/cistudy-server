@@ -1,37 +1,37 @@
 import {
-	Injectable,
-	NestInterceptor,
-	ExecutionContext,
-	CallHandler,
+    Injectable,
+    NestInterceptor,
+    ExecutionContext,
+    CallHandler,
 } from "@nestjs/common"
 import { AuthManagerService } from "@global"
 import { Observable, mergeMap } from "rxjs"
-import { IOutput } from "@common"
+import { IOutput } from "@definitions"
 
 @Injectable()
 export class GenerateAuthTokensInterceptor<T extends object>
 implements NestInterceptor<T, IOutput<T>>
 {
-	constructor(
+    constructor(
         private readonly authManagerService: AuthManagerService) {}
 
-	async intercept(
-		context: ExecutionContext,
-		next: CallHandler,
-	): Promise<Observable<IOutput<T>>> {
-		const request = context.switchToHttp().getRequest()
-		const query = request.query
-		const clientId = query.clientId as string | undefined
+    async intercept(
+        context: ExecutionContext,
+        next: CallHandler,
+    ): Promise<Observable<IOutput<T>>> {
+        const request = context.switchToHttp().getRequest()
+        const query = request.query
+        const clientId = query.clientId as string | undefined
 
-		return next.handle().pipe(
-			mergeMap(async (data) => {
-				return await this.authManagerService.generateResponse<T>(
-					data.userId,
-					data,
-					true,
-					clientId,
-				)
-			}),
-		)
-	}
+        return next.handle().pipe(
+            mergeMap(async (data) => {
+                return await this.authManagerService.generateResponse<T>(
+                    data.userId,
+                    data,
+                    true,
+                    clientId,
+                )
+            }),
+        )
+    }
 }

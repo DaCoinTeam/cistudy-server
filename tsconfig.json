@@ -20,13 +20,13 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@config": ["src/config"],
-      "@common": ["src/common"],
       "@database": ["src/database"],
       "@global": ["src/global"],
       "@controllers": ["src/controllers"],
       "@resolvers": ["src/resolvers"],
       "@workers": ["src/workers"],
-      "@utils": ["src/utils"]
+      "@utils": ["src/utils"],
+      "@definitions": ["src/definitions"]
     }
   }
 }

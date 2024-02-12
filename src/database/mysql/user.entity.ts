@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
 import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
-import { UserKind, UserRole } from "@common"
+import { UserKind, UserRole } from "@definitions"
 import { SessionEntity } from "./session.entity"
 import { PostCommentEntity } from "./post-comment.entity"
 import { PostReactEntity } from "./post-react.entity"

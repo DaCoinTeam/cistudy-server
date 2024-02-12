@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
-import { VerifiedStatus } from "@common"
+import { VerifiedStatus } from "@definitions"
 import { PostEntity } from "./post.entity"
 import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { SectionEntity } from "./section.entity"

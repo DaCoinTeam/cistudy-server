@@ -1,4 +1,4 @@
-import { Payload } from "@common"
+import { Payload } from "@definitions"
 import { createParamDecorator, ExecutionContext } from "@nestjs/common"
 
 export const DataFromBody = createParamDecorator((_, ctx: ExecutionContext) => {
