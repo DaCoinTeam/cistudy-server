@@ -8,3 +8,5 @@ export class FindProfileByBearerTokenInput implements IEmptyDataInput {
     @IsUUID()
         userId: string
 } 
+
+

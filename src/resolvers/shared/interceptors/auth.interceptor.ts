@@ -7,6 +7,7 @@ import {
 import { AuthManagerService } from "@global"
 import { Observable, mergeMap } from "rxjs"
 import { AuthTokenType, Payload, IOutput, getClientId } from "@common"
+import { GqlExecutionContext } from "@nestjs/graphql"
 
 @Injectable()
 export class AuthInterceptor<T extends object>
@@ -19,11 +20,13 @@ implements NestInterceptor<T, IOutput<T>>
         context: ExecutionContext,
         next: CallHandler,
     ): Promise<Observable<IOutput<T>>> {
-        const request = context.switchToHttp().getRequest()
+        const gqlContext = GqlExecutionContext.create(context).getContext()
+        const request = gqlContext.req
+
         const { userId, type } = request.user as Payload
 
         const clientId = getClientId(request)
-        console.log(request)
+
         const refresh = type === AuthTokenType.Refresh
         if (refresh) {
             await this.authManagerService.validateSession(userId, clientId)

@@ -1,6 +1,6 @@
 import { jwtConfig } from "@config"
 import { SessionMySqlEntity } from "@database"
-import { Injectable, UnauthorizedException } from "@nestjs/common"
+import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
 import { JsonWebTokenError, JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Payload, AuthTokens, UserRole, AuthTokenType, IOutput } from "@common"
@@ -25,6 +25,7 @@ export class AuthManagerService {
     }
 
     async validateSession(userId: string, clientId: string): Promise<void> {
+        if (!clientId) throw new NotFoundException("Client id not found.")
         const session = await this.sessionMySqlRepository.findOneBy({
             userId,
             clientId,

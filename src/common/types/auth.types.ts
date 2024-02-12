@@ -1,9 +1,16 @@
+import { Field, ObjectType } from "@nestjs/graphql"
 import { UserRole } from "./entities.types"
+import { IsJWT } from "class-validator"
 
-export type AuthTokens = {
-  accessToken: string;
-  refreshToken: string;
-};
+@ObjectType()
+export class AuthTokens {
+  @IsJWT()
+  @Field(() => String)
+      accessToken: string
+  @IsJWT()
+  @Field(() => String)
+      refreshToken: string
+}
 
 export enum TokenType {
   Access = "Access",

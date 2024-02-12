@@ -6,7 +6,7 @@ import {
     Get,
     Query,
 } from "@nestjs/common"
-import { ApiQuery, ApiTags } from "@nestjs/swagger"
+import { ApiHeader, ApiTags } from "@nestjs/swagger"
 import { SignInData, SignUpData, } from "./auth.input"
 import { AuthService } from "./auth.service"
 import {
@@ -16,9 +16,9 @@ import {
 import { UserMySqlEntity } from "@database"
 
 @ApiTags("Auth")
-@ApiQuery({
-    name: "clientId",
-    example: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
+@ApiHeader({
+    name: "Client-Id",
+    description: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
 })
 @Controller("api/auth")
 export class AuthController {

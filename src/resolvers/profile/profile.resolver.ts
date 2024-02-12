@@ -1,17 +1,18 @@
 import { Resolver, Query } from "@nestjs/graphql"
 import { ProfileService } from "./profile.service"
 import { UserMySqlEntity } from "@database"
-import { JwtAuthGuard, UserId } from "../shared"
-import { UseGuards } from "@nestjs/common"
+import { AuthInterceptor, JwtAuthGuard, UserId } from "../shared"
+import { UseGuards, UseInterceptors } from "@nestjs/common"
+import { FindProfileByBearerTokenOutput } from "./profile.output"
 
 @Resolver(() => UserMySqlEntity)
 export class ProfileResolver {
     constructor(private readonly profileService: ProfileService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Query(() => UserMySqlEntity)
+  @UseInterceptors(AuthInterceptor<UserMySqlEntity>)
+  @Query(() => FindProfileByBearerTokenOutput)
     async findProfileByBearerToken(@UserId() userId: string) {
-        console.log(userId)
         return this.profileService.findProfileByBearerToken({ userId })
     }
 }

@@ -14,6 +14,7 @@ import {
     ApiBearerAuth,
     ApiBody,
     ApiConsumes,
+    ApiHeader,
     ApiQuery,
     ApiTags,
 } from "@nestjs/swagger"
@@ -39,9 +40,9 @@ import {
 import { Files } from "@common"
 
 @ApiTags("Posts")
-@ApiQuery({
-    name: "clientId",
-    example: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
+@ApiHeader({
+    name: "Client-Id",
+    description: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
 })
 @Controller("api/posts")
 export class PostsController {

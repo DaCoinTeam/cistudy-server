@@ -10,7 +10,7 @@ import {
     ApiBearerAuth,
     ApiBody,
     ApiConsumes,
-    ApiQuery,
+    ApiHeader,
     ApiTags,
 } from "@nestjs/swagger"
 import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
@@ -32,9 +32,9 @@ import { CoursesService } from "./courses.service"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 
 @ApiTags("Courses")
-@ApiQuery({
-    name: "clientId",
-    example: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
+@ApiHeader({
+    name: "Client-Id",
+    description: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
 })
 @Controller("api/courses")
 export class CoursesController {
