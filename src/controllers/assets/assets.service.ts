@@ -2,7 +2,7 @@ import { extnameConfig } from "@config"
 import { SupabaseService } from "@global"
 import { Injectable, StreamableFile } from "@nestjs/common"
 import { extname } from "path"
-import { GetInput } from "../shared"
+import { GetInput } from "./assets.input"
 
 @Injectable()
 export class AssetsService {

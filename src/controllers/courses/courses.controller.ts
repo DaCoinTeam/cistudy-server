@@ -13,17 +13,19 @@ import {
     ApiQuery,
     ApiTags,
 } from "@nestjs/swagger"
+import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import {
-    UserId,
-    AuthInterceptor,
-    JwtAuthGuard,
-    DataFromBody,
     CreateCourseData,
-    createCourseSchema,
     CreateLectureData,
-    createLectureSchema,
     CreateSectionData,
-} from "../shared"
+} from "./courses.input"
+
+import {
+    createCourseSchema,
+    createLectureSchema,
+} from "./courses.schema"
+
+
 import { UserMySqlEntity } from "@database"
 import { Files } from "@common"
 import { CoursesService } from "./courses.service"

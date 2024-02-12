@@ -16,7 +16,7 @@ export interface IInput<T> {
     files?: Array<Express.Multer.File>
 }
 
-export interface IFileInput {
+export interface IEmptyDataInput {
     userId: string,
-    files: Array<Express.Multer.File>
+    files?: Array<Express.Multer.File>
 }

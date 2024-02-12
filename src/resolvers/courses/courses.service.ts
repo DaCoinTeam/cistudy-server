@@ -2,7 +2,7 @@ import { CourseMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
-import { FindOneCourseInput, FindManyCoursesInput } from "../shared"
+import { FindOneCourseInput, FindManyCoursesInput } from "./courses.input"
 
 @Injectable()
 export class CoursesService {
@@ -11,12 +11,12 @@ export class CoursesService {
     private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
     ) {}
 
-    async findOneCourse(args: FindOneCourseInput): Promise<CourseMySqlEntity> {
-        return await this.courseMySqlRepository.findOneBy(args)
+    async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
+        return await this.courseMySqlRepository.findOneBy(input)
     }
 
-    async findManyCourses(args: FindManyCoursesInput): Promise<CourseMySqlEntity[]> {
-        console.log(args)
+    async findManyCourses(input: FindManyCoursesInput): Promise<CourseMySqlEntity[]> {
+
         const founds = await this.courseMySqlRepository.findAndCount({
             relations: {
                 creator: true

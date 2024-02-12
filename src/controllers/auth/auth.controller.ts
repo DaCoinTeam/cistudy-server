@@ -7,7 +7,7 @@ import {
     Query,
 } from "@nestjs/common"
 import { ApiQuery, ApiTags } from "@nestjs/swagger"
-import { SignInData, SignUpData, } from "../shared"
+import { SignInData, SignUpData, } from "./auth.input"
 import { AuthService } from "./auth.service"
 import {
     AuthInterceptor,

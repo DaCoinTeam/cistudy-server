@@ -26,6 +26,7 @@ import {
     ShellService,
     SupabaseService
 } from "./services"
+import { JwtStrategy } from "./strategies"
 
 @Global()
 @Module({
@@ -57,6 +58,7 @@ import {
         Sha256Service,
         ShellService,
         SupabaseService,
+        JwtStrategy
     ],
     providers: [
         JwtService,
@@ -68,6 +70,7 @@ import {
         Sha256Service,
         ShellService,
         SupabaseService,
+        JwtStrategy
     ],
 })
 export class GlobalModule { }

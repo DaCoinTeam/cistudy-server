@@ -1,7 +1,7 @@
-import { IFileInput } from "@common"
+import { IEmptyDataInput } from "@common"
 import { IsUUID } from "class-validator"
 
-export class UpdateAvatarInput implements IFileInput {
+export class UpdateAvatarInput implements IEmptyDataInput {
     @IsUUID("4")
     	userId: string
     files: Express.Multer.File[]

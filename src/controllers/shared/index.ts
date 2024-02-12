@@ -1,6 +1,3 @@
 export * from "./interceptors"
 export * from "./decorators"
-export * from "./strageries"
 export * from "./guards"
-export * from "./inputs"
-export * from "./schemas"

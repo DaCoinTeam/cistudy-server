@@ -1,10 +1,10 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
-import { FindManyPostsInput, FindOnePostInput } from "../shared"
-import { PostsService } from "./post.service"
+import { FindManyPostsInput, FindOnePostInput } from "./posts.input"
+import { PostsService } from "./posts.service"
 import { PostMySqlEntity } from "@database"
 
 @Resolver(() => PostMySqlEntity)
-export class PostResolvers {
+export class PostsResolver {
     constructor(
     private readonly postsService: PostsService,
     ) {}

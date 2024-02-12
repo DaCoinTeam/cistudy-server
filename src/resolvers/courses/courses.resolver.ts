@@ -1,10 +1,10 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
-import { FindOneCourseInput, FindManyCoursesInput } from "../shared"
+import { FindOneCourseInput, FindManyCoursesInput } from "./courses.input"
 import { CoursesService } from "./courses.service"
 import { CourseMySqlEntity } from "@database"
 
 @Resolver(() => CourseMySqlEntity)
-export class CoursesResolvers {
+export class CoursesResolver {
     constructor(
     private readonly coursesService: CoursesService,
     ) {}

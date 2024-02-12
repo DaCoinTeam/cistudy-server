@@ -1,4 +1,5 @@
-export * from "./course"
-export * from "./post"
+export * from "./courses"
+export * from "./posts"
 export * from "./shared"
+export * from "./profile"
 export * from "./resolvers.module"

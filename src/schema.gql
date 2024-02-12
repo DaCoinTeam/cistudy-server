@@ -64,10 +64,15 @@ enum UserKind {
 }
 
 type Query {
+  findProfileByBearerToken(input: FindProfileByBearerTokenInput!): UserEntity!
   findOneCourse(input: FindOneCourseInput!): CourseEntity!
   findManyCourses(input: FindManyCoursesInput): [CourseEntity!]!
   findOnePost(input: FindOnePostInput!): PostEntity!
   findManyPosts(input: FindManyPostsInput!): [PostEntity!]!
+}
+
+input FindProfileByBearerTokenInput {
+  userId: String!
 }
 
 input FindOneCourseInput {

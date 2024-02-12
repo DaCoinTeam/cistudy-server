@@ -3,7 +3,7 @@ import { UserMySqlEntity } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { FirebaseService, MailerService, Sha256Service } from "@global"
-import { SignInInput, SignUpInput, VerifyGoogleAccessTokenInput } from "../shared"
+import { SignInInput, SignUpInput, VerifyGoogleAccessTokenInput } from "./auth.input"
 import {  UserKind } from "@common"
 
 @Injectable()

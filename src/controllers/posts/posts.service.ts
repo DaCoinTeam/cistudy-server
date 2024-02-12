@@ -7,7 +7,7 @@ import {
     UpdateCommentInput,
     UpdatePostInput,
     IContentData,
-} from "../shared"
+} from "./posts.input"
 import { ContentType, IndexFileAppended } from "@common"
 import {
     PostMySqlEntity,

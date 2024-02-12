@@ -3,7 +3,7 @@ import { CourseMySqlEntity, LectureMySqlEntity, SectionMySqlEntity } from "@data
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { SupabaseService } from "@global"
-import { CreateCourseInput, CreateSectionInput, CreateLectureInput } from "../shared"
+import { CreateCourseInput, CreateSectionInput, CreateLectureInput } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 
 @Injectable()

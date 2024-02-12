@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common"
-import { PostResolvers } from "./post.resolvers"
+import { PostsResolver } from "./posts.resolver"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     PostMySqlEntity,
@@ -9,7 +9,7 @@ import {
     PostCommentContentMySqlEntity,
     PostCommentLikeMySqlEntity,
 } from "@database"
-import { PostsService } from "./post.service"
+import { PostsService } from "./posts.service"
 
 @Module({
     imports: [
@@ -22,6 +22,6 @@ import { PostsService } from "./post.service"
             PostCommentLikeMySqlEntity,
         ]),
     ],
-    providers: [PostResolvers, PostsService],
+    providers: [PostsResolver, PostsService],
 })
-export class PostModule {}
+export class PostsModule {}

@@ -20,21 +20,22 @@ import {
 import { PostsService } from "./posts.service"
 import { UserMySqlEntity } from "@database"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
+import { JwtAuthGuard, AuthInterceptor, UserId, DataFromBody } from "../shared"
 import {
     CreateCommentData,
     CreatePostData,
     ReactPostData,
     UpdateCommentData,
     UpdatePostData,
+} from "./posts.input"
+
+import {
     createCommentSchema,
     createPostSchema,
     updateCommentSchema,
     updatePostSchema,
-    JwtAuthGuard,
-    AuthInterceptor,
-    UserId,
-    DataFromBody,
-} from "../shared"
+} from "./posts.schema"
+
 import { Files } from "@common"
 
 @ApiTags("Posts")

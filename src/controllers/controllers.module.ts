@@ -4,7 +4,6 @@ import { AuthModule } from "./auth"
 import { CoursesModule } from "./courses"
 import { AssetsModule } from "./assets"
 import { PostsModule } from "./posts"
-import { JwtStrategy } from "./shared"
 import { ProfileModule } from "./profile"
 
 @Module({
@@ -15,8 +14,6 @@ import { ProfileModule } from "./profile"
         PostsModule,
         ProfileModule
     ],
-    providers: [
-        JwtStrategy
-    ]
+    providers: []
 })
 export class ControllersModule {}
