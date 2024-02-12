@@ -7,7 +7,7 @@ import {
 } from "typeorm"
 
 import { PostEntity } from "./post.entity"
-import { ContentType } from "@definitions"
+import { ContentType } from "@common"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()

@@ -8,7 +8,7 @@ import {
     Metadata,
     MinimalFile,
     isMinimalFile,
-} from "@definitions"
+} from "@common"
 import { v4 as uuid4, validate as validateUuid4 } from "uuid"
 import { extname, join, basename } from "path"
 

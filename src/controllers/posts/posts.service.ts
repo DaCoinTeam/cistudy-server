@@ -8,7 +8,7 @@ import {
     UpdatePostInput,
     IContentData,
 } from "../shared"
-import { ContentType, IndexFileAppended } from "@definitions"
+import { ContentType, IndexFileAppended } from "@common"
 import {
     PostMySqlEntity,
     PostReactMySqlEntity,

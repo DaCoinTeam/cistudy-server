@@ -3,7 +3,7 @@ import { InjectQueue } from "@nestjs/bull"
 import { Queue } from "bull"
 import { ProcessMpegDashService } from "./process-mpeg-dash.service"
 import { QUEUE_NAME } from "./process-mpeg-dash.constants"
-import { AnyFile } from "@definitions"
+import { AnyFile } from "@common"
 
 @Injectable()
 export class ProcessMpegDashProducer {

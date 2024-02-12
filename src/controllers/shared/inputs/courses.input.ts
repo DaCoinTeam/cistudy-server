@@ -1,4 +1,4 @@
-import { IAuthInput } from "@definitions"
+import { IAuthInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsNumber, IsUUID, Length } from "class-validator"
 

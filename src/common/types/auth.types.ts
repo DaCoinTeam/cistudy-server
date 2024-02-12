@@ -1,4 +1,4 @@
-import { UserRole } from "./entities.definition"
+import { UserRole } from "./entities.types"
 
 export type AuthTokens = {
   accessToken: string;

@@ -1,4 +1,4 @@
-import { AnyFile, FileAndSubdirectory, Metadata, isMinimalFile } from "@definitions"
+import { AnyFile, FileAndSubdirectory, Metadata, isMinimalFile } from "@common"
 import { Injectable, Logger } from "@nestjs/common"
 import { promises as fsPromise } from "fs"
 import { basename, dirname, extname, join } from "path"

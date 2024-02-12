@@ -25,7 +25,7 @@ import {
     CreateSectionData,
 } from "../shared"
 import { UserMySqlEntity } from "@database"
-import { Files } from "@definitions"
+import { Files } from "@common"
 import { CoursesService } from "./courses.service"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 

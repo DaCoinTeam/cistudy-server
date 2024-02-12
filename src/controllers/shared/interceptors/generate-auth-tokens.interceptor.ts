@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common"
 import { AuthManagerService } from "@global"
 import { Observable, mergeMap } from "rxjs"
-import { IOutput } from "@definitions"
+import { IOutput } from "@common"
 
 @Injectable()
 export class GenerateAuthTokensInterceptor<T extends object>

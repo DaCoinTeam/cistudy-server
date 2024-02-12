@@ -1,4 +1,4 @@
-import { AuthTokens } from "./auth.definition"
+import { AuthTokens } from "./auth.types"
 
 export interface IOutput<T> {
     data: T,

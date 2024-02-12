@@ -35,7 +35,7 @@ import {
     UserId,
     DataFromBody,
 } from "../shared"
-import { Files } from "@definitions"
+import { Files } from "@common"
 
 @ApiTags("Posts")
 @ApiQuery({

@@ -8,7 +8,7 @@ import {
 import { ApiBearerAuth, ApiConsumes, ApiQuery, ApiTags } from "@nestjs/swagger"
 import { UserId, AuthInterceptor, JwtAuthGuard } from "../shared"
 import { UserMySqlEntity } from "@database"
-import { Files } from "@definitions"
+import { Files } from "@common"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { ProfileService } from "./users.service"
 

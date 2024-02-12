@@ -1,6 +1,6 @@
 import { Job } from "bull"
 import { OnQueueError, Process, Processor } from "@nestjs/bull"
-import { Metadata } from "@definitions"
+import { Metadata } from "@common"
 import { ProcessMpegDashService } from "./process-mpeg-dash.service"
 import { QUEUE_NAME } from "./process-mpeg-dash.constants"
 

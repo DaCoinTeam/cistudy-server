@@ -26,7 +26,7 @@
       "@resolvers": ["src/resolvers"],
       "@workers": ["src/workers"],
       "@utils": ["src/utils"],
-      "@definitions": ["src/definitions"]
+      "@common": ["src/common"]
     }
   }
 }

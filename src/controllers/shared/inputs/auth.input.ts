@@ -1,4 +1,4 @@
-import { IInput } from "@definitions"
+import { IInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsDateString, IsEmail, IsJWT, IsNotEmpty, IsStrongPassword, Length } from "class-validator"
 

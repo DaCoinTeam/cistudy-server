@@ -4,7 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { FirebaseService, MailerService, Sha256Service } from "@global"
 import { SignInInput, SignUpInput, VerifyGoogleAccessTokenInput } from "../shared"
-import {  UserKind } from "@definitions"
+import {  UserKind } from "@common"
 
 @Injectable()
 export class AuthService {

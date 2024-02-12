@@ -1,7 +1,7 @@
 import { appConfig, jwtConfig, servicesConfig } from "@config"
 import { Injectable } from "@nestjs/common"
 import { createTransport } from "nodemailer"
-import { TokenType } from "@definitions"
+import { TokenType } from "@common"
 import { JwtService } from "@nestjs/jwt"
 
 @Injectable()

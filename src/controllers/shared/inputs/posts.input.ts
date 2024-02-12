@@ -1,4 +1,4 @@
-import { ContentType, IAuthInput } from "@definitions"
+import { ContentType, IAuthInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID } from "class-validator"
 
