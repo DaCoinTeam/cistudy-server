@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository } from "typeorm"
+import { Repository, DeepPartial } from "typeorm"
 import { SupabaseService } from "@global"
-import { UpdateAvatarInput, UpdateCoverPhotoInput } from "./profile.input"
+import { UpdateProfileInput } from "./profile.input"
 import { UserEntity } from "src/database/mysql/user.entity"
+import { UserMySqlEntity } from "@database"
 
 @Injectable()
 export class ProfileService {
@@ -13,31 +14,24 @@ export class ProfileService {
         private readonly supabaseService: SupabaseService
     ) { }
 
-    async updateCoverPhoto(input: UpdateCoverPhotoInput): Promise<string> {
-        const { userId, files } = input
-        const file = files.at(0)
+    async updateProfile(input: UpdateProfileInput): Promise<string> {
+        const { userId, data, files } = input
+        const { avatarIndex, coverPhotoIndex } = data
         //validate to ensure it is image
 
-        const { assetId } = await this.supabaseService.upload(file)
+        const profile : DeepPartial<UserMySqlEntity> = {}
+        if (Number.isInteger(avatarIndex)) {
+            const file = files.at(avatarIndex)
+            const { assetId } = await this.supabaseService.upload(file)
+            profile.avatarId = assetId
+        }
+        if (Number.isInteger(coverPhotoIndex)) {
+            const file = files.at(coverPhotoIndex)
+            const { assetId } = await this.supabaseService.upload(file)
+            profile.coverPhotoId = assetId
+        }
+        await this.userMySqlRepository.update(userId, profile)
 
-        await this.userMySqlRepository.update(userId, {
-            coverPhotoId : assetId
-        })
-
-        return `A user with id ${userId} has had their cover photo updated successfully.`
-    }
-
-    async updateAvatar(input: UpdateAvatarInput): Promise<string> {
-        const { userId, files } = input
-        const file = files.at(0)
-        //validate to ensure it is image
-
-        const { assetId } = await this.supabaseService.upload(file)
-
-        await this.userMySqlRepository.update(userId, {
-            avatarId : assetId
-        })
-
-        return `A user with id ${userId} has had their avatar updated successfully.`
+        return `A profile with id ${userId} has updated successfully.`
     }
 }

@@ -3,14 +3,14 @@ import {
     UseInterceptors,
     UseGuards,
     UploadedFiles,
-    Patch,
+    Put,
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
-import { UserId, AuthInterceptor, JwtAuthGuard } from "../shared"
-import { UserMySqlEntity } from "@database"
+import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import { Files } from "@common"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { ProfileService } from "./profile.service"
+import { UpdateProfileData } from "./profile.input"
 
 @ApiTags("Profile")
 @ApiHeader({
@@ -23,36 +23,20 @@ export class ProfileController{
 
     @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
-    @Patch("update-cover-photo")
+    @Put("update-profile")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(
         AuthInterceptor,
         FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
     )
-    async updateCoverPhoto(
+    async updateProfile(
         @UserId() userId: string,
+        @DataFromBody() data: UpdateProfileData,
         @UploadedFiles() { files }: Files,
     ) {     
-    	return this.profileService.updateCoverPhoto({
+    	return this.profileService.updateProfile({
     		userId,
-    		files
-    	}) 
-    }
-
-    @ApiBearerAuth()
-    @ApiConsumes("multipart/form-data")
-    @Patch("update-avatar")
-    @UseGuards(JwtAuthGuard)
-    @UseInterceptors(
-        AuthInterceptor,
-        FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
-    )
-    async updateAvatar(
-        @UserId() userId: string,
-        @UploadedFiles() { files }: Files,
-    ) {     
-    	return this.profileService.updateAvatar({
-    		userId,
+            data,
     		files
     	}) 
     }

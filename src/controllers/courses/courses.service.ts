@@ -1,23 +1,33 @@
 import { Injectable, NotFoundException } from "@nestjs/common"
-import { CourseMySqlEntity, LectureMySqlEntity, SectionMySqlEntity } from "@database"
+import {
+    CourseMySqlEntity,
+    LectureMySqlEntity,
+    SectionMySqlEntity,
+} from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { SupabaseService } from "@global"
-import { CreateCourseInput, CreateSectionInput, CreateLectureInput } from "./courses.input"
+import {
+    CreateCourseInput,
+    CreateSectionInput,
+    CreateLectureInput,
+    UpdateCourseInput,
+} from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
+import { DeepPartial } from "typeorm"
 
 @Injectable()
 export class CoursesService {
     constructor(
-		@InjectRepository(CourseMySqlEntity)
-		private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-		@InjectRepository(SectionMySqlEntity)
-		private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
-		@InjectRepository(LectureMySqlEntity)
-		private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
-		private readonly supabaseService: SupabaseService,
-		private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
-    ) { }
+    @InjectRepository(CourseMySqlEntity)
+    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+    @InjectRepository(SectionMySqlEntity)
+    private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
+    @InjectRepository(LectureMySqlEntity)
+    private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
+    private readonly supabaseService: SupabaseService,
+    private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
+    ) {}
 
     async createCourse(input: CreateCourseInput): Promise<string> {
         const { description, price, title } = input.data
@@ -54,15 +64,47 @@ export class CoursesService {
             return `A course with id ${created.courseId} has been creeated successfully.`
     }
 
+    async updateCourse(input: UpdateCourseInput): Promise<string> {
+        const { data, files } = input
+        const {
+            thumbnailIndex,
+            previewVideoIndex,
+            courseId,
+            description,
+            price,
+            title,
+        } = data
+
+        const course: DeepPartial<CourseMySqlEntity> = {
+            description,
+            price,
+            title,
+        }
+        console.log(course)
+        
+        if (Number.isInteger(thumbnailIndex)) {
+            const file = files.at(thumbnailIndex)
+            const { assetId } = await this.supabaseService.upload(file)
+            course.thumbnailId = assetId
+        }
+        if (Number.isInteger(previewVideoIndex)) {
+            const file = files.at(previewVideoIndex)
+            const { assetId } = await this.supabaseService.upload(file)
+            course.previewVideoId = assetId
+        }
+        await this.courseMySqlRepository.update(courseId, course)
+        return `A course wth id ${courseId} has been updated successfully`
+    }
+
     async createSection(input: CreateSectionInput): Promise<string> {
         const { courseId, title } = input.data
         const course = await this.courseMySqlRepository.findOneBy({
-            courseId
+            courseId,
         })
         if (!course) throw new NotFoundException("Course not found.")
         const created = await this.sectionMySqlRepository.save({
             courseId,
-            title
+            title,
         })
         if (created)
             return `A section with id ${created.sectionId} has been creeated successfully.`
@@ -86,7 +128,7 @@ export class CoursesService {
         const created = await this.lectureMySqlRepository.save({
             videoId,
             title,
-            sectionId
+            sectionId,
         })
 
         if (created)

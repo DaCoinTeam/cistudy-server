@@ -1,15 +1,20 @@
-import { IAuthEmptyDataInput } from "@common"
-import { IsUUID } from "class-validator"
+import { IAuthInput } from "@common"
+import { ApiProperty } from "@nestjs/swagger"
+import { IsNumber, IsUUID } from "class-validator"
 
-export class UpdateAvatarInput implements IAuthEmptyDataInput {
-    @IsUUID("4")
-    	userId: string
-    files: Express.Multer.File[]
+export class UpdateProfileData {
+    @IsNumber()
+    @ApiProperty()
+        avatarIndex?: number
+
+    @IsNumber()
+    @ApiProperty()
+        coverPhotoIndex?: number
 }
-
-export class UpdateCoverPhotoInput implements IAuthEmptyDataInput {
+export class UpdateProfileInput implements IAuthInput<UpdateProfileData> {
     @IsUUID("4")
     	userId: string
-    files: Express.Multer.File[]
+    data: UpdateProfileData
+    files: Array<Express.Multer.File>
 }
 

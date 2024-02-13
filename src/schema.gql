@@ -74,7 +74,7 @@ type FindProfileByAuthTokenOutput {
 }
 
 type Query {
-  findProfileByAuthToken: FindProfileByAuthTokenOutput!
+  findProfile: FindProfileByAuthTokenOutput!
   findOneCourse(input: FindOneCourseInput!): CourseEntity!
   findManyCourses(input: FindManyCoursesInput): [CourseEntity!]!
   findOnePost(input: FindOnePostInput!): PostEntity!

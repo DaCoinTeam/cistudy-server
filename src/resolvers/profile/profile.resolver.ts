@@ -12,7 +12,7 @@ export class ProfileResolver {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   @Query(() => FindProfileByAuthTokenOutput)
-    async findProfileByAuthToken(@UserId() userId: string) {
-        return this.profileService.findProfileByAuthToken({ userId })
+    async findProfile(@UserId() userId: string) {
+        return this.profileService.findProfile({ userId })
     }
 }

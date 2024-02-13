@@ -2,7 +2,7 @@ import { UserMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
-import { FindProfileByAuthTokenInput } from "./profile.input"
+import { FindProfileInput } from "./profile.input"
 @Injectable()
 export class ProfileService {
     constructor(
@@ -10,8 +10,8 @@ export class ProfileService {
     private readonly userMySqlEntity: Repository<UserMySqlEntity>,
     ) {}
 
-    async findProfileByAuthToken(
-        input: FindProfileByAuthTokenInput,
+    async findProfile(
+        input: FindProfileInput,
     ): Promise<UserMySqlEntity> {
         return await this.userMySqlEntity.findOneBy(input)
     }

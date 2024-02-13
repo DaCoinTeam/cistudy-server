@@ -5,6 +5,7 @@ import {
     UseGuards,
     UploadedFiles,
     Body,
+    Put,
 } from "@nestjs/common"
 import {
     ApiBearerAuth,
@@ -18,11 +19,13 @@ import {
     CreateCourseData,
     CreateLectureData,
     CreateSectionData,
+    UpdateCourseData,
 } from "./courses.input"
 
 import {
     createCourseSchema,
     createLectureSchema,
+    updateCourseSchema,
 } from "./courses.schema"
 
 import { Files } from "@common"
@@ -59,19 +62,41 @@ export class CoursesController {
         })
     }
 
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: updateCourseSchema })
+    @Put("update-course")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+        AuthInterceptor,
+        FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
+    )
+  async updateCourse(
+      @UserId() userId: string,
+      @DataFromBody() data: UpdateCourseData,
+      @UploadedFiles() { files }: Files,
+  ) {
+      return this.coursesService.updateCourse({
+          userId,
+          data,
+          files,
+      })
+  }
+  
+
   @ApiBearerAuth()
   @Post("create-section")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
-  async createSection(
+    async createSection(
     @UserId() userId: string,
     @Body() body: CreateSectionData,
-  ) {
-      return this.coursesService.createSection({
-          userId,
-          data: body,
-      })
-  }
+    ) {
+        return this.coursesService.createSection({
+            userId,
+            data: body,
+        })
+    }
 
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")

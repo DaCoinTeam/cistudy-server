@@ -23,7 +23,7 @@ implements NestInterceptor<T, IOutput<T>>
         const { userId, type } = request.user as Payload
 
         const clientId = getClientId(request)
-        console.log(request)
+
         const refresh = type === AuthTokenType.Refresh
         if (refresh) {
             await this.authManagerService.validateSession(userId, clientId)

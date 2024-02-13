@@ -1,6 +1,6 @@
 import { IAuthEmptyDataInput } from "@common"
 
-export class FindProfileByAuthTokenInput implements IAuthEmptyDataInput {
+export class FindProfileInput implements IAuthEmptyDataInput {
     userId: string
 } 
 
