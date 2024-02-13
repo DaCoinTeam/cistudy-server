@@ -6,7 +6,7 @@ import {
     ReactPostInput,
     UpdateCommentInput,
     UpdatePostInput,
-    IContentData,
+    ContentData,
 } from "./posts.input"
 import { ContentType, IndexFileAppended } from "@common"
 import {
@@ -36,7 +36,7 @@ export class PostsService {
     private readonly supabaseService: SupabaseService,
     ) {}
 
-    private appendIndexFile<T extends IContentData>(
+    private appendIndexFile<T extends ContentData>(
         postContents: Array<T>,
     ): Array<IndexFileAppended<T>> {
         let indexFile = 0

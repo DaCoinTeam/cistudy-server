@@ -2,12 +2,12 @@ import { ContentType, AuthInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID } from "class-validator"
 
-export interface IContentData {
+export interface ContentData {
   content: string;
   contentType: ContentType;
 }
 
-export class PostContentData implements IContentData {
+export class PostContentData implements ContentData {
   @ApiProperty()
       content: string
 
@@ -19,7 +19,7 @@ export class PostContentData implements IContentData {
       postId?: string
 }
 
-export class PostCommentContentData implements IContentData {
+export class PostCommentContentData implements ContentData {
   @ApiProperty()
       content: string
 
