@@ -1,4 +1,4 @@
-import { ContentType, IAuthInput } from "@common"
+import { ContentType, AuthInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID } from "class-validator"
 
@@ -40,7 +40,7 @@ export class CreateCommentData {
         postCommentContents?: Array<PostCommentContentData>
 }
   
-export class CreateCommentInput implements IAuthInput<CreateCommentData> {
+export class CreateCommentInput implements AuthInput<CreateCommentData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
@@ -60,7 +60,7 @@ export class CreatePostData {
         postContents?: Array<PostContentData>
 }
   
-export class CreatePostInput implements IAuthInput<CreatePostData> {
+export class CreatePostInput implements AuthInput<CreatePostData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
@@ -74,7 +74,7 @@ export class ReactPostData {
         postId: string
 }
   
-export class ReactPostInput implements IAuthInput<ReactPostData> {
+export class ReactPostInput implements AuthInput<ReactPostData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
@@ -90,7 +90,7 @@ export class UpdateCommentData {
         postCommentContents?: Array<PostCommentContentData>
 }
   
-export class UpdateCommentInput implements IAuthInput<UpdateCommentData> {
+export class UpdateCommentInput implements AuthInput<UpdateCommentData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
@@ -110,7 +110,7 @@ export class UpdatePostData {
         postContents: Array<PostContentData>
 }
   
-export class UpdatePostInput implements IAuthInput<UpdatePostData> {
+export class UpdatePostInput implements AuthInput<UpdatePostData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string

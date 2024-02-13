@@ -1,6 +1,6 @@
-import { IAuthEmptyDataInput } from "@common"
+import { AuthEmptyDataInput } from "@common"
 
-export class FindProfileInput implements IAuthEmptyDataInput {
+export class FindProfileInput implements AuthEmptyDataInput {
     userId: string
 } 
 

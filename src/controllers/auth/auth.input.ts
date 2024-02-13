@@ -1,4 +1,4 @@
-import { IInput } from "@common"
+import { Input } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsDateString, IsEmail, IsJWT, IsNotEmpty, IsStrongPassword, Length } from "class-validator"
 
@@ -13,7 +13,7 @@ export class SignInData {
   	password: string
 }
 
-export class SignInInput implements IInput<SignInData> {
+export class SignInInput implements Input<SignInData> {
     data: SignInData
 }
 
@@ -39,11 +39,11 @@ export class SignUpData {
         birthdate: Date
 }
   
-export class SignUpInput implements IInput<SignUpData> {
+export class SignUpInput implements Input<SignUpData> {
     data: SignUpData
 }
   
-export class VerifyGoogleAccessTokenInput implements IInput<string> {
+export class VerifyGoogleAccessTokenInput implements Input<string> {
     @IsJWT()
     @ApiProperty()
         data: string

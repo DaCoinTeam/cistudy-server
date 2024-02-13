@@ -1,10 +1,10 @@
-import { IOutput, AuthTokens } from "@common"
+import { Output, AuthTokens } from "@common"
 import { UserMySqlEntity } from "@database"
 import { Field, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
 export class FindProfileByAuthTokenOutput
-implements IOutput<UserMySqlEntity>
+implements Output<UserMySqlEntity>
 {
   @Field(() => UserMySqlEntity)
       data: UserMySqlEntity

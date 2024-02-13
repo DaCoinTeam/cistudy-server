@@ -1,22 +1,22 @@
 import { AuthTokens } from "./auth.types"
 
-export interface IOutput<T> {
+export interface Output<T> {
     data: T,
     tokens?: AuthTokens 
 }
 
-export interface IAuthInput<T> {
+export interface AuthInput<T> {
     userId: string,
     data: T,
     files?: Array<Express.Multer.File>
 }
 
-export interface IInput<T> {
+export interface Input<T> {
     data: T,
     files?: Array<Express.Multer.File>
 }
 
-export interface IAuthEmptyDataInput {
+export interface AuthEmptyDataInput {
     userId: string,
     files?: Array<Express.Multer.File>
 }

@@ -6,11 +6,11 @@ import {
 } from "@nestjs/common"
 import { AuthManagerService } from "@global"
 import { Observable, mergeMap } from "rxjs"
-import { IOutput } from "@common"
+import { Output } from "@common"
 
 @Injectable()
 export class GenerateAuthTokensInterceptor<T extends object>
-implements NestInterceptor<T, IOutput<T>>
+implements NestInterceptor<T, Output<T>>
 {
     constructor(
         private readonly authManagerService: AuthManagerService) {}
@@ -18,7 +18,7 @@ implements NestInterceptor<T, IOutput<T>>
     async intercept(
         context: ExecutionContext,
         next: CallHandler,
-    ): Promise<Observable<IOutput<T>>> {
+    ): Promise<Observable<Output<T>>> {
         const request = context.switchToHttp().getRequest()
         const query = request.query
         const clientId = query.clientId as string | undefined

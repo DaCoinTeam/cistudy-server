@@ -3,7 +3,7 @@ import { SessionMySqlEntity } from "@database"
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
 import { JsonWebTokenError, JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Payload, AuthTokens, UserRole, AuthTokenType, IOutput } from "@common"
+import { Payload, AuthTokens, UserRole, AuthTokenType, Output } from "@common"
 import { Repository } from "typeorm"
 
 @Injectable()
@@ -93,7 +93,7 @@ export class AuthManagerService {
         data: T,
         authTokensRequested: boolean = false,
         clientId?: string,
-    ): Promise<IOutput<T>> {
+    ): Promise<Output<T>> {
         const tokens = authTokensRequested
             ? await this.generateAuthTokens({ userId }, clientId)
             : undefined

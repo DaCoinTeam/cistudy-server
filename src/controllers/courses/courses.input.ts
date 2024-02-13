@@ -1,4 +1,4 @@
-import { IAuthInput } from "@common"
+import { AuthInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsNumber, IsUUID, Length } from "class-validator"
 
@@ -16,7 +16,7 @@ export class CreateCourseData {
       price: number
 }
 
-export class CreateCourseInput implements IAuthInput<CreateCourseData> {
+export class CreateCourseInput implements AuthInput<CreateCourseData> {
   @IsUUID("4")
       userId: string
   data: CreateCourseData
@@ -49,7 +49,7 @@ export class UpdateCourseData {
       previewVideoIndex?: number
 }
 
-export class UpdateCourseInput implements IAuthInput<UpdateCourseData> {
+export class UpdateCourseInput implements AuthInput<UpdateCourseData> {
   @IsUUID("4")
       userId: string
   data: UpdateCourseData
@@ -65,7 +65,7 @@ export class CreateLectureData {
   @ApiProperty()
       title: string
 }
-export class CreateLectureInput implements IAuthInput<CreateLectureData> {
+export class CreateLectureInput implements AuthInput<CreateLectureData> {
   @IsUUID("4")
       userId: string
   data: CreateLectureData
@@ -82,7 +82,7 @@ export class CreateSectionData {
       title: string
 }
 
-export class CreateSectionInput implements IAuthInput<CreateSectionData> {
+export class CreateSectionInput implements AuthInput<CreateSectionData> {
   @IsUUID("4")
       userId: string
   data: CreateSectionData
