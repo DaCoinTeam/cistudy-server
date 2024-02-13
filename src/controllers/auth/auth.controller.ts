@@ -13,7 +13,6 @@ import {
     AuthInterceptor,
     GenerateAuthTokensInterceptor,
 } from "../shared"
-import { UserMySqlEntity } from "@database"
 
 @ApiTags("Auth")
 @ApiHeader({
@@ -24,19 +23,19 @@ import { UserMySqlEntity } from "@database"
 export class AuthController {
     constructor(private readonly authService: AuthService){}
   @Post("sign-in")
-  @UseInterceptors(GenerateAuthTokensInterceptor<UserMySqlEntity>)
+  @UseInterceptors(GenerateAuthTokensInterceptor)
     async signIn(@Body() body: SignInData) {
         return this.authService.signIn({ data: body })
     }
 
   @Post("sign-up")
-  @UseInterceptors(GenerateAuthTokensInterceptor<UserMySqlEntity>)
+  @UseInterceptors(GenerateAuthTokensInterceptor)
   async signUp(@Body() body: SignUpData) {
   	return this.authService.signUp({ data: body })
   }
 
   @Get("verify-google-access-token")
-  @UseInterceptors(AuthInterceptor<UserMySqlEntity>)
+  @UseInterceptors(AuthInterceptor)
   async verifyGoogleAccessToken(@Query("token") token: string) {
   	return this.authService.verifyGoogleAccessToken({ data: token })
   }

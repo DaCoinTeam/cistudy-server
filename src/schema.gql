@@ -68,17 +68,18 @@ enum UserKind {
   Facebook
 }
 
-type FindProfileByBearerTokenOutput {
+type FindProfileByAuthTokenOutput {
   data: UserEntity!
   tokens: AuthTokens
 }
 
 type Query {
-  findProfileByBearerToken: FindProfileByBearerTokenOutput!
+  findProfileByAuthToken: FindProfileByAuthTokenOutput!
   findOneCourse(input: FindOneCourseInput!): CourseEntity!
   findManyCourses(input: FindManyCoursesInput): [CourseEntity!]!
   findOnePost(input: FindOnePostInput!): PostEntity!
   findManyPosts(input: FindManyPostsInput!): [PostEntity!]!
+  findOneUser(input: FindOneUserInput!): UserEntity!
 }
 
 input FindOneCourseInput {
@@ -101,4 +102,8 @@ input FindManyPostsInput {
   courseId: String!
   take: Int!
   skip: Int!
+}
+
+input FindOneUserInput {
+  userId: String!
 }

@@ -3,7 +3,7 @@ import { UserMySqlEntity } from "@database"
 import { Field, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
-export class FindProfileByBearerTokenOutput
+export class FindProfileByAuthTokenOutput
 implements IOutput<UserMySqlEntity>
 {
   @Field(() => UserMySqlEntity)

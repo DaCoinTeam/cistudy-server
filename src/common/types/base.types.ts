@@ -2,7 +2,7 @@ import { AuthTokens } from "./auth.types"
 
 export interface IOutput<T> {
     data: T,
-    tokens: AuthTokens 
+    tokens?: AuthTokens 
 }
 
 export interface IAuthInput<T> {
@@ -16,7 +16,7 @@ export interface IInput<T> {
     files?: Array<Express.Multer.File>
 }
 
-export interface IEmptyDataInput {
+export interface IAuthEmptyDataInput {
     userId: string,
     files?: Array<Express.Multer.File>
 }

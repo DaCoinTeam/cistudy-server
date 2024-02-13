@@ -54,8 +54,8 @@ export class PostsController {
   @Post("create-post")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
-    AuthInterceptor<UserMySqlEntity>,
-    FileFieldsInterceptor([{ name: "files" }]),
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files" }]),
   )
     async createPost(
     @UserId() userId: string,
@@ -71,8 +71,8 @@ export class PostsController {
   @Put("update-post")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
-    AuthInterceptor<UserMySqlEntity>,
-    FileFieldsInterceptor([{ name: "files" }]),
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files" }]),
   )
   async updatePost(
     @UserId() userId: string,
@@ -85,7 +85,7 @@ export class PostsController {
   @ApiBearerAuth()
   @Delete("delete-post")
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor<UserMySqlEntity>)
+  @UseInterceptors(AuthInterceptor)
   async deletePost(@UserId() userId: string, @Param("postId") postId: string) {
       console.log(postId)
   }
@@ -93,7 +93,7 @@ export class PostsController {
   @ApiBearerAuth()
   @Patch("react-post")
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor<UserMySqlEntity>)
+  @UseInterceptors(AuthInterceptor)
   async reactPost(@UserId() userId: string, @Body() body: ReactPostData) {
       return this.postsService.reactPost({
           userId,
@@ -107,8 +107,8 @@ export class PostsController {
   @Post("create-comment")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
-    AuthInterceptor<UserMySqlEntity>,
-    FileFieldsInterceptor([{ name: "files" }]),
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files" }]),
   )
   async createComment(
     @UserId() userId: string,
@@ -124,8 +124,8 @@ export class PostsController {
   @Put("update-comment")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
-    AuthInterceptor<UserMySqlEntity>,
-    FileFieldsInterceptor([{ name: "files" }]),
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files" }]),
   )
   async updateComment(
     @UserId() userId: string,
@@ -138,7 +138,7 @@ export class PostsController {
   @ApiBearerAuth()
   @Delete("delete-comment")
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor<UserMySqlEntity>)
+  @UseInterceptors(AuthInterceptor)
   async deleteComment(
     @UserId() userId: string,
     @Param("commentId") postId: string,
@@ -149,7 +149,7 @@ export class PostsController {
   @ApiBearerAuth()
   @Patch("react-comment")
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor<UserMySqlEntity>)
+  @UseInterceptors(AuthInterceptor)
   async reactComment(@UserId() userId: string, @Body() body: ReactPostData) {
       return null
   }

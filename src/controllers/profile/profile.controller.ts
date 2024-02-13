@@ -26,7 +26,7 @@ export class ProfileController{
     @Patch("update-cover-photo")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(
-        AuthInterceptor<UserMySqlEntity>,
+        AuthInterceptor,
         FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
     )
     async updateCoverPhoto(
@@ -44,7 +44,7 @@ export class ProfileController{
     @Patch("update-avatar")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(
-        AuthInterceptor<UserMySqlEntity>,
+        AuthInterceptor,
         FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
     )
     async updateAvatar(

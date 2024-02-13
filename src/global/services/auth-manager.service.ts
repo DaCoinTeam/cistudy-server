@@ -88,7 +88,7 @@ export class AuthManagerService {
         }
     }
 
-    async generateResponse<T extends object>(
+    async generateOutput<T extends object>(
         userId: string,
         data: T,
         authTokensRequested: boolean = false,

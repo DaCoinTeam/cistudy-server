@@ -1,12 +1,7 @@
-import { IEmptyDataInput } from "@common"
-import { Field, InputType } from "@nestjs/graphql"
-import { IsUUID } from "class-validator"
+import { IAuthEmptyDataInput } from "@common"
 
-@InputType()
-export class FindProfileByBearerTokenInput implements IEmptyDataInput {
-    @Field(() => String)
-    @IsUUID()
-        userId: string
+export class FindProfileByAuthTokenInput implements IAuthEmptyDataInput {
+    userId: string
 } 
 
 

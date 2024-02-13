@@ -25,7 +25,7 @@ implements NestInterceptor<T, IOutput<T>>
 
         return next.handle().pipe(
             mergeMap(async (data) => {
-                return await this.authManagerService.generateResponse<T>(
+                return await this.authManagerService.generateOutput<T>(
                     data.userId,
                     data,
                     true,

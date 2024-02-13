@@ -25,8 +25,6 @@ import {
     createLectureSchema,
 } from "./courses.schema"
 
-
-import { UserMySqlEntity } from "@database"
 import { Files } from "@common"
 import { CoursesService } from "./courses.service"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
@@ -46,8 +44,8 @@ export class CoursesController {
   @Post("create-course")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
-    AuthInterceptor<UserMySqlEntity>,
-    FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
   )
     async createCourse(
     @UserId() userId: string,
@@ -64,7 +62,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Post("create-section")
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor<UserMySqlEntity>)
+  @UseInterceptors(AuthInterceptor)
   async createSection(
     @UserId() userId: string,
     @Body() body: CreateSectionData,
@@ -81,8 +79,8 @@ export class CoursesController {
   @Post("create-lecture")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
-    AuthInterceptor<UserMySqlEntity>,
-    FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
   )
   async createLecture(
     @UserId() userId: string,
