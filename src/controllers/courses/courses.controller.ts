@@ -17,9 +17,11 @@ import {
 import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import {
     CreateCourseData,
+    CreateCourseTargetData,
     CreateLectureData,
     CreateSectionData,
     UpdateCourseData,
+    UpdateCourseTargetData,
 } from "./courses.input"
 
 import {
@@ -62,19 +64,19 @@ export class CoursesController {
         })
     }
 
-    @ApiBearerAuth()
-    @ApiConsumes("multipart/form-data")
-    @ApiBody({ schema: updateCourseSchema })
-    @Put("update-course")
-    @UseGuards(JwtAuthGuard)
-    @UseInterceptors(
-        AuthInterceptor,
-        FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
-    )
+  @ApiBearerAuth()
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({ schema: updateCourseSchema })
+  @Put("update-course")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
+  )
   async updateCourse(
-      @UserId() userId: string,
-      @DataFromBody() data: UpdateCourseData,
-      @UploadedFiles() { files }: Files,
+    @UserId() userId: string,
+    @DataFromBody() data: UpdateCourseData,
+    @UploadedFiles() { files }: Files,
   ) {
       return this.coursesService.updateCourse({
           userId,
@@ -82,21 +84,48 @@ export class CoursesController {
           files,
       })
   }
-  
+
+  @ApiBearerAuth()
+  @Post("create-course-target")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async createCourseTarget(
+    @UserId() userId: string,
+    @Body() body: CreateCourseTargetData,
+  ) {
+      return this.coursesService.createCourseTarget({
+          userId,
+          data: body,
+      })
+  }
+
+  @ApiBearerAuth()
+  @Put("update-course-target")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async updateCourseTarget(
+    @UserId() userId: string,
+    @Body() body: UpdateCourseTargetData,
+  ) {
+      return this.coursesService.updateCourseTargetInput({
+          userId,
+          data: body,
+      })
+  }
 
   @ApiBearerAuth()
   @Post("create-section")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
-    async createSection(
+  async createSection(
     @UserId() userId: string,
     @Body() body: CreateSectionData,
-    ) {
-        return this.coursesService.createSection({
-            userId,
-            data: body,
-        })
-    }
+  ) {
+      return this.coursesService.createSection({
+          userId,
+          data: body,
+      })
+  }
 
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")

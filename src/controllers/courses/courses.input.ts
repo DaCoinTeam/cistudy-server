@@ -1,6 +1,6 @@
 import { AuthInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsNumber, IsUUID, Length } from "class-validator"
+import { IsInt, IsNumber, IsUUID, Length } from "class-validator"
 
 export class CreateCourseData {
   @Length(20)
@@ -20,7 +20,42 @@ export class CreateCourseInput implements AuthInput<CreateCourseData> {
   @IsUUID("4")
       userId: string
   data: CreateCourseData
-  files: Express.Multer.File[]
+  files: Array<Express.Multer.File>
+}
+
+export class CreateCourseTargetData {
+  @IsUUID()
+  @ApiProperty()
+      courseId: string
+  @ApiProperty()
+      content: string
+  @IsInt()
+  @ApiProperty()
+      index: number
+}
+
+export class CreateCourseTargetInput
+implements AuthInput<CreateCourseTargetData>
+{
+  @IsUUID("4")
+      userId: string
+  data: CreateCourseTargetData
+}
+
+export class UpdateCourseTargetData {
+  @IsUUID()
+  @ApiProperty()
+      courseTargetId: string
+  @ApiProperty()
+      content: string
+}
+
+export class UpdateCourseTargetInput
+implements AuthInput<UpdateCourseTargetData>
+{
+  @IsUUID("4")
+      userId: string
+  data: UpdateCourseTargetData
 }
 
 export class UpdateCourseData {

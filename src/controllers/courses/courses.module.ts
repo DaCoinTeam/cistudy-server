@@ -15,6 +15,7 @@ import {
     PostCommentContentMySqlEntity,
     PostReactMySqlEntity,
     PostCommentLikeMySqlEntity,
+    CourseTargetMySqlEntity,
 } from "@database"
 import { CoursesService } from "./courses.service"
 
@@ -34,6 +35,7 @@ import { CoursesService } from "./courses.service"
             PostCommentContentMySqlEntity,
             PostReactMySqlEntity,
             PostCommentLikeMySqlEntity,
+            CourseTargetMySqlEntity
         ]),
     ],
     controllers: [CoursesController],

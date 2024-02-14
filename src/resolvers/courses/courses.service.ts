@@ -12,7 +12,17 @@ export class CoursesService {
     ) {}
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
-        return await this.courseMySqlRepository.findOneBy(input)
+        return await this.courseMySqlRepository.findOne({
+            where: { courseId: input.courseId },
+            relations: {
+                courseTargets: true
+            },
+            order: {
+                courseTargets: {
+                    index: "ASC"
+                }
+            }
+        })
     }
 
     async findManyCourses(input: FindManyCoursesInput): Promise<CourseMySqlEntity[]> {

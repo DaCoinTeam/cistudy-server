@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common"
 import {
     CourseMySqlEntity,
+    CourseTargetMySqlEntity,
     LectureMySqlEntity,
     SectionMySqlEntity,
 } from "@database"
@@ -12,6 +13,8 @@ import {
     CreateSectionInput,
     CreateLectureInput,
     UpdateCourseInput,
+    CreateCourseTargetInput,
+    UpdateCourseTargetInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -25,6 +28,8 @@ export class CoursesService {
     private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
     @InjectRepository(LectureMySqlEntity)
     private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
+    @InjectRepository(CourseTargetMySqlEntity)
+    private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
     private readonly storageService: StorageService,
     private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
     ) {}
@@ -80,7 +85,6 @@ export class CoursesService {
             price,
             title,
         }
-        console.log(files)
 
         if (Number.isInteger(thumbnailIndex)) {
             const file = files.at(thumbnailIndex)
@@ -133,5 +137,26 @@ export class CoursesService {
 
         if (created)
             return `A lecture with id ${created.lectureId} has been creeated successfully.`
+    }
+
+    async createCourseTarget(input: CreateCourseTargetInput): Promise<string> {
+        const { content, courseId, index } = input.data
+        const created = await this.courseTargetMySqlRepository.save({
+            courseId,
+            index,
+            content,
+        })
+        if (created)
+            return `A course target with id ${created.courseTargetId} has been creeated successfully.`
+    }
+
+    async updateCourseTargetInput(
+        input: UpdateCourseTargetInput,
+    ): Promise<string> {
+        const { content, courseTargetId } = input.data
+        await this.courseTargetMySqlRepository.update(courseTargetId, {
+            content,
+        })
+        return `A course target with id ${courseTargetId} has been creeated successfully.`
     }
 }

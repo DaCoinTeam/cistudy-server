@@ -3,6 +3,21 @@ type AuthTokens {
   refreshToken: String!
 }
 
+type CourseTargetEntity {
+  courseTargetId: ID!
+  content: String!
+  index: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  courseId: String!
+  course: CourseEntity!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type CourseEntity {
   courseId: ID!
   title: String!
@@ -14,8 +29,8 @@ type CourseEntity {
   creator: UserEntity!
   isDeleted: Boolean!
   previewVideoId: String
-  targets: String
   includes: String
+  courseTargets: [CourseTargetEntity!]
 }
 
 enum VerifiedStatus {
@@ -32,11 +47,6 @@ type PostEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type UserEntity {
   userId: ID!

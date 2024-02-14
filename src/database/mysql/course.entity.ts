@@ -5,6 +5,7 @@ import { PostEntity } from "./post.entity"
 import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { SectionEntity } from "./section.entity"
 import { UserEntity } from "./user.entity"
+import { CourseTargetEntity } from "./course-target.entity"
 
 interface CourseIncludes {
   time: number;
@@ -63,15 +64,15 @@ export class CourseEntity {
   	previewVideoId: string
 
   @Field(() => String, { nullable: true })
-  @Column({ type: "varchar", length: 255, default: null })
-  	targets: string
-
-  @Field(() => String, { nullable: true })
   @Column({ type: "json", default: null })
   	includes: CourseIncludes
 
+  @Field(() => [CourseTargetEntity], { nullable: true })
+  @OneToMany(() => CourseTargetEntity, (courseTarget) => courseTarget.course)
+  	courseTargets: Array<CourseTargetEntity>
+
   @OneToMany(() => PostEntity, (post) => post.course)
-  	posts: PostEntity[]
+  	posts: Array<PostEntity>
 
   @OneToMany(() => EnrolledInfoEntity, (enrolled) => enrolled.course)
   	enrolledInfos: EnrolledInfoEntity[]

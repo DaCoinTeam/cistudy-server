@@ -11,7 +11,7 @@ import { EnrolledInfoEntity as EnrolledInfoMySqlEntity } from "./enrolled-info.e
 import { SectionEntity as SectionMySqlEntity } from "./section.entity"
 import { LectureEntity as LectureMySqlEntity } from "./lecture.entity"
 import { ResourceEntity as ResourceMySqlEntity } from "./resource.entity"
-
+import { CourseTargetEntity as CourseTargetMySqlEntity } from "./course-target.entity"
 export {
     UserMySqlEntity,
     PostMySqlEntity,
@@ -26,4 +26,5 @@ export {
     SectionMySqlEntity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
+    CourseTargetMySqlEntity
 }

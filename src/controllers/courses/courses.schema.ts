@@ -52,7 +52,7 @@ export const updateCourseSchema : SchemaObject = {
                 previewVideoIndex: {
                     type: "number",
                     example: "1"
-                }
+                },
             },
         },
         files: {

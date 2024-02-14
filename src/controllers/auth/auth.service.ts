@@ -48,7 +48,8 @@ export class AuthService {
 
     async verifyGoogleAccessToken(input: VerifyGoogleAccessTokenInput): Promise<UserMySqlEntity> {
         const { data } = input
-  	const decoded = await this.firebaseService.verifyGoogleAccessToken(data)
+        const { token } = data
+  	const decoded = await this.firebaseService.verifyGoogleAccessToken(token)
   	if (!decoded)
   		throw new UnauthorizedException("Invalid Google access token.")
   	let found = await this.userMySqlRepository.findOneBy({
