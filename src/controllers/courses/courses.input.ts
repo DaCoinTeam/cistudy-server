@@ -46,8 +46,10 @@ export class UpdateCourseTargetData {
   @IsUUID()
   @ApiProperty()
       courseTargetId: string
-  @ApiProperty()
-      content: string
+  @ApiProperty({ nullable: true })
+      content?: string
+  @ApiProperty({ nullable: true })
+      index?: number
 }
 
 export class UpdateCourseTargetInput
@@ -89,6 +91,21 @@ export class UpdateCourseInput implements AuthInput<UpdateCourseData> {
       userId: string
   data: UpdateCourseData
   files: Express.Multer.File[]
+}
+
+export class DeleteCourseTargetData {
+  @IsUUID()
+  @ApiProperty()
+      courseTargetId: string
+}
+
+export class DeleteCourseTargetInput
+implements AuthInput<DeleteCourseTargetData>
+{
+  @IsUUID("4")
+      userId: string
+  @ApiProperty()
+      data: DeleteCourseTargetData
 }
 
 export class CreateLectureData {

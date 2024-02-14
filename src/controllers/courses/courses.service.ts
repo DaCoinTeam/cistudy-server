@@ -15,6 +15,7 @@ import {
     UpdateCourseInput,
     CreateCourseTargetInput,
     UpdateCourseTargetInput,
+    DeleteCourseTargetInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -147,16 +148,20 @@ export class CoursesService {
             content,
         })
         if (created)
-            return `A course target with id ${created.courseTargetId} has been creeated successfully.`
+            return `A course target with id ${created.courseTargetId} has been created successfully.`
     }
 
-    async updateCourseTargetInput(
-        input: UpdateCourseTargetInput,
-    ): Promise<string> {
+    async updateCourseTarget(input: UpdateCourseTargetInput): Promise<string> {
         const { content, courseTargetId } = input.data
         await this.courseTargetMySqlRepository.update(courseTargetId, {
             content,
         })
-        return `A course target with id ${courseTargetId} has been creeated successfully.`
+        return `A course target with id ${courseTargetId} has been updated successfully.`
+    }
+
+    async deleteCourseTarget(input: DeleteCourseTargetInput): Promise<string> {
+        const { courseTargetId } = input.data
+        await this.courseTargetMySqlRepository.delete({ courseTargetId })
+        return `A course target with id ${courseTargetId} has been deleted successfully.`
     }
 }

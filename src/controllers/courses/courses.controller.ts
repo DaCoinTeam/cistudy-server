@@ -6,6 +6,8 @@ import {
     UploadedFiles,
     Body,
     Put,
+    Delete,
+    Param,
 } from "@nestjs/common"
 import {
     ApiBearerAuth,
@@ -107,9 +109,23 @@ export class CoursesController {
     @UserId() userId: string,
     @Body() body: UpdateCourseTargetData,
   ) {
-      return this.coursesService.updateCourseTargetInput({
+      return this.coursesService.updateCourseTarget({
           userId,
           data: body,
+      })
+  }
+
+  @ApiBearerAuth()
+  @Delete("delete-course-target/:courseTargetId")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async deleteCoureTarget(
+    @UserId() userId: string,
+    @Param("courseTargetId") courseTargetId: string,
+  ) {
+      return this.coursesService.deleteCourseTarget({
+          userId,
+          data: { courseTargetId },
       })
   }
 
