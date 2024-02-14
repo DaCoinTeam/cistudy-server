@@ -43,9 +43,15 @@ export class SignUpInput implements Input<SignUpData> {
     data: SignUpData
 }
   
-export class VerifyGoogleAccessTokenInput implements Input<string> {
+export class VerifyGoogleAccessTokenData {
     @IsJWT()
     @ApiProperty()
-        data: string
+        token: string
+}
+
+export class VerifyGoogleAccessTokenInput implements Input<VerifyGoogleAccessTokenData> {
+    @IsJWT()
+    @ApiProperty()
+        data: VerifyGoogleAccessTokenData
 }
   

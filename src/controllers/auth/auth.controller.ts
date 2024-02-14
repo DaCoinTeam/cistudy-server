@@ -7,12 +7,9 @@ import {
     Query,
 } from "@nestjs/common"
 import { ApiHeader, ApiTags } from "@nestjs/swagger"
-import { SignInData, SignUpData, } from "./auth.input"
+import { SignInData, SignUpData } from "./auth.input"
 import { AuthService } from "./auth.service"
-import {
-    AuthInterceptor,
-    GenerateAuthTokensInterceptor,
-} from "../shared"
+import { AuthInterceptor, GenerateAuthTokensInterceptor } from "../shared"
 
 @ApiTags("Auth")
 @ApiHeader({
@@ -21,7 +18,7 @@ import {
 })
 @Controller("api/auth")
 export class AuthController {
-    constructor(private readonly authService: AuthService){}
+    constructor(private readonly authService: AuthService) {}
   @Post("sign-in")
   @UseInterceptors(GenerateAuthTokensInterceptor)
     async signIn(@Body() body: SignInData) {
@@ -31,12 +28,12 @@ export class AuthController {
   @Post("sign-up")
   @UseInterceptors(GenerateAuthTokensInterceptor)
   async signUp(@Body() body: SignUpData) {
-  	return this.authService.signUp({ data: body })
+      return this.authService.signUp({ data: body })
   }
 
   @Get("verify-google-access-token")
   @UseInterceptors(AuthInterceptor)
   async verifyGoogleAccessToken(@Query("token") token: string) {
-  	return this.authService.verifyGoogleAccessToken({ data: token })
+      return this.authService.verifyGoogleAccessToken({ data: { token } })
   }
 }
