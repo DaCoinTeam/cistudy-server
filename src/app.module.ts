@@ -43,6 +43,7 @@ import { APP_PIPE } from "@nestjs/core"
             typePaths: ["./**/*.gql"],
             playground: false,
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
+            introspection: true
         }),
 
         ResolversModule,
