@@ -54,7 +54,7 @@ export class AssetsService {
         
         response.statusCode = HttpStatus.PARTIAL_CONTENT
 
-        const readableStream = await this.storageService.createReadStream(
+        const readStream = await this.storageService.createReadStream(
             assetIdOrPath,
             {
                 start,
@@ -63,7 +63,7 @@ export class AssetsService {
         )
         const contentType = extnameConfig().extnameToContentType[extname(filename)]
 
-        return new StreamableFile(readableStream, {
+        return new StreamableFile(readStream, {
             type: contentType,
             length: chunksize
         })
