@@ -51,8 +51,7 @@ export class AssetsService {
 
         response.setHeader("Content-Range", `bytes ${start}-${end}/${size}`)
         response.setHeader("Accept-Ranges", "bytes")
-        response.setHeader("Content-Length", chunksize)
-
+        
         response.statusCode = HttpStatus.PARTIAL_CONTENT
 
         const readableStream = await this.storageService.createReadStream(
@@ -66,6 +65,7 @@ export class AssetsService {
 
         return new StreamableFile(readableStream, {
             type: contentType,
+            length: chunksize
         })
     }
 }
