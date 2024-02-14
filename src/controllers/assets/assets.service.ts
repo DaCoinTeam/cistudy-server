@@ -45,8 +45,8 @@ export class AssetsService {
         const { size } = await this.storageService.getStat(assetIdOrPath)
         const parts = range.replace(/bytes=/, "").split("-")
         const start = Number.parseInt(parts.at(0), 10)
-        const partAt1 = parts.at(1)
-        const end = partAt1 ? Number.parseInt(partAt1, 10) : size - 1
+        const partAtOne = parts.at(1)
+        const end = partAtOne ? Number.parseInt(partAtOne, 10) : size - 1
         const chunksize = end - start + 1
 
         response.setHeader("Content-Range", `bytes ${start}-${end}/${size}`)
