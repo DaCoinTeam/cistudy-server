@@ -141,11 +141,15 @@ export class CoursesService {
     }
 
     async createCourseTarget(input: CreateCourseTargetInput): Promise<string> {
-        const { content, courseId, index } = input.data
+        const { content, courseId } = input.data
+        const query = this.courseTargetMySqlRepository.createQueryBuilder()
+        query.select("MAX(position)", "max")
+        const result = await query.getRawOne()
+        const max = result.max as number
         const created = await this.courseTargetMySqlRepository.save({
             courseId,
-            index,
             content,
+            position: max + 1
         })
         if (created)
             return `A course target with id ${created.courseTargetId} has been created successfully.`

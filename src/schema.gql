@@ -6,7 +6,7 @@ type AuthTokens {
 type CourseTargetEntity {
   courseTargetId: ID!
   content: String!
-  index: Int!
+  position: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
   courseId: String!

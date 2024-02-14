@@ -1,6 +1,6 @@
 import { AuthInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsInt, IsNumber, IsUUID, Length } from "class-validator"
+import { IsNumber, IsUUID, Length } from "class-validator"
 
 export class CreateCourseData {
   @Length(20)
@@ -29,9 +29,6 @@ export class CreateCourseTargetData {
       courseId: string
   @ApiProperty()
       content: string
-  @IsInt()
-  @ApiProperty()
-      index: number
 }
 
 export class CreateCourseTargetInput
@@ -49,7 +46,7 @@ export class UpdateCourseTargetData {
   @ApiProperty({ nullable: true })
       content?: string
   @ApiProperty({ nullable: true })
-      index?: number
+      position?: number
 }
 
 export class UpdateCourseTargetInput

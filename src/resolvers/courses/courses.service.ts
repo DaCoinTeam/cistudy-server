@@ -19,7 +19,7 @@ export class CoursesService {
             },
             order: {
                 courseTargets: {
-                    index: "ASC"
+                    position: "ASC"
                 }
             }
         })

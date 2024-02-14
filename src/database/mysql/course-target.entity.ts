@@ -7,7 +7,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
 } from "typeorm"
-import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
+import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
 import { CourseEntity } from "./course.entity"
 
 @ObjectType()
@@ -21,9 +21,9 @@ export class CourseTargetEntity {
   @Column({ type: "varchar", length: 200 })
       content: string
 
-  @Field(() => Int)
-  @Column({ type: "int", default: 0 })
-      index: number
+  @Field(() => Float)
+  @Column({ type: "float", default: 0 })
+      position: number
 
   @Field(() => Date)
   @CreateDateColumn()
