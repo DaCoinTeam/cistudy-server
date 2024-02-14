@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DeepPartial } from "typeorm"
-import { SupabaseService } from "@global"
+import { StorageService } from "@global"
 import { UpdateProfileInput } from "./profile.input"
 import { UserEntity } from "src/database/mysql/user.entity"
 import { UserMySqlEntity } from "@database"
@@ -11,7 +11,7 @@ export class ProfileService {
     constructor(
         @InjectRepository(UserEntity)
         private readonly userMySqlRepository: Repository<UserEntity>,
-        private readonly supabaseService: SupabaseService
+        private readonly storageService: StorageService
     ) { }
 
     async updateProfile(input: UpdateProfileInput): Promise<string> {
@@ -22,12 +22,12 @@ export class ProfileService {
         const profile : DeepPartial<UserMySqlEntity> = {}
         if (Number.isInteger(avatarIndex)) {
             const file = files.at(avatarIndex)
-            const { assetId } = await this.supabaseService.upload(file)
+            const { assetId } = await this.storageService.upload(file)
             profile.avatarId = assetId
         }
         if (Number.isInteger(coverPhotoIndex)) {
             const file = files.at(coverPhotoIndex)
-            const { assetId } = await this.supabaseService.upload(file)
+            const { assetId } = await this.storageService.upload(file)
             profile.coverPhotoId = assetId
         }
         await this.userMySqlRepository.update(userId, profile)

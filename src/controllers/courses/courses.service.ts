@@ -6,7 +6,7 @@ import {
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
-import { SupabaseService } from "@global"
+import { StorageService } from "@global"
 import {
     CreateCourseInput,
     CreateSectionInput,
@@ -25,7 +25,7 @@ export class CoursesService {
     private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
     @InjectRepository(LectureMySqlEntity)
     private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
-    private readonly supabaseService: SupabaseService,
+    private readonly storageService: StorageService,
     private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
     ) {}
 
@@ -36,7 +36,7 @@ export class CoursesService {
         let thumbnailId: string
         const thumbnail = input.files.at(0)
         const uploadThumbnailPromise = async () => {
-            const { assetId } = await this.supabaseService.upload(thumbnail)
+            const { assetId } = await this.storageService.upload(thumbnail)
             thumbnailId = assetId
         }
         promises.push(uploadThumbnailPromise())
@@ -44,7 +44,7 @@ export class CoursesService {
         let previewVideoId: string
         const previewVideo = input.files.at(1)
         const uploadPreviewVideoPromise = async () => {
-            const { assetId } = await this.supabaseService.upload(previewVideo)
+            const { assetId } = await this.storageService.upload(previewVideo)
             previewVideoId = assetId
         }
         promises.push(uploadPreviewVideoPromise())
@@ -80,16 +80,16 @@ export class CoursesService {
             price,
             title,
         }
-        console.log(course)
-        
+        console.log(files)
+
         if (Number.isInteger(thumbnailIndex)) {
             const file = files.at(thumbnailIndex)
-            const { assetId } = await this.supabaseService.upload(file)
+            const { assetId } = await this.storageService.upload(file)
             course.thumbnailId = assetId
         }
         if (Number.isInteger(previewVideoIndex)) {
             const file = files.at(previewVideoIndex)
-            const { assetId } = await this.supabaseService.upload(file)
+            const { assetId } = await this.storageService.upload(file)
             course.previewVideoId = assetId
         }
         await this.courseMySqlRepository.update(courseId, course)

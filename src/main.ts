@@ -1,6 +1,6 @@
 import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
-import appConfig from "./config/env/app.config"
+import { appConfig }  from "@config"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 import { ProfileResolver, CoursesResolver, PostsResolver, UsersResolver } from "@resolvers"
 import { promises as fsPromises } from "fs"

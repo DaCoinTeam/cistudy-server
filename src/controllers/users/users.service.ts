@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
-import { SupabaseService } from "@global"
+import { StorageService } from "@global"
 import { UpdateAvatarInput, UpdateCoverPhotoInput } from "./shared"
 import { UserEntity } from "src/database/mysql/user.entity"
 
@@ -10,7 +10,7 @@ export class ProfileService {
     constructor(
         @InjectRepository(UserEntity)
         private readonly userMySqlRepository: Repository<UserEntity>,
-        private readonly supabaseService: SupabaseService
+        private readonly storageService: StorageService
     ) { }
 
     async updateCoverPhoto(input: UpdateCoverPhotoInput): Promise<string> {
@@ -18,7 +18,7 @@ export class ProfileService {
         const file = files.at(0)
         //validate to ensure it is image
 
-        const { assetId } = await this.supabaseService.upload(file)
+        const { assetId } = await this.storageService.upload(file)
 
         await this.userMySqlRepository.update(userId, {
             coverPhotoId : assetId
@@ -32,7 +32,7 @@ export class ProfileService {
         const file = files.at(0)
         //validate to ensure it is image
 
-        const { assetId } = await this.supabaseService.upload(file)
+        const { assetId } = await this.storageService.upload(file)
 
         await this.userMySqlRepository.update(userId, {
             avatarId : assetId

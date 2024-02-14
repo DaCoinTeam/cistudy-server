@@ -1,7 +1,17 @@
 import { Input } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
+import { Response } from "express"
 
-export class GetInput implements Input<string>  {
+export class GetAssetData {
   @ApiProperty()
-  	data: string
+      assetIdOrPath: string
 }
+export class GetAssetInput implements Input<GetAssetData> {
+  @ApiProperty()
+      data: GetAssetData
+}
+
+export type GetFileOptions = Partial<{
+  response: Response;
+  range: string;
+}>;

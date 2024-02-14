@@ -1,4 +1,4 @@
-import { SupabaseService } from "@global"
+import { StorageService } from "@global"
 import { Injectable } from "@nestjs/common"
 import {
     CreateCommentInput,
@@ -33,7 +33,7 @@ export class PostsService {
     @InjectRepository(PostCommentContentMySqlEntity)
     private readonly postCommentContentMySqlRepository: Repository<PostCommentContentMySqlEntity>,
 
-    private readonly supabaseService: SupabaseService,
+    private readonly storageService: StorageService,
     ) {}
 
     private appendIndexFile<T extends ContentData>(
@@ -70,7 +70,7 @@ export class PostsService {
             ) {
                 const promise = async () => {
                     const file = files.at(appendedPostContent.indexFile)
-                    const { assetId } = await this.supabaseService.upload(file)
+                    const { assetId } = await this.storageService.upload(file)
                     appendedPostContent.content = assetId
                 }
                 promises.push(promise())
@@ -116,7 +116,7 @@ export class PostsService {
             ) {
                 const promise = async () => {
                     const file = files.at(appendedPostContent.indexFile)
-                    const { assetId } = await this.supabaseService.upload(file)
+                    const { assetId } = await this.storageService.upload(file)
                     appendedPostContent.content = assetId
                 }
                 promises.push(promise())
@@ -172,7 +172,7 @@ export class PostsService {
             ) {
                 const promise = async () => {
                     const file = files.at(appendedPostCommentContent.indexFile)
-                    const { assetId } = await this.supabaseService.upload(file)
+                    const { assetId } = await this.storageService.upload(file)
                     appendedPostCommentContent.content = assetId
                 }
                 promises.push(promise())
@@ -218,7 +218,7 @@ export class PostsService {
             ) {
                 const promise = async () => {
                     const file = files.at(appendedPostCommentContent.indexFile)
-                    const { assetId } = await this.supabaseService.upload(file)
+                    const { assetId } = await this.storageService.upload(file)
                     appendedPostCommentContent.postCommentId = assetId
                 }
                 promises.push(promise())

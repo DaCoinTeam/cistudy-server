@@ -61,6 +61,9 @@ ENV NODE_ENV production
 # Make tasks dir
 RUN mkdir -p /usr/src/app/tasks/process-mpeg-dash
 
+# Make storage dir
+RUN mkdir -p /usr/src/app/storage
+
 # Copy tools file
 RUN mkdir -p /usr/src/app/tools/Bento4-Docker
 COPY tools/Bento4-Docker /usr/src/app/tools/Bento4-Docker

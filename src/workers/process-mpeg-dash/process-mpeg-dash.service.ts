@@ -2,7 +2,7 @@ import { AnyFile, FileAndSubdirectory, Metadata, isMinimalFile } from "@common"
 import { Injectable, Logger } from "@nestjs/common"
 import { promises as fsPromise } from "fs"
 import { basename, dirname, extname, join } from "path"
-import { FfmpegService, Bento4Service, SupabaseService } from "@global"
+import { FfmpegService, Bento4Service, StorageService } from "@global"
 import { pathsConfig, videoConfig } from "@config"
 import { validate as validateUuidv4 } from "uuid"
 
@@ -12,7 +12,7 @@ const MANIFEST_FILE_NAME = "manifest.mpd"
 export class ProcessMpegDashService {
     private readonly logger = new Logger(ProcessMpegDashService.name)
     constructor(
-    private readonly supabaseService: SupabaseService,
+    private readonly storageService: StorageService,
     private readonly ffmegService: FfmpegService,
     private readonly bento4Service: Bento4Service,
     ) {}
@@ -36,7 +36,7 @@ export class ProcessMpegDashService {
         const fileBody = _isMinimalFile ? file.fileBody : file.buffer
         if (!this.validateVideoExtension(filename))
             throw new Error("Invalid video file extension")
-        const metadata = await this.supabaseService.upload(file)
+        const metadata = await this.storageService.upload(file)
         const dir = join(
             pathsConfig().processMpegDashTasksDirectory,
             metadata.assetId,
@@ -90,7 +90,7 @@ export class ProcessMpegDashService {
         const fileAndSubdirectories: Array<FileAndSubdirectory> = []
         const path = join(pathsConfig().processMpegDashTasksDirectory, assetId)
         await this.uploadMpegDashManifestRecusive(path, fileAndSubdirectories)
-        await this.supabaseService.update(assetId, fileAndSubdirectories, {
+        await this.storageService.update(assetId, fileAndSubdirectories, {
             assetId,
             filename: MANIFEST_FILE_NAME,
         })

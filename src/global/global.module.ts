@@ -24,7 +24,7 @@ import {
     MailerService,
     Sha256Service,
     ShellService,
-    SupabaseService
+    StorageService
 } from "./services"
 import { JwtStrategy } from "./strategies"
 
@@ -57,7 +57,7 @@ import { JwtStrategy } from "./strategies"
         MailerService,
         Sha256Service,
         ShellService,
-        SupabaseService,
+        StorageService,
         JwtStrategy
     ],
     providers: [
@@ -69,7 +69,7 @@ import { JwtStrategy } from "./strategies"
         MailerService,
         Sha256Service,
         ShellService,
-        SupabaseService,
+        StorageService,
         JwtStrategy
     ],
 })

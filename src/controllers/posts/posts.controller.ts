@@ -53,10 +53,7 @@ export class PostsController {
   @ApiBody({ schema: createPostSchema })
   @Post("create-post")
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-      AuthInterceptor,
-      FileFieldsInterceptor([{ name: "files" }]),
-  )
+  @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
     async createPost(
     @UserId() userId: string,
     @DataFromBody() data: CreatePostData,
@@ -70,10 +67,7 @@ export class PostsController {
   @ApiBody({ schema: updatePostSchema })
   @Put("update-post")
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-      AuthInterceptor,
-      FileFieldsInterceptor([{ name: "files" }]),
-  )
+  @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
   async updatePost(
     @UserId() userId: string,
     @DataFromBody() data: UpdatePostData,
@@ -106,10 +100,7 @@ export class PostsController {
   @ApiBody({ schema: createCommentSchema })
   @Post("create-comment")
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-      AuthInterceptor,
-      FileFieldsInterceptor([{ name: "files" }]),
-  )
+  @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
   async createComment(
     @UserId() userId: string,
     @DataFromBody() data: CreateCommentData,
@@ -123,10 +114,7 @@ export class PostsController {
   @ApiBody({ schema: updateCommentSchema })
   @Put("update-comment")
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-      AuthInterceptor,
-      FileFieldsInterceptor([{ name: "files" }]),
-  )
+  @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
   async updateComment(
     @UserId() userId: string,
     @DataFromBody() data: UpdateCommentData,

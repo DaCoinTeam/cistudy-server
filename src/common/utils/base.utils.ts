@@ -1,4 +1,5 @@
 import { appConfig } from "@config"
+import { existsSync, promises as fsPromises } from "fs"
 
 const CLIENT_ID = "client-id"
 export const getClientId = (request: Request) =>
@@ -14,5 +15,11 @@ export const getEnvValue = (values: {
         return production
     default:
         return development
+    }
+}
+
+export const makeDirectoryIfNotExisted = async (directory: string) => {
+    if (!existsSync(directory)) {
+        await fsPromises.mkdir(directory, { recursive: true })
     }
 }
