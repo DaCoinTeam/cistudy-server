@@ -121,11 +121,8 @@ export class StorageService {
         const fileBody = _isMinimalFile ? rootFile.fileBody : rootFile.buffer
         await this.writeFile([assetId, filename], fileBody)
 
-        if (fileAndSubdirectories){
-            for (const {
-                file: fileExtra,
-                subdirectory,
-            } of fileAndSubdirectories) {
+        if (fileAndSubdirectories) {
+            for (const { file: fileExtra, subdirectory } of fileAndSubdirectories) {
                 const isMinimalFileExtra = isMinimalFile(fileExtra)
                 const filenameExtra = isMinimalFileExtra
                     ? fileExtra.filename
@@ -133,7 +130,7 @@ export class StorageService {
                 const fileBodyExtra = isMinimalFileExtra
                     ? fileExtra.fileBody
                     : fileExtra.buffer
-    
+
                 const directory = subdirectory ? join(assetId, subdirectory) : assetId
                 await this.writeFile([directory, filenameExtra], fileBodyExtra)
             }
@@ -148,7 +145,7 @@ export class StorageService {
         return metadata
     }
 
-    private async clearDirectory (assetId: string) {
+    private async clearDirectory(assetId: string) {
         const directory = join(pathsConfig().storageDirectory, assetId)
         const filenames = await fsPromises.readdir(directory)
         for (const filename of filenames) {
@@ -157,7 +154,6 @@ export class StorageService {
     }
 
     async update(assetId: string, data: WriteData, options?: UpdateOptions) {
-        
         const { rootFile, fileAndSubdirectories } = data
         const { clearDirectory } = options
         if (clearDirectory) await this.clearDirectory(assetId)
@@ -165,9 +161,11 @@ export class StorageService {
         if (rootFile) {
             const isMinimalRootFile = isMinimalFile(rootFile)
 
-            const filename = isMinimalRootFile ? rootFile.filename : rootFile.originalname
+            const filename = isMinimalRootFile
+                ? rootFile.filename
+                : rootFile.originalname
             const fileBody = isMinimalRootFile ? rootFile.fileBody : rootFile.buffer
-            
+
             const metadata: Metadata = {
                 assetId,
                 filename,
@@ -177,7 +175,7 @@ export class StorageService {
             await this.uploadMetadata(metadata)
         }
 
-        if (fileAndSubdirectories){
+        if (fileAndSubdirectories) {
             for (const { file, subdirectory } of fileAndSubdirectories) {
                 const _isMinimalFile = isMinimalFile(file)
                 const filename = _isMinimalFile ? file.filename : file.originalname
@@ -186,7 +184,6 @@ export class StorageService {
                 await this.writeFile([directory, filename], fileBody)
             }
         }
-
     }
 }
 
@@ -200,6 +197,6 @@ type WriteData = Partial<{
   fileAndSubdirectories: Array<FileAndSubdirectory>;
 }>;
 
-interface UpdateOptions {
-    clearDirectory?: boolean
-}
+type UpdateOptions = Partial<{
+  clearDirectory?: boolean;
+}>;
