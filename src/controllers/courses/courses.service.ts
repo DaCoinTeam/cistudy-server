@@ -106,10 +106,7 @@ export class CoursesService {
                         thumbnailId,
                         {
                             rootFile: file,
-                        },
-                        {
-                            clearDirectory: true,
-                        },
+                        }
                     )
                 } else {
                     const { assetId } = await this.storageService.upload({
@@ -129,9 +126,6 @@ export class CoursesService {
                         thumbnailId,
                         {
                             rootFile: file,
-                        },
-                        {
-                            clearDirectory: true,
                         },
                     )
                 } else {
@@ -209,9 +203,6 @@ export class CoursesService {
                         {
                             rootFile: file,
                         },
-                        {
-                            clearDirectory: true,
-                        },
                     )
                 } else {
                     const { assetId } = await this.storageService.upload({
@@ -231,9 +222,6 @@ export class CoursesService {
                         thumbnailId,
                         {
                             rootFile: file,
-                        },
-                        {
-                            clearDirectory: true,
                         },
                     )
                 } else {

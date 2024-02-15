@@ -32,9 +32,6 @@ export class ProfileService {
                     {
                         rootFile: file,
                     },
-                    {
-                        clearDirectory: true,
-                    },
                 )
             } else {
                 const { assetId } = await this.storageService.upload({
@@ -51,9 +48,7 @@ export class ProfileService {
                     {
                         rootFile: file,
                     },
-                    {
-                        clearDirectory: true,
-                    },
+
                 )
             } else {
                 const { assetId } = await this.storageService.upload({

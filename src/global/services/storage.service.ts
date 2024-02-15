@@ -155,8 +155,8 @@ export class StorageService {
 
     async update(assetId: string, data: WriteData, options?: UpdateOptions) {
         const { rootFile, fileAndSubdirectories } = data
-        const { clearDirectory } = options
-        if (clearDirectory) await this.clearDirectory(assetId)
+        const { keepDirectory } = options
+        if (!keepDirectory) await this.clearDirectory(assetId)
 
         if (rootFile) {
             const isMinimalRootFile = isMinimalFile(rootFile)
@@ -198,5 +198,5 @@ type WriteData = Partial<{
 }>;
 
 type UpdateOptions = Partial<{
-  clearDirectory?: boolean;
+  keepDirectory?: boolean;
 }>;
