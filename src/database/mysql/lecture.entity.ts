@@ -5,35 +5,46 @@ import {
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
+    CreateDateColumn,
+    UpdateDateColumn,
 } from "typeorm"
 import { SectionEntity } from "./section.entity"
 import { ResourceEntity } from "./resource.entity"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 
+@ObjectType()
 @Entity("lecture")
 export class LectureEntity {
-    @PrimaryGeneratedColumn("uuid")
-    	lectureId: string
+  @Field(() => ID)
+  @PrimaryGeneratedColumn("uuid")
+      lectureId: string
 
-    @Column({ type: "varchar", length: 150 })
-    	title: string
+  @Field(() => String)
+  @Column({ type: "varchar", length: 150 })
+      title: string
 
-    @Column({ type: "uuid", length: 36 })
-    	videoId: string
+  @Field(() => String)
+  @Column({ type: "uuid", length: 36 })
+      videoId: string
 
-    @Column({ name: "sectionId", type: "uuid", length: 36 })
-    	sectionId: string
+  @Field(() => String)
+  @Column({ name: "sectionId", type: "uuid", length: 36 })
+      sectionId: string
 
-    @Column({
-    	type: "timestamp",
-    	default: () => "CURRENT_TIMESTAMP",
-    	onUpdate: "CURRENT_TIMESTAMP",
-    })
-    	createdAt: Date
+  @Field(() => Date)
+  @CreateDateColumn()
+      createdAt: Date
 
-    @ManyToOne(() => SectionEntity, (section) => section.lecture)
-    @JoinColumn({ name: "sectionId" })
-    	section: SectionEntity
+  @Field(() => Date)
+  @UpdateDateColumn()
+      updatedAt: Date
 
-    @OneToMany(() => ResourceEntity, (resource) => resource.lecture)
-    	resource: ResourceEntity
+  @Field(() => SectionEntity)
+  @ManyToOne(() => SectionEntity, (section) => section.lectures)
+  @JoinColumn({ name: "sectionId" })
+      section: SectionEntity
+
+  @Field(() => [ResourceEntity])
+  @OneToMany(() => ResourceEntity, (resource) => resource.lecture)
+      resources: Array<ResourceEntity>
 }

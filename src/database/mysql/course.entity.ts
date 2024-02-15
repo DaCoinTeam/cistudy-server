@@ -77,6 +77,7 @@ export class CourseEntity {
   @OneToMany(() => EnrolledInfoEntity, (enrolled) => enrolled.course)
   	enrolledInfos: EnrolledInfoEntity[]
 
+  @Field(() => [SectionEntity])
   @OneToMany(() => SectionEntity, (section) => section.course, {
   	onDelete: "CASCADE",
   })

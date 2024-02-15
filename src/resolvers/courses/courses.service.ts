@@ -15,6 +15,11 @@ export class CoursesService {
         return await this.courseMySqlRepository.findOne({
             where: { courseId: input.courseId },
             relations: {
+                sections: {
+                    lectures: {
+                        resources: true
+                    }
+                },
                 courseTargets: true
             },
             order: {

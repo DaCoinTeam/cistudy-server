@@ -8,29 +8,37 @@ import {
 } from "typeorm"
 import { LectureEntity } from "./lecture.entity"
 import { CourseEntity } from "./course.entity"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 
+@ObjectType()
 @Entity("section")
 export class SectionEntity {
-    @PrimaryGeneratedColumn("uuid")
-    	sectionId: string
+  @Field(() => ID)
+  @PrimaryGeneratedColumn("uuid")
+      sectionId: string
 
-    @Column({ type: "varchar", length: 200 })
-    	title: string
+  @Field(() => String)
+  @Column({ type: "varchar", length: 200 })
+      title: string
 
-    @Column({ name: "courseId", type: "uuid", length: 36 })
-    	courseId: string
+  @Field(() => String)
+  @Column({ name: "courseId", type: "uuid", length: 36 })
+      courseId: string
 
-    @Column({
-    	type: "timestamp",
-    	default: () => "CURRENT_TIMESTAMP",
-    	onUpdate: "CURRENT_TIMESTAMP",
-    })
-    	createdAt: Date
+  @Field(() => Date)
+  @Column({
+      type: "timestamp",
+      default: () => "CURRENT_TIMESTAMP",
+      onUpdate: "CURRENT_TIMESTAMP",
+  })
+      createdAt: Date
 
-    @ManyToOne(() => CourseEntity, (course) => course.sections)
-    @JoinColumn({ name: "courseId" })
-    	course: CourseEntity
+  @Field(() => CourseEntity)
+  @ManyToOne(() => CourseEntity, (course) => course.sections)
+  @JoinColumn({ name: "courseId" })
+      course: CourseEntity
 
-    @OneToMany(() => LectureEntity, (video) => video.section)
-    	lecture: LectureEntity[]
+  @Field(() => [LectureEntity])
+  @OneToMany(() => LectureEntity, (video) => video.section)
+      lectures: Array<LectureEntity>
 }

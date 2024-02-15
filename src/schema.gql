@@ -3,6 +3,41 @@ type AuthTokens {
   refreshToken: String!
 }
 
+type ResourceEntity {
+  resourceId: ID!
+  name: String!
+  fileId: String!
+  lectureId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  lecture: LectureEntity!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type LectureEntity {
+  lectureId: ID!
+  title: String!
+  videoId: String!
+  sectionId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  section: SectionEntity!
+  resources: [ResourceEntity!]!
+}
+
+type SectionEntity {
+  sectionId: ID!
+  title: String!
+  courseId: String!
+  createdAt: DateTime!
+  course: CourseEntity!
+  lectures: [LectureEntity!]!
+}
+
 type CourseTargetEntity {
   courseTargetId: ID!
   content: String!
@@ -12,11 +47,6 @@ type CourseTargetEntity {
   courseId: String!
   course: CourseEntity!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type CourseEntity {
   courseId: ID!
@@ -31,6 +61,7 @@ type CourseEntity {
   previewVideoId: String
   includes: String
   courseTargets: [CourseTargetEntity!]
+  sections: [SectionEntity!]!
 }
 
 enum VerifiedStatus {

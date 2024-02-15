@@ -21,6 +21,7 @@ import {
     CreateCourseData,
     CreateCourseTargetData,
     CreateLectureData,
+    CreateResourcesData,
     CreateSectionData,
     UpdateCourseData,
     UpdateCourseTargetData,
@@ -29,6 +30,7 @@ import {
 import {
     createCourseSchema,
     createLectureSchema,
+    createResourcesSchema,
     updateCourseSchema,
 } from "./courses.schema"
 
@@ -158,6 +160,27 @@ export class CoursesController {
     @UploadedFiles() { files }: Files,
   ) {
       return this.coursesService.createLecture({
+          userId,
+          data,
+          files,
+      })
+  }
+
+  @ApiBearerAuth()
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({ schema: createResourcesSchema })
+  @Post("create-resources")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files", maxCount: 10 }]),
+  )
+  async createResoures(
+    @UserId() userId: string,
+    @DataFromBody() data: CreateResourcesData,
+    @UploadedFiles() { files }: Files,
+  ) {
+      return this.coursesService.createResources({
           userId,
           data,
           files,

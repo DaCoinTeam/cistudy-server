@@ -136,3 +136,16 @@ export class CreateSectionInput implements AuthInput<CreateSectionData> {
       userId: string
   data: CreateSectionData
 }
+
+export class CreateResourcesData {
+    @IsUUID("4")
+    @ApiProperty()
+        lectureId: string
+}
+export class CreateResourcesInput implements AuthInput<CreateResourcesData> {
+    @IsUUID("4")
+        userId: string
+    data: CreateResourcesData
+    files: Express.Multer.File[]
+}
+  

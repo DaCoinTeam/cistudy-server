@@ -88,3 +88,24 @@ export const createLectureSchema : SchemaObject = {
         },
     }
 }
+
+export const createResourcesSchema : SchemaObject = {
+    type: "object",
+    properties: {
+        data: {
+            type: "object",
+            properties: {
+                lectureId: {
+                    type: "string",
+                },
+            },
+        },
+        files: {
+            type: "array",
+            items: {
+                type: "string",
+                format: "binary"
+            },
+        },
+    }
+}

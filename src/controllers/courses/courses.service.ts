@@ -3,6 +3,7 @@ import {
     CourseMySqlEntity,
     CourseTargetMySqlEntity,
     LectureMySqlEntity,
+    ResourceMySqlEntity,
     SectionMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
@@ -16,6 +17,7 @@ import {
     CreateCourseTargetInput,
     UpdateCourseTargetInput,
     DeleteCourseTargetInput,
+    CreateResourcesInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -31,6 +33,8 @@ export class CoursesService {
     private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
     @InjectRepository(CourseTargetMySqlEntity)
     private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+    @InjectRepository(ResourceMySqlEntity)
+    private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
     private readonly storageService: StorageService,
     private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
     ) {}
@@ -149,7 +153,7 @@ export class CoursesService {
         const created = await this.courseTargetMySqlRepository.save({
             courseId,
             content,
-            position: max + 1
+            position: max + 1,
         })
         if (created)
             return `A course target with id ${created.courseTargetId} has been created successfully.`
@@ -167,5 +171,29 @@ export class CoursesService {
         const { courseTargetId } = input.data
         await this.courseTargetMySqlRepository.delete({ courseTargetId })
         return `A course target with id ${courseTargetId} has been deleted successfully.`
+    }
+
+    async createResources(input: CreateResourcesInput): Promise<string> {
+        const { files, data } = input
+        const { lectureId } = data
+
+        const promises: Array<Promise<void>> = []
+        const resources: Array<DeepPartial<ResourceMySqlEntity>> = []
+
+        for (const file of files) {
+            const promise = async () => {
+                const { assetId } = await this.storageService.upload(file)
+                resources.push({
+                    name: file.originalname,
+                    fileId: assetId,
+                    lectureId,
+                })
+            }
+            promises.push(promise())
+        }
+        await Promise.all(promises)
+
+        await this.resourceMySqlRepository.save(resources)
+        return `Resources with ids ${resources.map((resource) => resource.resourceId)} has been created successfully.`
     }
 }
