@@ -25,7 +25,11 @@ export class LectureEntity {
 
   @Field(() => String)
   @Column({ type: "uuid", length: 36 })
-      videoId: string
+      thumbnailId: string
+
+  @Field(() => String)
+  @Column({ type: "uuid", length: 36 })
+      lectureVideoId: string
 
   @Field(() => String)
   @Column({ name: "sectionId", type: "uuid", length: 36 })

@@ -138,14 +138,32 @@ export class CreateSectionInput implements AuthInput<CreateSectionData> {
 }
 
 export class CreateResourcesData {
-    @IsUUID("4")
-    @ApiProperty()
-        lectureId: string
+  @IsUUID("4")
+  @ApiProperty()
+      lectureId: string
 }
 export class CreateResourcesInput implements AuthInput<CreateResourcesData> {
-    @IsUUID("4")
-        userId: string
-    data: CreateResourcesData
-    files: Express.Multer.File[]
+  @IsUUID("4")
+      userId: string
+  data: CreateResourcesData
+  files: Express.Multer.File[]
 }
-  
+
+export class UpdateLectureData {
+  @IsUUID("4")
+  @ApiProperty()
+      lectureId: string
+  @ApiProperty({ nullable: true })
+      title?: string
+  @ApiProperty({ nullable: true })
+      thumbnailIndex?: number
+  @ApiProperty({ nullable: true })
+      lectureVideoIndex?: number
+}
+
+export class UpdateLectureInput implements AuthInput<UpdateLectureData> {
+  @IsUUID("4")
+      userId: string
+  data: UpdateLectureData
+  files: Express.Multer.File[]
+}

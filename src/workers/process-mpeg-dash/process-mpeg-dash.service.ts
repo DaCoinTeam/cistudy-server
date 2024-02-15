@@ -36,7 +36,9 @@ export class ProcessMpegDashService {
         const fileBody = _isMinimalFile ? file.fileBody : file.buffer
         if (!this.validateVideoExtension(filename))
             throw new Error("Invalid video file extension")
-        const metadata = await this.storageService.upload(file)
+        const metadata = await this.storageService.upload({
+            rootFile: file
+        })
         const dir = join(
             pathsConfig().processMpegDashTasksDirectory,
             metadata.assetId,
@@ -90,10 +92,14 @@ export class ProcessMpegDashService {
         const fileAndSubdirectories: Array<FileAndSubdirectory> = []
         const path = join(pathsConfig().processMpegDashTasksDirectory, assetId)
         await this.uploadMpegDashManifestRecusive(path, fileAndSubdirectories)
-        await this.storageService.update(assetId, fileAndSubdirectories, {
-            assetId,
-            filename: MANIFEST_FILE_NAME,
-        })
+        // await this.storageService.update(assetId, 
+        //     {
+        //         rootFile: 
+        //     }
+        //     fileAndSubdirectories, {
+        //     assetId,
+        //     filename: MANIFEST_FILE_NAME,
+        // })
     }
 
     private async cleanUp(assetId: string) {

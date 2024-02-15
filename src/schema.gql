@@ -21,7 +21,8 @@ scalar DateTime
 type LectureEntity {
   lectureId: ID!
   title: String!
-  videoId: String!
+  thumbnailId: String!
+  lectureVideoId: String!
   sectionId: String!
   createdAt: DateTime!
   updatedAt: DateTime!

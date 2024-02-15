@@ -20,40 +20,4 @@ import { ProfileService } from "./users.service"
 @Controller("api/profile")
 export class ProfileController{
     constructor(private readonly profileService: ProfileService) { }
-
-    @ApiBearerAuth()
-    @ApiConsumes("multipart/form-data")
-    @Patch("update-cover-photo")
-    @UseGuards(JwtAuthGuard)
-    @UseInterceptors(
-        AuthInterceptor,
-        FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
-    )
-    async updateCoverPhoto(
-        @UserId() userId: string,
-        @UploadedFiles() { files }: Files,
-    ) {     
-    	return this.profileService.updateCoverPhoto({
-    		userId,
-    		files
-    	}) 
-    }
-
-    @ApiBearerAuth()
-    @ApiConsumes("multipart/form-data")
-    @Patch("update-avatar")
-    @UseGuards(JwtAuthGuard)
-    @UseInterceptors(
-        AuthInterceptor,
-        FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
-    )
-    async updateAvatar(
-        @UserId() userId: string,
-        @UploadedFiles() { files }: Files,
-    ) {     
-    	return this.profileService.updateAvatar({
-    		userId,
-    		files
-    	}) 
-    }
 }

@@ -18,6 +18,7 @@ import {
     UpdateCourseTargetInput,
     DeleteCourseTargetInput,
     CreateResourcesInput,
+    UpdateLectureInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -43,31 +44,31 @@ export class CoursesService {
         const { description, price, title } = input.data
         const promises: Array<Promise<void>> = []
 
-        let thumbnailId: string
-        const thumbnail = input.files.at(0)
-        const uploadThumbnailPromise = async () => {
-            const { assetId } = await this.storageService.upload(thumbnail)
-            thumbnailId = assetId
-        }
-        promises.push(uploadThumbnailPromise())
+        // let thumbnailId: string
+        // const thumbnail = input.files.at(0)
+        // const uploadThumbnailPromise = async () => {
+        //     const { assetId } = await this.storageService.upload(thumbnail)
+        //     thumbnailId = assetId
+        // }
+        // promises.push(uploadThumbnailPromise())
 
-        let previewVideoId: string
-        const previewVideo = input.files.at(1)
-        const uploadPreviewVideoPromise = async () => {
-            const { assetId } = await this.storageService.upload(previewVideo)
-            previewVideoId = assetId
-        }
-        promises.push(uploadPreviewVideoPromise())
+        // let previewVideoId: string
+        // const previewVideo = input.files.at(1)
+        // const uploadPreviewVideoPromise = async () => {
+        //     const { assetId } = await this.storageService.upload(previewVideo)
+        //     previewVideoId = assetId
+        // }
+        // promises.push(uploadPreviewVideoPromise())
 
-        await Promise.all(promises)
+        // await Promise.all(promises)
 
         const created = await this.courseMySqlRepository.save({
             creatorId: input.userId,
             description,
             price,
             title,
-            thumbnailId,
-            previewVideoId,
+            //thumbnailId,
+            //previewVideoId,
         })
 
         if (created)
@@ -91,17 +92,60 @@ export class CoursesService {
             title,
         }
 
-        if (Number.isInteger(thumbnailIndex)) {
-            const file = files.at(thumbnailIndex)
-            const { assetId } = await this.storageService.upload(file)
-            course.thumbnailId = assetId
-        }
+        const promises: Array<Promise<void>> = []
+
+        const { previewVideoId, thumbnailId } =
+      await this.courseMySqlRepository.findOneBy({ courseId })
+
         if (Number.isInteger(previewVideoIndex)) {
-            const file = files.at(previewVideoIndex)
-            const { assetId } = await this.storageService.upload(file)
-            course.previewVideoId = assetId
+            const promise = async () => {
+                const file = files.at(previewVideoIndex)
+                if (previewVideoId) {
+                    await this.storageService.update(
+                        thumbnailId,
+                        {
+                            rootFile: file,
+                        },
+                        {
+                            clearDirectory: true,
+                        },
+                    )
+                } else {
+                    const { assetId } = await this.storageService.upload({
+                        rootFile: file,
+                    })
+                    course.previewVideoId = assetId
+                }
+            }
+            promises.push(promise())
         }
-        await this.courseMySqlRepository.update(courseId, course)
+
+        if (Number.isInteger(thumbnailIndex)) {
+            const promise = async () => {
+                const file = files.at(thumbnailIndex)
+                if (thumbnailId) {
+                    await this.storageService.update(
+                        thumbnailId,
+                        {
+                            rootFile: file,
+                        },
+                        {
+                            clearDirectory: true,
+                        },
+                    )
+                } else {
+                    const { assetId } = await this.storageService.upload({
+                        rootFile: file,
+                    })
+                    course.thumbnailId = assetId
+                }
+            }
+            promises.push(promise())
+        }
+        await Promise.all(promises)
+
+        if (Object.keys(course).length)
+            await this.courseMySqlRepository.update(courseId, course)
         return `A course wth id ${courseId} has been updated successfully`
     }
 
@@ -144,6 +188,70 @@ export class CoursesService {
             return `A lecture with id ${created.lectureId} has been creeated successfully.`
     }
 
+    async updateLecture(input: UpdateLectureInput): Promise<string> {
+        const { data, files } = input
+        const { lectureId, title, lectureVideoIndex, thumbnailIndex } = data
+
+        const { thumbnailId, lectureVideoId } =
+      await this.lectureMySqlRepository.findOneBy({ lectureId })
+
+        const promises: Array<Promise<void>> = []
+
+        const lecture: DeepPartial<LectureMySqlEntity> = { title }
+
+        if (Number.isInteger(lectureVideoIndex)) {
+            const promise = async () => {
+                const file = files.at(lectureVideoIndex)
+                if (lectureVideoId) {
+                    await this.storageService.update(
+                        lectureVideoId,
+                        {
+                            rootFile: file,
+                        },
+                        {
+                            clearDirectory: true,
+                        },
+                    )
+                } else {
+                    const { assetId } = await this.storageService.upload({
+                        rootFile: file,
+                    })
+                    lecture.lectureVideoId = assetId
+                }
+            }
+            promises.push(promise())
+        }
+
+        if (Number.isInteger(thumbnailIndex)) {
+            const promise = async () => {
+                const file = files.at(thumbnailIndex)
+                if (thumbnailId) {
+                    await this.storageService.update(
+                        thumbnailId,
+                        {
+                            rootFile: file,
+                        },
+                        {
+                            clearDirectory: true,
+                        },
+                    )
+                } else {
+                    const { assetId } = await this.storageService.upload({
+                        rootFile: file,
+                    })
+                    lecture.thumbnailId = assetId
+                }
+            }
+            promises.push(promise())
+        }
+
+        await Promise.all(promises)
+
+        if (Object.keys(lecture).length)
+            await this.lectureMySqlRepository.update(lectureId, lecture)
+        return `A lecture with id ${lectureId} has been updated successfully.`
+    }
+
     async createCourseTarget(input: CreateCourseTargetInput): Promise<string> {
         const { content, courseId } = input.data
         const query = this.courseTargetMySqlRepository.createQueryBuilder()
@@ -182,7 +290,9 @@ export class CoursesService {
 
         for (const file of files) {
             const promise = async () => {
-                const { assetId } = await this.storageService.upload(file)
+                const { assetId } = await this.storageService.upload({
+                    rootFile: file,
+                })
                 resources.push({
                     name: file.originalname,
                     fileId: assetId,

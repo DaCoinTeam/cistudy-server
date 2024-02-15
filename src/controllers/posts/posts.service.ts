@@ -69,9 +69,9 @@ export class PostsService {
         appendedPostContent.contentType === ContentType.Video
             ) {
                 const promise = async () => {
-                    const file = files.at(appendedPostContent.indexFile)
-                    const { assetId } = await this.storageService.upload(file)
-                    appendedPostContent.content = assetId
+                   // const file = files.at(appendedPostContent.indexFile)
+                  //  const { assetId } = await this.storageService.upload(file)
+                  //  appendedPostContent.content = assetId
                 }
                 promises.push(promise())
             }
@@ -116,8 +116,8 @@ export class PostsService {
             ) {
                 const promise = async () => {
                     const file = files.at(appendedPostContent.indexFile)
-                    const { assetId } = await this.storageService.upload(file)
-                    appendedPostContent.content = assetId
+                  //  const { assetId } = await this.storageService.upload(file)
+                 //   appendedPostContent.content = assetId
                 }
                 promises.push(promise())
             }
@@ -172,8 +172,8 @@ export class PostsService {
             ) {
                 const promise = async () => {
                     const file = files.at(appendedPostCommentContent.indexFile)
-                    const { assetId } = await this.storageService.upload(file)
-                    appendedPostCommentContent.content = assetId
+                  //  const { assetId } = await this.storageService.upload(file)
+                  //  appendedPostCommentContent.content = assetId
                 }
                 promises.push(promise())
             }
@@ -218,8 +218,8 @@ export class PostsService {
             ) {
                 const promise = async () => {
                     const file = files.at(appendedPostCommentContent.indexFile)
-                    const { assetId } = await this.storageService.upload(file)
-                    appendedPostCommentContent.postCommentId = assetId
+                    //  const { assetId } = await this.storageService.upload(file)
+                    // appendedPostCommentContent.postCommentId = assetId
                 }
                 promises.push(promise())
             }
