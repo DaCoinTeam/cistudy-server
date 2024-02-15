@@ -23,3 +23,12 @@ export const makeDirectoryIfNotExisted = async (directory: string) => {
         await fsPromises.mkdir(directory, { recursive: true })
     }
 }
+
+export const existKeyNotUndefined = (object: object) => {
+    for (const key in object) {
+        if (object[key] !== undefined) {
+            return true
+        }
+    }
+    return false
+}

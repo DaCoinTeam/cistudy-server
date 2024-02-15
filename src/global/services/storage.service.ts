@@ -121,20 +121,22 @@ export class StorageService {
         const fileBody = _isMinimalFile ? rootFile.fileBody : rootFile.buffer
         await this.writeFile([assetId, filename], fileBody)
 
-        for (const {
-            file: fileExtra,
-            subdirectory,
-        } of fileAndSubdirectories) {
-            const isMinimalFileExtra = isMinimalFile(fileExtra)
-            const filenameExtra = isMinimalFileExtra
-                ? fileExtra.filename
-                : fileExtra.originalname
-            const fileBodyExtra = isMinimalFileExtra
-                ? fileExtra.fileBody
-                : fileExtra.buffer
-
-            const directory = subdirectory ? join(assetId, subdirectory) : assetId
-            await this.writeFile([directory, filenameExtra], fileBodyExtra)
+        if (fileAndSubdirectories){
+            for (const {
+                file: fileExtra,
+                subdirectory,
+            } of fileAndSubdirectories) {
+                const isMinimalFileExtra = isMinimalFile(fileExtra)
+                const filenameExtra = isMinimalFileExtra
+                    ? fileExtra.filename
+                    : fileExtra.originalname
+                const fileBodyExtra = isMinimalFileExtra
+                    ? fileExtra.fileBody
+                    : fileExtra.buffer
+    
+                const directory = subdirectory ? join(assetId, subdirectory) : assetId
+                await this.writeFile([directory, filenameExtra], fileBodyExtra)
+            }
         }
 
         const metadata: Metadata = {
@@ -147,7 +149,7 @@ export class StorageService {
     }
 
     private async clearDirectory (assetId: string) {
-        const directory = join(process.cwd(), assetId)
+        const directory = join(pathsConfig().storageDirectory, assetId)
         const filenames = await fsPromises.readdir(directory)
         for (const filename of filenames) {
             await fsPromises.unlink(join(directory, filename))
@@ -175,13 +177,16 @@ export class StorageService {
             await this.uploadMetadata(metadata)
         }
 
-        for (const { file, subdirectory } of fileAndSubdirectories) {
-            const _isMinimalFile = isMinimalFile(file)
-            const filename = _isMinimalFile ? file.filename : file.originalname
-            const fileBody = _isMinimalFile ? file.fileBody : file.buffer
-            const directory = subdirectory ? join(assetId, subdirectory) : assetId
-            await this.writeFile([directory, filename], fileBody)
+        if (fileAndSubdirectories){
+            for (const { file, subdirectory } of fileAndSubdirectories) {
+                const _isMinimalFile = isMinimalFile(file)
+                const filename = _isMinimalFile ? file.filename : file.originalname
+                const fileBody = _isMinimalFile ? file.fileBody : file.buffer
+                const directory = subdirectory ? join(assetId, subdirectory) : assetId
+                await this.writeFile([directory, filename], fileBody)
+            }
         }
+
     }
 }
 

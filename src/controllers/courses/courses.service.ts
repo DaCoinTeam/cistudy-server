@@ -22,6 +22,7 @@ import {
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
+import { existKeyNotUndefined } from "@common"
 
 @Injectable()
 export class CoursesService {
@@ -143,8 +144,8 @@ export class CoursesService {
             promises.push(promise())
         }
         await Promise.all(promises)
-
-        if (Object.keys(course).length)
+        
+        if (existKeyNotUndefined(course))
             await this.courseMySqlRepository.update(courseId, course)
         return `A course wth id ${courseId} has been updated successfully`
     }
@@ -244,10 +245,9 @@ export class CoursesService {
             }
             promises.push(promise())
         }
-
         await Promise.all(promises)
 
-        if (Object.keys(lecture).length)
+        if (existKeyNotUndefined(lecture))
             await this.lectureMySqlRepository.update(lectureId, lecture)
         return `A lecture with id ${lectureId} has been updated successfully.`
     }
