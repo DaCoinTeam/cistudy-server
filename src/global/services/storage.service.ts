@@ -187,10 +187,10 @@ export class StorageService {
     }
 }
 
-interface ReadStreamOptions {
+type ReadStreamOptions = Partial<{
   start: number;
   end: number;
-}
+}>
 
 type WriteData = Partial<{
   rootFile: AnyFile;
