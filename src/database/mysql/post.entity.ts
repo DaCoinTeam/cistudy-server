@@ -50,6 +50,7 @@ export class PostEntity {
     @JoinColumn({ name: "creatorId" })
     	creator: UserEntity
 
+    @Field(() => [PostContentEntity])
     @OneToMany(() => PostContentEntity, (postContent) => postContent.post, {
     	cascade: ["remove", "insert", "update"],
     })

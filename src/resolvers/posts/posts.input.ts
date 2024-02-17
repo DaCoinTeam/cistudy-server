@@ -8,13 +8,19 @@ export class FindOnePostInput {
 }
 
 @InputType()
+export class FindManyPostsOptions {
+  @Field(() => Int, { nullable: true })
+  @IsInt()
+      take?: number
+  @Field(() => Int, { nullable: true })
+  @IsInt()
+      skip?: number
+}
+
+@InputType()
 export class FindManyPostsInput {
   @Field(() => String)
-  	courseId: string
-  @Field(() => Int)
-  @IsInt()
-  	take: number
-  @Field(() => Int)
-  @IsInt()
-  	skip: number
+      courseId: string
+  @Field(() => FindManyPostsOptions, { nullable: true })
+      options?: FindManyPostsOptions
 }

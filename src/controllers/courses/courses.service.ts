@@ -23,7 +23,7 @@ import {
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
-import { ProcessStatus, existKeyNotUndefined } from "@common"
+import { ProcessStatus, VideoType, existKeyNotUndefined } from "@common"
 
 @Injectable()
 export class CoursesService {
@@ -197,12 +197,13 @@ export class CoursesService {
                         lectureId, 
                     })
                     .getQueryAndParameters()
-                console.log(queryAtStart)
+
                 const queryAtEnd = this.lectureMySqlRepository
                     .createQueryBuilder()
                     .update()
                     .set({
                         processStatus: ProcessStatus.Completed,
+                        videoType: VideoType.DASH
                     })
                     .andWhere({
                         lectureId,

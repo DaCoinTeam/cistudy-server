@@ -25,6 +25,7 @@ type LectureEntity {
   lectureVideoId: String
   sectionId: String!
   processStatus: ProcessStatus!
+  videoType: VideoType!
   createdAt: DateTime!
   updatedAt: DateTime!
   section: SectionEntity!
@@ -35,6 +36,11 @@ enum ProcessStatus {
   Pending
   Processing
   Completed
+}
+
+enum VideoType {
+  MP4
+  DASH
 }
 
 type SectionEntity {
@@ -78,6 +84,15 @@ enum VerifyStatus {
   Rejected
 }
 
+type PostContentEntity {
+  postContentId: ID!
+  index: Int!
+  content: String!
+  contentType: String!
+  postId: String!
+  post: PostEntity!
+}
+
 type PostEntity {
   postId: ID!
   title: String!
@@ -85,6 +100,7 @@ type PostEntity {
   courseId: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  postContents: [PostContentEntity!]!
 }
 
 type UserEntity {
@@ -149,8 +165,12 @@ input FindOnePostInput {
 
 input FindManyPostsInput {
   courseId: String!
-  take: Int!
-  skip: Int!
+  options: FindManyPostsOptions
+}
+
+input FindManyPostsOptions {
+  take: Int
+  skip: Int
 }
 
 input FindOneUserInput {

@@ -33,8 +33,9 @@ export class PostContentEntity {
   @Column({ type: "uuid", length: 36 })
   	postId: string
 
-  @Field(() => [PostEntity])
+  @Field(() => PostEntity)
   @ManyToOne(() => PostEntity, (post) => post.postContents)
   @JoinColumn({ name: "postId" })
   	post: PostEntity
 }
+  

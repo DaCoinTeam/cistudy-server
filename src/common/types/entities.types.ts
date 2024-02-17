@@ -20,36 +20,44 @@ registerEnumType(UserRole, {
     name: "UserRole",
 })
 
-
 export enum VerifyStatus {
-    Pending = "Pending",
-    Approved = "Approved",
-    Rejected = "Rejected",
-  }
-  
+  Pending = "Pending",
+  Approved = "Approved",
+  Rejected = "Rejected",
+}
+
 registerEnumType(VerifyStatus, {
     name: "VerifyStatus",
 })
-  
+
 export enum ContentType {
-    Text = "Text",
-    Video = "Video",
-    Code = "Code",
-    Image = "Image",
-    Label = "Label",
-    Application = "Application",
-  }
-  
+  Text = "Text",
+  Video = "Video",
+  Code = "Code",
+  Image = "Image",
+  Label = "Label",
+  Application = "Application",
+}
+
 registerEnumType(ContentType, {
     name: "ContentType",
 })
 
 export enum ProcessStatus {
   Pending = "Pending",
-  Processing = "Processing", 
+  Processing = "Processing",
   Completed = "Completed",
 }
 
 registerEnumType(ProcessStatus, {
     name: "ProcessStatus",
+})
+
+export enum VideoType {
+  MP4 = "MP4",
+  DASH = "DASH",
+}
+
+registerEnumType(VideoType, {
+    name: "VideoType",
 })

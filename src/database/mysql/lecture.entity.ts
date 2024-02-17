@@ -11,7 +11,7 @@ import {
 import { SectionEntity } from "./section.entity"
 import { ResourceEntity } from "./resource.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
-import { ProcessStatus } from "@common"
+import { ProcessStatus, VideoType } from "@common"
 
 @ObjectType()
 @Entity("lecture")
@@ -40,6 +40,10 @@ export class LectureEntity {
   @Column({ type: "enum", enum: ProcessStatus, default: ProcessStatus.Pending })
       processStatus: ProcessStatus
 
+  @Field(() => VideoType)
+  @Column({ type: "enum", enum: VideoType, default: VideoType.MP4 })
+      videoType: VideoType
+  
   @Field(() => Date)
   @CreateDateColumn()
       createdAt: Date
