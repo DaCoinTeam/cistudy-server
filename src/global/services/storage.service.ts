@@ -1,9 +1,8 @@
 import { Injectable } from "@nestjs/common"
 
 import {
-    AnyFile,
-    FileAndSubdirectory,
     Metadata,
+    FilesData,
     isMinimalFile,
     makeDirectoryIfNotExisted,
 } from "@common"
@@ -112,7 +111,7 @@ export class StorageService {
         )
     }
 
-    async upload(data: WriteData): Promise<Metadata> {
+    async upload(data: FilesData): Promise<Metadata> {
         const { rootFile, fileAndSubdirectories } = data
         const assetId = uuid4()
 
@@ -149,18 +148,16 @@ export class StorageService {
         const directory = join(pathsConfig().storageDirectory, assetId)
         const filenames = await fsPromises.readdir(directory)
         for (const filename of filenames) {
-            await fsPromises.unlink(join(directory, filename))
+            const filePath = join(directory, filename)
+            await fsPromises.rm(filePath, { recursive: true })
         }
     }
 
-    async update(assetId: string, data: WriteData, options?: UpdateOptions) {
+    async update(assetId: string, data: FilesData, options?: UpdateOptions) {
         const { rootFile, fileAndSubdirectories } = data
-        
-        if (options) {
-            const { keepDirectory } = options
-            if (!keepDirectory) await this.clearDirectory(assetId)
-        }
-        
+
+        if (!options?.keepDirectoryContent) await this.clearDirectory(assetId)
+
         if (rootFile) {
             const isMinimalRootFile = isMinimalFile(rootFile)
 
@@ -193,13 +190,8 @@ export class StorageService {
 type ReadStreamOptions = Partial<{
   start: number;
   end: number;
-}>
-
-type WriteData = Partial<{
-  rootFile: AnyFile;
-  fileAndSubdirectories: Array<FileAndSubdirectory>;
 }>;
 
 type UpdateOptions = Partial<{
-  keepDirectory?: boolean;
+  keepDirectoryContent?: boolean;
 }>;

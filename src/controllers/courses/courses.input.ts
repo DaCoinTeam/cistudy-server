@@ -109,24 +109,37 @@ export class CreateLectureData {
   @IsUUID("4")
   @ApiProperty()
       sectionId: string
-
-  @Length(200)
   @ApiProperty()
       title: string
 }
+
 export class CreateLectureInput implements AuthInput<CreateLectureData> {
   @IsUUID("4")
       userId: string
   data: CreateLectureData
-  files: Express.Multer.File[]
 }
+
+export class DeleteLectureData {
+    @IsUUID()
+    @ApiProperty()
+        lectureId: string
+}
+  
+export class DeleteLectureInput
+implements AuthInput<DeleteLectureData>
+{
+    @IsUUID("4")
+        userId: string
+    @ApiProperty()
+        data: DeleteLectureData
+}
+  
 
 export class CreateSectionData {
   @IsUUID("4")
   @ApiProperty()
       courseId: string
 
-  @Length(200)
   @ApiProperty()
       title: string
 }

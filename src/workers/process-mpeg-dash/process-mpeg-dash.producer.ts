@@ -3,7 +3,7 @@ import { InjectQueue } from "@nestjs/bull"
 import { Queue } from "bull"
 import { ProcessMpegDashService } from "./process-mpeg-dash.service"
 import { QUEUE_NAME } from "./process-mpeg-dash.constants"
-import { AnyFile } from "@common"
+import { AnyFile, isMinimalFile } from "@common"
 
 @Injectable()
 export class ProcessMpegDashProducer {
@@ -12,10 +12,10 @@ export class ProcessMpegDashProducer {
     @InjectQueue(QUEUE_NAME) private readonly convertQueue: Queue,
     ) {}
 
-    async add(file: AnyFile) {
-        const metadata = await this.processMpegDashService.createTask(file)
-        await this.convertQueue.add(metadata)
-        //await this.processMpegDashService.processVideo(metadata)
-        return metadata
+    async add(assetId: string, file: AnyFile) {
+        await this.processMpegDashService.createTask(assetId, file)
+        const filename = isMinimalFile(file) ? file.filename : file.originalname
+        //await this.convertQueue.add(metadata)
+        await this.processMpegDashService.processVideo({ assetId, filename })
     }
 }

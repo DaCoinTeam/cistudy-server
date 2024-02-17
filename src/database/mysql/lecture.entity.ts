@@ -23,13 +23,13 @@ export class LectureEntity {
   @Column({ type: "varchar", length: 150 })
       title: string
 
-  @Field(() => String)
-  @Column({ type: "uuid", length: 36 })
-      thumbnailId: string
+  @Field(() => String, {nullable: true})
+  @Column({ type: "uuid", length: 36, nullable: true })
+      thumbnailId?: string
 
-  @Field(() => String)
-  @Column({ type: "uuid", length: 36 })
-      lectureVideoId: string
+  @Field(() => String, {nullable: true})
+  @Column({ type: "uuid", length: 36, nullable: true })
+      lectureVideoId?: string
 
   @Field(() => String)
   @Column({ name: "sectionId", type: "uuid", length: 36 })

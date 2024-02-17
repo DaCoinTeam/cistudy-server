@@ -35,4 +35,9 @@ export type Files = {
   files: Array<Express.Multer.File>;
 };
 
-export type IndexFileAppended<T extends object> = T & { indexFile?: number }
+export type IndexFileAppended<T extends object> = T & { indexFile?: number };
+
+export type FilesData = Partial<{
+  rootFile: AnyFile;
+  fileAndSubdirectories: Array<FileAndSubdirectory>;
+}>;

@@ -1,4 +1,9 @@
-import { AnyFile, FileAndSubdirectory, Metadata, isMinimalFile } from "@common"
+import {
+    AnyFile,
+    Metadata,
+    FilesData,
+    isMinimalFile,
+} from "@common"
 import { Injectable, Logger } from "@nestjs/common"
 import { promises as fsPromise } from "fs"
 import { basename, dirname, extname, join } from "path"
@@ -30,27 +35,24 @@ export class ProcessMpegDashService {
         return allowedExtensions.includes(extname(fileName))
     }
 
-    async createTask(file: AnyFile): Promise<Metadata> {
+    async createTask(assetId: string, file: AnyFile) {
         const _isMinimalFile = isMinimalFile(file)
         const filename = _isMinimalFile ? file.filename : file.originalname
         const fileBody = _isMinimalFile ? file.fileBody : file.buffer
         if (!this.validateVideoExtension(filename))
             throw new Error("Invalid video file extension")
-        const metadata = await this.storageService.upload({
-            rootFile: file
-        })
-        const dir = join(
+
+        const directory = join(
             pathsConfig().processMpegDashTasksDirectory,
-            metadata.assetId,
+            assetId,
         )
-        await fsPromise.mkdir(dir)
-        await fsPromise.writeFile(join(dir, filename), fileBody)
-        return metadata
+        await fsPromise.mkdir(directory)
+        await fsPromise.writeFile(join(directory, filename), fileBody)
     }
 
     private async uploadMpegDashManifestRecusive(
         path: string,
-        fileAndSubdirectories: Array<FileAndSubdirectory> = [],
+        data: FilesData,
         sendPath?: string,
         insideNonRootDir: boolean = true,
     ) {
@@ -67,7 +69,7 @@ export class ProcessMpegDashService {
                         : childName
                     await this.uploadMpegDashManifestRecusive(
                         childPath,
-                        fileAndSubdirectories,
+                        data,
                         childSendPath,
                         isRoot,
                     )
@@ -75,31 +77,33 @@ export class ProcessMpegDashService {
             }
         } else {
             const isManifest = name === MANIFEST_FILE_NAME
-            if (!insideNonRootDir || isManifest) {
-                const fileBody = await fsPromise.readFile(path)
-                fileAndSubdirectories.push({
+            if (!isManifest && insideNonRootDir) return
+            const fileBody = await fsPromise.readFile(path)
+            if (isManifest) {
+                data.rootFile = {
+                    filename: name,
+                    fileBody,
+                }
+            } else {
+                data.fileAndSubdirectories.push({
                     file: {
                         filename: name,
                         fileBody,
                     },
-                    subdirectory: !isManifest ? dirname(sendPath) : undefined,
+                    subdirectory: dirname(sendPath),
                 })
             }
         }
     }
 
     private async uploadMpegDashManifest(assetId: string) {
-        const fileAndSubdirectories: Array<FileAndSubdirectory> = []
+        const data : FilesData = {
+            fileAndSubdirectories: []
+        }
         const path = join(pathsConfig().processMpegDashTasksDirectory, assetId)
-        await this.uploadMpegDashManifestRecusive(path, fileAndSubdirectories)
-        // await this.storageService.update(assetId, 
-        //     {
-        //         rootFile: 
-        //     }
-        //     fileAndSubdirectories, {
-        //     assetId,
-        //     filename: MANIFEST_FILE_NAME,
-        // })
+        await this.uploadMpegDashManifestRecusive(path, data)
+        
+        await this.storageService.update(assetId, data)
     }
 
     private async cleanUp(assetId: string) {

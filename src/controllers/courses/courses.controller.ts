@@ -25,11 +25,11 @@ import {
     CreateSectionData,
     UpdateCourseData,
     UpdateCourseTargetData,
+    UpdateLectureData,
 } from "./courses.input"
 
 import {
     createCourseSchema,
-    createLectureSchema,
     createResourcesSchema,
     updateCourseSchema,
 } from "./courses.schema"
@@ -146,25 +146,34 @@ export class CoursesController {
   }
 
   @ApiBearerAuth()
-  @ApiConsumes("multipart/form-data")
-  @ApiBody({ schema: createLectureSchema })
   @Post("create-lecture")
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-      AuthInterceptor,
-      FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
-  )
+  @UseInterceptors(AuthInterceptor)
   async createLecture(
     @UserId() userId: string,
-    @DataFromBody() data: CreateLectureData,
-    @UploadedFiles() { files }: Files,
+    @Body() data: CreateLectureData,
   ) {
       return this.coursesService.createLecture({
           userId,
           data,
-          files,
       })
   }
+
+  
+  @ApiBearerAuth()
+  @Delete("delete-lecture/:lectureId")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async deleteLecture(
+    @UserId() userId: string,
+    @Param("lectureId") lectureId: string,
+  ) {
+      return this.coursesService.deleteLecture({
+          userId,
+          data: { lectureId },
+      })
+  }
+
 
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")
@@ -181,6 +190,27 @@ export class CoursesController {
     @UploadedFiles() { files }: Files,
   ) {
       return this.coursesService.createResources({
+          userId,
+          data,
+          files,
+      })
+  }
+
+  @ApiBearerAuth()
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({ schema: createResourcesSchema })
+  @Put("update-lecture")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
+  )
+  async updateLecture(
+    @UserId() userId: string,
+    @DataFromBody() data: UpdateLectureData,
+    @UploadedFiles() { files }: Files,
+  ) {
+      return this.coursesService.updateLecture({
           userId,
           data,
           files,

@@ -38,7 +38,10 @@ export class ResourceEntity {
       updatedAt: Date
 
   @Field(() => LectureEntity)
-  @ManyToOne(() => LectureEntity, (lecture) => lecture.resources)
+  @ManyToOne(() => LectureEntity, (lecture) => lecture.resources, {
+      onDelete: "CASCADE"
+  })
+  
   @JoinColumn({ name: "lectureId" })
       lecture: LectureEntity
 }

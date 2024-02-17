@@ -19,6 +19,7 @@ import {
     DeleteCourseTargetInput,
     CreateResourcesInput,
     UpdateLectureInput,
+    DeleteLectureInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -102,12 +103,9 @@ export class CoursesService {
             const promise = async () => {
                 const file = files.at(previewVideoIndex)
                 if (previewVideoId) {
-                    await this.storageService.update(
-                        thumbnailId,
-                        {
-                            rootFile: file,
-                        }
-                    )
+                    await this.storageService.update(thumbnailId, {
+                        rootFile: file,
+                    })
                 } else {
                     const { assetId } = await this.storageService.upload({
                         rootFile: file,
@@ -122,12 +120,9 @@ export class CoursesService {
             const promise = async () => {
                 const file = files.at(thumbnailIndex)
                 if (thumbnailId) {
-                    await this.storageService.update(
-                        thumbnailId,
-                        {
-                            rootFile: file,
-                        },
-                    )
+                    await this.storageService.update(thumbnailId, {
+                        rootFile: file,
+                    })
                 } else {
                     const { assetId } = await this.storageService.upload({
                         rootFile: file,
@@ -138,7 +133,7 @@ export class CoursesService {
             promises.push(promise())
         }
         await Promise.all(promises)
-        
+
         if (existKeyNotUndefined(course))
             await this.courseMySqlRepository.update(courseId, course)
         return `A course wth id ${courseId} has been updated successfully`
@@ -155,26 +150,13 @@ export class CoursesService {
             title,
         })
         if (created)
-            return `A section with id ${created.sectionId} has been creeated successfully.`
+            return `A section with id ${created.sectionId} has been created successfully.`
     }
 
     async createLecture(input: CreateLectureInput): Promise<string> {
         const { title, sectionId } = input.data
-        const promises: Array<Promise<void>> = []
-
-        let videoId: string
-        const video = input.files.at(0)
-
-        const uploadVideoPromise = async () => {
-            const { assetId } = await this.mpegDashProcessorProducer.add(video)
-            videoId = assetId
-        }
-        promises.push(uploadVideoPromise())
-
-        await Promise.all(promises)
 
         const created = await this.lectureMySqlRepository.save({
-            videoId,
             title,
             sectionId,
         })
@@ -198,16 +180,21 @@ export class CoursesService {
             const promise = async () => {
                 const file = files.at(lectureVideoIndex)
                 if (lectureVideoId) {
-                    await this.storageService.update(
+                    await this.storageService.update(lectureVideoId, {
+                        rootFile: file,
+                    })
+                    await this.mpegDashProcessorProducer.add(
                         lectureVideoId,
-                        {
-                            rootFile: file,
-                        },
+                        file
                     )
                 } else {
                     const { assetId } = await this.storageService.upload({
                         rootFile: file,
                     })
+                    await this.mpegDashProcessorProducer.add(
+                        assetId,
+                        file
+                    )
                     lecture.lectureVideoId = assetId
                 }
             }
@@ -218,12 +205,9 @@ export class CoursesService {
             const promise = async () => {
                 const file = files.at(thumbnailIndex)
                 if (thumbnailId) {
-                    await this.storageService.update(
-                        thumbnailId,
-                        {
-                            rootFile: file,
-                        },
-                    )
+                    await this.storageService.update(thumbnailId, {
+                        rootFile: file,
+                    })
                 } else {
                     const { assetId } = await this.storageService.upload({
                         rootFile: file,
@@ -238,6 +222,12 @@ export class CoursesService {
         if (existKeyNotUndefined(lecture))
             await this.lectureMySqlRepository.update(lectureId, lecture)
         return `A lecture with id ${lectureId} has been updated successfully.`
+    }
+
+    async deleteLecture(input: DeleteLectureInput): Promise<string> {
+        const { lectureId } = input.data
+        await this.lectureMySqlRepository.delete({ lectureId })
+        return `A lecture with id ${lectureId} has been deleted successfully.`
     }
 
     async createCourseTarget(input: CreateCourseTargetInput): Promise<string> {
