@@ -1,6 +1,6 @@
 import {
     AnyFile,
-    Metadata,
+    FilenameProcessData,
     FilesData,
     isMinimalFile,
 } from "@common"
@@ -10,6 +10,8 @@ import { basename, dirname, extname, join } from "path"
 import { FfmpegService, Bento4Service, StorageService } from "@global"
 import { pathsConfig, videoConfig } from "@config"
 import { validate as validateUuidv4 } from "uuid"
+import { EntityManager } from "typeorm"
+import { InjectEntityManager } from "@nestjs/typeorm"
 
 const MANIFEST_FILE_NAME = "manifest.mpd"
 
@@ -20,6 +22,8 @@ export class ProcessMpegDashService {
     private readonly storageService: StorageService,
     private readonly ffmegService: FfmpegService,
     private readonly bento4Service: Bento4Service,
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager,
     ) {}
 
     private validateVideoExtension(fileName: string): boolean {
@@ -97,12 +101,12 @@ export class ProcessMpegDashService {
     }
 
     private async uploadMpegDashManifest(assetId: string) {
-        const data : FilesData = {
-            fileAndSubdirectories: []
+        const data: FilesData = {
+            fileAndSubdirectories: [],
         }
         const path = join(pathsConfig().processMpegDashTasksDirectory, assetId)
         await this.uploadMpegDashManifestRecusive(path, data)
-        
+
         await this.storageService.update(assetId, data)
     }
 
@@ -111,13 +115,19 @@ export class ProcessMpegDashService {
         await fsPromise.rm(path, { recursive: true })
     }
 
-    async processVideo(metadata: Metadata) {
-        const { assetId, filename } = metadata
+    async processVideo(data: FilenameProcessData) {
+        const { assetId, filename, callbackQueries } = data
+        const { queryAtStart, queryAtEnd } = callbackQueries
+        
         this.logger.verbose(`DOING TASK: ${assetId}`)
-        this.logger.verbose("1/5. Encoding video at multiple bitrates...")
+        this.entityManager.query(queryAtStart[0], queryAtStart[1])
+
+        this.logger.verbose("1/7. Handling query at the start...")
+
+        this.logger.verbose("2/7. Encoding video at multiple bitrates...")
         await this.ffmegService.encodeAtMultipleBitrates(assetId, filename)
 
-        this.logger.verbose("2/5. Fragmenting videos...")
+        this.logger.verbose("3/7. Fragmenting videos...")
         const promises: Array<Promise<void>> = []
         for (const videoName of videoConfig().videoNames) {
             const promise = async () => {
@@ -133,16 +143,20 @@ export class ProcessMpegDashService {
         }
         await Promise.all(promises)
 
-        this.logger.verbose("3/5. Generating MPEG-DASH manifest...")
+        this.logger.verbose("4/7. Generating MPEG-DASH manifest...")
         await this.bento4Service.generateMpegDashManifestFromFragments(
             assetId,
             videoConfig().videoNames,
         )
 
-        this.logger.verbose("4/5. Uploading...")
+        this.logger.verbose("5/7. Uploading...")
         await this.uploadMpegDashManifest(assetId)
 
-        this.logger.verbose("5/5. Cleaning up...")
+        this.logger.verbose("6/7. Cleaning up...")
         await this.cleanUp(assetId)
+
+        this.logger.verbose("7/7. Handling query at the end...")
+        this.entityManager.query(queryAtEnd[0], queryAtEnd[1])
+
     }
 }

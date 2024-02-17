@@ -11,6 +11,7 @@ import {
 import { SectionEntity } from "./section.entity"
 import { ResourceEntity } from "./resource.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
+import { ProcessStatus } from "@common"
 
 @ObjectType()
 @Entity("lecture")
@@ -23,17 +24,21 @@ export class LectureEntity {
   @Column({ type: "varchar", length: 150 })
       title: string
 
-  @Field(() => String, {nullable: true})
+  @Field(() => String, { nullable: true })
   @Column({ type: "uuid", length: 36, nullable: true })
       thumbnailId?: string
 
-  @Field(() => String, {nullable: true})
+  @Field(() => String, { nullable: true })
   @Column({ type: "uuid", length: 36, nullable: true })
       lectureVideoId?: string
 
   @Field(() => String)
   @Column({ name: "sectionId", type: "uuid", length: 36 })
       sectionId: string
+
+  @Field(() => ProcessStatus)
+  @Column({ type: "enum", enum: ProcessStatus, default: ProcessStatus.Pending })
+      processStatus: ProcessStatus
 
   @Field(() => Date)
   @CreateDateColumn()

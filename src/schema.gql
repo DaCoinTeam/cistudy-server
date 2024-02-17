@@ -24,10 +24,17 @@ type LectureEntity {
   thumbnailId: String
   lectureVideoId: String
   sectionId: String!
+  processStatus: ProcessStatus!
   createdAt: DateTime!
   updatedAt: DateTime!
   section: SectionEntity!
   resources: [ResourceEntity!]!
+}
+
+enum ProcessStatus {
+  Pending
+  Processing
+  Completed
 }
 
 type SectionEntity {
@@ -55,7 +62,7 @@ type CourseEntity {
   thumbnailId: String
   description: String!
   price: Float!
-  verifiedStatus: VerifiedStatus
+  verifyStatus: VerifyStatus
   isDraft: Boolean!
   creator: UserEntity!
   isDeleted: Boolean!
@@ -65,7 +72,7 @@ type CourseEntity {
   sections: [SectionEntity!]!
 }
 
-enum VerifiedStatus {
+enum VerifyStatus {
   Pending
   Approved
   Rejected

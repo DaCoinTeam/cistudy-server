@@ -29,7 +29,7 @@ export enum UserKind {
     Facebook = "Facebook"
 }
 
-export enum VerifiedStatus {
+export enum VerifyStatus {
     Pending = "Pending",
     Approved = "Approved",
     Rejected = "Rejected"
@@ -88,7 +88,7 @@ export interface CourseModel {
     thumbnailId?: Nullable<string>;
     description: string;
     price: number;
-    verifiedStatus?: Nullable<VerifiedStatus>;
+    verifyStatus?: Nullable<VerifyStatus>;
     isDraft: boolean;
     creator: UserModel;
     isDeleted: boolean;

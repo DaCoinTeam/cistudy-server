@@ -21,14 +21,14 @@ registerEnumType(UserRole, {
 })
 
 
-export enum VerifiedStatus {
+export enum VerifyStatus {
     Pending = "Pending",
     Approved = "Approved",
     Rejected = "Rejected",
   }
   
-registerEnumType(VerifiedStatus, {
-    name: "VerifiedStatus",
+registerEnumType(VerifyStatus, {
+    name: "VerifyStatus",
 })
   
 export enum ContentType {
@@ -42,4 +42,14 @@ export enum ContentType {
   
 registerEnumType(ContentType, {
     name: "ContentType",
+})
+
+export enum ProcessStatus {
+  Pending = "Pending",
+  Processing = "Processing", 
+  Completed = "Completed",
+}
+
+registerEnumType(ProcessStatus, {
+    name: "ProcessStatus",
 })

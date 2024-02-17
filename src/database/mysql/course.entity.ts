@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
-import { VerifiedStatus } from "@common"
+import { VerifyStatus } from "@common"
 import { PostEntity } from "./post.entity"
 import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { SectionEntity } from "./section.entity"
@@ -42,9 +42,9 @@ export class CourseEntity {
   @Column({ type: "float", default: 0 })
   	price: number
 
-  @Field(() => VerifiedStatus, { nullable: true })
-  @Column({ type: "enum", enum: VerifiedStatus, default: null })
-  	verifiedStatus: VerifiedStatus
+  @Field(() => VerifyStatus, { nullable: true })
+  @Column({ type: "enum", enum: VerifyStatus, default: null })
+  	verifyStatus: VerifyStatus
 
   @Field(() => Boolean, { defaultValue: true })
   @Column({ default: true })

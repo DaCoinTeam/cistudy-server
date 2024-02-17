@@ -23,7 +23,7 @@ import {
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
-import { existKeyNotUndefined } from "@common"
+import { ProcessStatus, existKeyNotUndefined } from "@common"
 
 @Injectable()
 export class CoursesService {
@@ -179,24 +179,58 @@ export class CoursesService {
         if (Number.isInteger(lectureVideoIndex)) {
             const promise = async () => {
                 const file = files.at(lectureVideoIndex)
+
+                await this.lectureMySqlRepository.update(
+                    { lectureId },
+                    {
+                        processStatus: ProcessStatus.Pending,
+                    },
+                )
+
+                const queryAtStart = this.lectureMySqlRepository
+                    .createQueryBuilder()
+                    .update()
+                    .set({
+                        processStatus: ProcessStatus.Processing,
+                    })
+                    .where({
+                        lectureId, 
+                    })
+                    .getQueryAndParameters()
+                console.log(queryAtStart)
+                const queryAtEnd = this.lectureMySqlRepository
+                    .createQueryBuilder()
+                    .update()
+                    .set({
+                        processStatus: ProcessStatus.Completed,
+                    })
+                    .andWhere({
+                        lectureId,
+                    })
+                    .getQueryAndParameters()
+                
+                let assetId: string
                 if (lectureVideoId) {
                     await this.storageService.update(lectureVideoId, {
                         rootFile: file,
                     })
-                    await this.mpegDashProcessorProducer.add(
-                        lectureVideoId,
-                        file
-                    )
+                    assetId = lectureVideoId
                 } else {
-                    const { assetId } = await this.storageService.upload({
+                    const { assetId: createdAssetId } = await this.storageService.upload({
                         rootFile: file,
                     })
-                    await this.mpegDashProcessorProducer.add(
-                        assetId,
-                        file
-                    )
-                    lecture.lectureVideoId = assetId
+                    lecture.lectureVideoId = createdAssetId
+                    assetId = createdAssetId
                 }
+
+                await this.mpegDashProcessorProducer.add({
+                    assetId,
+                    file,
+                    callbackQueries: {
+                        queryAtStart,
+                        queryAtEnd,
+                    },
+                })
             }
             promises.push(promise())
         }
