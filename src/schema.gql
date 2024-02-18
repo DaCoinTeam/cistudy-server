@@ -84,13 +84,22 @@ enum VerifyStatus {
   Rejected
 }
 
+type PostContentMediaEntity {
+  postContentMediaId: ID!
+  position: Int!
+  mediaId: String!
+  postContentId: String!
+  postContent: PostContentEntity!
+}
+
 type PostContentEntity {
   postContentId: ID!
-  index: Int!
-  content: String!
+  position: Int!
+  text: String!
   contentType: String!
   postId: String!
   post: PostEntity!
+  postContentMedias: [PostContentMediaEntity!]!
 }
 
 type PostEntity {

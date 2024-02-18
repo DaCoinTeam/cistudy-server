@@ -1,9 +1,9 @@
 import { registerEnumType } from "@nestjs/graphql"
 
 export enum UserKind {
-  Local = "Local",
-  Google = "Google",
-  Facebook = "Facebook",
+  Local = "local",
+  Google = "google",
+  Facebook = "facebook",
 }
 
 registerEnumType(UserKind, {
@@ -11,9 +11,9 @@ registerEnumType(UserKind, {
 })
 
 export enum UserRole {
-  User = "User",
-  Moderator = "Moderator",
-  Administrator = "Administrator",
+  User = "user",
+  Moderator = "moderator",
+  Administrator = "administrator",
 }
 
 registerEnumType(UserRole, {
@@ -21,9 +21,9 @@ registerEnumType(UserRole, {
 })
 
 export enum VerifyStatus {
-  Pending = "Pending",
-  Approved = "Approved",
-  Rejected = "Rejected",
+  Pending = "pending",
+  Approved = "approved",
+  Rejected = "rejected",
 }
 
 registerEnumType(VerifyStatus, {
@@ -31,12 +31,11 @@ registerEnumType(VerifyStatus, {
 })
 
 export enum ContentType {
-  Text = "Text",
-  Video = "Video",
-  Code = "Code",
-  Image = "Image",
-  Label = "Label",
-  Application = "Application",
+  Text = "text",
+  Code = "code",
+  Link = "link",
+  Images = "images",
+  Videos = "videos",
 }
 
 registerEnumType(ContentType, {
@@ -44,9 +43,9 @@ registerEnumType(ContentType, {
 })
 
 export enum ProcessStatus {
-  Pending = "Pending",
-  Processing = "Processing",
-  Completed = "Completed",
+  Pending = "pending",
+  Processing = "processing",
+  Completed = "completed",
 }
 
 registerEnumType(ProcessStatus, {
@@ -54,8 +53,8 @@ registerEnumType(ProcessStatus, {
 })
 
 export enum VideoType {
-  MP4 = "MP4",
-  DASH = "DASH",
+  MP4 = "mp4",
+  DASH = "dash",
 }
 
 registerEnumType(VideoType, {

@@ -8,6 +8,7 @@ import {
     PostCommentMySqlEntity,
     PostCommentContentMySqlEntity,
     PostCommentLikeMySqlEntity,
+    PostContentMediaMySqlEntity,
 } from "@database"
 import { PostsService } from "./posts.service"
 
@@ -20,6 +21,7 @@ import { PostsService } from "./posts.service"
             PostCommentMySqlEntity,
             PostCommentContentMySqlEntity,
             PostCommentLikeMySqlEntity,
+            PostContentMediaMySqlEntity
         ]),
     ],
     providers: [PostsResolver, PostsService],

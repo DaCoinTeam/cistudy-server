@@ -4,11 +4,13 @@ import {
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    OneToMany
 } from "typeorm"
 
 import { PostEntity } from "./post.entity"
 import { ContentType } from "@common"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
+import { PostContentMediaEntity } from "./post-content-media.entity"
 
 @ObjectType()
 @Entity("post_content")
@@ -19,11 +21,11 @@ export class PostContentEntity {
 
   @Field(() => Int)
   @Column({ type: "int", default: 0 })
-  	index: number
+  	position: number
 
   @Field(() => String)
-  @Column({ type: "varchar", length: 1000 })
-  	content: string
+  @Column({ type: "varchar", length: 1000, nullable: true })
+  	text: string
 
   @Field(() => String)
   @Column({ type: "enum", enum: ContentType, default: ContentType.Text })
@@ -37,5 +39,11 @@ export class PostContentEntity {
   @ManyToOne(() => PostEntity, (post) => post.postContents)
   @JoinColumn({ name: "postId" })
   	post: PostEntity
+
+  @Field(() => [PostContentMediaEntity])
+  @OneToMany(() => PostContentMediaEntity, (postContentMedia) => postContentMedia.postContent, {
+      cascade: true
+  })
+      postContentMedias: Array<PostContentMediaEntity>
 }
   

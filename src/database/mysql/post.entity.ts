@@ -18,47 +18,47 @@ import { Field, ID, ObjectType } from "@nestjs/graphql"
 @ObjectType()
 @Entity("post")
 export class PostEntity {
-    @Field(() => ID)
-    @PrimaryGeneratedColumn("uuid")
-    	postId: string
+  @Field(() => ID)
+  @PrimaryGeneratedColumn("uuid")
+      postId: string
 
-    @Field(() => String)
-    @Column({ type: "varchar", length: 500 })
-    	title: string
+  @Field(() => String)
+  @Column({ type: "varchar", length: 500 })
+      title: string
 
-    @Field(() => String)
-    @Column({ type: "uuid", length: 36 })
-    	creatorId: string
+  @Field(() => String)
+  @Column({ type: "uuid", length: 36 })
+      creatorId: string
 
-    @Field(() => String)
-    @Column({ type: "uuid", length: 36 })
-    	courseId: string
+  @Field(() => String)
+  @Column({ type: "uuid", length: 36 })
+      courseId: string
 
-    @Field(() => Date)
-    @CreateDateColumn()
-    	createdAt: Date
+  @Field(() => Date)
+  @CreateDateColumn()
+      createdAt: Date
 
-	@Field(() => Date)
-    @UpdateDateColumn()
-    	updatedAt: Date
+  @Field(() => Date)
+  @UpdateDateColumn()
+      updatedAt: Date
 
-    @ManyToOne(() => CourseEntity, (course) => course.posts)
-    @JoinColumn({ name: "courseId" })
-    	course: CourseEntity
+  @ManyToOne(() => CourseEntity, (course) => course.posts)
+  @JoinColumn({ name: "courseId" })
+      course: CourseEntity
 
-    @ManyToOne(() => UserEntity, (user) => user.posts)
-    @JoinColumn({ name: "creatorId" })
-    	creator: UserEntity
+  @ManyToOne(() => UserEntity, (user) => user.posts)
+  @JoinColumn({ name: "creatorId" })
+      creator: UserEntity
 
-    @Field(() => [PostContentEntity])
-    @OneToMany(() => PostContentEntity, (postContent) => postContent.post, {
-    	cascade: ["remove", "insert", "update"],
-    })
-    	postContents: Partial<PostContentEntity>[]
+  @Field(() => [PostContentEntity])
+  @OneToMany(() => PostContentEntity, (postContent) => postContent.post, {
+      cascade: ["remove", "insert", "update"],
+  })
+      postContents: Array<PostContentEntity>
 
-    @OneToMany(() => PostCommentEntity, (postComment) => postComment.post)
-    	postComments: PostCommentEntity[]
+  @OneToMany(() => PostCommentEntity, (postComment) => postComment.post)
+      postComments: Array<PostCommentEntity>
 
-    @OneToMany(() => PostReactEntity, (postReact) => postReact.post)
-    	postReacts: PostReactEntity[]
+  @OneToMany(() => PostReactEntity, (postReact) => postReact.post)
+      postReacts: Array<PostReactEntity>
 }

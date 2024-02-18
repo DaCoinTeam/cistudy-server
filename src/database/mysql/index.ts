@@ -12,6 +12,8 @@ import { SectionEntity as SectionMySqlEntity } from "./section.entity"
 import { LectureEntity as LectureMySqlEntity } from "./lecture.entity"
 import { ResourceEntity as ResourceMySqlEntity } from "./resource.entity"
 import { CourseTargetEntity as CourseTargetMySqlEntity } from "./course-target.entity"
+import { PostContentMediaEntity as PostContentMediaMySqlEntity } from "./post-content-media.entity"
+
 export {
     UserMySqlEntity,
     PostMySqlEntity,
@@ -26,5 +28,6 @@ export {
     SectionMySqlEntity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
-    CourseTargetMySqlEntity
+    CourseTargetMySqlEntity,
+    PostContentMediaMySqlEntity
 }

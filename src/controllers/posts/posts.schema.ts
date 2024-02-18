@@ -52,12 +52,23 @@ export const createPostSchema: SchemaObject = {
                     items: {
                         type: "object",
                         properties: {
-                            content: {
+                            text: {
                                 type: "string",
                             },
                             contentType: {
                                 type: "string",
                             },
+                            postContentMedias: {
+                                type: "array",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        mediaIndex: {
+                                            type: "number",
+                                        },
+                                    }
+                                }
+                            }
                         },
                     },
                 },
