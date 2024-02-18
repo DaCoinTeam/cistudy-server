@@ -102,6 +102,8 @@ export class PostsService {
         await Promise.all(promises)
 
         const created = await this.postMySqlRepository.save(post)
+        console.dir(created, { depth: null })
+        
         return `A post with id ${created.postId} has been created successfully.`
     }
 
