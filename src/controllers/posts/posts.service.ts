@@ -88,7 +88,6 @@ export class PostsService {
                         mediaPromises.push(mediaPromise())
                     }
                     await Promise.all(mediaPromises)
-                    console.log(medias)
 
                     post.postContents.push({
                         contentType,
@@ -103,7 +102,6 @@ export class PostsService {
         await Promise.all(promises)
 
         const created = await this.postMySqlRepository.save(post)
-        console.dir(created, { depth: null} )
         return `A post with id ${created.postId} has been created successfully.`
     }
 
