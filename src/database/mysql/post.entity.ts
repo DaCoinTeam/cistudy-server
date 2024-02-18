@@ -14,6 +14,7 @@ import { PostContentEntity } from "./post-content.entity"
 import { PostReactEntity } from "./post-react.entity"
 import { UserEntity } from "./user.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
+import { UserMySqlEntity } from "."
 
 @ObjectType()
 @Entity("post")
@@ -46,6 +47,7 @@ export class PostEntity {
   @JoinColumn({ name: "courseId" })
       course: CourseEntity
 
+  @Field(() => UserMySqlEntity)
   @ManyToOne(() => UserEntity, (user) => user.posts)
   @JoinColumn({ name: "creatorId" })
       creator: UserEntity
@@ -59,6 +61,7 @@ export class PostEntity {
   @OneToMany(() => PostCommentEntity, (postComment) => postComment.post)
       postComments: Array<PostCommentEntity>
 
+  @Field(() => [PostReactEntity])
   @OneToMany(() => PostReactEntity, (postReact) => postReact.post)
       postReacts: Array<PostReactEntity>
 }

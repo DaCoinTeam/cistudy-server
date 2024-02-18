@@ -95,11 +95,22 @@ type PostContentMediaEntity {
 type PostContentEntity {
   postContentId: ID!
   position: Int!
-  text: String!
+  text: String
   contentType: String!
   postId: String!
   post: PostEntity!
-  postContentMedias: [PostContentMediaEntity!]!
+  postContentMedias: [PostContentMediaEntity!]
+}
+
+type PostReactEntity {
+  postReactId: ID!
+  userId: String!
+  postId: String!
+  liked: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: UserEntity!
+  post: PostEntity!
 }
 
 type PostEntity {
@@ -109,7 +120,9 @@ type PostEntity {
   courseId: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  creator: UserEntity!
   postContents: [PostContentEntity!]!
+  postReacts: [PostReactEntity!]!
 }
 
 type UserEntity {

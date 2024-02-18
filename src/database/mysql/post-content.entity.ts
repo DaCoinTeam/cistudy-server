@@ -23,7 +23,7 @@ export class PostContentEntity {
   @Column({ type: "int", default: 0 })
   	position: number
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 1000, nullable: true })
   	text: string
 
@@ -40,7 +40,7 @@ export class PostContentEntity {
   @JoinColumn({ name: "postId" })
   	post: PostEntity
 
-  @Field(() => [PostContentMediaEntity])
+  @Field(() => [PostContentMediaEntity], { nullable: true })
   @OneToMany(() => PostContentMediaEntity, (postContentMedia) => postContentMedia.postContent, {
       cascade: true
   })

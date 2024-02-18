@@ -6,9 +6,8 @@ import {
     ReactPostInput,
     UpdateCommentInput,
     UpdatePostInput,
-    PostContentData,
 } from "./posts.input"
-import { ContentType, IndexFileAppended } from "@common"
+import { ContentType } from "@common"
 import {
     PostMySqlEntity,
     PostReactMySqlEntity,
@@ -102,7 +101,6 @@ export class PostsService {
         await Promise.all(promises)
 
         const created = await this.postMySqlRepository.save(post)
-        console.dir(created, { depth: null })
         
         return `A post with id ${created.postId} has been created successfully.`
     }

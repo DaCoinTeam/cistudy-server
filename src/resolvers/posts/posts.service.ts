@@ -16,18 +16,21 @@ export class PostsService {
     }
 
     async findManyPosts(input: FindManyPostsInput): Promise<PostMySqlEntity[]> {
-        const founds = await this.postMySqlRepository.find({
+        console.log(input)
+        return await this.postMySqlRepository.find({
             where: {
                 courseId: input.courseId,
             },
             take: input.options?.take,
             skip: input.options?.skip,
             relations: {
-                postContents: true,
+                postContents: {
+                    postContentMedias: true,
+                },
                 creator: true,
                 course: true,
+                postReacts: true
             },
         })
-        return founds
     }
 }
