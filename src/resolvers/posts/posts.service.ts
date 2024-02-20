@@ -12,7 +12,17 @@ export class PostsService {
     ) {}
 
     async findOnePost(input: FindOnePostInput): Promise<PostMySqlEntity> {
-        return await this.postMySqlRepository.findOneBy(input)
+        return await this.postMySqlRepository.findOne({
+            where: input,
+            relations: {
+                postContents: {
+                    postContentMedias: true,
+                },
+                creator: true,
+                course: true,
+                postReacts: true
+            },
+        })
     }
 
     async findManyPosts(input: FindManyPostsInput): Promise<PostMySqlEntity[]> {
