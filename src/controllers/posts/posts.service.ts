@@ -107,8 +107,6 @@ export class PostsService {
         return `A post with id ${created.postId} has been created successfully.`
     }
 
-
-
     async updatePost(input: UpdatePostInput): Promise<string> {
     // const { data, files } = input
     // const { postContents, postId, title } = data
@@ -201,7 +199,7 @@ export class PostsService {
                         contentType,
                         position,
                         text,
-                    } as PostContentMySqlEntity)
+                    } as PostCommentContentMySqlEntity)
                 } else {
                     let mediaPosition = 0
                     const mediaPromises: Array<Promise<void>> = []

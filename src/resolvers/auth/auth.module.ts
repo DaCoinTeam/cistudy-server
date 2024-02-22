@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common"
-import { ProfileResolver } from "./profile.resolver"
+import { AuthResolver } from "./auth.resolver"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     UserMySqlEntity,
 } from "@database"
-import { ProfileService } from "./profile.service"
+import { AuthService } from "./auth.service"
 
 @Module({
     imports: [
@@ -12,6 +12,6 @@ import { ProfileService } from "./profile.service"
             UserMySqlEntity
         ]),
     ],
-    providers: [ProfileResolver, ProfileService],
+    providers: [AuthResolver, AuthService],
 })
-export class ProfileModule {}
+export class AuthModule {}

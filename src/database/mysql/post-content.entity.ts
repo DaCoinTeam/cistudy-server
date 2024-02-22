@@ -31,7 +31,7 @@ export class PostContentEntity {
   @Column({ type: "enum", enum: ContentType, default: ContentType.Text })
   	contentType: ContentType
 
-  @Field(() => String)
+  @Field(() => ID)
   @Column({ type: "uuid", length: 36 })
   	postId: string
 

@@ -20,7 +20,7 @@ export class PostCommentContentMediaEntity {
   @Column({ type: "int", default: 0 })
       position: number
 
-  @Field(() => String)
+  @Field(() => ID)
   @Column({ type: "uuid", length: 36 })
       mediaId: string
 

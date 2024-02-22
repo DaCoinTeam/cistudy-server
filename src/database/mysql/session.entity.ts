@@ -4,6 +4,8 @@ import {
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    CreateDateColumn,
+    UpdateDateColumn
 } from "typeorm"
 
 import { UserEntity } from "./user.entity"
@@ -11,27 +13,29 @@ import { UserEntity } from "./user.entity"
 @Entity("session")
 export class SessionEntity {
   @PrimaryGeneratedColumn("uuid")
-  	sessionId: string
+      sessionId: string
 
-  @Column({ type: "uuid", length:"36" })
-  	userId: string
+  @Column({ type: "uuid", length: "36" })
+      userId: string
 
-  @Column({
-  	type: "timestamp",
-  	default: () => "CURRENT_TIMESTAMP",
-  	onUpdate: "CURRENT_TIMESTAMP",
-  })
-  	createdAt: Date
+  @CreateDateColumn()
+      createdAt: Date
+  
+  @UpdateDateColumn()
+      updatedAt: Date
 
   @Column({ type: "boolean", default: false })
-  	isDisabled: boolean
+      isDisabled: boolean
+
+  @Column({ type: "int", default: 0 })
+      numberOfUpdates: number
 
   @Column({
-  	type: "uuid", length:"36"
+      type: "uuid", length: "36"
   })
-  	clientId: string
-  
+      clientId: string
+
   @ManyToOne(() => UserEntity, (user) => user.sessions)
   @JoinColumn({ name: "userId" })
-  	user: UserEntity
+      user: UserEntity
 }

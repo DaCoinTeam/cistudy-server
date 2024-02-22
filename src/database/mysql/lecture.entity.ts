@@ -24,15 +24,15 @@ export class LectureEntity {
   @Column({ type: "varchar", length: 150 })
       title: string
 
-  @Field(() => String, { nullable: true })
+  @Field(() => ID, { nullable: true })
   @Column({ type: "uuid", length: 36, nullable: true })
       thumbnailId?: string
 
-  @Field(() => String, { nullable: true })
+  @Field(() => ID, { nullable: true })
   @Column({ type: "uuid", length: 36, nullable: true })
       lectureVideoId?: string
 
-  @Field(() => String)
+  @Field(() => ID)
   @Column({ name: "sectionId", type: "uuid", length: 36 })
       sectionId: string
 

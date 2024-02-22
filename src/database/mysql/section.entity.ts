@@ -21,8 +21,8 @@ export class SectionEntity {
   @Column({ type: "varchar", length: 200 })
       title: string
 
-  @Field(() => String)
-  @Column({ name: "courseId", type: "uuid", length: 36 })
+  @Field(() => ID)
+  @Column({ type: "uuid", length: 36 })
       courseId: string
 
   @Field(() => Date)

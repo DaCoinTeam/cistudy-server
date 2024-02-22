@@ -7,7 +7,7 @@ type ResourceEntity {
   resourceId: ID!
   name: String!
   fileId: String!
-  lectureId: String!
+  lectureId: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
   lecture: LectureEntity!
@@ -21,9 +21,9 @@ scalar DateTime
 type LectureEntity {
   lectureId: ID!
   title: String!
-  thumbnailId: String
-  lectureVideoId: String
-  sectionId: String!
+  thumbnailId: ID
+  lectureVideoId: ID
+  sectionId: ID!
   processStatus: ProcessStatus!
   videoType: VideoType!
   createdAt: DateTime!
@@ -46,7 +46,7 @@ enum VideoType {
 type SectionEntity {
   sectionId: ID!
   title: String!
-  courseId: String!
+  courseId: ID!
   createdAt: DateTime!
   course: CourseEntity!
   lectures: [LectureEntity!]!
@@ -58,21 +58,22 @@ type CourseTargetEntity {
   position: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
-  courseId: String!
+  courseId: ID!
   course: CourseEntity!
 }
 
 type CourseEntity {
   courseId: ID!
   title: String!
-  thumbnailId: String
+  thumbnailId: ID
   description: String!
+  creatorId: ID!
   price: Float!
   verifyStatus: VerifyStatus
   isDraft: Boolean!
   creator: UserEntity!
   isDeleted: Boolean!
-  previewVideoId: String
+  previewVideoId: ID
   includes: String
   courseTargets: [CourseTargetEntity!]
   sections: [SectionEntity!]!
@@ -87,8 +88,8 @@ enum VerifyStatus {
 type PostContentMediaEntity {
   postContentMediaId: ID!
   position: Int!
-  mediaId: String!
-  postContentId: String!
+  mediaId: ID!
+  postContentId: ID!
   postContent: PostContentEntity!
 }
 
@@ -97,7 +98,7 @@ type PostContentEntity {
   position: Int!
   text: String
   contentType: String!
-  postId: String!
+  postId: ID!
   post: PostEntity!
   postContentMedias: [PostContentMediaEntity!]
 }
@@ -116,25 +117,55 @@ type PostReactEntity {
 type PostEntity {
   postId: ID!
   title: String!
-  creatorId: String!
-  courseId: String!
+  creatorId: ID!
+  courseId: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
   creator: UserEntity!
   postContents: [PostContentEntity!]!
+  postComments: [PostCommentEntity!]!
   postReacts: [PostReactEntity!]!
+}
+
+type PostCommentContentMediaEntity {
+  postCommentContentMediaId: ID!
+  position: Int!
+  mediaId: ID!
+  postCommentContentId: String!
+  postCommentContent: PostCommentContentEntity!
+}
+
+type PostCommentContentEntity {
+  postCommentContentId: ID!
+  postCommentId: String!
+  position: Int!
+  text: String
+  contentType: String!
+  postComment: PostCommentEntity!
+  postCommentContentMedias: [PostCommentContentMediaEntity!]
+}
+
+type PostCommentEntity {
+  postCommentId: ID!
+  creatorId: ID!
+  postId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  post: PostEntity!
+  creator: UserEntity!
+  postCommentContents: [PostCommentContentEntity!]!
 }
 
 type UserEntity {
   userId: ID!
   email: String!
   password: String
-  avatarId: String
-  coverPhotoId: String
+  avatarId: ID
+  coverPhotoId: ID
   phoneNumber: String
   balance: Float
   role: UserRole!
-  walletId: String
+  walletId: ID
   firstName: String
   lastName: String
   birthdate: DateTime
@@ -155,25 +186,52 @@ enum UserKind {
   Facebook
 }
 
-type FindProfileByAuthTokenOutput {
+type FindOnePostOutput {
+  data: PostEntity!
+  tokens: AuthTokens
+}
+
+type FindManyPostsOutput {
+  data: [PostEntity!]!
+  tokens: AuthTokens
+}
+
+type FindOnePostCommentOutput {
+  data: PostCommentEntity!
+  tokens: AuthTokens
+}
+
+type InitOutput {
+  data: UserEntity!
+  tokens: AuthTokens
+}
+
+type SignInOutput {
   data: UserEntity!
   tokens: AuthTokens
 }
 
 type Query {
-  findProfile: FindProfileByAuthTokenOutput!
-  findOneCourse(input: FindOneCourseInput!): CourseEntity!
-  findManyCourses(input: FindManyCoursesInput): [CourseEntity!]!
-  findOnePost(input: FindOnePostInput!): PostEntity!
-  findManyPosts(input: FindManyPostsInput!): [PostEntity!]!
-  findOneUser(input: FindOneUserInput!): UserEntity!
+  init: InitOutput!
+  signIn(data: SignInData!): SignInOutput!
+  findOneCourse(data: FindOneCourseData!): CourseEntity!
+  findManyCourses(data: FindManyCoursesData): [CourseEntity!]!
+  findOnePost(data: FindOnePostData!): FindOnePostOutput!
+  findOnePostComment(data: FindOnePostCommentData!): FindOnePostCommentOutput!
+  findManyPosts(data: FindManyPostsData!): FindManyPostsOutput!
+  findOneUser(data: FindOneUserData!): UserEntity!
 }
 
-input FindOneCourseInput {
+input SignInData {
+  email: String!
+  password: String!
+}
+
+input FindOneCourseData {
   courseId: ID!
 }
 
-input FindManyCoursesInput {
+input FindManyCoursesData {
   filter: CourseFilterInput
 }
 
@@ -181,11 +239,15 @@ input CourseFilterInput {
   category: String
 }
 
-input FindOnePostInput {
+input FindOnePostData {
   postId: ID!
 }
 
-input FindManyPostsInput {
+input FindOnePostCommentData {
+  postCommentId: ID!
+}
+
+input FindManyPostsData {
   courseId: String!
   options: FindManyPostsOptions
 }
@@ -195,6 +257,6 @@ input FindManyPostsOptions {
   skip: Int
 }
 
-input FindOneUserInput {
+input FindOneUserData {
   userId: String!
 }

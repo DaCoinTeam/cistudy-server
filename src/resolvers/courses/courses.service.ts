@@ -12,8 +12,9 @@ export class CoursesService {
     ) {}
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
+        const { data } = input
         return await this.courseMySqlRepository.findOne({
-            where: { courseId: input.courseId },
+            where: { courseId: data.courseId },
             relations: {
                 sections: {
                     lectures: {
@@ -30,14 +31,13 @@ export class CoursesService {
         })
     }
 
-    async findManyCourses(input: FindManyCoursesInput): Promise<CourseMySqlEntity[]> {
-
+    async findManyCourses(input: FindManyCoursesInput): Promise<Array<CourseMySqlEntity>> {
+        const { data } = input
         const founds = await this.courseMySqlRepository.findAndCount({
             relations: {
                 creator: true
             }
         })
-        console.dir(founds, { depth: null})
         return founds[0]
     }
 }

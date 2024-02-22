@@ -23,11 +23,11 @@ export class UserEntity {
   @Column({ type: "varchar", length: 64, default: null })
   	password: string
 
-  @Field(() => String, { nullable: true })
+  @Field(() => ID, { nullable: true })
   @Column({ type: "uuid", length: 36, default: null })
   	avatarId: string
 
-    @Field(() => String, { nullable: true })
+    @Field(() => ID, { nullable: true })
   @Column({ type: "uuid", length: 36, default: null })
   	coverPhotoId: string
 
@@ -52,7 +52,7 @@ export class UserEntity {
   })
   	role: UserRole
 
-  @Field(() => String, { nullable: true })
+  @Field(() => ID, { nullable: true })
   @Column({
   	type: "uuid",
   	default: null,

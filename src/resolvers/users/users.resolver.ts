@@ -1,15 +1,14 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
 import { UsersService } from "./users.service"
-import { UserMySqlEntity } from "@database"
-import { FindOneUserInput } from "./users.input"
+import { FindOneUserData } from "./users.input"
 import { UserEntity } from "src/database/mysql/user.entity"
 
-@Resolver(() => UserMySqlEntity)
+@Resolver()
 export class UsersResolver {
     constructor(private readonly usersService: UsersService) {}
 
   @Query(() => UserEntity)
-    async findOneUser(@Args("input") input: FindOneUserInput) {
-        return this.usersService.findOneUser(input)
+    async findOneUser(@Args("data") data: FindOneUserData) {
+        return this.usersService.findOneUser({ data })
     }
 }

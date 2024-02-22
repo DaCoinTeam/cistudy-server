@@ -12,7 +12,7 @@ import { CourseEntity } from "./course.entity"
 export class EnrolledInfoEntity {
   @PrimaryGeneratedColumn("uuid")
   	enrolledId: string
-
+  
   @Column({ type: "uuid", length: 36 })
   	userId: string
 

@@ -16,70 +16,74 @@ interface CourseIncludes {
 export class CourseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn("uuid")
-  	courseId: string
+      courseId: string
 
   @Field(() => String)
   @Column({
-  	type: "varchar",
-  	length: 1000,
-  	default: null,
+      type: "varchar",
+      length: 1000,
+      default: null,
   })
-  	title: string
+      title: string
 
-  @Field(() => String, { nullable: true })
+  @Field(() => ID, { nullable: true })
   @Column({
-  	type: "uuid",
-  	length: 36,
-  	default: null,
+      type: "uuid",
+      length: 36,
+      default: null,
   })
-  	thumbnailId: string
+      thumbnailId: string
 
   @Field(() => String)
   @Column({ type: "varchar", length: 1000 })
-  	description: string
+      description: string
+
+  @Field(() => ID)
+  @Column({ type: "uuid", length: 36 })
+      creatorId: string
 
   @Field(() => Float, { defaultValue: 0 })
   @Column({ type: "float", default: 0 })
-  	price: number
+      price: number
 
   @Field(() => VerifyStatus, { nullable: true })
   @Column({ type: "enum", enum: VerifyStatus, default: null })
-  	verifyStatus: VerifyStatus
+      verifyStatus: VerifyStatus
 
   @Field(() => Boolean, { defaultValue: true })
   @Column({ default: true })
-  	isDraft: boolean
+      isDraft: boolean
 
   @Field(() => UserEntity)
   @ManyToOne(() => UserEntity, (user) => user.courses)
   @JoinColumn({ name: "creatorId" })
-  	creator: UserEntity
+      creator: UserEntity
 
   @Field(() => Boolean, { defaultValue: false })
   @Column({ default: false })
-  	isDeleted: boolean
+      isDeleted: boolean
 
-  @Field(() => String, { nullable: true })
+  @Field(() => ID, { nullable: true })
   @Column({ type: "uuid", length: 36 })
-  	previewVideoId: string
+      previewVideoId: string
 
   @Field(() => String, { nullable: true })
   @Column({ type: "json", default: null })
-  	includes: CourseIncludes
+      includes: CourseIncludes
 
   @Field(() => [CourseTargetEntity], { nullable: true })
   @OneToMany(() => CourseTargetEntity, (courseTarget) => courseTarget.course)
-  	courseTargets: Array<CourseTargetEntity>
+      courseTargets: Array<CourseTargetEntity>
 
   @OneToMany(() => PostEntity, (post) => post.course)
-  	posts: Array<PostEntity>
+      posts: Array<PostEntity>
 
   @OneToMany(() => EnrolledInfoEntity, (enrolled) => enrolled.course)
-  	enrolledInfos: EnrolledInfoEntity[]
+      enrolledInfos: EnrolledInfoEntity[]
 
   @Field(() => [SectionEntity])
   @OneToMany(() => SectionEntity, (section) => section.course, {
-  	onDelete: "CASCADE",
+      onDelete: "CASCADE",
   })
-  	sections: SectionEntity[]
+      sections: SectionEntity[]
 }

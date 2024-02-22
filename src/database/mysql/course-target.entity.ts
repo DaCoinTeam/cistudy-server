@@ -33,7 +33,7 @@ export class CourseTargetEntity {
   @UpdateDateColumn()
       updatedAt: Date
 
-  @Field(() => String)
+  @Field(() => ID)
   @Column({ type: "uuid", length: 36 })
       courseId: string
 

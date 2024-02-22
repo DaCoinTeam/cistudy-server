@@ -12,57 +12,67 @@ import { PostEntity } from "./post.entity"
 import { PostCommentContentEntity } from "./post-comment-content.entity"
 import { UserEntity } from "./user.entity"
 import { PostCommentLikeEntity } from "./post-comment-like.entity"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 
+@ObjectType()
 @Entity("post_comment")
 export class PostCommentEntity {
-  @PrimaryGeneratedColumn("uuid")
-      postCommentId: string
+    @Field(() => ID)
+    @PrimaryGeneratedColumn("uuid")
+        postCommentId: string
 
-  @Column({ type: "uuid", length: 36 })
-      creatorId: string
+    @Field(() => ID)
+    @Column({ type: "uuid", length: 36 })
+        creatorId: string
 
-  @Column({ type: "uuid", length: 36 })
-      postId: string
+    @Field(() => ID)
+    @Column({ type: "uuid", length: 36 })
+        postId: string
 
-  @CreateDateColumn()
-      createdAt: Date
+    @Field(() => Date)
+    @CreateDateColumn()
+        createdAt: Date
 
-  @UpdateDateColumn()
-      updatedAt: Date
+    @Field(() => Date)
+    @UpdateDateColumn()
+        updatedAt: Date
 
-  @ManyToOne(
-      () => PostCommentEntity,
-      (postComment) => postComment.childComments,
-  )
-  @JoinColumn({ name: "fatherCommentId" })
-  @Column({ type: "uuid", default: null, length: 36 })
-      fatherCommentId: string
+    @ManyToOne(
+        () => PostCommentEntity,
+        (postComment) => postComment.childComments,
+    )
+    @JoinColumn({ name: "fatherCommentId" })
+    @Column({ type: "uuid", default: null, length: 36 })
+        fatherCommentId: string
 
-  @ManyToOne(() => PostEntity, (post) => post.postComments)
-  @JoinColumn({ name: "postId" })
-      post: PostEntity
+    @Field(() => PostEntity)
+    @ManyToOne(() => PostEntity, (post) => post.postComments)
+    @JoinColumn({ name: "postId" })
+        post: PostEntity
 
-  @ManyToOne(() => UserEntity, (user) => user.postComments)
-  @JoinColumn({ name: "creatorId" })
-      creator: UserEntity
+    @Field(() => UserEntity)
+    @ManyToOne(() => UserEntity, (user) => user.postComments)
+    @JoinColumn({ name: "creatorId" })
+        creator: UserEntity
 
-  @OneToMany(
-      () => PostCommentContentEntity,
-      (postCommentContent) => postCommentContent.postComment,
-      { cascade: true },
-  )
-      postCommentContents: Array<Partial<PostCommentContentEntity>>
+    @Field(() => [PostCommentContentEntity])
+    @OneToMany(
+        () => PostCommentContentEntity,
+        (postCommentContent) => postCommentContent.postComment,
+        { cascade: true },
+    )
+        postCommentContents: Array<PostCommentContentEntity>
 
-  @OneToMany(
-      () => PostCommentLikeEntity,
-      (postCommentLike) => postCommentLike.postComment,
-  )
-      postCommentLikes: Array<PostCommentLikeEntity>
+    @OneToMany(
+        () => PostCommentLikeEntity,
+        (postCommentLike) => postCommentLike.postComment,
+    )
+        postCommentLikes: Array<PostCommentLikeEntity>
 
-  @OneToMany(
-      () => PostCommentEntity,
-      (postComment) => postComment.fatherCommentId,
-      { cascade: true },
-  )
-      childComments: PostCommentEntity[]
+    @OneToMany(
+        () => PostCommentEntity,
+        (postComment) => postComment.fatherCommentId,
+        { cascade: true },
+    )
+        childComments: PostCommentEntity[]
 }

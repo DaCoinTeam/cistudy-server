@@ -1,20 +1,35 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
-import { FindManyPostsInput, FindOnePostInput } from "./posts.input"
+import { FindManyPostsData, FindOnePostCommentData, FindOnePostData } from "./posts.input"
 import { PostsService } from "./posts.service"
-import { PostMySqlEntity } from "@database"
+import { AuthInterceptor, JwtAuthGuard, UserId } from "../shared"
+import { UseGuards, UseInterceptors } from "@nestjs/common"
+import { FindManyPostsOutput, FindOnePostCommentOutput, FindOnePostOutput } from "./posts.output"
 
-@Resolver(() => PostMySqlEntity)
+@Resolver()
 export class PostsResolver {
     constructor(
     private readonly postsService: PostsService,
-    ) {}
-  @Query(() => PostMySqlEntity)
-    async findOnePost(@Args("input") input: FindOnePostInput) {
-        return this.postsService.findOnePost(input)
+    ) { }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  @Query(() => FindOnePostOutput)
+    async findOnePost(@UserId() userId: string,
+    @Args("data") data: FindOnePostData) {
+        return this.postsService.findOnePost({ userId, data })
     }
 
-  @Query(() => [PostMySqlEntity])
-  async findManyPosts(@Args("input") input: FindManyPostsInput) {
-  	return this.postsService.findManyPosts(input)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  @Query(() => FindOnePostCommentOutput)
+  async findOnePostComment(@UserId() userId: string, @Args("data") data: FindOnePostCommentData) {
+      return this.postsService.findOnePostComment({ userId, data })
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  @Query(() => FindManyPostsOutput)
+  async findManyPosts(@UserId() userId: string, @Args("data") data: FindManyPostsData) {
+      return this.postsService.findManyPosts({ userId, data })
   }
 }

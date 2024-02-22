@@ -25,7 +25,7 @@ export class ResourceEntity {
   @Column({ type: "varchar", length: 200 })
       fileId: string
 
-  @Field(() => String)
+  @Field(() => ID)
   @Column({ name: "lectureId", type: "uuid", length: 36 })
       lectureId: string
 

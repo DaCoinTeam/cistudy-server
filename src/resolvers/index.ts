@@ -1,6 +1,5 @@
 export * from "./courses"
 export * from "./posts"
 export * from "./shared"
-export * from "./profile"
 export * from "./users"
 export * from "./resolvers.module"

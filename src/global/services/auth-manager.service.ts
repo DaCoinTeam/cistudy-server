@@ -9,10 +9,10 @@ import { Repository } from "typeorm"
 @Injectable()
 export class AuthManagerService {
     constructor(
-    private readonly jwtService: JwtService,
-    @InjectRepository(SessionMySqlEntity)
-    private readonly sessionMySqlRepository: Repository<SessionMySqlEntity>,
-    ) {}
+        private readonly jwtService: JwtService,
+        @InjectRepository(SessionMySqlEntity)
+        private readonly sessionMySqlRepository: Repository<SessionMySqlEntity>,
+    ) { }
 
     async verifyToken(token: string): Promise<Payload> {
         try {
@@ -50,7 +50,7 @@ export class AuthManagerService {
             userRole: type === AuthTokenType.Access ? data.userRole : undefined,
             type,
         }
-        
+
         return await this.jwtService.signAsync(payload, {
             expiresIn,
             secret: jwtConfig().secret,
@@ -74,12 +74,13 @@ export class AuthManagerService {
                     clientId,
                     userId: data.userId,
                 })
+            } else {
+                const { sessionId, numberOfUpdates } = found
+                    
+                await this.sessionMySqlRepository.update({
+                    sessionId,
+                }, { numberOfUpdates: numberOfUpdates + 1 })
             }
-            await this.sessionMySqlRepository.save({
-                sessionId: found.sessionId,
-                userId: found.userId,
-                clientId: found.clientId,
-            })
         }
 
         return {
@@ -106,7 +107,7 @@ export class AuthManagerService {
 }
 
 interface PayloadLike {
-  userId: string;
-  userRole?: UserRole;
-  type?: AuthTokenType;
+    userId: string;
+    userRole?: UserRole;
+    type?: AuthTokenType;
 }

@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common"
 import { CoursesModule } from "./courses"
 import { PostsModule } from "./posts"
-import { ProfileModule } from "./profile"
 import { UsersModule } from "./users"
+import { AuthModule } from "./auth"
 
 @Module({
-    imports: [CoursesModule, PostsModule, ProfileModule, UsersModule],
+    imports: [AuthModule, CoursesModule, PostsModule, UsersModule],
 })
-export class ResolversModule {}
+export class ResolversModule { }
