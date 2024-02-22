@@ -19,7 +19,7 @@ export class PostCommentEntity {
       postCommentId: string
 
   @Column({ type: "uuid", length: 36 })
-      userId: string
+      creatorId: string
 
   @Column({ type: "uuid", length: 36 })
       postId: string
@@ -43,21 +43,21 @@ export class PostCommentEntity {
       post: PostEntity
 
   @ManyToOne(() => UserEntity, (user) => user.postComments)
-  @JoinColumn({ name: "userId" })
-      user: UserEntity
+  @JoinColumn({ name: "creatorId" })
+      creator: UserEntity
 
   @OneToMany(
       () => PostCommentContentEntity,
       (postCommentContent) => postCommentContent.postComment,
       { cascade: true },
   )
-      postCommentContents: Partial<PostCommentContentEntity>[]
+      postCommentContents: Array<Partial<PostCommentContentEntity>>
 
   @OneToMany(
       () => PostCommentLikeEntity,
       (postCommentLike) => postCommentLike.postComment,
   )
-      postCommentLikes: PostCommentLikeEntity[]
+      postCommentLikes: Array<PostCommentLikeEntity>
 
   @OneToMany(
       () => PostCommentEntity,

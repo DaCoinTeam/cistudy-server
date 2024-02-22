@@ -43,6 +43,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "graphql": "^16.8.1",
     "mysql2": "^3.9.1",
+    "nest-cli": "^0.0.5",
     "nodemailer": "^6.9.9",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.1.13",

@@ -14,12 +14,23 @@ export const createCommentSchema: SchemaObject = {
                     items: {
                         type: "object",
                         properties: {
-                            content: {
+                            text: {
                                 type: "string",
                             },
                             contentType: {
                                 type: "string",
                             },
+                            postCommentContentMedias: {
+                                type: "array",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        mediaIndex: {
+                                            type: "number",
+                                        },
+                                    }
+                                }
+                            }
                         },
                     },
                 },

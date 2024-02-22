@@ -17,6 +17,7 @@ import {
     PostCommentLikeMySqlEntity,
 } from "@database"
 import { PostsService } from "./posts.service"
+import { PostCommentContentMediaEntity } from "src/database/mysql/post-comment-content-media.entity"
 
 @Module({
     imports: [
@@ -34,6 +35,7 @@ import { PostsService } from "./posts.service"
             PostCommentContentMySqlEntity,
             PostReactMySqlEntity,
             PostCommentLikeMySqlEntity,
+            PostCommentContentMediaEntity
         ]),
     ],
     controllers: [PostsController],

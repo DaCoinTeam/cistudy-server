@@ -13,6 +13,7 @@ import { LectureEntity as LectureMySqlEntity } from "./lecture.entity"
 import { ResourceEntity as ResourceMySqlEntity } from "./resource.entity"
 import { CourseTargetEntity as CourseTargetMySqlEntity } from "./course-target.entity"
 import { PostContentMediaEntity as PostContentMediaMySqlEntity } from "./post-content-media.entity"
+import { PostCommentContentMediaEntity as PostCommentContentMediaMySqlEntity} from "./post-comment-content-media.entity"
 
 export {
     UserMySqlEntity,
@@ -29,5 +30,6 @@ export {
     LectureMySqlEntity,
     ResourceMySqlEntity,
     CourseTargetMySqlEntity,
-    PostContentMediaMySqlEntity
+    PostContentMediaMySqlEntity,
+    PostCommentContentMediaMySqlEntity
 }

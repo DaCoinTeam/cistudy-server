@@ -90,7 +90,7 @@ export class UserEntity {
   @OneToMany(() => SessionEntity, (session) => session.user)
   	sessions: SessionEntity[]
 
-  @OneToMany(() => PostCommentEntity, (postComment) => postComment.user)
+  @OneToMany(() => PostCommentEntity, (postComment) => postComment.creator)
   	postComments: PostCommentEntity[]
 
   @OneToMany(() => PostReactEntity, (postReact) => postReact.user)

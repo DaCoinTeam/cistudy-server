@@ -14,6 +14,7 @@ import {
     PostCommentMySqlEntity,
     PostContentMySqlEntity,
     PostCommentContentMySqlEntity,
+    PostCommentContentMediaMySqlEntity
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DeepPartial } from "typeorm"
@@ -38,6 +39,7 @@ export class PostsService {
 
     async createPost(input: CreatePostInput): Promise<string> {
         const { data, files, userId } = input
+        console.log(data)
         const { postContents, title, courseId } = data
         const post: DeepPartial<PostMySqlEntity> = {
             title,
@@ -104,6 +106,8 @@ export class PostsService {
         
         return `A post with id ${created.postId} has been created successfully.`
     }
+
+
 
     async updatePost(input: UpdatePostInput): Promise<string> {
     // const { data, files } = input
@@ -172,42 +176,70 @@ export class PostsService {
     }
 
     async createComment(input: CreateCommentInput) {
-    //     const { userId, data, files } = input
-    //     const { postId, postCommentContents } = data
+        const { data, files, userId } = input
+        const { postCommentContents, postId } = data
+        const postComment: DeepPartial<PostCommentMySqlEntity> = {
+            postId,
+            creatorId: userId,
+            postCommentContents: [],
+        }
 
-        //     const promises: Array<Promise<void>> = []
-        //     const appendedPostCommentContents =
-        //   this.appendIndexFile(postCommentContents)
+        const promises: Array<Promise<void>> = []
 
-        //     for (const appendedPostCommentContent of appendedPostCommentContents) {
-        //         if (
-        //             appendedPostCommentContent.contentType === ContentType.Image ||
-        //     appendedPostCommentContent.contentType === ContentType.Video
-        //         ) {
-        //             const promise = async () => {
-        //                 const file = files.at(appendedPostCommentContent.indexFile)
-        //                 //  const { assetId } = await this.storageService.upload(file)
-        //                 //  appendedPostCommentContent.content = assetId
-        //             }
-        //             promises.push(promise())
-        //         }
-        //     }
-        //     await Promise.all(promises)
+        let contentPosition = 0
+        for (const postCommentContent of postCommentContents) {
+            const { text, postCommentContentMedias, contentType } = postCommentContent
 
-        //     const postComment: DeepPartial<PostCommentMySqlEntity> = {
-        //         ...data,
-        //         userId,
-        //         postId,
-        //         postCommentContents: appendedPostCommentContents.map(
-        //             (appendedPostContent, index) => ({
-        //                 ...appendedPostContent,
-        //                 index,
-        //             }),
-        //         ),
-        //     }
+            const position = contentPosition
+            const promise = async () => {
+                if (
+                    contentType === ContentType.Text ||
+          contentType === ContentType.Code ||
+          contentType === ContentType.Link
+                ) {
+                    postComment.postCommentContents.push({
+                        contentType,
+                        position,
+                        text,
+                    } as PostContentMySqlEntity)
+                } else {
+                    let mediaPosition = 0
+                    const mediaPromises: Array<Promise<void>> = []
+                    const medias: Array<DeepPartial<PostContentMediaEntity>> = []
 
-        //     const created = await this.postCommentMySqlRepository.save(postComment)
-        return "A post comment with id has been created successfully."
+                    for (const postCommentContentMedia of postCommentContentMedias) {
+                        const { mediaIndex } = postCommentContentMedia
+                        const position = mediaPosition
+                        const mediaPromise = async () => {
+                            const file = files.at(mediaIndex)
+                            const { assetId } = await this.storageService.upload({
+                                rootFile: file,
+                            })
+                            const media: DeepPartial<PostCommentContentMediaMySqlEntity> = {
+                                position,
+                                mediaId: assetId,
+                            }
+                            medias.push(media)
+                        }
+                        mediaPosition++
+                        mediaPromises.push(mediaPromise())
+                    }
+                    await Promise.all(mediaPromises)
+
+                    postComment.postCommentContents.push({
+                        contentType,
+                        position,
+                        postCommentContentMedias: medias,
+                    } as PostCommentContentMySqlEntity)
+                }
+            }
+            contentPosition++
+            promises.push(promise())
+        }
+        await Promise.all(promises)
+
+        const created = await this.postCommentMySqlRepository.save(postComment)
+        return `A post comment with id ${created.postCommentId} has been created successfully.`
     }
 
     async updateComment(input: UpdateCommentInput) {
