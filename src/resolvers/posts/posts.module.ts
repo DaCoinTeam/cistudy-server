@@ -4,11 +4,8 @@ import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     PostMySqlEntity,
     PostReactMySqlEntity,
-    PostContentMySqlEntity,
     PostCommentMySqlEntity,
-    PostCommentContentMySqlEntity,
     PostCommentLikeMySqlEntity,
-    PostContentMediaMySqlEntity,
 } from "@database"
 import { PostsService } from "./posts.service"
 
@@ -17,11 +14,8 @@ import { PostsService } from "./posts.service"
         TypeOrmModule.forFeature([
             PostMySqlEntity,
             PostReactMySqlEntity,
-            PostContentMySqlEntity,
             PostCommentMySqlEntity,
-            PostCommentContentMySqlEntity,
             PostCommentLikeMySqlEntity,
-            PostContentMediaMySqlEntity
         ]),
     ],
     providers: [PostsResolver, PostsService],

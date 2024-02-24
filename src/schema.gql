@@ -85,24 +85,6 @@ enum VerifyStatus {
   Rejected
 }
 
-type PostContentMediaEntity {
-  postContentMediaId: ID!
-  position: Int!
-  mediaId: ID!
-  postContentId: ID!
-  postContent: PostContentEntity!
-}
-
-type PostContentEntity {
-  postContentId: ID!
-  position: Int!
-  text: String
-  contentType: String!
-  postId: ID!
-  post: PostEntity!
-  postContentMedias: [PostContentMediaEntity!]
-}
-
 type PostReactEntity {
   postReactId: ID!
   userId: String!
@@ -114,6 +96,15 @@ type PostReactEntity {
   post: PostEntity!
 }
 
+type PostMediaEntity {
+  postMediaId: ID!
+  position: Int!
+  mediaId: ID!
+  postId: ID!
+  mediaType: String!
+  post: PostEntity!
+}
+
 type PostEntity {
   postId: ID!
   title: String!
@@ -121,28 +112,20 @@ type PostEntity {
   courseId: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
+  html: String!
   creator: UserEntity!
-  postContents: [PostContentEntity!]!
+  postMedias: [PostMediaEntity!]!
   postComments: [PostCommentEntity!]!
   postReacts: [PostReactEntity!]!
 }
 
-type PostCommentContentMediaEntity {
-  postCommentContentMediaId: ID!
+type PostCommentMediaEntity {
+  postCommentMediaId: ID!
   position: Int!
   mediaId: ID!
-  postCommentContentId: String!
-  postCommentContent: PostCommentContentEntity!
-}
-
-type PostCommentContentEntity {
-  postCommentContentId: ID!
   postCommentId: String!
-  position: Int!
-  text: String
-  contentType: String!
+  mediaType: String!
   postComment: PostCommentEntity!
-  postCommentContentMedias: [PostCommentContentMediaEntity!]
 }
 
 type PostCommentEntity {
@@ -151,9 +134,10 @@ type PostCommentEntity {
   postId: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
+  html: String!
   post: PostEntity!
   creator: UserEntity!
-  postCommentContents: [PostCommentContentEntity!]!
+  postCommentMedias: [PostCommentMediaEntity!]!
 }
 
 type UserEntity {

@@ -18,18 +18,14 @@ export class PostsService {
         return await this.postMySqlRepository.findOne({
             where: data,
             relations: {
-                postContents: {
-                    postContentMedias: true,
-                },
                 creator: true,
                 course: true,
                 postReacts: true,
                 postComments: {
                     creator: true,
-                    postCommentContents: {
-                        postCommentContentMedias: true
-                    }
-                }
+                    postCommentMedias: true  
+                },
+                postMedias: true
             },
         })
     }
@@ -40,9 +36,7 @@ export class PostsService {
             where: data,
             relations: {
                 creator: true,
-                postCommentContents: {
-                    postCommentContentMedias: true
-                }
+                postCommentMedias: true
             },
         })
     }
@@ -56,9 +50,7 @@ export class PostsService {
             take: data.options?.take,
             skip: data.options?.skip,
             relations: {
-                postContents: {
-                    postContentMedias: true,
-                },
+                postMedias: true,
                 creator: true,
                 course: true,
                 postReacts: true

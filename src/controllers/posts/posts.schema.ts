@@ -9,30 +9,20 @@ export const createCommentSchema: SchemaObject = {
                 postId: {
                     type: "string",
                 },
-                postCommentContents: {
+                html: {
+                    type: "string"
+                },
+                postCommentMedias: {
                     type: "array",
                     items: {
                         type: "object",
                         properties: {
-                            text: {
-                                type: "string",
+                            mediaIndex: {
+                                type: "number",
                             },
-                            contentType: {
-                                type: "string",
-                            },
-                            postCommentContentMedias: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        mediaIndex: {
-                                            type: "number",
-                                        },
-                                    }
-                                }
-                            }
-                        },
-                    },
+                        }
+                    }
+                            
                 },
             },
         },
@@ -58,30 +48,20 @@ export const createPostSchema: SchemaObject = {
                 courseId: {
                     type: "string",
                 },
-                postContents: {
+                html: {
+                    type: "string"
+                },
+                postMedias: {
                     type: "array",
                     items: {
                         type: "object",
                         properties: {
-                            text: {
-                                type: "string",
+                            mediaIndex: {
+                                type: "number",
                             },
-                            contentType: {
-                                type: "string",
-                            },
-                            postContentMedias: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        mediaIndex: {
-                                            type: "number",
-                                        },
-                                    }
-                                }
-                            }
-                        },
-                    },
+                        }
+                    }
+                            
                 },
             },
         },

@@ -10,14 +10,13 @@ import {
     SectionMySqlEntity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
-    PostContentMySqlEntity,
     PostCommentMySqlEntity,
-    PostCommentContentMySqlEntity,
     PostReactMySqlEntity,
     PostCommentLikeMySqlEntity,
+    PostMediaMySqlEntity,
+    PostCommentMediaMySqlEntity,
 } from "@database"
 import { PostsService } from "./posts.service"
-import { PostCommentContentMediaEntity } from "src/database/mysql/post-comment-content-media.entity"
 
 @Module({
     imports: [
@@ -30,12 +29,11 @@ import { PostCommentContentMediaEntity } from "src/database/mysql/post-comment-c
             SectionMySqlEntity,
             LectureMySqlEntity,
             ResourceMySqlEntity,
-            PostContentMySqlEntity,
             PostCommentMySqlEntity,
-            PostCommentContentMySqlEntity,
             PostReactMySqlEntity,
             PostCommentLikeMySqlEntity,
-            PostCommentContentMediaEntity
+            PostMediaMySqlEntity,
+            PostCommentMediaMySqlEntity
         ]),
     ],
     controllers: [PostsController],

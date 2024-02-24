@@ -30,17 +30,15 @@ registerEnumType(VerifyStatus, {
     name: "VerifyStatus",
 })
 
-export enum ContentType {
-  Text = "text",
-  Code = "code",
-  Link = "link",
-  Images = "images",
-  Videos = "videos",
+export enum MediaType {
+  Image = "image",
+  Video = "video",
 }
 
-registerEnumType(ContentType, {
-    name: "ContentType",
+registerEnumType(MediaType, {
+    name: "MediaType",
 })
+
 
 export enum ProcessStatus {
   Pending = "pending",

@@ -4,10 +4,8 @@ import {
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     LectureMySqlEntity,
-    PostCommentContentMySqlEntity,
     PostCommentLikeMySqlEntity,
     PostCommentMySqlEntity,
-    PostContentMySqlEntity,
     PostReactMySqlEntity,
     PostMySqlEntity,
     ResourceMySqlEntity,
@@ -41,10 +39,8 @@ import { JwtStrategy } from "./strategies"
             SectionMySqlEntity,
             LectureMySqlEntity,
             ResourceMySqlEntity,
-            PostContentMySqlEntity,
             PostReactMySqlEntity,
             PostCommentMySqlEntity,
-            PostCommentContentMySqlEntity,
             PostCommentLikeMySqlEntity
         ])
     ],

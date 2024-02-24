@@ -1,31 +1,30 @@
-import { ContentType, AuthInput } from "@common"
+import { AuthInput, MediaType } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsInt, IsUUID } from "class-validator"
 
 // CREATE POST
-export class PostContentMediaData {
-  @IsInt()
-  @ApiProperty()
-      mediaIndex: number
+export class PostMediaData {
+    @IsInt()
+    @ApiProperty()
+        mediaIndex: number
+
+    @ApiProperty()
+        mediaType: MediaType
 }
-export class PostContentData {
-  @ApiProperty({ nullable: true })
-      text?: string
-  @ApiProperty()
-      contentType: ContentType
-  @ApiProperty({ nullable: true })
-      postContentMedias?: Array<PostContentMediaData>
-}
+
 export class CreatePostData {
     @ApiProperty()
         title: string
-  
+
     @IsUUID("4")
     @ApiProperty()
         courseId: string
-  
+
+    @ApiProperty()
+        html: string
+
     @ApiProperty({ nullable: true })
-        postContents?: Array<PostContentData>
+        postMedias?: Array<PostMediaData>
 }
 export class CreatePostInput implements AuthInput<CreatePostData> {
     @IsUUID("4")
@@ -36,26 +35,25 @@ export class CreatePostInput implements AuthInput<CreatePostData> {
 }
 
 // CREATE COMMENT
-export class PostCommentContentMediaData {
+export class PostCommentMediaData {
     @IsInt()
     @ApiProperty()
         mediaIndex: number
-}
-export class PostCommentContentData {
-    @ApiProperty({ nullable: true })
-        text?: string
+
     @ApiProperty()
-        contentType: ContentType
-    @ApiProperty({ nullable: true })
-        postCommentContentMedias?: Array<PostCommentContentMediaData>
+        mediaType: MediaType
 }
+
 export class CreateCommentData {
     @IsUUID("4")
     @ApiProperty()
         postId: string
-  
+
+    @ApiProperty()
+        html: string
+
     @ApiProperty({ nullable: true })
-        postCommentContents?: Array<PostCommentContentData>
+        postCommentMedias?: Array<PostCommentMediaData>
 }
 export class CreateCommentInput implements AuthInput<CreateCommentData> {
     @IsUUID("4")
@@ -66,51 +64,51 @@ export class CreateCommentInput implements AuthInput<CreateCommentData> {
 }
 
 export class ReactPostData {
-  @IsUUID()
-  @ApiProperty()
-      postId: string
+    @IsUUID()
+    @ApiProperty()
+        postId: string
 }
 
 export class ReactPostInput implements AuthInput<ReactPostData> {
-  @IsUUID("4")
-  @ApiProperty()
-      userId: string
-  data: ReactPostData
+    @IsUUID("4")
+    @ApiProperty()
+        userId: string
+    data: ReactPostData
 }
 
 export class UpdateCommentData {
-  @IsUUID("4")
-  @ApiProperty()
-      postCommentId: string
+    @IsUUID("4")
+    @ApiProperty()
+        postCommentId: string
 
-  @ApiProperty({ nullable: true })
-      postCommentContents?: Array<PostCommentContentData>
+    @ApiProperty({ nullable: true })
+        postCommentMedias?: Array<PostCommentMediaData>
 }
 
 export class UpdateCommentInput implements AuthInput<UpdateCommentData> {
-  @IsUUID("4")
-  @ApiProperty()
-      userId: string
-  data: UpdateCommentData
-  files: Array<Express.Multer.File>
+    @IsUUID("4")
+    @ApiProperty()
+        userId: string
+    data: UpdateCommentData
+    files: Array<Express.Multer.File>
 }
 
 export class UpdatePostData {
-  @ApiProperty()
-      title: string
+    @ApiProperty()
+        title: string
 
-  @IsUUID("4")
-  @ApiProperty()
-      postId: string
+    @IsUUID("4")
+    @ApiProperty()
+        postId: string
 
-  @ApiProperty()
-      postContents: Array<PostContentData>
+    @ApiProperty()
+        postMedias: Array<PostMediaData>
 }
 
 export class UpdatePostInput implements AuthInput<UpdatePostData> {
-  @IsUUID("4")
-  @ApiProperty()
-      userId: string
-  data: UpdatePostData
-  files: Array<Express.Multer.File>
+    @IsUUID("4")
+    @ApiProperty()
+        userId: string
+    data: UpdatePostData
+    files: Array<Express.Multer.File>
 }

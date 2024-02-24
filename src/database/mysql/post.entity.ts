@@ -10,11 +10,11 @@ import {
 } from "typeorm"
 import { CourseEntity } from "./course.entity"
 import { PostCommentEntity } from "./post-comment.entity"
-import { PostContentEntity } from "./post-content.entity"
 import { PostReactEntity } from "./post-react.entity"
 import { UserEntity } from "./user.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { UserMySqlEntity } from "."
+import { PostMediaEntity } from "./post-media.entity"
 
 @ObjectType()
 @Entity("post")
@@ -42,6 +42,10 @@ export class PostEntity {
     @Field(() => Date)
     @UpdateDateColumn()
         updatedAt: Date
+    
+    @Field(() => String)
+    @Column({ type: "varchar" })
+        html: string
 
     @ManyToOne(() => CourseEntity, (course) => course.posts)
     @JoinColumn({ name: "courseId" })
@@ -52,11 +56,11 @@ export class PostEntity {
     @JoinColumn({ name: "creatorId" })
         creator: UserEntity
 
-    @Field(() => [PostContentEntity])
-    @OneToMany(() => PostContentEntity, (postContent) => postContent.post, {
+    @Field(() => [PostMediaEntity])
+    @OneToMany(() => PostMediaEntity, (postMedia) => postMedia.post, {
         cascade: true,
     })
-        postContents: Array<PostContentEntity>
+        postMedias: Array<PostMediaEntity>
 
     @Field(() => [PostCommentEntity])
     @OneToMany(() => PostCommentEntity, (postComment) => postComment.post)
