@@ -1,8 +1,8 @@
-import { CourseMySqlEntity, LectureMySqlEntity } from "@database"
+import { CourseMySqlEntity, LectureMySqlEntity, ResourceMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
-import { FindOneCourseInput, FindManyCoursesInput, FindOneLectureInput } from "./courses.input"
+import { FindOneCourseInput, FindManyCoursesInput, FindManyLecturesInput, FindManyResourcesInput } from "./courses.input"
 
 @Injectable()
 export class CoursesService {
@@ -11,6 +11,8 @@ export class CoursesService {
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
         @InjectRepository(LectureMySqlEntity)
         private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
+        @InjectRepository(ResourceMySqlEntity)
+        private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
     ) { }
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
@@ -43,13 +45,20 @@ export class CoursesService {
         return founds[0]
     }
 
-    async findOneLecture(input: FindOneLectureInput): Promise<LectureMySqlEntity> {
+    async findManyLectures(input: FindManyLecturesInput): Promise<Array<LectureMySqlEntity>> {
         const { data } = input
-        return await this.lectureMySqlRepository.findOne({
-            where: { lectureId: data.lectureId },
+        return await this.lectureMySqlRepository.find({
+            where: data,
             relations: {
                 resources: true
             }
+        })
+    }
+
+    async findManyResources(input: FindManyResourcesInput): Promise<Array<ResourceMySqlEntity>> {
+        const { data } = input
+        return await this.resourceMySqlRepository.find({
+            where: data,
         })
     }
 }

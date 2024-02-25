@@ -1,5 +1,5 @@
 import { Field, ID, InputType } from "@nestjs/graphql"
-import { Input } from "@common"
+import { AuthInput, Input } from "@common"
 @InputType()
 export class FindOneCourseData {
   @Field(() => ID)
@@ -11,15 +11,14 @@ export class FindOneCourseInput implements Input<FindOneCourseData> {
 }
 
 @InputType()
-export class FindOneLectureData {
+export class FindManyLecturesData {
   @Field(() => ID)
-  	lectureId: string
+  	sectionId: string
 }
 
-export class FindOneLectureInput implements Input<FindOneLectureData> {
-    data: FindOneLectureData
+export class FindManyLecturesInput implements Input<FindManyLecturesData> {
+    data: FindManyLecturesData
 }
-
 
 @InputType()
 export class CourseFilterInput {
@@ -35,4 +34,15 @@ export class FindManyCoursesData {
 
 export class FindManyCoursesInput implements Input<FindManyCoursesData> {
   	data: FindManyCoursesData
+}
+
+@InputType()
+export class FindManyResourcesData {
+  @Field(() => ID)
+  	lectureId: string
+}
+
+export class FindManyResourcesInput implements AuthInput<FindManyResourcesData> {
+    userId: string
+    data: FindManyResourcesData
 }

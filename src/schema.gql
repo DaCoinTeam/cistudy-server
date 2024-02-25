@@ -170,6 +170,11 @@ enum UserKind {
   Facebook
 }
 
+type FindManyResourcesOutput {
+  data: [ResourceEntity!]!
+  tokens: AuthTokens
+}
+
 type FindOnePostOutput {
   data: PostEntity!
   tokens: AuthTokens
@@ -205,7 +210,8 @@ type Query {
   signIn(data: SignInData!): SignInOutput!
   findOneCourse(data: FindOneCourseData!): CourseEntity!
   findManyCourses(data: FindManyCoursesData): [CourseEntity!]!
-  findOneLecture(data: FindOneLectureData!): LectureEntity!
+  findManyLectures(data: FindManyLecturesData!): [LectureEntity!]!
+  findManyResources(data: FindManyResourcesData!): FindManyResourcesOutput!
   findOnePost(data: FindOnePostData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentData!): FindOnePostCommentOutput!
@@ -230,7 +236,11 @@ input CourseFilterInput {
   category: String
 }
 
-input FindOneLectureData {
+input FindManyLecturesData {
+  sectionId: ID!
+}
+
+input FindManyResourcesData {
   lectureId: ID!
 }
 
