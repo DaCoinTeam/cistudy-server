@@ -53,3 +53,17 @@ export class FindManyPostsInput implements AuthInput<FindManyPostsData> {
     userId: string
     data: FindManyPostsData
 }
+
+@InputType()
+export class FindManyPostCommentsData {
+  @Field(() => String)
+      postId: string
+}
+
+@InputType()
+export class FindManyPostCommentsInput implements AuthInput<FindManyPostCommentsData> {
+  @Field(() => ID)
+      userId: string
+  @Field(() => FindOnePostData)
+      data: FindManyPostCommentsData
+}

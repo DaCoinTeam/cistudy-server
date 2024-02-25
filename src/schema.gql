@@ -185,6 +185,11 @@ type FindOnePostCommentOutput {
   tokens: AuthTokens
 }
 
+type FindManyPostCommentsOutput {
+  data: [PostCommentEntity!]!
+  tokens: AuthTokens
+}
+
 type InitOutput {
   data: UserEntity!
   tokens: AuthTokens
@@ -200,9 +205,11 @@ type Query {
   signIn(data: SignInData!): SignInOutput!
   findOneCourse(data: FindOneCourseData!): CourseEntity!
   findManyCourses(data: FindManyCoursesData): [CourseEntity!]!
+  findOneLecture(data: FindOneLectureData!): LectureEntity!
   findOnePost(data: FindOnePostData!): FindOnePostOutput!
-  findOnePostComment(data: FindOnePostCommentData!): FindOnePostCommentOutput!
   findManyPosts(data: FindManyPostsData!): FindManyPostsOutput!
+  findOnePostComment(data: FindOnePostCommentData!): FindOnePostCommentOutput!
+  findManyPostComments(data: FindManyPostCommentsData!): FindManyPostCommentsOutput!
   findOneUser(data: FindOneUserData!): UserEntity!
 }
 
@@ -223,12 +230,12 @@ input CourseFilterInput {
   category: String
 }
 
-input FindOnePostData {
-  postId: ID!
+input FindOneLectureData {
+  lectureId: ID!
 }
 
-input FindOnePostCommentData {
-  postCommentId: ID!
+input FindOnePostData {
+  postId: ID!
 }
 
 input FindManyPostsData {
@@ -239,6 +246,14 @@ input FindManyPostsData {
 input FindManyPostsOptions {
   take: Int
   skip: Int
+}
+
+input FindOnePostCommentData {
+  postCommentId: ID!
+}
+
+input FindManyPostCommentsData {
+  postId: String!
 }
 
 input FindOneUserData {

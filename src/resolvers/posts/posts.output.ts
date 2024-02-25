@@ -31,3 +31,13 @@ implements Output<PostCommentMySqlEntity>
     @Field(() => AuthTokens, { nullable: true })
         tokens: AuthTokens
 }
+
+@ObjectType()
+export class FindManyPostCommentsOutput
+implements Output<Array<PostCommentMySqlEntity>>
+{
+    @Field(() => [PostCommentMySqlEntity])
+        data: Array<PostCommentMySqlEntity>
+    @Field(() => AuthTokens, { nullable: true })
+        tokens: AuthTokens
+}

@@ -2,7 +2,7 @@ import { PostCommentMySqlEntity, PostMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
-import { FindManyPostsInput, FindOnePostCommentInput, FindOnePostInput } from "./posts.input"
+import { FindManyPostCommentsInput, FindManyPostsInput, FindOnePostCommentInput, FindOnePostInput } from "./posts.input"
 
 @Injectable()
 export class PostsService {
@@ -33,6 +33,17 @@ export class PostsService {
     async findOnePostComment(input: FindOnePostCommentInput): Promise<PostCommentMySqlEntity> {
         const { data } = input
         return await this.postCommentMySqlRepository.findOne({
+            where: data,
+            relations: {
+                creator: true,
+                postCommentMedias: true
+            },
+        })
+    }
+
+    async findManyPostComments(input: FindManyPostCommentsInput): Promise<Array<PostCommentMySqlEntity>> {
+        const { data } = input
+        return await this.postCommentMySqlRepository.find({
             where: data,
             relations: {
                 creator: true,

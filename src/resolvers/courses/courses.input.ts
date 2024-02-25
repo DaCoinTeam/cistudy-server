@@ -11,6 +11,17 @@ export class FindOneCourseInput implements Input<FindOneCourseData> {
 }
 
 @InputType()
+export class FindOneLectureData {
+  @Field(() => ID)
+  	lectureId: string
+}
+
+export class FindOneLectureInput implements Input<FindOneLectureData> {
+    data: FindOneLectureData
+}
+
+
+@InputType()
 export class CourseFilterInput {
   @Field(() => String, { nullable: true })
       category: string

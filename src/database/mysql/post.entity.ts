@@ -44,7 +44,7 @@ export class PostEntity {
         updatedAt: Date
     
     @Field(() => String)
-    @Column({ type: "varchar" })
+    @Column({ type: "longtext" })
         html: string
 
     @ManyToOne(() => CourseEntity, (course) => course.posts)

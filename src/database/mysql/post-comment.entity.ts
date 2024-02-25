@@ -38,7 +38,7 @@ export class PostCommentEntity {
         updatedAt: Date
 
     @Field(() => String)
-    @Column({ type: "varchar" })
+    @Column({ type: "longtext" })
         html: string
 
     @ManyToOne(

@@ -1,15 +1,17 @@
-import { CourseMySqlEntity } from "@database"
+import { CourseMySqlEntity, LectureMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
-import { FindOneCourseInput, FindManyCoursesInput } from "./courses.input"
+import { FindOneCourseInput, FindManyCoursesInput, FindOneLectureInput } from "./courses.input"
 
 @Injectable()
 export class CoursesService {
     constructor(
-    @InjectRepository(CourseMySqlEntity)
-    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-    ) {}
+        @InjectRepository(CourseMySqlEntity)
+        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(LectureMySqlEntity)
+        private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
+    ) { }
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
         const { data } = input
@@ -39,5 +41,15 @@ export class CoursesService {
             }
         })
         return founds[0]
+    }
+
+    async findOneLecture(input: FindOneLectureInput): Promise<LectureMySqlEntity> {
+        const { data } = input
+        return await this.lectureMySqlRepository.findOne({
+            where: { lectureId: data.lectureId },
+            relations: {
+                resources: true
+            }
+        })
     }
 }
