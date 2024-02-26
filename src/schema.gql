@@ -24,23 +24,12 @@ type LectureEntity {
   thumbnailId: ID
   lectureVideoId: ID
   sectionId: ID!
-  processStatus: ProcessStatus!
-  videoType: VideoType!
+  processStatus: String!
+  videoType: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   section: SectionEntity!
   resources: [ResourceEntity!]!
-}
-
-enum ProcessStatus {
-  Pending
-  Processing
-  Completed
-}
-
-enum VideoType {
-  MP4
-  DASH
 }
 
 type SectionEntity {

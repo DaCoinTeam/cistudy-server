@@ -26,6 +26,8 @@
       "@resolvers": ["src/resolvers"],
       "@workers": ["src/workers"],
       "@common": ["src/common"]
-    }
-  }
+    },
+  },
+  "include": ["src/**/*"],
+  "exclude": ["storage/**/*", "tasks/**/*"]
 }

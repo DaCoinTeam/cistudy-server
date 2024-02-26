@@ -36,11 +36,11 @@ export class LectureEntity {
   @Column({ name: "sectionId", type: "uuid", length: 36 })
       sectionId: string
 
-  @Field(() => ProcessStatus)
+  @Field(() => String)
   @Column({ type: "enum", enum: ProcessStatus, default: ProcessStatus.Pending })
       processStatus: ProcessStatus
 
-  @Field(() => VideoType)
+  @Field(() => String)
   @Column({ type: "enum", enum: VideoType, default: VideoType.MP4 })
       videoType: VideoType
   

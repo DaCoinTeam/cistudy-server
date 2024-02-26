@@ -64,7 +64,7 @@ export class CourseEntity {
       isDeleted: boolean
 
   @Field(() => ID, { nullable: true })
-  @Column({ type: "uuid", length: 36 })
+  @Column({ type: "uuid", length: 36, default: null })
       previewVideoId: string
 
   @Field(() => String, { nullable: true })
