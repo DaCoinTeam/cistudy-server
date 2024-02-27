@@ -7,101 +7,120 @@ import { PostReactEntity } from "./post-react.entity"
 import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { PostEntity } from "./post.entity"
 import { CourseEntity } from "./course.entity"
+import { FollowEntity } from "./follow.entity"
 
 @ObjectType()
 @Entity("user")
 export class UserEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn("uuid")
-  	userId: string
+      userId: string
 
   @Field(() => String)
   @Column({ type: "varchar", length: 50, default: null })
-  	email: string
+      email: string
 
   @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 64, default: null })
-  	password: string
+      password: string
 
   @Field(() => ID, { nullable: true })
   @Column({ type: "uuid", length: 36, default: null })
-  	avatarId: string
+      avatarId: string
 
-    @Field(() => ID, { nullable: true })
+  @Field(() => ID, { nullable: true })
   @Column({ type: "uuid", length: 36, default: null })
-  	coverPhotoId: string
+      coverPhotoId: string
 
   @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 12, default: null })
-  	phoneNumber: string
+      phoneNumber: string
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", length: 60, default: null })
+      username: string
 
   @Field(() => Float, { nullable: true })
   @Column({
-  	type: "decimal",
-  	precision: 10,
-  	scale: 5,
-  	default: 0,
+      type: "decimal",
+      precision: 10,
+      scale: 5,
+      default: 0,
   })
-  	balance: number
+      balance: number
 
   @Field(() => UserRole)
   @Column({
-  	type: "enum",
-  	enum: UserRole,
-  	default: UserRole.User,
+      type: "enum",
+      enum: UserRole,
+      default: UserRole.User,
   })
-  	role: UserRole
+      role: UserRole
 
   @Field(() => ID, { nullable: true })
   @Column({
-  	type: "uuid",
-  	default: null,
+      type: "uuid",
+      default: null,
   })
-  	walletId: string
+      walletId: string
 
   @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 50, default: null })
-  	firstName: string
+      firstName: string
 
   @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 50, default: null })
-  	lastName: string
+      lastName: string
 
   @Field(() => Date, { nullable: true })
   @Column({ type: "date", default: null })
-  	birthdate: Date
+      birthdate: Date
 
   @Field(() => Boolean)
   @Column({ type: "boolean", default: false })
-  	verified: boolean
+      verified: boolean
 
   @Field(() => UserKind)
   @Column({
-  	type: "enum",
-  	enum: UserKind,
-  	default: UserKind.Local,
+      type: "enum",
+      enum: UserKind,
+      default: UserKind.Local,
   })
-  	kind: UserKind
+      kind: UserKind
 
   @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 128, default: null })
-  	externalId: string
+      externalId: string
 
   @OneToMany(() => SessionEntity, (session) => session.user)
-  	sessions: SessionEntity[]
+      sessions: SessionEntity[]
 
   @OneToMany(() => PostCommentEntity, (postComment) => postComment.creator)
-  	postComments: PostCommentEntity[]
+      postComments: PostCommentEntity[]
 
   @OneToMany(() => PostReactEntity, (postReact) => postReact.user)
-  	postReacts: PostReactEntity[]
+      postReacts: PostReactEntity[]
 
   @OneToMany(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.user)
-  	enrolledInfos: EnrolledInfoEntity[]
+      enrolledInfos: EnrolledInfoEntity[]
 
+  @Field(() => [PostEntity])
   @OneToMany(() => PostEntity, (post) => post.creator)
-  	posts: PostEntity[]
+      posts: Array<PostEntity>
 
+  @Field(() => [CourseEntity])
   @OneToMany(() => CourseEntity, (course) => course.creator)
-  	courses: CourseEntity[]
+      courses: Array<CourseEntity>
+
+  @Field(() => [FollowEntity])
+  @OneToMany(() => FollowEntity, (user) => user.follower)
+      followers: Array<UserEntity>
+
+  @Field(() => [FollowEntity])
+  @OneToMany(() => FollowEntity, (user) => user.followedUser)
+      followedUsers: Array<UserEntity>
+
+  //graphql
+  @Field(() => Boolean )
+      followed?: boolean
 }

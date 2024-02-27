@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common"
 import {
     CreateCommentInput,
     CreatePostInput,
-    ReactPostInput,
+    UpsertReactPostInput,
     UpdateCommentInput,
     UpdatePostInput,
 } from "./posts.input"
@@ -20,14 +20,14 @@ import { Repository, DeepPartial } from "typeorm"
 @Injectable()
 export class PostsService {
     constructor(
-    @InjectRepository(PostMySqlEntity)
-    private readonly postMySqlRepository: Repository<PostMySqlEntity>,
-    @InjectRepository(PostReactMySqlEntity)
-    private readonly postReactMySqlRepository: Repository<PostReactMySqlEntity>,
-    @InjectRepository(PostCommentMySqlEntity)
-    private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
-    private readonly storageService: StorageService,
-    ) {}
+        @InjectRepository(PostMySqlEntity)
+        private readonly postMySqlRepository: Repository<PostMySqlEntity>,
+        @InjectRepository(PostReactMySqlEntity)
+        private readonly postReactMySqlRepository: Repository<PostReactMySqlEntity>,
+        @InjectRepository(PostCommentMySqlEntity)
+        private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
+        private readonly storageService: StorageService,
+    ) { }
 
     async createPost(input: CreatePostInput): Promise<string> {
         console.log(input)
@@ -54,7 +54,7 @@ export class PostsService {
                 const { assetId } = await this.storageService.upload({
                     rootFile: file,
                 })
-                post.postMedias.push({                      
+                post.postMedias.push({
                     position,
                     mediaId: assetId,
                     mediaType
@@ -66,13 +66,13 @@ export class PostsService {
         await Promise.all(promises)
 
         const created = await this.postMySqlRepository.save(post)
-        
+
         return `A post with id ${created.postId} has been created successfully.`
     }
 
     async updatePost(input: UpdatePostInput): Promise<string> {
-    // const { data, files } = input
-    // const { postContents, postId, title } = data
+        // const { data, files } = input
+        // const { postContents, postId, title } = data
 
         // const post: DeepPartial<PostMySqlEntity> = {
         //     postId,
@@ -108,32 +108,33 @@ export class PostsService {
         return "A post with id  has been updated successfully."
     }
 
-    async reactPost(input: ReactPostInput) {
+    async upsertReactPost(input: UpsertReactPostInput) {
         const { userId, data } = input
-        const { postId } = data
-        const found = await this.postReactMySqlRepository.findOneBy({
-            userId,
-            postId,
+        const { postId, liked } = data
+        const found = await this.postReactMySqlRepository.findOne({
+            where: {
+                userId,
+                postId,
+            }
         })
-
-        let postReactId: string
-        let liked: boolean
 
         if (found === null) {
             // do claim rewards action
-        } else {
-            postReactId = found.postReactId
-            liked = !found.liked
+
+            const postReact = await this.postReactMySqlRepository.save({
+                userId,
+                postId,
+                liked
+            })
+            return `A react with ${postReact.postReactId} has been created successfully.`
         }
 
-        const postReact = await this.postReactMySqlRepository.save({
-            postReactId,
-            userId,
-            postId,
-            liked,
+        const { postReactId } = found
+        await this.postReactMySqlRepository.update(postReactId, {
+            liked
         })
 
-        return `Successfully react the post with id ${postReact.postReactId}.`
+        return `A react with ${postReactId} has been updated successfully.`
     }
 
     async createComment(input: CreateCommentInput) {
@@ -157,16 +158,16 @@ export class PostsService {
                 const { assetId } = await this.storageService.upload({
                     rootFile: file,
                 })
-                postComment.postCommentMedias.push({                      
+                postComment.postCommentMedias.push({
                     position,
                     mediaId: assetId,
                     mediaType
                 } as PostCommentMediaMySqlEntity)
             }
-            mediaPosition ++
+            mediaPosition++
             promises.push(promise())
         }
-        
+
         await Promise.all(promises)
 
         const created = await this.postCommentMySqlRepository.save(postComment)
@@ -174,8 +175,8 @@ export class PostsService {
     }
 
     async updateComment(input: UpdateCommentInput) {
-    //     const { data, files } = input
-    //     const { postCommentContents, postCommentId } = data
+        //     const { data, files } = input
+        //     const { postCommentContents, postCommentId } = data
 
         //     await this.postCommentMySqlRepository.update(postCommentId, {})
 

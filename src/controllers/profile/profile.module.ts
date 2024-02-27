@@ -13,6 +13,7 @@ import {
     PostCommentMySqlEntity,
     PostReactMySqlEntity,
     PostCommentLikeMySqlEntity,
+    FollowMySqlEnitity,
 } from "@database"
 import { ProfileService } from "./profile.service"
 
@@ -30,6 +31,7 @@ import { ProfileService } from "./profile.service"
             PostCommentMySqlEntity,
             PostReactMySqlEntity,
             PostCommentLikeMySqlEntity,
+            FollowMySqlEnitity
         ]),
     ],
     controllers: [ProfileController],

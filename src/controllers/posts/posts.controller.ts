@@ -88,8 +88,8 @@ export class PostsController {
   @Patch("react-post")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
-  async reactPost(@UserId() userId: string, @Body() body: ReactPostData) {
-      return this.postsService.reactPost({
+  async upsertReactPost(@UserId() userId: string, @Body() body: ReactPostData) {
+      return this.postsService.upsertReactPost({
           userId,
           data: body,
       })

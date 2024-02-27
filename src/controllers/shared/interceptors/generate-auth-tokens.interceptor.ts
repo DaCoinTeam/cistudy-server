@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common"
 import { AuthManagerService } from "@global"
 import { Observable, mergeMap } from "rxjs"
-import { Output } from "@common"
+import { Output, getClientId } from "@common"
 
 @Injectable()
 export class GenerateAuthTokensInterceptor<T extends object>
@@ -20,8 +20,7 @@ implements NestInterceptor<T, Output<T>>
         next: CallHandler,
     ): Promise<Observable<Output<T>>> {
         const request = context.switchToHttp().getRequest()
-        const query = request.query
-        const clientId = query.clientId as string | undefined
+        const clientId = getClientId(request)
 
         return next.handle().pipe(
             mergeMap(async (data) => {

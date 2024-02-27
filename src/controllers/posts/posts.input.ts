@@ -1,6 +1,6 @@
 import { AuthInput, MediaType } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsInt, IsUUID } from "class-validator"
+import { IsBoolean, IsInt, IsUUID } from "class-validator"
 
 // CREATE POST
 export class PostMediaData {
@@ -67,13 +67,17 @@ export class ReactPostData {
     @IsUUID()
     @ApiProperty()
         postId: string
+    @IsBoolean()
+    @ApiProperty()
+        liked: boolean
 }
 
-export class ReactPostInput implements AuthInput<ReactPostData> {
+export class UpsertReactPostInput implements AuthInput<ReactPostData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
     data: ReactPostData
+
 }
 
 export class UpdateCommentData {

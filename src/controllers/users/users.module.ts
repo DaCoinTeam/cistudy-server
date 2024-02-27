@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common"
-import { ProfileController } from "./users.controller"
+import { UsersController } from "./users.controller"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     SessionMySqlEntity,
@@ -13,8 +13,9 @@ import {
     PostCommentMySqlEntity,
     PostReactMySqlEntity,
     PostCommentLikeMySqlEntity,
+    FollowMySqlEnitity,
 } from "@database"
-import { ProfileService } from "./users.service"
+import { UsersService } from "./users.service"
 
 @Module({
     imports: [
@@ -30,9 +31,10 @@ import { ProfileService } from "./users.service"
             PostCommentMySqlEntity,
             PostReactMySqlEntity,
             PostCommentLikeMySqlEntity,
+            FollowMySqlEnitity
         ]),
     ],
-    controllers: [ProfileController],
-    providers: [ProfileService],
+    controllers: [UsersController],
+    providers: [UsersService],
 })
-export class ProfileModule {}
+export class UsersModule {}

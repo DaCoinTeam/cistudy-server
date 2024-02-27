@@ -12,6 +12,7 @@ import { ResourceEntity as ResourceMySqlEntity } from "./resource.entity"
 import { CourseTargetEntity as CourseTargetMySqlEntity } from "./course-target.entity"
 import { PostMediaEntity as PostMediaMySqlEntity } from "./post-media.entity"
 import { PostCommentMediaEntity as PostCommentMediaMySqlEntity} from "./post-comment-media.entity"
+import { FollowEntity as FollowMySqlEnitity } from "./follow.entity"
 
 export {
     UserMySqlEntity,
@@ -28,4 +29,5 @@ export {
     LectureMySqlEntity,
     ResourceMySqlEntity,
     CourseTargetMySqlEntity,
+    FollowMySqlEnitity
 }

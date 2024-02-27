@@ -129,6 +129,17 @@ type PostCommentEntity {
   postCommentMedias: [PostCommentMediaEntity!]!
 }
 
+type FollowEntity {
+  followId: ID!
+  followerId: String!
+  followedUserId: String!
+  followed: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  follower: UserEntity!
+  followedUser: UserEntity!
+}
+
 type UserEntity {
   userId: ID!
   email: String!
@@ -136,6 +147,7 @@ type UserEntity {
   avatarId: ID
   coverPhotoId: ID
   phoneNumber: String
+  username: String
   balance: Float
   role: UserRole!
   walletId: ID
@@ -145,6 +157,11 @@ type UserEntity {
   verified: Boolean!
   kind: UserKind!
   externalId: String
+  posts: [PostEntity!]!
+  courses: [CourseEntity!]!
+  followers: [FollowEntity!]!
+  followedUsers: [FollowEntity!]!
+  followed: Boolean!
 }
 
 enum UserRole {
@@ -157,6 +174,11 @@ enum UserKind {
   Local
   Google
   Facebook
+}
+
+type FindOneLectureOutput {
+  data: LectureEntity!
+  tokens: AuthTokens
 }
 
 type FindManyResourcesOutput {
@@ -199,6 +221,7 @@ type Query {
   signIn(data: SignInData!): SignInOutput!
   findOneCourse(data: FindOneCourseData!): CourseEntity!
   findManyCourses(data: FindManyCoursesData): [CourseEntity!]!
+  findOneLecture(data: FindOneLectureData!): FindOneLectureOutput!
   findManyLectures(data: FindManyLecturesData!): [LectureEntity!]!
   findManyResources(data: FindManyResourcesData!): FindManyResourcesOutput!
   findOnePost(data: FindOnePostData!): FindOnePostOutput!
@@ -223,6 +246,10 @@ input FindManyCoursesData {
 
 input CourseFilterInput {
   category: String
+}
+
+input FindOneLectureData {
+  lectureId: ID!
 }
 
 input FindManyLecturesData {
@@ -257,4 +284,9 @@ input FindManyPostCommentsData {
 
 input FindOneUserData {
   userId: String!
+  options: FindOneUserOptions
+}
+
+input FindOneUserOptions {
+  followerId: String!
 }
