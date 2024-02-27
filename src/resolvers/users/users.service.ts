@@ -21,13 +21,15 @@ export class UsersService {
             const user = await queryRunner.manager.findOne(UserMySqlEntity, {
                 where: { userId }
             })
-
-            const follows = await queryRunner.manager.createQueryBuilder().select()
-                .from(FollowMySqlEnitity, "follow")
-                .where("followerId = :followerId", { followerId })
-                .andWhere("followedUserId = :userId", { userId })
-                .getRawMany()
-            
+            const follows = await queryRunner.manager.find(
+                FollowMySqlEnitity,
+                {
+                    where: {
+                        followerId,
+                        followedUserId: userId
+                    }
+                }
+            ) 
             await queryRunner.commitTransaction()
 
             if (follows.length) {
