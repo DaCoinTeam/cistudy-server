@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
-import { UpsertFollowInput } from "./users.input"
+import { FollowOrUnfollowInput } from "./users.input"
 import { FollowMySqlEnitity } from "@database"
 
 @Injectable()
@@ -11,9 +11,9 @@ export class UsersService {
     private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
     ) {}
 
-    async upsertFollow(input: UpsertFollowInput) {
+    async followOrUnfollow(input: FollowOrUnfollowInput) {
         const { userId, data } = input
-        const { followedUserId, followed } = data
+        const { followedUserId } = data
 
         if (userId === followedUserId)
             throw new ConflictException("You cannot follow yourself.")
@@ -29,20 +29,19 @@ export class UsersService {
         })
 
         if (found === null) {
-            if (!followed) throw new ConflictException("You haven't followed yet.")
-
             const created = await this.followMySqlRepository.save({
                 followerId: userId,
                 followedUserId,
-                followed,
             })
-            return responseMessage(created.followId, followed)
+            
+            const { followId, followed } = created
+            return responseMessage(followId, followed)
         }
 
-        const { followId } = found
+        const { followId, followed } = found
         await this.followMySqlRepository.update(followId, {
-            followed,
+            followed: !followed,
         })
-        return responseMessage(followId, followed)
+        return responseMessage(followId, !followed)
     }
 }

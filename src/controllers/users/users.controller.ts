@@ -5,7 +5,7 @@ import {
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { UsersService } from "./users.service"
 import { AuthInterceptor, JwtAuthGuard, UserId } from "../shared"
-import { UpsertFollowData } from "./users.input"
+import { FollowOrUnfollowData } from "./users.input"
 
 @ApiTags("Users")
 @ApiHeader({
@@ -17,11 +17,11 @@ export class UsersController{
     constructor(private readonly usersService: UsersService) { }
 
     @ApiBearerAuth()
-    @Patch("upsert-follow")
+    @Patch("follow-or-unfollow")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    async upsertFollow(@UserId() userId: string, @Body() body: UpsertFollowData) {
-        return this.usersService.upsertFollow({
+    async followOrUnfollow(@UserId() userId: string, @Body() body: FollowOrUnfollowData) {
+        return this.usersService.followOrUnfollow({
             userId,
             data: body,
         })
