@@ -30,6 +30,13 @@ export class UsersService {
                     }
                 }
             ) 
+            const numberOfFollowers = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "result")
+                .from(FollowMySqlEnitity, "follow")
+                .where("followedUserId = :userId", { userId })
+                .getRawOne()
+
             await queryRunner.commitTransaction()
 
             if (follows.length) {
@@ -37,6 +44,7 @@ export class UsersService {
             } else {
                 user.followed = false
             }
+            user.numberOfFollowers = numberOfFollowers.result
 
             return user
         } catch (ex) {

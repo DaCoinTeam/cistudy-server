@@ -7,36 +7,42 @@ import { FollowMySqlEnitity } from "@database"
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectRepository(FollowMySqlEnitity)
-        private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
-    ) { }
+    @InjectRepository(FollowMySqlEnitity)
+    private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
+    ) {}
 
     async upsertFollow(input: UpsertFollowInput) {
         const { userId, data } = input
         const { followedUserId, followed } = data
 
-        if (userId === followedUserId) throw new ConflictException("You cannot follow yourself.")
+        if (userId === followedUserId)
+            throw new ConflictException("You cannot follow yourself.")
+
+        const responseMessage = (followId: string, followed: boolean = true) =>
+            `${followed ? "Follow" : "Unfollow"} successfully with id ${followId}`
 
         const found = await this.followMySqlRepository.findOne({
             where: {
                 followerId: userId,
                 followedUserId,
-            }
+            },
         })
 
         if (found === null) {
+            if (!followed) throw new ConflictException("You haven't followed yet.")
+
             const created = await this.followMySqlRepository.save({
                 followerId: userId,
                 followedUserId,
-                followed
+                followed,
             })
-            return `A follow with id ${created.followId} has been created successfully.`
+            return responseMessage(created.followId, followed)
         }
 
         const { followId } = found
         await this.followMySqlRepository.update(followId, {
-            followed
+            followed,
         })
-        return `Follow with id ${followId} has been updated successfully.`
+        return responseMessage(followId, followed)
     }
 }

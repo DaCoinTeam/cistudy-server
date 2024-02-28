@@ -162,6 +162,7 @@ type UserEntity {
   followers: [FollowEntity!]!
   followedUsers: [FollowEntity!]!
   followed: Boolean!
+  numberOfFollowers: Int!
 }
 
 enum UserRole {
