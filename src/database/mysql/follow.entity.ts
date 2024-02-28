@@ -41,12 +41,12 @@ export class FollowEntity {
         updatedAt: Date
 
     @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (user) => user.followers)
+    @ManyToOne(() => UserEntity, (user) => user.followerRelations)
     @JoinColumn({ name: "followerId" })
         follower: UserEntity
 
     @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (post) => post.followedUsers)
+    @ManyToOne(() => UserEntity, (post) => post.followedUserRelations)
     @JoinColumn({ name: "followedUserId" })
         followedUser: UserEntity
 }

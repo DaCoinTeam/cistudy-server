@@ -5,6 +5,7 @@ import { StorageService } from "@global"
 import { UpdateProfileInput } from "./profile.input"
 import { UserEntity } from "src/database/mysql/user.entity"
 import { UserMySqlEntity } from "@database"
+import { existKeyNotUndefined } from "@common"
 
 @Injectable()
 export class ProfileService {
@@ -45,7 +46,7 @@ export class ProfileService {
             const file = files.at(coverPhotoIndex)
             if (coverPhotoId) {
                 await this.storageService.update(
-                    avatarId,
+                    coverPhotoId,
                     {
                         rootFile: file,
                     },
@@ -58,7 +59,8 @@ export class ProfileService {
                 profile.coverPhotoId = assetId
             }
         }
-        if (Object.keys(profile).length)
+
+        if (existKeyNotUndefined(profile))
             await this.userMySqlRepository.update(userId, profile)
 
         return `A profile with id ${userId} has updated successfully.`

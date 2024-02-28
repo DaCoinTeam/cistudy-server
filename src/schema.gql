@@ -159,8 +159,8 @@ type UserEntity {
   externalId: String
   posts: [PostEntity!]!
   courses: [CourseEntity!]!
-  followers: [FollowEntity!]!
-  followedUsers: [FollowEntity!]!
+  followerRelations: [FollowEntity!]!
+  followedUserRelations: [FollowEntity!]!
   followed: Boolean!
   numberOfFollowers: Int!
 }
@@ -230,6 +230,8 @@ type Query {
   findOnePostComment(data: FindOnePostCommentData!): FindOnePostCommentOutput!
   findManyPostComments(data: FindManyPostCommentsData!): FindManyPostCommentsOutput!
   findOneUser(data: FindOneUserData!): UserEntity!
+  findManyFollowers(data: FindManyFollowersData!): [UserEntity!]!
+  findManyCreatedCourses(data: FindManyCreatedCoursesData!): [CourseEntity!]!
 }
 
 input SignInData {
@@ -290,4 +292,12 @@ input FindOneUserData {
 
 input FindOneUserOptions {
   followerId: String!
+}
+
+input FindManyFollowersData {
+  userId: String!
+}
+
+input FindManyCreatedCoursesData {
+  userId: String!
 }

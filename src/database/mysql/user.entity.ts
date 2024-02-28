@@ -114,16 +114,15 @@ export class UserEntity {
 
     @Field(() => [FollowEntity])
     @OneToMany(() => FollowEntity, (user) => user.follower)
-        followers: Array<UserEntity>
+        followerRelations: Array<FollowEntity>
 
     @Field(() => [FollowEntity])
     @OneToMany(() => FollowEntity, (user) => user.followedUser)
-        followedUsers: Array<UserEntity>
+        followedUserRelations: Array<FollowEntity>
 
     //graphql
     @Field(() => Boolean)
         followed?: boolean
-    //graphql
     @Field(() => Int)
         numberOfFollowers?: number
 }
