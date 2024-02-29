@@ -82,12 +82,18 @@ export class UsersService {
 
     async findManyCreatedCourses(input: FindManyCreatedCoursesInput): Promise<Array<CourseMySqlEntity>> {
         const { data } = input
-        const { userId } = data
+        const { userId, options } = data
+        
+        const take = options?.take
+        const skip = options?.skip
+
         return await this.courseMySqlRepository.find(
             {
                 where: {
                     creatorId: userId,
                 },
+                take,
+                skip
             }
         ) 
     }

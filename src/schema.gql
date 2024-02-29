@@ -300,4 +300,10 @@ input FindManyFollowersData {
 
 input FindManyCreatedCoursesData {
   userId: String!
+  options: FindManyCreatedCoursesOptions
+}
+
+input FindManyCreatedCoursesOptions {
+  take: Int
+  skip: Int
 }
