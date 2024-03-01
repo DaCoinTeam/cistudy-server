@@ -18,7 +18,6 @@ import {
 } from "@nestjs/swagger"
 import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import {
-    CreateCourseData,
     CreateCourseTargetData,
     CreateLectureData,
     CreateResourcesData,
@@ -29,7 +28,6 @@ import {
 } from "./courses.input"
 
 import {
-    createCourseSchema,
     createResourcesSchema,
     updateCourseSchema,
 } from "./courses.schema"
@@ -48,23 +46,16 @@ export class CoursesController {
     constructor(private readonly coursesService: CoursesService) {}
 
   @ApiBearerAuth()
-  @ApiConsumes("multipart/form-data")
-  @ApiBody({ schema: createCourseSchema })
   @Post("create-course")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
-      AuthInterceptor,
-      FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
+      AuthInterceptor
   )
     async createCourse(
     @UserId() userId: string,
-    @DataFromBody() data: CreateCourseData,
-    @UploadedFiles() { files }: Files,
     ) {
         return this.coursesService.createCourse({
-            userId,
-            data,
-            files,
+            userId
         })
     }
 

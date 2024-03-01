@@ -53,9 +53,9 @@ type CourseTargetEntity {
 
 type CourseEntity {
   courseId: ID!
-  title: String!
+  title: String
   thumbnailId: ID
-  description: String!
+  description: String
   creatorId: ID!
   price: Float!
   verifyStatus: VerifyStatus
@@ -64,6 +64,8 @@ type CourseEntity {
   isDeleted: Boolean!
   previewVideoId: ID
   includes: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
   courseTargets: [CourseTargetEntity!]
   sections: [SectionEntity!]!
 }

@@ -14,7 +14,7 @@ implements NestInterceptor<T, Output<T>>
 {
     constructor(
         private readonly authManagerService: AuthManagerService) {}
-
+        
     async intercept(
         context: ExecutionContext,
         next: CallHandler,

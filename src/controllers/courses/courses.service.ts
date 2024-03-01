@@ -24,57 +24,35 @@ import {
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import { ProcessStatus, VideoType, existKeyNotUndefined } from "@common"
+import { CreateCourseOutput } from "./courses.output"
 
 @Injectable()
 export class CoursesService {
     constructor(
-    @InjectRepository(CourseMySqlEntity)
-    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-    @InjectRepository(SectionMySqlEntity)
-    private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
-    @InjectRepository(LectureMySqlEntity)
-    private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
-    @InjectRepository(CourseTargetMySqlEntity)
-    private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
-    @InjectRepository(ResourceMySqlEntity)
-    private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
-    private readonly storageService: StorageService,
-    private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
-    ) {}
+        @InjectRepository(CourseMySqlEntity)
+        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(SectionMySqlEntity)
+        private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
+        @InjectRepository(LectureMySqlEntity)
+        private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
+        @InjectRepository(CourseTargetMySqlEntity)
+        private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+        @InjectRepository(ResourceMySqlEntity)
+        private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+        private readonly storageService: StorageService,
+        private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
+    ) { }
 
-    async createCourse(input: CreateCourseInput): Promise<string> {
-        const { description, price, title } = input.data
-        const promises: Array<Promise<void>> = []
-
-        // let thumbnailId: string
-        // const thumbnail = input.files.at(0)
-        // const uploadThumbnailPromise = async () => {
-        //     const { assetId } = await this.storageService.upload(thumbnail)
-        //     thumbnailId = assetId
-        // }
-        // promises.push(uploadThumbnailPromise())
-
-        // let previewVideoId: string
-        // const previewVideo = input.files.at(1)
-        // const uploadPreviewVideoPromise = async () => {
-        //     const { assetId } = await this.storageService.upload(previewVideo)
-        //     previewVideoId = assetId
-        // }
-        // promises.push(uploadPreviewVideoPromise())
-
-        // await Promise.all(promises)
-
+    async createCourse(input: CreateCourseInput): Promise<CreateCourseOutput> {
+        const { userId } = input
         const created = await this.courseMySqlRepository.save({
-            creatorId: input.userId,
-            description,
-            price,
-            title,
-            //thumbnailId,
-            //previewVideoId,
+            creatorId: userId,
         })
 
         if (created)
-            return `A course with id ${created.courseId} has been creeated successfully.`
+            return {
+                courseId: created.courseId
+            }
     }
 
     async updateCourse(input: UpdateCourseInput): Promise<string> {
@@ -97,7 +75,7 @@ export class CoursesService {
         const promises: Array<Promise<void>> = []
 
         const { previewVideoId, thumbnailId } =
-      await this.courseMySqlRepository.findOneBy({ courseId })
+            await this.courseMySqlRepository.findOneBy({ courseId })
 
         if (Number.isInteger(previewVideoIndex)) {
             const promise = async () => {
@@ -170,7 +148,7 @@ export class CoursesService {
         const { lectureId, title, lectureVideoIndex, thumbnailIndex } = data
 
         const { thumbnailId, lectureVideoId } =
-      await this.lectureMySqlRepository.findOneBy({ lectureId })
+            await this.lectureMySqlRepository.findOneBy({ lectureId })
 
         const promises: Array<Promise<void>> = []
 
@@ -194,7 +172,7 @@ export class CoursesService {
                         processStatus: ProcessStatus.Processing,
                     })
                     .where({
-                        lectureId, 
+                        lectureId,
                     })
                     .getQueryAndParameters()
 
@@ -209,7 +187,7 @@ export class CoursesService {
                         lectureId,
                     })
                     .getQueryAndParameters()
-                
+
                 let assetId: string
                 if (lectureVideoId) {
                     await this.storageService.update(lectureVideoId, {
