@@ -10,7 +10,6 @@ import {
 import { UserEntity } from "./user.entity"
 import { PostEntity } from "./post.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
-import { PostMySqlEntity, UserMySqlEntity } from "."
 
 @ObjectType()
 @Entity("post_react")
@@ -42,12 +41,12 @@ export class PostReactEntity {
   @UpdateDateColumn()
       updatedAt: Date
 
-  @Field(() => UserMySqlEntity)
+  @Field(() => UserEntity)
   @ManyToOne(() => UserEntity, (user) => user.postReacts)
   @JoinColumn({ name: "userId" })
       user: UserEntity
 
-  @Field(() => PostMySqlEntity)
+  @Field(() => PostEntity)
   @ManyToOne(() => PostEntity, (post) => post.postReacts)
   @JoinColumn({ name: "postId" })
       post: PostEntity
