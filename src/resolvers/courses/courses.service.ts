@@ -31,8 +31,9 @@ export class CoursesService {
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
         const { data } = input
+        const { courseId } = data
         return await this.courseMySqlRepository.findOne({
-            where: { courseId: data.courseId },
+            where: { courseId },
             relations: {
                 sections: {
                     lectures: {

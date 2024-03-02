@@ -1,7 +1,7 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
 import { FindOneCourseData, FindManyCoursesData, FindManyLecturesData, FindManyResourcesData, FindOneLectureData, FindManyCourseTargetsData } from "./courses.input"
 import { CoursesService } from "./courses.service"
-import { CourseMySqlEntity, CourseTargetMySqlEntity, LectureMySqlEntity } from "@database"
+import { CourseMySqlEntity, LectureMySqlEntity } from "@database"
 import { FindManyCourseTargetsOutput, FindManyResourcesOutput, FindOneLectureOutput } from "./courses.output"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { JwtAuthGuard, AuthInterceptor, UserId } from "../shared"
