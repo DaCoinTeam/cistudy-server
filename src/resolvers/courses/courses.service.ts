@@ -1,5 +1,6 @@
 import {
     CourseMySqlEntity,
+    CourseTargetMySqlEntity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
 } from "@database"
@@ -12,6 +13,7 @@ import {
     FindManyLecturesInput,
     FindManyResourcesInput,
     FindOneLectureInput,
+    FindManyCourseTargetsInput,
 } from "./courses.input"
 
 @Injectable()
@@ -23,6 +25,8 @@ export class CoursesService {
     private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
     @InjectRepository(ResourceMySqlEntity)
     private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+    @InjectRepository(CourseTargetMySqlEntity)
+    private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
     ) {}
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
@@ -86,6 +90,15 @@ export class CoursesService {
     ): Promise<Array<ResourceMySqlEntity>> {
         const { data } = input
         return await this.resourceMySqlRepository.find({
+            where: data,
+        })
+    }
+
+    async findManyCourseTargets(
+        input: FindManyCourseTargetsInput,
+    ): Promise<Array<CourseTargetMySqlEntity>> {
+        const { data } = input
+        return await this.courseTargetMySqlRepository.find({
             where: data,
         })
     }

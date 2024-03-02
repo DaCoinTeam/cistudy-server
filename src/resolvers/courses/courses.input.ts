@@ -58,3 +58,14 @@ export class FindManyResourcesInput implements AuthInput<FindManyResourcesData> 
     userId: string
     data: FindManyResourcesData
 }
+
+@InputType()
+export class FindManyCourseTargetsData {
+  @Field(() => ID)
+      courseId: string
+}
+
+export class FindManyCourseTargetsInput implements AuthInput<FindManyCourseTargetsData> {
+    userId: string
+    data: FindManyCourseTargetsData
+}

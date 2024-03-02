@@ -43,7 +43,7 @@ export class LectureEntity {
   @Field(() => String)
   @Column({ type: "enum", enum: VideoType, default: VideoType.MP4 })
       videoType: VideoType
-  
+
   @Field(() => Date)
   @CreateDateColumn()
       createdAt: Date
@@ -53,7 +53,9 @@ export class LectureEntity {
       updatedAt: Date
 
   @Field(() => SectionEntity)
-  @ManyToOne(() => SectionEntity, (section) => section.lectures)
+  @ManyToOne(() => SectionEntity, (section) => section.lectures, {
+      onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "sectionId" })
       section: SectionEntity
 

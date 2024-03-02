@@ -1,8 +1,8 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
-import { FindOneCourseData, FindManyCoursesData, FindManyLecturesData, FindManyResourcesData, FindOneLectureData } from "./courses.input"
+import { FindOneCourseData, FindManyCoursesData, FindManyLecturesData, FindManyResourcesData, FindOneLectureData, FindManyCourseTargetsData } from "./courses.input"
 import { CoursesService } from "./courses.service"
-import { CourseMySqlEntity, LectureMySqlEntity } from "@database"
-import { FindManyResourcesOutput, FindOneLectureOutput } from "./courses.output"
+import { CourseMySqlEntity, CourseTargetMySqlEntity, LectureMySqlEntity } from "@database"
+import { FindManyCourseTargetsOutput, FindManyResourcesOutput, FindOneLectureOutput } from "./courses.output"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { JwtAuthGuard, AuthInterceptor, UserId } from "../shared"
 
@@ -39,5 +39,12 @@ export class CoursesResolver {
   @Query(() => FindManyResourcesOutput)
   async findManyResources(@UserId() userId: string, @Args("data") data: FindManyResourcesData) {
       return await this.coursesService.findManyResources({ userId, data })
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  @Query(() => FindManyCourseTargetsOutput)
+  async findManyCourseTargets(@UserId() userId: string, @Args("data") data: FindManyCourseTargetsData) {
+      return await this.coursesService.findManyCourseTargets({ userId, data })
   }
 }

@@ -25,12 +25,10 @@ import {
     UpdateCourseData,
     UpdateCourseTargetData,
     UpdateLectureData,
+    UpdateSectionData,
 } from "./courses.input"
 
-import {
-    createResourcesSchema,
-    updateCourseSchema,
-} from "./courses.schema"
+import { createResourcesSchema, updateCourseSchema } from "./courses.schema"
 
 import { Files } from "@common"
 import { CoursesService } from "./courses.service"
@@ -48,14 +46,10 @@ export class CoursesController {
   @ApiBearerAuth()
   @Post("create-course")
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-      AuthInterceptor
-  )
-    async createCourse(
-    @UserId() userId: string,
-    ) {
+  @UseInterceptors(AuthInterceptor)
+    async createCourse(@UserId() userId: string) {
         return this.coursesService.createCourse({
-            userId
+            userId,
         })
     }
 
@@ -150,7 +144,6 @@ export class CoursesController {
       })
   }
 
-  
   @ApiBearerAuth()
   @Delete("delete-lecture/:lectureId")
   @UseGuards(JwtAuthGuard)
@@ -164,7 +157,6 @@ export class CoursesController {
           data: { lectureId },
       })
   }
-
 
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")
@@ -205,6 +197,48 @@ export class CoursesController {
           userId,
           data,
           files,
+      })
+  }
+
+  @ApiBearerAuth()
+  @Put("update-section")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async updateSection(
+    @UserId() userId: string,
+    @Body() body: UpdateSectionData,
+  ) {
+      return this.coursesService.updateSection({
+          userId,
+          data: body,
+      })
+  }
+
+  @ApiBearerAuth()
+  @Delete("delete-section/:sectionId")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async deleteSection(
+    @UserId() userId: string,
+    @Param("sectionId") sectionId: string,
+  ) {
+      return this.coursesService.deleteSection({
+          userId,
+          data: { sectionId },
+      })
+  }
+
+  @ApiBearerAuth()
+  @Delete("delete-resource/:resourceId")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async deleteResource(
+    @UserId() userId: string,
+    @Param("resourceId") resourceId: string,
+  ) {
+      return this.coursesService.deleteResource({
+          userId,
+          data: { resourceId },
       })
   }
 }

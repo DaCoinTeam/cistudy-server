@@ -189,6 +189,11 @@ type FindManyResourcesOutput {
   tokens: AuthTokens
 }
 
+type FindManyCourseTargetsOutput {
+  data: [CourseTargetEntity!]!
+  tokens: AuthTokens
+}
+
 type FindOnePostOutput {
   data: PostEntity!
   tokens: AuthTokens
@@ -227,6 +232,7 @@ type Query {
   findOneLecture(data: FindOneLectureData!): FindOneLectureOutput!
   findManyLectures(data: FindManyLecturesData!): [LectureEntity!]!
   findManyResources(data: FindManyResourcesData!): FindManyResourcesOutput!
+  findManyCourseTargets(data: FindManyCourseTargetsData!): FindManyCourseTargetsOutput!
   findOnePost(data: FindOnePostData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentData!): FindOnePostCommentOutput!
@@ -263,6 +269,10 @@ input FindManyLecturesData {
 
 input FindManyResourcesData {
   lectureId: ID!
+}
+
+input FindManyCourseTargetsData {
+  courseId: ID!
 }
 
 input FindOnePostData {

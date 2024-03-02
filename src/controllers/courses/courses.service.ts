@@ -20,6 +20,9 @@ import {
     CreateResourcesInput,
     UpdateLectureInput,
     DeleteLectureInput,
+    DeleteSectionInput,
+    UpdateSectionInput,
+    DeleteResourceInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -118,7 +121,8 @@ export class CoursesService {
     }
 
     async createSection(input: CreateSectionInput): Promise<string> {
-        const { courseId, title } = input.data
+        const { data } = input
+        const { courseId, title } = data
         const course = await this.courseMySqlRepository.findOneBy({
             courseId,
         })
@@ -238,13 +242,15 @@ export class CoursesService {
     }
 
     async deleteLecture(input: DeleteLectureInput): Promise<string> {
-        const { lectureId } = input.data
+        const { data } = input
+        const { lectureId } = data
         await this.lectureMySqlRepository.delete({ lectureId })
         return `A lecture with id ${lectureId} has been deleted successfully.`
     }
 
     async createCourseTarget(input: CreateCourseTargetInput): Promise<string> {
-        const { content, courseId } = input.data
+        const { data } = input
+        const { content, courseId } = data
         const maxPosition = await this.courseTargetMySqlRepository.createQueryBuilder()
             .select("MAX(position)", "result").getRawOne()
         const max = maxPosition.result as number
@@ -259,7 +265,8 @@ export class CoursesService {
     }
 
     async updateCourseTarget(input: UpdateCourseTargetInput): Promise<string> {
-        const { content, courseTargetId } = input.data
+        const { data } = input
+        const { content, courseTargetId } = data
         await this.courseTargetMySqlRepository.update(courseTargetId, {
             content,
         })
@@ -267,7 +274,8 @@ export class CoursesService {
     }
 
     async deleteCourseTarget(input: DeleteCourseTargetInput): Promise<string> {
-        const { courseTargetId } = input.data
+        const { data } = input
+        const { courseTargetId } = data
         await this.courseTargetMySqlRepository.delete({ courseTargetId })
         return `A course target with id ${courseTargetId} has been deleted successfully.`
     }
@@ -296,5 +304,28 @@ export class CoursesService {
 
         await this.resourceMySqlRepository.save(resources)
         return `Resources with ids ${resources.map((resource) => resource.resourceId)} has been created successfully.`
+    }
+
+    async updateSection(input: UpdateSectionInput): Promise<string> {
+        const { data } = input
+        const { sectionId, title } = data
+        await this.sectionMySqlRepository.update(sectionId, {
+            title,
+        })
+        return `A section with id  ${sectionId} has been updated successfully.`
+    }
+
+    async deleteSection(input: DeleteSectionInput): Promise<string> {
+        const { data } = input
+        const { sectionId } = data
+        await this.sectionMySqlRepository.delete({ sectionId })
+        return `A section with id ${sectionId} has been deleted successfully.`
+    }
+
+    async deleteResource(input: DeleteResourceInput): Promise<string> {
+        const { data } = input
+        const { resourceId } = data
+        await this.resourceMySqlRepository.delete({ resourceId })
+        return `A resource with id ${resourceId} has been deleted successfully.`
     }
 }

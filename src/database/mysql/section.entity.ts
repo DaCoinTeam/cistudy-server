@@ -39,6 +39,6 @@ export class SectionEntity {
       course: CourseEntity
 
   @Field(() => [LectureEntity])
-  @OneToMany(() => LectureEntity, (video) => video.section)
+  @OneToMany(() => LectureEntity, (video) => video.section, { cascade: true })
       lectures: Array<LectureEntity>
 }
