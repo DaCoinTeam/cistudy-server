@@ -1,30 +1,46 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn } from "typeorm"
 import { UserEntity } from "./user.entity"
 import { PostCommentEntity } from "./post-comment.entity"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
+import { PostEntity } from "./post.entity"
 
+@ObjectType()
 @Entity("post_comment_like")
 export class PostCommentLikeEntity {
+  @Field(() => ID)
   @PrimaryGeneratedColumn("uuid")
-  	postCommentLikeId: string
+      postCommentLikeId: string
 
+  @Field(() => ID)
   @Column({ type: "uuid", length: 36 })
-  	userId: string
+      userId: string
 
-  @Column({ type: "uuid", length: 36 })
-  	postId: string
+  @Field(() => Date)
+  @CreateDateColumn()
+      createdAt: Date
 
+  @Field(() => Date)
+  @UpdateDateColumn()
+      updatedAt: Date
+
+  @Field(() => Boolean)
   @Column({
-  	type: "timestamp",
-  	default: () => "CURRENT_TIMESTAMP",
-  	onUpdate: "CURRENT_TIMESTAMP",
+      type: "boolean",
+      default: true,
   })
-  	createdAt: Date
+      liked: boolean
 
+  @Field(() => ID)
+  @Column({ type: "uuid", length: 36 })
+      postCommentId: string
+
+  @Field(() => UserEntity)
   @ManyToOne(() => UserEntity, (user) => user.postReacts)
   @JoinColumn({ name: "userId" })
-      	user: UserEntity
+      user: UserEntity
 
+  @Field(() => PostEntity)
   @ManyToOne(() => PostCommentEntity, (postComment) => postComment.postCommentLikes)
-  @JoinColumn({ name: "postId" })
-  	postComment: PostCommentEntity
+  @JoinColumn({ name: "postCommentId" })
+      postComment: PostCommentEntity
 }

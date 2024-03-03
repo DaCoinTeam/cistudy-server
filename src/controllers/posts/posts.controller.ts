@@ -15,19 +15,17 @@ import {
     ApiBody,
     ApiConsumes,
     ApiHeader,
-    ApiQuery,
     ApiTags,
 } from "@nestjs/swagger"
 import { PostsService } from "./posts.service"
-import { UserMySqlEntity } from "@database"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { JwtAuthGuard, AuthInterceptor, UserId, DataFromBody } from "../shared"
 import {
-    CreateCommentData,
-    CreatePostData,
-    ReactPostData,
-    UpdateCommentData,
-    UpdatePostData,
+    CreateCommentInputData,
+    CreatePostInputData,
+    ToggleLikePostInputData,
+    UpdateCommentInputData,
+    UpdatePostInputData,
 } from "./posts.input"
 
 import {
@@ -46,99 +44,91 @@ import { Files } from "@common"
 })
 @Controller("api/posts")
 export class PostsController {
-    constructor(private readonly postsService: PostsService) {}
+    constructor(private readonly postsService: PostsService) { }
 
-  @ApiBearerAuth()
-  @ApiConsumes("multipart/form-data")
-  @ApiBody({ schema: createPostSchema })
-  @Post("create-post")
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: createPostSchema })
+    @Post("create-post")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
     async createPost(
-    @UserId() userId: string,
-    @DataFromBody() data: CreatePostData,
-    @UploadedFiles() { files }: Files,
+        @UserId() userId: string,
+        @DataFromBody() data: CreatePostInputData,
+        @UploadedFiles() { files }: Files,
     ) {
         return await this.postsService.createPost({ userId, data, files })
     }
 
-  @ApiBearerAuth()
-  @ApiConsumes("multipart/form-data")
-  @ApiBody({ schema: updatePostSchema })
-  @Put("update-post")
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
-  async updatePost(
-    @UserId() userId: string,
-    @DataFromBody() data: UpdatePostData,
-    @UploadedFiles() { files }: Files,
-  ) {
-      return await this.postsService.updatePost({ userId, data, files })
-  }
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: updatePostSchema })
+    @Put("update-post")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
+    async updatePost(
+        @UserId() userId: string,
+        @DataFromBody() data: UpdatePostInputData,
+        @UploadedFiles() { files }: Files,
+    ) {
+        return await this.postsService.updatePost({ userId, data, files })
+    }
 
-  @ApiBearerAuth()
-  @Delete("delete-post")
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor)
-  async deletePost(@UserId() userId: string, @Param("postId") postId: string) {
-      console.log(postId)
-  }
+    @ApiBearerAuth()
+    @Delete("delete-post")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async deletePost(@UserId() userId: string, @Param("postId") postId: string) {
+        console.log(postId)
+    }
 
-  @ApiBearerAuth()
-  @Patch("react-post")
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor)
-  async upsertReactPost(@UserId() userId: string, @Body() body: ReactPostData) {
-      return this.postsService.upsertReactPost({
-          userId,
-          data: body,
-      })
-  }
+    @ApiBearerAuth()
+    @Patch("toggle-like-post")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async toggleLikePost(@UserId() userId: string, @Body() body: ToggleLikePostInputData) {
+        return this.postsService.toggleLikePost({
+            userId,
+            data: body,
+        })
+    }
 
-  @ApiBearerAuth()
-  @ApiConsumes("multipart/form-data")
-  @ApiBody({ schema: createCommentSchema })
-  @Post("create-comment")
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
-  async createComment(
-    @UserId() userId: string,
-    @DataFromBody() data: CreateCommentData,
-    @UploadedFiles() { files }: Files,
-  ) {
-      return await this.postsService.createComment({ userId, data, files })
-  }
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: createCommentSchema })
+    @Post("create-comment")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
+    async createComment(
+        @UserId() userId: string,
+        @DataFromBody() data: CreateCommentInputData,
+        @UploadedFiles() { files }: Files,
+    ) {
+        return await this.postsService.createComment({ userId, data, files })
+    }
 
-  @ApiBearerAuth()
-  @ApiConsumes("multipart/form-data")
-  @ApiBody({ schema: updateCommentSchema })
-  @Put("update-comment")
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
-  async updateComment(
-    @UserId() userId: string,
-    @DataFromBody() data: UpdateCommentData,
-    @UploadedFiles() { files }: Files,
-  ) {
-      return await this.postsService.updateComment({ userId, data, files })
-  }
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: updateCommentSchema })
+    @Put("update-comment")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
+    async updateComment(
+        @UserId() userId: string,
+        @DataFromBody() data: UpdateCommentInputData,
+        @UploadedFiles() { files }: Files,
+    ) {
+        return await this.postsService.updateComment({ userId, data, files })
+    }
 
-  @ApiBearerAuth()
-  @Delete("delete-comment")
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor)
-  async deleteComment(
-    @UserId() userId: string,
-    @Param("commentId") postId: string,
-  ) {
-      console.log(postId)
-  }
-
-  @ApiBearerAuth()
-  @Patch("react-comment")
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor)
-  async reactComment(@UserId() userId: string, @Body() body: ReactPostData) {
-      return null
-  }
+    @ApiBearerAuth()
+    @Delete("delete-comment")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async deleteComment(
+        @UserId() userId: string,
+        @Param("commentId") postId: string,
+    ) {
+        console.log(postId)
+    }
 }

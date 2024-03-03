@@ -3,7 +3,7 @@ import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { UserKind, UserRole } from "@common"
 import { SessionEntity } from "./session.entity"
 import { PostCommentEntity } from "./post-comment.entity"
-import { PostReactEntity } from "./post-react.entity"
+import { PostLikeEntity } from "./post-like.entity"
 import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { PostEntity } from "./post.entity"
 import { CourseEntity } from "./course.entity"
@@ -98,8 +98,8 @@ export class UserEntity {
     @OneToMany(() => PostCommentEntity, (postComment) => postComment.creator)
         postComments: PostCommentEntity[]
 
-    @OneToMany(() => PostReactEntity, (postReact) => postReact.user)
-        postReacts: PostReactEntity[]
+    @OneToMany(() => PostLikeEntity, (postReact) => postReact.user)
+        postReacts: PostLikeEntity[]
 
     @OneToMany(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.user)
         enrolledInfos: EnrolledInfoEntity[]

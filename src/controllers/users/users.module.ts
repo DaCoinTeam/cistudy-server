@@ -11,7 +11,7 @@ import {
     LectureMySqlEntity,
     ResourceMySqlEntity,
     PostCommentMySqlEntity,
-    PostReactMySqlEntity,
+    PostLikeMySqlEntity,
     PostCommentLikeMySqlEntity,
     FollowMySqlEnitity,
 } from "@database"
@@ -29,7 +29,7 @@ import { UsersService } from "./users.service"
             LectureMySqlEntity,
             ResourceMySqlEntity,
             PostCommentMySqlEntity,
-            PostReactMySqlEntity,
+            PostLikeMySqlEntity,
             PostCommentLikeMySqlEntity,
             FollowMySqlEnitity
         ]),

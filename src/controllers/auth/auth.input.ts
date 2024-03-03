@@ -2,7 +2,7 @@ import { Input } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsDateString, IsEmail, IsJWT, IsNotEmpty, IsStrongPassword, Length } from "class-validator"
 
-export class SignInData {
+export class SignInInputData {
   @IsEmail()
   @ApiProperty()
   	email: string
@@ -13,8 +13,8 @@ export class SignInData {
   	password: string
 }
 
-export class SignInInput implements Input<SignInData> {
-    data: SignInData
+export class SignInInput implements Input<SignInInputData> {
+    data: SignInInputData
 }
 
 export class SignUpData {

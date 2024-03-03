@@ -6,7 +6,7 @@ import {
     LectureMySqlEntity,
     PostCommentLikeMySqlEntity,
     PostCommentMySqlEntity,
-    PostReactMySqlEntity,
+    PostLikeMySqlEntity,
     PostMySqlEntity,
     ResourceMySqlEntity,
     SectionMySqlEntity,
@@ -39,7 +39,7 @@ import { JwtStrategy } from "./strategies"
             SectionMySqlEntity,
             LectureMySqlEntity,
             ResourceMySqlEntity,
-            PostReactMySqlEntity,
+            PostLikeMySqlEntity,
             PostCommentMySqlEntity,
             PostCommentLikeMySqlEntity
         ])

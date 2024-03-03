@@ -1,9 +1,9 @@
 import { AuthInput, MediaType } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsBoolean, IsInt, IsUUID } from "class-validator"
+import { IsInt, IsUUID } from "class-validator"
 
 // CREATE POST
-export class PostMediaData {
+export class PostMediaInputData {
     @IsInt()
     @ApiProperty()
         mediaIndex: number
@@ -12,7 +12,7 @@ export class PostMediaData {
         mediaType: MediaType
 }
 
-export class CreatePostData {
+export class CreatePostInputData {
     @ApiProperty()
         title: string
 
@@ -24,18 +24,18 @@ export class CreatePostData {
         html: string
 
     @ApiProperty({ nullable: true })
-        postMedias?: Array<PostMediaData>
+        postMedias?: Array<PostMediaInputData>
 }
-export class CreatePostInput implements AuthInput<CreatePostData> {
+export class CreatePostInput implements AuthInput<CreatePostInputData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
-    data: CreatePostData
+    data: CreatePostInputData
     files: Array<Express.Multer.File>
 }
 
 // CREATE COMMENT
-export class PostCommentMediaData {
+export class PostCommentMediaInputData {
     @IsInt()
     @ApiProperty()
         mediaIndex: number
@@ -44,7 +44,7 @@ export class PostCommentMediaData {
         mediaType: MediaType
 }
 
-export class CreateCommentData {
+export class CreateCommentInputData {
     @IsUUID("4")
     @ApiProperty()
         postId: string
@@ -53,51 +53,48 @@ export class CreateCommentData {
         html: string
 
     @ApiProperty({ nullable: true })
-        postCommentMedias?: Array<PostCommentMediaData>
+        postCommentMedias?: Array<PostCommentMediaInputData>
 }
-export class CreateCommentInput implements AuthInput<CreateCommentData> {
+export class CreateCommentInput implements AuthInput<CreateCommentInputData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
-    data: CreateCommentData
+    data: CreateCommentInputData
     files: Array<Express.Multer.File>
 }
 
-export class ReactPostData {
+export class ToggleLikePostInputData {
     @IsUUID()
     @ApiProperty()
         postId: string
-    @IsBoolean()
-    @ApiProperty()
-        liked: boolean
 }
 
-export class UpsertReactPostInput implements AuthInput<ReactPostData> {
+export class ToggleLikePostInput implements AuthInput<ToggleLikePostInputData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
-    data: ReactPostData
+    data: ToggleLikePostInputData
 
 }
 
-export class UpdateCommentData {
+export class UpdateCommentInputData {
     @IsUUID("4")
     @ApiProperty()
         postCommentId: string
 
     @ApiProperty({ nullable: true })
-        postCommentMedias?: Array<PostCommentMediaData>
+        postCommentMedias?: Array<PostCommentMediaInputData>
 }
 
-export class UpdateCommentInput implements AuthInput<UpdateCommentData> {
+export class UpdateCommentInput implements AuthInput<UpdateCommentInputData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
-    data: UpdateCommentData
+    data: UpdateCommentInputData
     files: Array<Express.Multer.File>
 }
 
-export class UpdatePostData {
+export class UpdatePostInputData {
     @ApiProperty()
         title: string
 
@@ -106,13 +103,13 @@ export class UpdatePostData {
         postId: string
 
     @ApiProperty()
-        postMedias: Array<PostMediaData>
+        postMedias: Array<PostMediaInputData>
 }
 
-export class UpdatePostInput implements AuthInput<UpdatePostData> {
+export class UpdatePostInput implements AuthInput<UpdatePostInputData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
-    data: UpdatePostData
+    data: UpdatePostInputData
     files: Array<Express.Multer.File>
 }

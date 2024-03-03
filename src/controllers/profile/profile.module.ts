@@ -11,7 +11,7 @@ import {
     LectureMySqlEntity,
     ResourceMySqlEntity,
     PostCommentMySqlEntity,
-    PostReactMySqlEntity,
+    PostLikeMySqlEntity,
     PostCommentLikeMySqlEntity,
     FollowMySqlEnitity,
 } from "@database"
@@ -29,7 +29,7 @@ import { ProfileService } from "./profile.service"
             LectureMySqlEntity,
             ResourceMySqlEntity,
             PostCommentMySqlEntity,
-            PostReactMySqlEntity,
+            PostLikeMySqlEntity,
             PostCommentLikeMySqlEntity,
             FollowMySqlEnitity
         ]),

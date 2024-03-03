@@ -3,7 +3,7 @@ import { AuthService } from "./auth.service"
 import { AuthInterceptor, GenerateAuthTokensInterceptor, JwtAuthGuard, UserId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { InitOutput, SignInOutput } from "./auth.output"
-import { SignInData } from "./auth.input"
+import { SignInInputData } from "./auth.input"
 
 @Resolver()
 export class AuthResolver {
@@ -18,7 +18,7 @@ export class AuthResolver {
 
   @UseInterceptors(GenerateAuthTokensInterceptor)
   @Query(() => SignInOutput)
-  async signIn(@Args("data")  data: SignInData ) {
+  async signIn(@Args("data") data: SignInInputData ) {
       return this.authService.signIn({ data })
   }
 }

@@ -7,7 +7,7 @@ export class CreateCourseInput implements AuthEmptyDataInput {
         userId: string
 }
 
-export class CreateCourseTargetData {
+export class CreateCourseTargetInputData {
     @IsUUID()
     @ApiProperty()
         courseId: string
@@ -16,14 +16,14 @@ export class CreateCourseTargetData {
 }
 
 export class CreateCourseTargetInput
-implements AuthInput<CreateCourseTargetData>
+implements AuthInput<CreateCourseTargetInputData>
 {
     @IsUUID("4")
         userId: string
-    data: CreateCourseTargetData
+    data: CreateCourseTargetInputData
 }
 
-export class UpdateCourseTargetData {
+export class UpdateCourseTargetInputData {
     @IsUUID()
     @ApiProperty()
         courseTargetId: string
@@ -34,14 +34,14 @@ export class UpdateCourseTargetData {
 }
 
 export class UpdateCourseTargetInput
-implements AuthInput<UpdateCourseTargetData>
+implements AuthInput<UpdateCourseTargetInputData>
 {
     @IsUUID("4")
         userId: string
-    data: UpdateCourseTargetData
+    data: UpdateCourseTargetInputData
 }
 
-export class UpdateCourseData {
+export class UpdateCourseInputData {
     @IsUUID("4")
     @ApiProperty({ nullable: true })
         courseId: string
@@ -67,29 +67,29 @@ export class UpdateCourseData {
         previewVideoIndex?: number
 }
 
-export class UpdateCourseInput implements AuthInput<UpdateCourseData> {
+export class UpdateCourseInput implements AuthInput<UpdateCourseInputData> {
     @IsUUID("4")
         userId: string
-    data: UpdateCourseData
+    data: UpdateCourseInputData
     files: Array<Express.Multer.File>
 }
 
-export class DeleteCourseTargetData {
+export class DeleteCourseTargetInputData {
     @IsUUID()
     @ApiProperty()
         courseTargetId: string
 }
 
 export class DeleteCourseTargetInput
-implements AuthInput<DeleteCourseTargetData>
+implements AuthInput<DeleteCourseTargetInputData>
 {
     @IsUUID("4")
         userId: string
     @ApiProperty()
-        data: DeleteCourseTargetData
+        data: DeleteCourseTargetInputData
 }
 
-export class CreateLectureData {
+export class CreateLectureInputData {
     @IsUUID("4")
     @ApiProperty()
         sectionId: string
@@ -97,29 +97,29 @@ export class CreateLectureData {
         title: string
 }
 
-export class CreateLectureInput implements AuthInput<CreateLectureData> {
+export class CreateLectureInput implements AuthInput<CreateLectureInputData> {
     @IsUUID("4")
         userId: string
-    data: CreateLectureData
+    data: CreateLectureInputData
 }
 
-export class DeleteLectureData {
+export class DeleteLectureInputData {
     @IsUUID()
     @ApiProperty()
         lectureId: string
 }
 
 export class DeleteLectureInput
-implements AuthInput<DeleteLectureData>
+implements AuthInput<DeleteLectureInputData>
 {
     @IsUUID("4")
         userId: string
     @ApiProperty()
-        data: DeleteLectureData
+        data: DeleteLectureInputData
 }
 
 
-export class CreateSectionData {
+export class CreateSectionInputData {
     @IsUUID("4")
     @ApiProperty()
         courseId: string
@@ -128,25 +128,25 @@ export class CreateSectionData {
         title: string
 }
 
-export class CreateSectionInput implements AuthInput<CreateSectionData> {
+export class CreateSectionInput implements AuthInput<CreateSectionInputData> {
     @IsUUID("4")
         userId: string
-    data: CreateSectionData
+    data: CreateSectionInputData
 }
 
-export class CreateResourcesData {
+export class CreateResourcesInputData {
     @IsUUID("4")
     @ApiProperty()
         lectureId: string
 }
-export class CreateResourcesInput implements AuthInput<CreateResourcesData> {
+export class CreateResourcesInput implements AuthInput<CreateResourcesInputData> {
     @IsUUID("4")
         userId: string
-    data: CreateResourcesData
+    data: CreateResourcesInputData
     files: Express.Multer.File[]
 }
 
-export class UpdateLectureData {
+export class UpdateLectureInputData {
     @IsUUID("4")
     @ApiProperty()
         lectureId: string
@@ -158,29 +158,29 @@ export class UpdateLectureData {
         lectureVideoIndex?: number
 }
 
-export class UpdateLectureInput implements AuthInput<UpdateLectureData> {
+export class UpdateLectureInput implements AuthInput<UpdateLectureInputData> {
     @IsUUID("4")
         userId: string
-    data: UpdateLectureData
+    data: UpdateLectureInputData
     files: Express.Multer.File[]
 }
 
-export class DeleteSectionData {
+export class DeleteSectionInputData {
     @IsUUID()
     @ApiProperty()
         sectionId: string
 }
 
 export class DeleteSectionInput
-implements AuthInput<DeleteSectionData>
+implements AuthInput<DeleteSectionInputData>
 {
     @IsUUID("4")
         userId: string
     @ApiProperty()
-        data: DeleteSectionData
+        data: DeleteSectionInputData
 }
 
-export class UpdateSectionData {
+export class UpdateSectionInputData {
     @IsUUID("4")
     @ApiProperty({ nullable: true })
         sectionId: string
@@ -190,23 +190,23 @@ export class UpdateSectionData {
         title?: string
 }
 
-export class UpdateSectionInput implements AuthInput<UpdateSectionData> {
+export class UpdateSectionInput implements AuthInput<UpdateSectionInputData> {
     @IsUUID("4")
         userId: string
-    data: UpdateSectionData
+    data: UpdateSectionInputData
 }
 
-export class DeleteResourceData {
+export class DeleteResourceInputData {
     @IsUUID()
     @ApiProperty()
         resourceId: string
 }
 
 export class DeleteResourceInput
-implements AuthInput<DeleteResourceData>
+implements AuthInput<DeleteResourceInputData>
 {
     @IsUUID("4")
         userId: string
     @ApiProperty()
-        data: DeleteResourceData
+        data: DeleteResourceInputData
 }

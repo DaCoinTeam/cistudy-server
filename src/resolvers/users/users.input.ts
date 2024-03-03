@@ -3,39 +3,39 @@ import { Field, InputType, Int } from "@nestjs/graphql"
 import { IsUUID } from "class-validator"
 
 @InputType()
-export class FindOneUserOptions {
+export class FindOneUserInputOptions {
     @Field(() => String)
     @IsUUID()
         followerId: string
 }
 
 @InputType()
-export class FindOneUserData {
+export class FindOneUserInputData {
     @Field(() => String)
     @IsUUID()
         userId: string
 
-    @Field(() => FindOneUserOptions, { nullable: true })
-        options?: FindOneUserOptions
+    @Field(() => FindOneUserInputOptions, { nullable: true })
+        options?: FindOneUserInputOptions
 }
 
-export class FindOneUserInput implements Input<FindOneUserData> {
-    data: FindOneUserData
+export class FindOneUserInput implements Input<FindOneUserInputData> {
+    data: FindOneUserInputData
 }
 
 @InputType()
-export class FindManyFollowersData {
+export class FindManyFollowersInputData {
     @Field(() => String)
     @IsUUID()
         userId: string
 }
 
-export class FindManyFollowersInput implements Input<FindManyFollowersData> {
-    data: FindManyFollowersData
+export class FindManyFollowersInput implements Input<FindManyFollowersInputData> {
+    data: FindManyFollowersInputData
 }
 
 @InputType()
-export class FindManyCreatedCoursesOptions {
+export class FindManyCreatedCoursesInputOptions {
     @Field(() => Int, { nullable: true })
         take?: number
     @Field(() => Int, { nullable: true })
@@ -43,16 +43,16 @@ export class FindManyCreatedCoursesOptions {
 }
 
 @InputType()
-export class FindManyCreatedCoursesData {
+export class FindManyCreatedCoursesInputData {
     @Field(() => String)
     @IsUUID()
         userId: string
-    @Field(() => FindManyCreatedCoursesOptions, { nullable: true})
-        options?: FindManyCreatedCoursesOptions
+    @Field(() => FindManyCreatedCoursesInputOptions, { nullable: true})
+        options?: FindManyCreatedCoursesInputOptions
 }
 
 export class FindManyCreatedCoursesInput
-implements Input<FindManyCreatedCoursesData>
+implements Input<FindManyCreatedCoursesInputData>
 {
-    data: FindManyCreatedCoursesData
+    data: FindManyCreatedCoursesInputData
 }

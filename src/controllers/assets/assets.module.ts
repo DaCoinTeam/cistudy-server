@@ -11,7 +11,7 @@ import {
     LectureMySqlEntity,
     ResourceMySqlEntity,
     PostCommentMySqlEntity,
-    PostReactMySqlEntity,
+    PostLikeMySqlEntity,
     PostCommentLikeMySqlEntity,
 } from "@database"
 import { AssetsService } from "./assets.service"
@@ -28,7 +28,7 @@ import { AssetsService } from "./assets.service"
             LectureMySqlEntity,
             ResourceMySqlEntity,
             PostCommentMySqlEntity,
-            PostReactMySqlEntity,
+            PostLikeMySqlEntity,
             PostCommentLikeMySqlEntity,
         ]),
     ],

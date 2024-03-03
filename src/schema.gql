@@ -76,8 +76,8 @@ enum VerifyStatus {
   Rejected
 }
 
-type PostReactEntity {
-  postReactId: ID!
+type PostLikeEntity {
+  postLikeId: ID!
   userId: String!
   postId: String!
   liked: Boolean!
@@ -107,7 +107,10 @@ type PostEntity {
   creator: UserEntity!
   postMedias: [PostMediaEntity!]!
   postComments: [PostCommentEntity!]!
-  postReacts: [PostReactEntity!]!
+  postReacts: [PostLikeEntity!]!
+  numberOfLikes: Int
+  numberOfComments: Int
+  liked: Boolean
 }
 
 type PostCommentMediaEntity {
@@ -129,6 +132,8 @@ type PostCommentEntity {
   post: PostEntity!
   creator: UserEntity!
   postCommentMedias: [PostCommentMediaEntity!]!
+  numberOfLikes: Int
+  liked: Boolean
 }
 
 type FollowEntity {
@@ -214,6 +219,24 @@ type FindManyPostCommentsOutput {
   tokens: AuthTokens
 }
 
+type FindManyPostsMetadataOutputData {
+  numberOfPosts: Int!
+}
+
+type FindManyPostsMetadataOutput {
+  data: FindManyPostsMetadataOutputData!
+  tokens: AuthTokens
+}
+
+type FindManyPostCommentsMetadataOutputData {
+  numberOfPostComments: Int!
+}
+
+type FindManyPostCommentsMetadataOutput {
+  data: FindManyPostCommentsMetadataOutputData!
+  tokens: AuthTokens
+}
+
 type InitOutput {
   data: UserEntity!
   tokens: AuthTokens
@@ -226,32 +249,35 @@ type SignInOutput {
 
 type Query {
   init: InitOutput!
-  signIn(data: SignInData!): SignInOutput!
-  findOneCourse(data: FindOneCourseData!): CourseEntity!
-  findManyCourses(data: FindManyCoursesData): [CourseEntity!]!
-  findOneLecture(data: FindOneLectureData!): FindOneLectureOutput!
-  findManyLectures(data: FindManyLecturesData!): [LectureEntity!]!
-  findManyResources(data: FindManyResourcesData!): FindManyResourcesOutput!
-  findManyCourseTargets(data: FindManyCourseTargetsData!): FindManyCourseTargetsOutput!
-  findOnePost(data: FindOnePostData!): FindOnePostOutput!
-  findManyPosts(data: FindManyPostsData!): FindManyPostsOutput!
-  findOnePostComment(data: FindOnePostCommentData!): FindOnePostCommentOutput!
-  findManyPostComments(data: FindManyPostCommentsData!): FindManyPostCommentsOutput!
-  findOneUser(data: FindOneUserData!): UserEntity!
-  findManyFollowers(data: FindManyFollowersData!): [UserEntity!]!
-  findManyCreatedCourses(data: FindManyCreatedCoursesData!): [CourseEntity!]!
+  signIn(data: SignInInputData!): SignInOutput!
+  findOneCourse(data: FindOneCourseInputData!): CourseEntity!
+  findManyCourses(data: FindManyCoursesInputData): [CourseEntity!]!
+  findOneLecture(data: FindOneLectureInputData!): FindOneLectureOutput!
+  findManyLectures(data: FindManyLecturesInputData!): [LectureEntity!]!
+  findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
+  findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
+  findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
+  findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
+  findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
+  findManyPostsMetadata: FindManyPostsMetadataOutput!
+  findManyPostComments(data: FindManyPostCommentsInputData!): FindManyPostCommentsOutput!
+  findManyPostCommentsMetadata(data: FindManyPostCommentsMetadataInputData!): FindManyPostCommentsMetadataOutput!
+  findOneUser(data: FindOneUserInputData!): UserEntity!
+  findManyFollowers(data: FindManyFollowersInputData!): [UserEntity!]!
+  findManyCreatedCourses(data: FindManyCreatedCoursesInputData!): [CourseEntity!]!
+  findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): [CourseEntity!]!
 }
 
-input SignInData {
+input SignInInputData {
   email: String!
   password: String!
 }
 
-input FindOneCourseData {
+input FindOneCourseInputData {
   courseId: ID!
 }
 
-input FindManyCoursesData {
+input FindManyCoursesInputData {
   filter: CourseFilterInput
 }
 
@@ -259,63 +285,82 @@ input CourseFilterInput {
   category: String
 }
 
-input FindOneLectureData {
+input FindOneLectureInputData {
   lectureId: ID!
 }
 
-input FindManyLecturesData {
+input FindManyLecturesInputData {
   sectionId: ID!
 }
 
-input FindManyResourcesData {
+input FindManyResourcesInputData {
   lectureId: ID!
 }
 
-input FindManyCourseTargetsData {
+input FindManyCourseTargetsInputData {
   courseId: ID!
 }
 
-input FindOnePostData {
+input FindOnePostInputData {
   postId: ID!
 }
 
-input FindManyPostsData {
+input FindManyPostsInputData {
   courseId: String!
-  options: FindManyPostsOptions
+  options: FindManyPostsInputOptions
 }
 
-input FindManyPostsOptions {
+input FindManyPostsInputOptions {
   take: Int
   skip: Int
 }
 
-input FindOnePostCommentData {
+input FindOnePostCommentInputData {
   postCommentId: ID!
 }
 
-input FindManyPostCommentsData {
-  postId: String!
+input FindManyPostCommentsInputData {
+  postId: ID!
+  options: FindManyPostsCommentInputOptions
 }
 
-input FindOneUserData {
+input FindManyPostsCommentInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManyPostCommentsMetadataInputData {
+  postId: ID!
+}
+
+input FindOneUserInputData {
   userId: String!
-  options: FindOneUserOptions
+  options: FindOneUserInputOptions
 }
 
-input FindOneUserOptions {
+input FindOneUserInputOptions {
   followerId: String!
 }
 
-input FindManyFollowersData {
+input FindManyFollowersInputData {
   userId: String!
 }
 
-input FindManyCreatedCoursesData {
+input FindManyCreatedCoursesInputData {
   userId: String!
-  options: FindManyCreatedCoursesOptions
+  options: FindManyCreatedCoursesInputOptions
 }
 
-input FindManyCreatedCoursesOptions {
+input FindManyCreatedCoursesInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManySelfCreatedCoursesInputData {
+  options: FindManySelfCreatedCoursesInputOptions
+}
+
+input FindManySelfCreatedCoursesInputOptions {
   take: Int
   skip: Int
 }

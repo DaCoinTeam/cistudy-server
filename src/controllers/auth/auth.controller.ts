@@ -7,7 +7,7 @@ import {
     Query,
 } from "@nestjs/common"
 import { ApiHeader, ApiTags } from "@nestjs/swagger"
-import { SignInData, SignUpData } from "./auth.input"
+import { SignInInputData, SignUpData } from "./auth.input"
 import { AuthService } from "./auth.service"
 import { AuthInterceptor, GenerateAuthTokensInterceptor } from "../shared"
 
@@ -21,7 +21,7 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
   @Post("sign-in")
   @UseInterceptors(GenerateAuthTokensInterceptor)
-    async signIn(@Body() body: SignInData) {
+    async signIn(@Body() body: SignInInputData) {
         return this.authService.signIn({ data: body })
     }
 

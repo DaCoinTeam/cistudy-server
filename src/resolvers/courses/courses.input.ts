@@ -2,34 +2,34 @@ import { Field, ID, InputType } from "@nestjs/graphql"
 import { AuthInput, Input } from "@common"
 
 @InputType()
-export class FindOneCourseData {
+export class FindOneCourseInputData {
   @Field(() => ID)
       courseId: string
 }
 
-export class FindOneCourseInput implements Input<FindOneCourseData> {
-    data: FindOneCourseData
+export class FindOneCourseInput implements Input<FindOneCourseInputData> {
+    data: FindOneCourseInputData
 }
 
 @InputType()
-export class FindOneLectureData {
+export class FindOneLectureInputData {
   @Field(() => ID)
       lectureId: string
 }
 
-export class FindOneLectureInput implements AuthInput<FindOneLectureData> {
+export class FindOneLectureInput implements AuthInput<FindOneLectureInputData> {
     userId: string
-    data: FindOneLectureData
+    data: FindOneLectureInputData
 }
 
 @InputType()
-export class FindManyLecturesData {
+export class FindManyLecturesInputData {
   @Field(() => ID)
       sectionId: string
 }
 
-export class FindManyLecturesInput implements Input<FindManyLecturesData> {
-    data: FindManyLecturesData
+export class FindManyLecturesInput implements Input<FindManyLecturesInputData> {
+    data: FindManyLecturesInputData
 }
 
 @InputType()
@@ -39,33 +39,33 @@ export class CourseFilterInput {
 }
 
 @InputType()
-export class FindManyCoursesData {
+export class FindManyCoursesInputData {
   @Field(() => CourseFilterInput, { nullable: true })
       filter: CourseFilterInput
 }
 
-export class FindManyCoursesInput implements Input<FindManyCoursesData> {
-    data: FindManyCoursesData
+export class FindManyCoursesInput implements Input<FindManyCoursesInputData> {
+    data: FindManyCoursesInputData
 }
 
 @InputType()
-export class FindManyResourcesData {
+export class FindManyResourcesInputData {
   @Field(() => ID)
       lectureId: string
 }
 
-export class FindManyResourcesInput implements AuthInput<FindManyResourcesData> {
+export class FindManyResourcesInput implements AuthInput<FindManyResourcesInputData> {
     userId: string
-    data: FindManyResourcesData
+    data: FindManyResourcesInputData
 }
 
 @InputType()
-export class FindManyCourseTargetsData {
+export class FindManyCourseTargetsInputData {
   @Field(() => ID)
       courseId: string
 }
 
-export class FindManyCourseTargetsInput implements AuthInput<FindManyCourseTargetsData> {
+export class FindManyCourseTargetsInput implements AuthInput<FindManyCourseTargetsInputData> {
     userId: string
-    data: FindManyCourseTargetsData
+    data: FindManyCourseTargetsInputData
 }

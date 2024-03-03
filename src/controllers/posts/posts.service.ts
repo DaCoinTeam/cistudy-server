@@ -3,13 +3,13 @@ import { Injectable } from "@nestjs/common"
 import {
     CreateCommentInput,
     CreatePostInput,
-    UpsertReactPostInput,
     UpdateCommentInput,
     UpdatePostInput,
+    ToggleLikePostInput,
 } from "./posts.input"
 import {
     PostMySqlEntity,
-    PostReactMySqlEntity,
+    PostLikeMySqlEntity,
     PostCommentMySqlEntity,
     PostCommentMediaMySqlEntity,
     PostMediaMySqlEntity
@@ -22,8 +22,8 @@ export class PostsService {
     constructor(
         @InjectRepository(PostMySqlEntity)
         private readonly postMySqlRepository: Repository<PostMySqlEntity>,
-        @InjectRepository(PostReactMySqlEntity)
-        private readonly postReactMySqlRepository: Repository<PostReactMySqlEntity>,
+        @InjectRepository(PostLikeMySqlEntity)
+        private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
         @InjectRepository(PostCommentMySqlEntity)
         private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
         private readonly storageService: StorageService,
@@ -108,33 +108,37 @@ export class PostsService {
         return "A post with id  has been updated successfully."
     }
 
-    async upsertReactPost(input: UpsertReactPostInput) {
+    async toggleLikePost(input: ToggleLikePostInput) {
         const { userId, data } = input
-        const { postId, liked } = data
-        const found = await this.postReactMySqlRepository.findOne({
+        const { postId } = data
+
+        const found = await this.postLikeMySqlRepository.findOne({
             where: {
                 userId,
                 postId,
             }
         })
 
+        const responseMessage = (postLikeId: string, liked: boolean = true) =>
+            `${liked ? "Like" : "Unlike"} successfully with id ${postLikeId}`
+
         if (found === null) {
             // do claim rewards action
 
-            const postReact = await this.postReactMySqlRepository.save({
+            const postLike = await this.postLikeMySqlRepository.save({
                 userId,
                 postId,
-                liked
             })
-            return `A react with ${postReact.postReactId} has been created successfully.`
+            const { postLikeId, liked } = postLike
+            return responseMessage(postLikeId, liked)
         }
 
-        const { postReactId } = found
-        await this.postReactMySqlRepository.update(postReactId, {
-            liked
+        const { postLikeId, liked } = found
+        await this.postLikeMySqlRepository.update(postLikeId, {
+            liked : !liked
         })
 
-        return `A react with ${postReactId} has been updated successfully.`
+        return responseMessage(postLikeId, liked)
     }
 
     async createComment(input: CreateCommentInput) {

@@ -2,15 +2,15 @@ import { AuthInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID } from "class-validator"
 
-export class FollowOrUnfollowData {
+export class ToggleFollowInputData {
     @IsUUID("4")
     @ApiProperty()
         followedUserId: string
 }
 
-export class FollowOrUnfollowInput implements AuthInput<FollowOrUnfollowData> {
+export class ToggleFollowInput implements AuthInput<ToggleFollowInputData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
-    data: FollowOrUnfollowData
+    data: ToggleFollowInputData
 }

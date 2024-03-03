@@ -1,15 +1,18 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
 import {
-    FindManyPostCommentsData,
-    FindManyPostsData,
-    FindOnePostCommentData,
-    FindOnePostData,
+    FindManyPostCommentsInputData,
+    FindManyPostCommentsMetadataInputData,
+    FindManyPostsInputData,
+    FindOnePostCommentInputData,
+    FindOnePostInputData,
 } from "./posts.input"
 import { PostsService } from "./posts.service"
 import { AuthInterceptor, JwtAuthGuard, UserId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import {
+    FindManyPostCommentsMetadataOutput,
     FindManyPostCommentsOutput,
+    FindManyPostsMetadataOutput,
     FindManyPostsOutput,
     FindOnePostCommentOutput,
     FindOnePostOutput,
@@ -17,14 +20,14 @@ import {
 
 @Resolver()
 export class PostsResolver {
-    constructor(private readonly postsService: PostsService) {}
+    constructor(private readonly postsService: PostsService) { }
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   @Query(() => FindOnePostOutput)
     async findOnePost(
     @UserId() userId: string,
-    @Args("data") data: FindOnePostData,
+    @Args("data") data: FindOnePostInputData,
     ) {
         return this.postsService.findOnePost({ userId, data })
     }
@@ -34,7 +37,7 @@ export class PostsResolver {
   @Query(() => FindManyPostsOutput)
   async findManyPosts(
     @UserId() userId: string,
-    @Args("data") data: FindManyPostsData,
+    @Args("data") data: FindManyPostsInputData,
   ) {
       return this.postsService.findManyPosts({ userId, data })
   }
@@ -44,9 +47,17 @@ export class PostsResolver {
   @Query(() => FindOnePostCommentOutput)
   async findOnePostComment(
     @UserId() userId: string,
-    @Args("data") data: FindOnePostCommentData,
+    @Args("data") data: FindOnePostCommentInputData,
   ) {
       return this.postsService.findOnePostComment({ userId, data })
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  @Query(() => FindManyPostsMetadataOutput)
+  async findManyPostsMetadata(
+  ) {
+      return this.postsService.findManyPostsMetadata()
   }
 
   @UseGuards(JwtAuthGuard)
@@ -54,8 +65,18 @@ export class PostsResolver {
   @Query(() => FindManyPostCommentsOutput)
   async findManyPostComments(
     @UserId() userId: string,
-    @Args("data") data: FindManyPostCommentsData,
+    @Args("data") data: FindManyPostCommentsInputData,
   ) {
       return this.postsService.findManyPostComments({ userId, data })
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  @Query(() => FindManyPostCommentsMetadataOutput)
+  async findManyPostCommentsMetadata(
+    @UserId() userId: string,
+    @Args("data") data: FindManyPostCommentsMetadataInputData,
+  ) {
+      return this.postsService.findManyPostCommentsMetadata({ userId, data })
   }
 }

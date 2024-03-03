@@ -9,7 +9,7 @@ export class InitInput implements AuthEmptyDataInput {
 }
 
 @InputType()
-export class SignInData {
+export class SignInInputData {
     @Field(() => String)
     @IsEmail()
         email: string
@@ -19,7 +19,7 @@ export class SignInData {
         password: string
 }
 
-export class SignInInput implements Input<SignInData> {
-    data: SignInData
+export class SignInInput implements Input<SignInInputData> {
+    data: SignInInputData
 }
 

@@ -18,14 +18,14 @@ import {
 } from "@nestjs/swagger"
 import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import {
-    CreateCourseTargetData,
-    CreateLectureData,
-    CreateResourcesData,
-    CreateSectionData,
-    UpdateCourseData,
-    UpdateCourseTargetData,
-    UpdateLectureData,
-    UpdateSectionData,
+    CreateCourseTargetInputData,
+    CreateLectureInputData,
+    CreateResourcesInputData,
+    CreateSectionInputData,
+    UpdateCourseInputData,
+    UpdateCourseTargetInputData,
+    UpdateLectureInputData,
+    UpdateSectionInputData,
 } from "./courses.input"
 
 import { createResourcesSchema, updateCourseSchema } from "./courses.schema"
@@ -64,7 +64,7 @@ export class CoursesController {
   )
   async updateCourse(
     @UserId() userId: string,
-    @DataFromBody() data: UpdateCourseData,
+    @DataFromBody() data: UpdateCourseInputData,
     @UploadedFiles() { files }: Files,
   ) {
       return this.coursesService.updateCourse({
@@ -80,7 +80,7 @@ export class CoursesController {
   @UseInterceptors(AuthInterceptor)
   async createCourseTarget(
     @UserId() userId: string,
-    @Body() body: CreateCourseTargetData,
+    @Body() body: CreateCourseTargetInputData,
   ) {
       return this.coursesService.createCourseTarget({
           userId,
@@ -94,7 +94,7 @@ export class CoursesController {
   @UseInterceptors(AuthInterceptor)
   async updateCourseTarget(
     @UserId() userId: string,
-    @Body() body: UpdateCourseTargetData,
+    @Body() body: UpdateCourseTargetInputData,
   ) {
       return this.coursesService.updateCourseTarget({
           userId,
@@ -122,7 +122,7 @@ export class CoursesController {
   @UseInterceptors(AuthInterceptor)
   async createSection(
     @UserId() userId: string,
-    @Body() body: CreateSectionData,
+    @Body() body: CreateSectionInputData,
   ) {
       return this.coursesService.createSection({
           userId,
@@ -136,7 +136,7 @@ export class CoursesController {
   @UseInterceptors(AuthInterceptor)
   async createLecture(
     @UserId() userId: string,
-    @Body() data: CreateLectureData,
+    @Body() data: CreateLectureInputData,
   ) {
       return this.coursesService.createLecture({
           userId,
@@ -169,7 +169,7 @@ export class CoursesController {
   )
   async createResoures(
     @UserId() userId: string,
-    @DataFromBody() data: CreateResourcesData,
+    @DataFromBody() data: CreateResourcesInputData,
     @UploadedFiles() { files }: Files,
   ) {
       return this.coursesService.createResources({
@@ -190,7 +190,7 @@ export class CoursesController {
   )
   async updateLecture(
     @UserId() userId: string,
-    @DataFromBody() data: UpdateLectureData,
+    @DataFromBody() data: UpdateLectureInputData,
     @UploadedFiles() { files }: Files,
   ) {
       return this.coursesService.updateLecture({
@@ -206,7 +206,7 @@ export class CoursesController {
   @UseInterceptors(AuthInterceptor)
   async updateSection(
     @UserId() userId: string,
-    @Body() body: UpdateSectionData,
+    @Body() body: UpdateSectionInputData,
   ) {
       return this.coursesService.updateSection({
           userId,

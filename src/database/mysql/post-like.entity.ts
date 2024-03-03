@@ -13,11 +13,11 @@ import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { PostMySqlEntity, UserMySqlEntity } from "."
 
 @ObjectType()
-@Entity("post_react")
-export class PostReactEntity {
+@Entity("post_like")
+export class PostLikeEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn("uuid")
-      postReactId: string
+      postLikeId: string
 
   @Field(() => String)
   @Column({ type: "uuid", length: 36 })

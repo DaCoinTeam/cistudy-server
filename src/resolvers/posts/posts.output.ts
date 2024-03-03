@@ -1,6 +1,6 @@
 import { Output, AuthTokens } from "@common"
 import { PostCommentMySqlEntity, PostMySqlEntity } from "@database"
-import { Field, ObjectType } from "@nestjs/graphql"
+import { Field, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
 export class FindOnePostOutput
@@ -38,6 +38,38 @@ implements Output<Array<PostCommentMySqlEntity>>
 {
     @Field(() => [PostCommentMySqlEntity])
         data: Array<PostCommentMySqlEntity>
+    @Field(() => AuthTokens, { nullable: true })
+        tokens: AuthTokens
+}
+
+@ObjectType()
+export class FindManyPostsMetadataOutputData {
+    @Field(() => Int)
+        numberOfPosts: number
+}
+
+@ObjectType()
+export class FindManyPostsMetadataOutput
+implements Output<FindManyPostsMetadataOutputData>
+{
+    @Field(() => FindManyPostsMetadataOutputData)
+        data: FindManyPostsMetadataOutputData
+    @Field(() => AuthTokens, { nullable: true })
+        tokens: AuthTokens
+}
+
+@ObjectType()
+export class FindManyPostCommentsMetadataOutputData {
+    @Field(() => Int)
+        numberOfPostComments: number
+}
+
+@ObjectType()
+export class FindManyPostCommentsMetadataOutput
+implements Output<FindManyPostCommentsMetadataOutputData>
+{
+    @Field(() => FindManyPostCommentsMetadataOutputData)
+        data: FindManyPostCommentsMetadataOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens: AuthTokens
 }

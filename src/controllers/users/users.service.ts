@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
-import { FollowOrUnfollowInput } from "./users.input"
+import { ToggleFollowInput } from "./users.input"
 import { FollowMySqlEnitity } from "@database"
 
 @Injectable()
@@ -11,7 +11,7 @@ export class UsersService {
     private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
     ) {}
 
-    async followOrUnfollow(input: FollowOrUnfollowInput) {
+    async toggleFollow(input: ToggleFollowInput) {
         const { userId, data } = input
         const { followedUserId } = data
 

@@ -11,7 +11,7 @@ import {
 import { PostEntity } from "./post.entity"
 import { UserEntity } from "./user.entity"
 import { PostCommentLikeEntity } from "./post-comment-like.entity"
-import { Field, ID, ObjectType } from "@nestjs/graphql"
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { PostCommentMediaEntity } from "./post-comment-media.entity"
 
 @ObjectType()
@@ -79,4 +79,10 @@ export class PostCommentEntity {
         { cascade: true },
     )
         childComments: PostCommentEntity[]
+
+    //graphql
+    @Field(() => Int, { nullable: true })
+        numberOfLikes?: number
+    @Field(() => Boolean, { nullable: true })
+        liked?: boolean
 }

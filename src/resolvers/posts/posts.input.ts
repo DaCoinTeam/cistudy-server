@@ -3,67 +3,107 @@ import { Field, ID, InputType, Int } from "@nestjs/graphql"
 import { IsInt } from "class-validator"
 
 @InputType()
-export class FindOnePostData {
-  @Field(() => ID)
-      postId: string
+export class FindOnePostInputData {
+    @Field(() => ID)
+        postId: string
 }
 
 @InputType()
-export class FindOnePostInput implements AuthInput<FindOnePostData> {
-  @Field(() => ID)
-      userId: string
-  @Field(() => FindOnePostData)
-      data: FindOnePostData
+export class FindOnePostInput implements AuthInput<FindOnePostInputData> {
+    @Field(() => ID)
+        userId: string
+    @Field(() => FindOnePostInputData)
+        data: FindOnePostInputData
 }
 
 @InputType()
-export class FindOnePostCommentData {
-  @Field(() => ID)
-      postCommentId: string
+export class FindOnePostCommentInputData {
+    @Field(() => ID)
+        postCommentId: string
 }
 
 @InputType()
-export class FindOnePostCommentInput implements AuthInput<FindOnePostCommentData> {
-  @Field(() => ID)
-      userId: string
-  @Field(() => FindOnePostCommentData)
-      data: FindOnePostCommentData
+export class FindOnePostCommentInput
+implements AuthInput<FindOnePostCommentInputData>
+{
+    @Field(() => ID)
+        userId: string
+    @Field(() => FindOnePostCommentInputData)
+        data: FindOnePostCommentInputData
 }
 
 @InputType()
-export class FindManyPostsOptions {
-  @Field(() => Int, { nullable: true })
-  @IsInt()
-      take?: number
-  @Field(() => Int, { nullable: true })
-  @IsInt()
-      skip?: number
+export class FindManyPostsInputOptions {
+    @Field(() => Int, { nullable: true })
+    @IsInt()
+        take?: number
+    @Field(() => Int, { nullable: true })
+    @IsInt()
+        skip?: number
 }
 
 @InputType()
-export class FindManyPostsData {
-  @Field(() => String)
-      courseId: string
-  @Field(() => FindManyPostsOptions, { nullable: true })
-      options?: FindManyPostsOptions
+export class FindManyPostsInputData {
+    @Field(() => String)
+        courseId: string
+    @Field(() => FindManyPostsInputOptions, { nullable: true })
+        options?: FindManyPostsInputOptions
 }
 
-
-export class FindManyPostsInput implements AuthInput<FindManyPostsData> {
+export class FindManyPostsInput implements AuthInput<FindManyPostsInputData> {
     userId: string
-    data: FindManyPostsData
+    data: FindManyPostsInputData
 }
 
 @InputType()
-export class FindManyPostCommentsData {
-  @Field(() => String)
-      postId: string
+export class FindManyPostsCommentInputOptions {
+    @Field(() => Int, { nullable: true })
+    @IsInt()
+        take?: number
+    @Field(() => Int, { nullable: true })
+    @IsInt()
+        skip?: number
 }
 
 @InputType()
-export class FindManyPostCommentsInput implements AuthInput<FindManyPostCommentsData> {
-  @Field(() => ID)
-      userId: string
-  @Field(() => FindOnePostData)
-      data: FindManyPostCommentsData
+export class FindManyPostCommentsInputData {
+    @Field(() => ID)
+        postId: string
+    @Field(() => FindManyPostsCommentInputOptions, { nullable: true })
+        options?: FindManyPostsCommentInputOptions
+}
+
+@InputType()
+export class FindManyPostsMetadataInputData {
+    @Field(() => ID)
+        postId: string
+}
+
+@InputType()
+export class FindManyPostsMetadataInput implements AuthInput<FindManyPostsMetadataInputData> {
+    @Field(() => ID)
+        userId: string
+    @Field(() => FindManyPostsMetadataInputData)
+        data: FindManyPostsMetadataInputData
+}
+
+@InputType()
+export class FindManyPostCommentsMetadataInputData {
+    @Field(() => ID)
+        postId: string
+}
+
+@InputType()
+export class FindManyPostCommentsMetadataInput implements AuthInput<FindManyPostCommentsMetadataInputData> {
+    @Field(() => ID)
+        userId: string
+    @Field(() => FindManyPostCommentsMetadataInputData)
+        data: FindManyPostCommentsMetadataInputData
+}
+
+export class FindManyPostCommentsInput
+implements AuthInput<FindManyPostCommentsInputData>
+{
+    userId: string
+    data: FindManyPostCommentsInputData
 }
