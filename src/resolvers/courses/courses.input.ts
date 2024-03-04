@@ -1,10 +1,10 @@
 import { Field, ID, InputType } from "@nestjs/graphql"
-import { AuthInput, Input } from "@common"
+import { AuthInput, Input, ParamsWithOptions } from "@common"
 
 @InputType()
 export class FindOneCourseInputData {
-  @Field(() => ID)
-      courseId: string
+    @Field(() => ID)
+        courseId: string
 }
 
 export class FindOneCourseInput implements Input<FindOneCourseInputData> {
@@ -12,9 +12,15 @@ export class FindOneCourseInput implements Input<FindOneCourseInputData> {
 }
 
 @InputType()
-export class FindOneLectureInputData {
-  @Field(() => ID)
-      lectureId: string
+export class FindOneLectureInputParams {
+    @Field(() => ID)
+        lectureId: string
+}
+
+@InputType()
+export class FindOneLectureInputData implements ParamsWithOptions<FindOneLectureInputParams, undefined> {
+    @Field(() => FindOneLectureInputParams)
+        params: FindOneLectureInputParams
 }
 
 export class FindOneLectureInput implements AuthInput<FindOneLectureInputData> {
@@ -24,8 +30,8 @@ export class FindOneLectureInput implements AuthInput<FindOneLectureInputData> {
 
 @InputType()
 export class FindManyLecturesInputData {
-  @Field(() => ID)
-      sectionId: string
+    @Field(() => ID)
+        sectionId: string
 }
 
 export class FindManyLecturesInput implements Input<FindManyLecturesInputData> {
@@ -34,14 +40,14 @@ export class FindManyLecturesInput implements Input<FindManyLecturesInputData> {
 
 @InputType()
 export class CourseFilterInput {
-  @Field(() => String, { nullable: true })
-      category: string
+    @Field(() => String, { nullable: true })
+        category: string
 }
 
 @InputType()
 export class FindManyCoursesInputData {
-  @Field(() => CourseFilterInput, { nullable: true })
-      filter: CourseFilterInput
+    @Field(() => CourseFilterInput, { nullable: true })
+        filter: CourseFilterInput
 }
 
 export class FindManyCoursesInput implements Input<FindManyCoursesInputData> {
@@ -50,8 +56,8 @@ export class FindManyCoursesInput implements Input<FindManyCoursesInputData> {
 
 @InputType()
 export class FindManyResourcesInputData {
-  @Field(() => ID)
-      lectureId: string
+    @Field(() => ID)
+        lectureId: string
 }
 
 export class FindManyResourcesInput implements AuthInput<FindManyResourcesInputData> {
@@ -61,8 +67,8 @@ export class FindManyResourcesInput implements AuthInput<FindManyResourcesInputD
 
 @InputType()
 export class FindManyCourseTargetsInputData {
-  @Field(() => ID)
-      courseId: string
+    @Field(() => ID)
+        courseId: string
 }
 
 export class FindManyCourseTargetsInput implements AuthInput<FindManyCourseTargetsInputData> {

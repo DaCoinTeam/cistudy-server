@@ -10,56 +10,64 @@ import {
 } from "typeorm"
 import { SectionEntity } from "./section.entity"
 import { ResourceEntity } from "./resource.entity"
-import { Field, ID, ObjectType } from "@nestjs/graphql"
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { ProcessStatus, VideoType } from "@common"
 
 @ObjectType()
 @Entity("lecture")
 export class LectureEntity {
-  @Field(() => ID)
-  @PrimaryGeneratedColumn("uuid")
-      lectureId: string
+    @Field(() => ID)
+    @PrimaryGeneratedColumn("uuid")
+        lectureId: string
 
-  @Field(() => String)
-  @Column({ type: "varchar", length: 150 })
-      title: string
+    @Field(() => String)
+    @Column({ type: "varchar", length: 150 })
+        title: string
 
-  @Field(() => ID, { nullable: true })
-  @Column({ type: "uuid", length: 36, nullable: true })
-      thumbnailId?: string
+    @Field(() => ID, { nullable: true })
+    @Column({ type: "uuid", length: 36, nullable: true })
+        thumbnailId?: string
 
-  @Field(() => ID, { nullable: true })
-  @Column({ type: "uuid", length: 36, nullable: true })
-      lectureVideoId?: string
+    @Field(() => ID, { nullable: true })
+    @Column({ type: "uuid", length: 36, nullable: true })
+        lectureVideoId?: string
 
-  @Field(() => ID)
-  @Column({ name: "sectionId", type: "uuid", length: 36 })
-      sectionId: string
+    @Field(() => ID)
+    @Column({ name: "sectionId", type: "uuid", length: 36 })
+        sectionId: string
 
-  @Field(() => String)
-  @Column({ type: "enum", enum: ProcessStatus, default: ProcessStatus.Pending })
-      processStatus: ProcessStatus
+    @Field(() => String)
+    @Column({ type: "enum", enum: ProcessStatus, default: ProcessStatus.Pending })
+        processStatus: ProcessStatus
 
-  @Field(() => String)
-  @Column({ type: "enum", enum: VideoType, default: VideoType.MP4 })
-      videoType: VideoType
+    @Field(() => String)
+    @Column({ type: "enum", enum: VideoType, default: VideoType.MP4 })
+        videoType: VideoType
 
-  @Field(() => Date)
-  @CreateDateColumn()
-      createdAt: Date
+    @Field(() => Int)
+    @Column({ type: "int", default: 0 })
+        numberOfViews: number
 
-  @Field(() => Date)
-  @UpdateDateColumn()
-      updatedAt: Date
+    @Field(() => String)
+    @Column({ type: "varchar" })
+        description: number
 
-  @Field(() => SectionEntity)
-  @ManyToOne(() => SectionEntity, (section) => section.lectures, {
-      onDelete: "CASCADE",
-  })
-  @JoinColumn({ name: "sectionId" })
-      section: SectionEntity
+    @Field(() => Date)
+    @CreateDateColumn()
+        createdAt: Date
 
-  @Field(() => [ResourceEntity])
-  @OneToMany(() => ResourceEntity, (resource) => resource.lecture)
-      resources: Array<ResourceEntity>
+    @Field(() => Date)
+    @UpdateDateColumn()
+        updatedAt: Date
+
+    @Field(() => SectionEntity)
+    @ManyToOne(() => SectionEntity, (section) => section.lectures, {
+        onDelete: "CASCADE",
+    })
+    @JoinColumn({ name: "sectionId" })
+        section: SectionEntity
+
+    @Field(() => [ResourceEntity])
+    @OneToMany(() => ResourceEntity, (resource) => resource.lecture)
+        resources: Array<ResourceEntity>
 }

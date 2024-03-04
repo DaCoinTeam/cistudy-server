@@ -26,6 +26,8 @@ type LectureEntity {
   sectionId: ID!
   processStatus: String!
   videoType: String!
+  numberOfViews: Int!
+  description: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   section: SectionEntity!
@@ -298,6 +300,10 @@ input CourseFilterInput {
 }
 
 input FindOneLectureInputData {
+  params: FindOneLectureInputParams!
+}
+
+input FindOneLectureInputParams {
   lectureId: ID!
 }
 

@@ -1,12 +1,14 @@
 import {
     CourseMySqlEntity,
     CourseTargetMySqlEntity,
+    FollowMySqlEnitity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
+    UserMySqlEntity,
 } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository } from "typeorm"
+import { Repository, DataSource } from "typeorm"
 import {
     FindOneCourseInput,
     FindManyCoursesInput,
@@ -27,6 +29,7 @@ export class CoursesService {
     private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
     @InjectRepository(CourseTargetMySqlEntity)
     private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+    private readonly dataSource: DataSource
     ) {}
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
@@ -65,13 +68,44 @@ export class CoursesService {
     async findOneLecture(
         input: FindOneLectureInput,
     ): Promise<LectureMySqlEntity> {
-        const { data } = input
-        return await this.lectureMySqlRepository.findOne({
-            where: data,
-            relations: {
-                resources: true,
-            },
-        })
+        const { data, userId } = input
+        const { params } = data
+        const { lectureId } = params
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const lecture = await this.lectureMySqlRepository.findOne({
+                where: { lectureId },
+                relations: {
+                    resources: true,
+                    section: {
+                        course: {
+                            creator: true
+                        }
+                    }
+                }})
+
+            const numberOfFollowers = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "result")
+                .from(FollowMySqlEnitity, "follow")
+                .where("followedUserId = :userId", { userId })
+                .andWhere("followed = :followed", { followed: true })
+                .getRawOne()
+
+            await queryRunner.commitTransaction()
+
+            lecture.section.course.creator.numberOfFollowers = numberOfFollowers.result
+
+            return lecture
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
     }
 
     async findManyLectures(

@@ -93,7 +93,7 @@ export class PostsService {
         const { data, userId } = input
         const { params, options } = data
         const { courseId } = params
-        const { take, skip } = options || {}
+        const { take, skip } = { ...options }
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -196,7 +196,7 @@ export class PostsService {
         const { userId, data } = input
         const { params, options } = data
         const { postId } = params
-        const { take, skip } = options || {}
+        const { take, skip } = { ...options }
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
