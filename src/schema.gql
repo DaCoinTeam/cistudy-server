@@ -301,10 +301,15 @@ input CourseFilterInput {
 
 input FindOneLectureInputData {
   params: FindOneLectureInputParams!
+  options: FindOneLectureInputOptions
 }
 
 input FindOneLectureInputParams {
   lectureId: ID!
+}
+
+input FindOneLectureInputOptions {
+  followerId: ID
 }
 
 input FindManyLecturesInputData {

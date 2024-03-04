@@ -4,7 +4,6 @@ import {
     FollowMySqlEnitity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
-    UserMySqlEntity,
 } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
@@ -88,6 +87,17 @@ export class CoursesService {
                     }
                 }})
 
+            const follow = await queryRunner.manager.findOne(
+                FollowMySqlEnitity,
+                {
+                    where: {
+                        followerId: userId,
+                        followedUserId: lecture.section.course.creator.userId,
+                        followed: true
+                    }
+                }
+            ) 
+
             const numberOfFollowers = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "result")
@@ -99,6 +109,7 @@ export class CoursesService {
             await queryRunner.commitTransaction()
 
             lecture.section.course.creator.numberOfFollowers = numberOfFollowers.result
+            lecture.section.course.creator.followed = follow ? follow.followed : false
 
             return lecture
         } catch (ex) {

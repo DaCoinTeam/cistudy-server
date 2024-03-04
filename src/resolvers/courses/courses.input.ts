@@ -18,9 +18,17 @@ export class FindOneLectureInputParams {
 }
 
 @InputType()
-export class FindOneLectureInputData implements ParamsWithOptions<FindOneLectureInputParams, undefined> {
+export class FindOneLectureInputOptions {
+    @Field(() => ID, { nullable: true })
+        followerId?: string
+}
+
+@InputType()
+export class FindOneLectureInputData implements ParamsWithOptions<FindOneLectureInputParams, FindOneLectureInputOptions> {
     @Field(() => FindOneLectureInputParams)
         params: FindOneLectureInputParams
+    @Field(() => FindOneLectureInputOptions, { nullable: true })
+        options?: FindOneLectureInputOptions
 }
 
 export class FindOneLectureInput implements AuthInput<FindOneLectureInputData> {

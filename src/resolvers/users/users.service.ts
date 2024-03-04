@@ -27,7 +27,7 @@ export class UsersService {
                 where: { userId },
             })
 
-            const follows = await queryRunner.manager.find(
+            const follow = await queryRunner.manager.findOne(
                 FollowMySqlEnitity,
                 {
                     where: {
@@ -48,12 +48,8 @@ export class UsersService {
 
             await queryRunner.commitTransaction()
 
-            if (follows.length) {
-                user.followed = follows.at(0).followed
-            } else {
-                user.followed = false
-            }
             user.numberOfFollowers = numberOfFollowers.result
+            user.followed = follow ? follow.followed : null
 
             return user
         } catch (ex) {
