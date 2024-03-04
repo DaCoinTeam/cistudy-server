@@ -1,4 +1,4 @@
-import { AuthInput } from "@common"
+import { AuthEmptyDataInput, AuthInput } from "@common"
 import { Field, InputType, Int } from "@nestjs/graphql"
 
 
@@ -12,7 +12,7 @@ export class FindManySelfCreatedCoursesInputOptions {
 
 @InputType()
 export class FindManySelfCreatedCoursesInputData {
-    @Field(() => FindManySelfCreatedCoursesInputOptions, { nullable: true})
+    @Field(() => FindManySelfCreatedCoursesInputOptions, { nullable: true })
         options?: FindManySelfCreatedCoursesInputOptions
 }
 
@@ -21,4 +21,8 @@ implements AuthInput<FindManySelfCreatedCoursesInputData>
 {
     userId: string
     data: FindManySelfCreatedCoursesInputData
+}
+
+export class FindManySelfCreatedCoursesMetadataInput implements AuthEmptyDataInput {
+    userId: string
 }

@@ -9,12 +9,11 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource } from "typeorm"
 import {
     FindManyPostCommentsInput,
-    FindManyPostCommentsMetadataInput,
     FindManyPostsInput,
     FindOnePostCommentInput,
     FindOnePostInput,
 } from "./posts.input"
-import { FindManyPostCommentsMetadataOutputData, FindManyPostsMetadataOutputData } from "./posts.output"
+import { FindManyPostCommentsOutputData, FindManyPostsOutputData } from "./posts.output"
 
 @Injectable()
 export class PostsService {
@@ -90,9 +89,10 @@ export class PostsService {
 
     async findManyPosts(
         input: FindManyPostsInput,
-    ): Promise<Array<PostMySqlEntity>> {
+    ): Promise<FindManyPostsOutputData> {
         const { data, userId } = input
-        const { courseId, options } = data
+        const { params, options } = data
+        const { courseId } = params
         const { take, skip } = options || {}
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -149,9 +149,15 @@ export class PostsService {
                 .andWhere("post_like.liked = :liked", { liked: true })
                 .getRawMany()
 
+            const numberOfPostsResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "result")
+                .from(PostMySqlEntity, "post")
+                .getRawOne()
+
             await queryRunner.commitTransaction()
 
-            return posts.map((post) => {
+            const results = posts.map((post) => {
                 const numberOfLikes = numberOfLikesResults.find(
                     result => result.postId === post.postId,
                 )?.count ?? 0
@@ -169,6 +175,13 @@ export class PostsService {
                     liked
                 }
             })
+
+            return ({
+                results,
+                metadata: {
+                    count: numberOfPostsResult.result
+                }
+            })
         } catch (ex) {
             console.log(ex)
             await queryRunner.rollbackTransaction()
@@ -177,35 +190,12 @@ export class PostsService {
         }
     }
 
-    async findManyPostsMetadata(): Promise<FindManyPostsMetadataOutputData> {
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            const numberOfPosts = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "result")
-                .from(PostMySqlEntity, "post")
-                .getRawOne()
-
-            await queryRunner.commitTransaction()
-
-            return {
-                numberOfPosts: numberOfPosts.result,
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
-        }
-    }
-
     async findManyPostComments(
         input: FindManyPostCommentsInput,
-    ): Promise<Array<PostCommentMySqlEntity>> {
+    ): Promise<FindManyPostCommentsOutputData> {
         const { userId, data } = input
-        const { options, postId } = data
+        const { params, options } = data
+        const { postId } = params
         const { take, skip } = options || {}
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -244,9 +234,16 @@ export class PostsService {
                 .andWhere("post_comment_like.liked = :liked", { liked: true })
                 .getRawMany()
 
+            const numberOfPostCommentsResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "result")
+                .from(PostCommentMySqlEntity, "post_comment")
+                .where("post_comment.postId = :postId", { postId })
+                .getRawOne()
+
             await queryRunner.commitTransaction()
 
-            return postComments.map((postComment) => {
+            const results = postComments.map((postComment) => {
                 const numberOfLikes = numberOfLikesResults.find(
                     result => result.postCommentId === postComment.postCommentId,
                 )?.count ?? 0
@@ -260,36 +257,15 @@ export class PostsService {
                     liked
                 }
             })
-        } catch (ex) {
-            console.log(ex)
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
-        }
-    }
-
-    async findManyPostCommentsMetadata(input: FindManyPostCommentsMetadataInput): Promise<FindManyPostCommentsMetadataOutputData> {
-        const { data } = input
-        const { postId } = data
-
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            const numberOfPostComments = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "result")
-                .from(PostCommentMySqlEntity, "post_comment")
-                .where("post_comment.postId = :postId", { postId })
-                .getRawOne()
-
-            await queryRunner.commitTransaction()
 
             return {
-                numberOfPostComments: numberOfPostComments.result,
+                results,
+                metadata: {
+                    count: numberOfPostCommentsResult.result
+                }
             }
         } catch (ex) {
+            console.log(ex)
             await queryRunner.rollbackTransaction()
         } finally {
             await queryRunner.release()

@@ -204,9 +204,27 @@ type FindOnePostOutput {
   tokens: AuthTokens
 }
 
+type FindManyPostsOutputMetadata {
+  count: Int
+}
+
+type FindManyPostsOutputData {
+  results: [PostEntity!]!
+  metadata: FindManyPostsOutputMetadata
+}
+
 type FindManyPostsOutput {
-  data: [PostEntity!]!
+  data: FindManyPostsOutputData!
   tokens: AuthTokens
+}
+
+type FindOnePostCommentOutputMetadata {
+  count: Int
+}
+
+type FindManyPostCommentsOutputData {
+  results: [PostCommentEntity!]!
+  metadata: FindOnePostCommentOutputMetadata
 }
 
 type FindOnePostCommentOutput {
@@ -215,25 +233,21 @@ type FindOnePostCommentOutput {
 }
 
 type FindManyPostCommentsOutput {
-  data: [PostCommentEntity!]!
+  data: FindManyPostCommentsOutputData!
   tokens: AuthTokens
 }
 
-type FindManyPostsMetadataOutputData {
-  numberOfPosts: Int!
+type FindManySelfCreatedCoursesOutputMetadata {
+  count: Int
 }
 
-type FindManyPostsMetadataOutput {
-  data: FindManyPostsMetadataOutputData!
-  tokens: AuthTokens
+type FindManySelfCreatedCoursesOutputData {
+  results: [CourseEntity!]!
+  metadata: FindManySelfCreatedCoursesOutputMetadata
 }
 
-type FindManyPostCommentsMetadataOutputData {
-  numberOfPostComments: Int!
-}
-
-type FindManyPostCommentsMetadataOutput {
-  data: FindManyPostCommentsMetadataOutputData!
+type FindManySelfCreatedCoursesOutput {
+  data: FindManySelfCreatedCoursesOutputData!
   tokens: AuthTokens
 }
 
@@ -259,13 +273,11 @@ type Query {
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
-  findManyPostsMetadata: FindManyPostsMetadataOutput!
   findManyPostComments(data: FindManyPostCommentsInputData!): FindManyPostCommentsOutput!
-  findManyPostCommentsMetadata(data: FindManyPostCommentsMetadataInputData!): FindManyPostCommentsMetadataOutput!
   findOneUser(data: FindOneUserInputData!): UserEntity!
   findManyFollowers(data: FindManyFollowersInputData!): [UserEntity!]!
   findManyCreatedCourses(data: FindManyCreatedCoursesInputData!): [CourseEntity!]!
-  findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): [CourseEntity!]!
+  findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
 }
 
 input SignInInputData {
@@ -306,8 +318,12 @@ input FindOnePostInputData {
 }
 
 input FindManyPostsInputData {
-  courseId: String!
+  params: FindManyPostsInputParams!
   options: FindManyPostsInputOptions
+}
+
+input FindManyPostsInputParams {
+  courseId: String!
 }
 
 input FindManyPostsInputOptions {
@@ -320,17 +336,17 @@ input FindOnePostCommentInputData {
 }
 
 input FindManyPostCommentsInputData {
-  postId: ID!
+  params: FindManyPostsCommentInputParams!
   options: FindManyPostsCommentInputOptions
+}
+
+input FindManyPostsCommentInputParams {
+  postId: String!
 }
 
 input FindManyPostsCommentInputOptions {
   take: Int
   skip: Int
-}
-
-input FindManyPostCommentsMetadataInputData {
-  postId: ID!
 }
 
 input FindOneUserInputData {

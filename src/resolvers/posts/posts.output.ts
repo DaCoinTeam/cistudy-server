@@ -1,75 +1,75 @@
-import { Output, AuthTokens } from "@common"
+import { Output, AuthTokens, ResultsWithMetadata } from "@common"
 import { PostCommentMySqlEntity, PostMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
-export class FindOnePostOutput
-implements Output<PostMySqlEntity>
-{
-    @Field(() => PostMySqlEntity)
-        data: PostMySqlEntity
-    @Field(() => AuthTokens, { nullable: true })
-        tokens: AuthTokens
+export class FindOnePostOutput implements Output<PostMySqlEntity> {
+  @Field(() => PostMySqlEntity)
+      data: PostMySqlEntity
+  @Field(() => AuthTokens, { nullable: true })
+      tokens: AuthTokens
 }
 
 @ObjectType()
-export class FindManyPostsOutput
-implements Output<Array<PostMySqlEntity>>
+export class FindManyPostsOutputMetadata {
+  @Field(() => Int, { nullable: true })
+      count?: number
+}
+
+@ObjectType()
+export class FindManyPostsOutputData
+implements ResultsWithMetadata<PostMySqlEntity, FindManyPostsOutputMetadata>
 {
-    @Field(() => [PostMySqlEntity])
-        data: Array<PostMySqlEntity>
-    @Field(() => AuthTokens, { nullable: true })
-        tokens: AuthTokens
+  @Field(() => [PostMySqlEntity])
+      results: Array<PostMySqlEntity>
+  @Field(() => FindManyPostsOutputMetadata, { nullable: true })
+      metadata: FindManyPostsOutputMetadata
+}
+
+@ObjectType()
+export class FindManyPostsOutput implements Output<FindManyPostsOutputData> {
+  @Field(() => FindManyPostsOutputData)
+      data: FindManyPostsOutputData
+  @Field(() => AuthTokens, { nullable: true })
+      tokens: AuthTokens
+}
+
+@ObjectType()
+export class FindOnePostCommentOutputMetadata {
+    @Field(() => Int, { nullable: true })
+        count?: number
+}
+
+@ObjectType()
+export class FindManyPostCommentsOutputData
+implements
+    ResultsWithMetadata<
+      PostCommentMySqlEntity,
+      FindOnePostCommentOutputMetadata
+    >
+{
+  @Field(() => [PostCommentMySqlEntity])
+      results: Array<PostCommentMySqlEntity>
+  @Field(() => FindOnePostCommentOutputMetadata, { nullable: true })
+      metadata: FindOnePostCommentOutputMetadata
 }
 
 @ObjectType()
 export class FindOnePostCommentOutput
 implements Output<PostCommentMySqlEntity>
 {
-    @Field(() => PostCommentMySqlEntity)
-        data: PostCommentMySqlEntity
-    @Field(() => AuthTokens, { nullable: true })
-        tokens: AuthTokens
+  @Field(() => PostCommentMySqlEntity)
+      data: PostCommentMySqlEntity
+  @Field(() => AuthTokens, { nullable: true })
+      tokens: AuthTokens
 }
 
 @ObjectType()
 export class FindManyPostCommentsOutput
-implements Output<Array<PostCommentMySqlEntity>>
+implements Output<FindManyPostCommentsOutputData>
 {
-    @Field(() => [PostCommentMySqlEntity])
-        data: Array<PostCommentMySqlEntity>
-    @Field(() => AuthTokens, { nullable: true })
-        tokens: AuthTokens
-}
-
-@ObjectType()
-export class FindManyPostsMetadataOutputData {
-    @Field(() => Int)
-        numberOfPosts: number
-}
-
-@ObjectType()
-export class FindManyPostsMetadataOutput
-implements Output<FindManyPostsMetadataOutputData>
-{
-    @Field(() => FindManyPostsMetadataOutputData)
-        data: FindManyPostsMetadataOutputData
-    @Field(() => AuthTokens, { nullable: true })
-        tokens: AuthTokens
-}
-
-@ObjectType()
-export class FindManyPostCommentsMetadataOutputData {
-    @Field(() => Int)
-        numberOfPostComments: number
-}
-
-@ObjectType()
-export class FindManyPostCommentsMetadataOutput
-implements Output<FindManyPostCommentsMetadataOutputData>
-{
-    @Field(() => FindManyPostCommentsMetadataOutputData)
-        data: FindManyPostCommentsMetadataOutputData
-    @Field(() => AuthTokens, { nullable: true })
-        tokens: AuthTokens
+  @Field(() => FindManyPostCommentsOutputData)
+      data: FindManyPostCommentsOutputData
+  @Field(() => AuthTokens, { nullable: true })
+      tokens: AuthTokens
 }

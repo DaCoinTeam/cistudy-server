@@ -1,4 +1,4 @@
-import { AuthInput } from "@common"
+import { AuthInput, ParamsWithOptions } from "@common"
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
 import { IsInt } from "class-validator"
 
@@ -33,6 +33,12 @@ implements AuthInput<FindOnePostCommentInputData>
 }
 
 @InputType()
+export class FindManyPostsInputParams {
+    @Field(() => String)
+        courseId: string
+}
+
+@InputType()
 export class FindManyPostsInputOptions {
     @Field(() => Int, { nullable: true })
     @IsInt()
@@ -43,16 +49,22 @@ export class FindManyPostsInputOptions {
 }
 
 @InputType()
-export class FindManyPostsInputData {
-    @Field(() => String)
-        courseId: string
+export class FindManyPostsInputData implements ParamsWithOptions<FindManyPostsInputParams, FindManyPostsInputOptions> {
+    @Field(() => FindManyPostsInputParams)
+        params: FindManyPostsInputParams
     @Field(() => FindManyPostsInputOptions, { nullable: true })
-        options?: FindManyPostsInputOptions
+        options?: Partial<FindManyPostsInputOptions>
 }
 
 export class FindManyPostsInput implements AuthInput<FindManyPostsInputData> {
     userId: string
     data: FindManyPostsInputData
+}
+
+@InputType()
+export class FindManyPostsCommentInputParams {
+    @Field(() => String)
+        postId: string
 }
 
 @InputType()
@@ -66,11 +78,11 @@ export class FindManyPostsCommentInputOptions {
 }
 
 @InputType()
-export class FindManyPostCommentsInputData {
-    @Field(() => ID)
-        postId: string
+export class FindManyPostCommentsInputData implements ParamsWithOptions<FindManyPostsCommentInputParams, FindManyPostsCommentInputOptions> {
+    @Field(() => FindManyPostsCommentInputParams)
+        params: FindManyPostsCommentInputParams
     @Field(() => FindManyPostsCommentInputOptions, { nullable: true })
-        options?: FindManyPostsCommentInputOptions
+        options?: Partial<FindManyPostsCommentInputOptions>
 }
 
 @InputType()
