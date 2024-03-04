@@ -82,7 +82,10 @@ export class CoursesService {
                     resources: true,
                     section: {
                         course: {
-                            creator: true
+                            creator: true,
+                            sections: {
+                                lectures: true
+                            }
                         }
                     }
                 }})
@@ -102,7 +105,7 @@ export class CoursesService {
                 .createQueryBuilder()
                 .select("COUNT(*)", "result")
                 .from(FollowMySqlEnitity, "follow")
-                .where("followedUserId = :userId", { userId })
+                .where("followedUserId = :userId", { userId: lecture.section.course.creator.userId })
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 
