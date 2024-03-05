@@ -124,6 +124,17 @@ type PostCommentMediaEntity {
   postComment: PostCommentEntity!
 }
 
+type PostCommentReplyEntity {
+  postCommentReplyId: ID!
+  creatorId: ID!
+  postCommentId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  content: String!
+  postComment: PostEntity!
+  creator: UserEntity!
+}
+
 type PostCommentEntity {
   postCommentId: ID!
   creatorId: ID!
@@ -224,18 +235,28 @@ type FindOnePostCommentOutputMetadata {
   count: Int
 }
 
-type FindManyPostCommentsOutputData {
-  results: [PostCommentEntity!]!
-  metadata: FindOnePostCommentOutputMetadata
-}
-
 type FindOnePostCommentOutput {
   data: PostCommentEntity!
   tokens: AuthTokens
 }
 
+type FindManyPostCommentsOutputData {
+  results: [PostCommentEntity!]!
+  metadata: FindOnePostCommentOutputMetadata
+}
+
 type FindManyPostCommentsOutput {
   data: FindManyPostCommentsOutputData!
+  tokens: AuthTokens
+}
+
+type FindManyPostCommentRepliesOutputData {
+  results: [PostCommentReplyEntity!]!
+  metadata: FindOnePostCommentOutputMetadata
+}
+
+type FindManyPostCommentRepliesOutput {
+  data: FindManyPostCommentRepliesOutputData!
   tokens: AuthTokens
 }
 
@@ -276,6 +297,7 @@ type Query {
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
   findManyPostComments(data: FindManyPostCommentsInputData!): FindManyPostCommentsOutput!
+  findManyPostCommentReplies(data: FindManyPostCommentRepliesInputData!): FindManyPostCommentRepliesOutput!
   findOneUser(data: FindOneUserInputData!): UserEntity!
   findManyFollowers(data: FindManyFollowersInputData!): [UserEntity!]!
   findManyCreatedCourses(data: FindManyCreatedCoursesInputData!): [CourseEntity!]!
@@ -347,15 +369,29 @@ input FindOnePostCommentInputData {
 }
 
 input FindManyPostCommentsInputData {
-  params: FindManyPostsCommentInputParams!
-  options: FindManyPostsCommentInputOptions
+  params: FindManyPostCommentsInputParams!
+  options: FindManyPostCommentsInputOptions
 }
 
-input FindManyPostsCommentInputParams {
+input FindManyPostCommentsInputParams {
   postId: String!
 }
 
-input FindManyPostsCommentInputOptions {
+input FindManyPostCommentsInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManyPostCommentRepliesInputData {
+  params: FindManyPostCommentRepliesInputParams!
+  options: FindManyPostsCommentRepliesInputOptions
+}
+
+input FindManyPostCommentRepliesInputParams {
+  postCommentId: String!
+}
+
+input FindManyPostsCommentRepliesInputOptions {
   take: Int
   skip: Int
 }

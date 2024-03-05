@@ -13,6 +13,7 @@ import { PostMediaEntity as PostMediaMySqlEntity } from "./post-media.entity"
 import { PostCommentMediaEntity as PostCommentMediaMySqlEntity} from "./post-comment-media.entity"
 import { FollowEntity as FollowMySqlEnitity } from "./follow.entity"
 import { PostLikeEntity as PostLikeMySqlEntity } from "./post-like.entity"
+import { PostCommentReplyEntity as PostCommentReplyMySqlEntity } from "./post-comment-reply.entity"
 
 export {
     UserMySqlEntity,
@@ -29,5 +30,6 @@ export {
     ResourceMySqlEntity,
     CourseTargetMySqlEntity,
     FollowMySqlEnitity,
-    PostLikeMySqlEntity
+    PostLikeMySqlEntity,
+    PostCommentReplyMySqlEntity
 }

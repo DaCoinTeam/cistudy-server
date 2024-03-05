@@ -6,16 +6,21 @@ import {
     UpdateCommentInput,
     UpdatePostInput,
     ToggleLikePostInput,
+    ToggleLikePostCommentInput,
+    CreatePostCommentReplyInput,
 } from "./posts.input"
 import {
     PostMySqlEntity,
     PostLikeMySqlEntity,
     PostCommentMySqlEntity,
     PostCommentMediaMySqlEntity,
-    PostMediaMySqlEntity
+    PostMediaMySqlEntity,
+    PostCommentLikeMySqlEntity,
+    PostCommentReplyMySqlEntity
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DeepPartial } from "typeorm"
+import { CreatePostCommentReplyOutput } from "./posts.output"
 
 @Injectable()
 export class PostsService {
@@ -24,8 +29,12 @@ export class PostsService {
         private readonly postMySqlRepository: Repository<PostMySqlEntity>,
         @InjectRepository(PostLikeMySqlEntity)
         private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
+        @InjectRepository(PostCommentLikeMySqlEntity)
+        private readonly postCommentLikeMySqlRepository: Repository<PostCommentLikeMySqlEntity>,
         @InjectRepository(PostCommentMySqlEntity)
         private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
+        @InjectRepository(PostCommentReplyMySqlEntity)
+        private readonly postCommentReplyMySqlRepository: Repository<PostCommentReplyMySqlEntity>,
         private readonly storageService: StorageService,
     ) { }
 
@@ -120,7 +129,7 @@ export class PostsService {
         })
 
         const responseMessage = (postLikeId: string, liked: boolean = true) =>
-            `${liked ? "Like" : "Unlike"} successfully with id ${postLikeId}`
+            `${liked ? "Like" : "Unlike"} post successfully with id ${postLikeId}`
 
         if (found === null) {
             // do claim rewards action
@@ -138,7 +147,7 @@ export class PostsService {
             liked : !liked
         })
 
-        return responseMessage(postLikeId, liked)
+        return responseMessage(postLikeId, !liked)
     }
 
     async createComment(input: CreateCommentInput) {
@@ -178,6 +187,39 @@ export class PostsService {
         return `A post comment with id ${created.postCommentId} has been created successfully.`
     }
 
+    async toggleLikePostComment(input: ToggleLikePostCommentInput) {
+        const { userId, data } = input
+        const { postCommentId } = data
+
+        const found = await this.postCommentLikeMySqlRepository.findOne({
+            where: {
+                userId,
+                postCommentId,
+            }
+        })
+
+        const responseMessage = (postCommentLikeId: string, liked: boolean = true) =>
+            `${liked ? "Like" : "Unlike"} post comment successfully with id ${postCommentLikeId}`
+
+        if (found === null) {
+            // do claim rewards action
+
+            const postCommentLike = await this.postCommentLikeMySqlRepository.save({
+                userId,
+                postCommentId,
+            })
+            const { postCommentLikeId, liked } = postCommentLike
+            return responseMessage(postCommentLikeId, liked)
+        }
+
+        const { postCommentLikeId, liked } = found
+        await this.postCommentLikeMySqlRepository.update(postCommentLikeId, {
+            liked : !liked
+        })
+
+        return responseMessage(postCommentLikeId, !liked)
+    }
+
     async updateComment(input: UpdateCommentInput) {
         //     const { data, files } = input
         //     const { postCommentContents, postCommentId } = data
@@ -211,5 +253,20 @@ export class PostsService {
         //     await this.postCommentContentMySqlRepository.save(appendedPostCommentContents)
 
         return "A post comment with id has been updated successfully."
+    }
+
+    async createPostCommentReply (input: CreatePostCommentReplyInput) : Promise<CreatePostCommentReplyOutput> {
+        const { data, userId } = input
+        const { content, postCommentId} = data
+        
+        const created = await this.postCommentReplyMySqlRepository.save({
+            content,
+            creatorId: userId,
+            postCommentId
+        })
+
+        return {
+            postCommentReplyId: created.postCommentReplyId
+        }
     }
 }

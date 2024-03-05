@@ -13,6 +13,7 @@ import { UserEntity } from "./user.entity"
 import { PostCommentLikeEntity } from "./post-comment-like.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { PostCommentMediaEntity } from "./post-comment-media.entity"
+import { PostCommentReplyEntity } from "./post-comment-reply.entity"
 
 @ObjectType()
 @Entity("post_comment")
@@ -41,14 +42,6 @@ export class PostCommentEntity {
     @Column({ type: "longtext" })
         html: string
 
-    @ManyToOne(
-        () => PostCommentEntity,
-        (postComment) => postComment.childComments,
-    )
-    @JoinColumn({ name: "fatherCommentId" })
-    @Column({ type: "uuid", default: null, length: 36 })
-        fatherCommentId: string
-
     @Field(() => PostEntity)
     @ManyToOne(() => PostEntity, (post) => post.postComments)
     @JoinColumn({ name: "postId" })
@@ -74,11 +67,10 @@ export class PostCommentEntity {
         postCommentLikes: Array<PostCommentLikeEntity>
 
     @OneToMany(
-        () => PostCommentEntity,
-        (postComment) => postComment.fatherCommentId,
-        { cascade: true },
+        () => PostCommentReplyEntity,
+        (postCommentReply) => postCommentReply.postComment,
     )
-        childComments: PostCommentEntity[]
+        postCommentReplies: Array<PostCommentReplyEntity>
 
     //graphql
     @Field(() => Int, { nullable: true })

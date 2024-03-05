@@ -6,6 +6,7 @@ import {
     PostLikeMySqlEntity,
     PostCommentMySqlEntity,
     PostCommentLikeMySqlEntity,
+    PostCommentReplyMySqlEntity
 } from "@database"
 import { PostsService } from "./posts.service"
 
@@ -16,6 +17,7 @@ import { PostsService } from "./posts.service"
             PostLikeMySqlEntity,
             PostCommentMySqlEntity,
             PostCommentLikeMySqlEntity,
+            PostCommentReplyMySqlEntity
         ]),
     ],
     providers: [PostsResolver, PostsService],

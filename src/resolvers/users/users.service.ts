@@ -40,7 +40,7 @@ export class UsersService {
 
             const numberOfFollowers = await queryRunner.manager
                 .createQueryBuilder()
-                .select("COUNT(*)", "result")
+                .select("COUNT(*)", "count")
                 .from(FollowMySqlEnitity, "follow")
                 .where("followedUserId = :userId", { userId })
                 .andWhere("followed = :followed", { followed: true })
@@ -48,7 +48,7 @@ export class UsersService {
 
             await queryRunner.commitTransaction()
 
-            user.numberOfFollowers = numberOfFollowers.result
+            user.numberOfFollowers = numberOfFollowers.count
             user.followed = follow ? follow.followed : null
 
             return user

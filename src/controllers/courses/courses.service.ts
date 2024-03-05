@@ -251,9 +251,9 @@ export class CoursesService {
     async createCourseTarget(input: CreateCourseTargetInput): Promise<string> {
         const { data } = input
         const { content, courseId } = data
-        const maxPosition = await this.courseTargetMySqlRepository.createQueryBuilder()
-            .select("MAX(position)", "result").getRawOne()
-        const max = maxPosition.result as number
+        const maxResult = await this.courseTargetMySqlRepository.createQueryBuilder()
+            .select("MAX(position)", "count").getRawOne()
+        const max = maxResult.count as number
 
         const created = await this.courseTargetMySqlRepository.save({
             courseId,

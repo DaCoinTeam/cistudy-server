@@ -74,8 +74,21 @@ export class ToggleLikePostInput implements AuthInput<ToggleLikePostInputData> {
     @ApiProperty()
         userId: string
     data: ToggleLikePostInputData
-
 }
+
+export class ToggleLikePostCommentInputData {
+    @IsUUID()
+    @ApiProperty()
+        postCommentId: string
+}
+
+export class ToggleLikePostCommentInput implements AuthInput<ToggleLikePostCommentInputData> {
+    @IsUUID("4")
+    @ApiProperty()
+        userId: string
+    data: ToggleLikePostCommentInputData
+}
+
 
 export class UpdateCommentInputData {
     @IsUUID("4")
@@ -112,4 +125,20 @@ export class UpdatePostInput implements AuthInput<UpdatePostInputData> {
         userId: string
     data: UpdatePostInputData
     files: Array<Express.Multer.File>
+}
+
+export class CreatePostCommentReplyInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        postCommentId: string
+
+    @ApiProperty()
+        content: string
+}
+
+export class CreatePostCommentReplyInput implements AuthInput<CreatePostCommentReplyInputData> {
+    @IsUUID("4")
+    @ApiProperty()
+        userId: string
+    data: CreatePostCommentReplyInputData
 }

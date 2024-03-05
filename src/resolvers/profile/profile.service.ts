@@ -39,7 +39,7 @@ export class ProfileService {
             
             const numberOfCoursesResult = await queryRunner.manager
                 .createQueryBuilder()
-                .select("COUNT(*)", "result")
+                .select("COUNT(*)", "count")
                 .from(CourseMySqlEntity, "course")
                 .where("creatorId = :creatorId", { creatorId: userId })
                 .getRawOne()
@@ -49,7 +49,7 @@ export class ProfileService {
             return {
                 results: courses,
                 metadata: {
-                    count: numberOfCoursesResult.result
+                    count: numberOfCoursesResult.count
                 }
             }
         } catch (ex) {
