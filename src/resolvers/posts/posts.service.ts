@@ -117,6 +117,11 @@ export class PostsService {
                     course: true,
                     postReacts: true,
                 },
+                order: {
+                    createdAt: {
+                        direction: "DESC"
+                    }
+                }
             })
 
             const numberOfLikesResults = await queryRunner.manager
@@ -215,7 +220,12 @@ export class PostsService {
                     postCommentMedias: true,
                 },
                 take,
-                skip
+                skip,
+                order: {
+                    createdAt: {
+                        direction: "DESC"
+                    }
+                }
             })
 
             const numberOfLikesResults = await queryRunner.manager
@@ -246,10 +256,27 @@ export class PostsService {
                 .where("post_comment.postId = :postId", { postId })
                 .getRawOne()
 
+            const numberOfRepliesResults = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(post_comment.postCommentId)", "count")
+                .addSelect("post_comment.postCommentId", "postCommentId")
+                .from(PostCommentMySqlEntity, "post_comment")
+                .innerJoin(
+                    PostCommentReplyMySqlEntity,
+                    "post_comment_reply",
+                    "post_comment.postCommentId = post_comment_reply.postCommentId",
+                )
+                .where("postId = :postId", { postId })
+                .groupBy("post_comment.postCommentId")
+                .getRawMany()
+
             await queryRunner.commitTransaction()
 
             const results = postComments.map((postComment) => {
                 const numberOfLikes = numberOfLikesResults.find(
+                    result => result.postCommentId === postComment.postCommentId,
+                )?.count ?? 0
+                const numberOfReplies = numberOfRepliesResults.find(
                     result => result.postCommentId === postComment.postCommentId,
                 )?.count ?? 0
                 const liked = likedResults.find(
@@ -259,6 +286,7 @@ export class PostsService {
                 return {
                     ...postComment,
                     numberOfLikes,
+                    numberOfReplies,
                     liked
                 }
             })
@@ -296,7 +324,12 @@ export class PostsService {
                     creator: true,
                 },
                 take,
-                skip
+                skip,
+                order: {
+                    createdAt: {
+                        direction: "DESC"
+                    }
+                }
             })
 
             const numberOfPostCommentRepliesResult = await queryRunner.manager

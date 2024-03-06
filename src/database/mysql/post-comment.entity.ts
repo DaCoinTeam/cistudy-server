@@ -75,6 +75,8 @@ export class PostCommentEntity {
     //graphql
     @Field(() => Int, { nullable: true })
         numberOfLikes?: number
+     @Field(() => Int, { nullable: true })
+         numberOfReplies?: number
     @Field(() => Boolean, { nullable: true })
         liked?: boolean
 }

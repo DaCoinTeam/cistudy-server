@@ -146,6 +146,7 @@ type PostCommentEntity {
   creator: UserEntity!
   postCommentMedias: [PostCommentMediaEntity!]!
   numberOfLikes: Int
+  numberOfReplies: Int
   liked: Boolean
 }
 

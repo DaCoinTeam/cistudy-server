@@ -36,6 +36,7 @@ import { APP_PIPE } from "@nestjs/core"
             database: databaseConfig().mysql.schema,
             autoLoadEntities: true,
             synchronize: true,
+            timezone: "Z"
         }),
 
         GraphQLModule.forRoot<ApolloDriverConfig>({
