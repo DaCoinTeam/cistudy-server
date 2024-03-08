@@ -44,7 +44,7 @@ export class PostCommentMediaInputData {
         mediaType: MediaType
 }
 
-export class CreateCommentInputData {
+export class CreatePostCommentInputData {
     @IsUUID("4")
     @ApiProperty()
         postId: string
@@ -55,11 +55,11 @@ export class CreateCommentInputData {
     @ApiProperty({ nullable: true })
         postCommentMedias?: Array<PostCommentMediaInputData>
 }
-export class CreateCommentInput implements AuthInput<CreateCommentInputData> {
+export class CreatePostCommentInput implements AuthInput<CreatePostCommentInputData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
-    data: CreateCommentInputData
+    data: CreatePostCommentInputData
     files: Array<Express.Multer.File>
 }
 
@@ -90,20 +90,35 @@ export class ToggleLikePostCommentInput implements AuthInput<ToggleLikePostComme
 }
 
 
-export class UpdateCommentInputData {
+export class UpdatePostCommentInputData {
     @IsUUID("4")
     @ApiProperty()
         postCommentId: string
-
+    @ApiProperty()
+        html: string
     @ApiProperty({ nullable: true })
         postCommentMedias?: Array<PostCommentMediaInputData>
 }
 
-export class UpdateCommentInput implements AuthInput<UpdateCommentInputData> {
+export class DeletePostCommentInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        postCommentId: string
+}
+
+export class DeletePostCommentInput implements AuthInput<DeletePostCommentInputData> {
     @IsUUID("4")
     @ApiProperty()
         userId: string
-    data: UpdateCommentInputData
+    data: DeletePostCommentInputData
+}
+
+
+export class UpdatePostCommentInput implements AuthInput<UpdatePostCommentInputData> {
+    @IsUUID("4")
+    @ApiProperty()
+        userId: string
+    data: UpdatePostCommentInputData
     files: Array<Express.Multer.File>
 }
 
@@ -141,4 +156,33 @@ export class CreatePostCommentReplyInput implements AuthInput<CreatePostCommentR
     @ApiProperty()
         userId: string
     data: CreatePostCommentReplyInputData
+}
+
+export class UpdatePostCommentReplyInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        postCommentReplyId: string
+
+    @ApiProperty()
+        content: string
+}
+
+export class UpdatePostCommentReplyInput implements AuthInput<UpdatePostCommentReplyInputData> {
+    @IsUUID("4")
+    @ApiProperty()
+        userId: string
+    data: UpdatePostCommentReplyInputData
+}
+
+export class DeletePostCommentReplyInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        postCommentReplyId: string
+}
+
+export class DeletePostCommentReplyInput implements AuthInput<DeletePostCommentReplyInputData> {
+    @IsUUID("4")
+    @ApiProperty()
+        userId: string
+    data: DeletePostCommentReplyInputData
 }

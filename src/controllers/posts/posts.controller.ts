@@ -21,23 +21,25 @@ import { PostsService } from "./posts.service"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { JwtAuthGuard, AuthInterceptor, UserId, DataFromBody } from "../shared"
 import {
-    CreateCommentInputData,
+    CreatePostCommentInputData,
     CreatePostCommentReplyInputData,
     CreatePostInputData,
     ToggleLikePostCommentInputData,
     ToggleLikePostInputData,
-    UpdateCommentInputData,
+    UpdatePostCommentInputData,
+    UpdatePostCommentReplyInputData,
     UpdatePostInputData,
 } from "./posts.input"
 
 import {
-    createCommentSchema,
+    createPostCommentSchema,
     createPostSchema,
     updateCommentSchema,
     updatePostSchema,
 } from "./posts.schema"
 
 import { Files } from "@common"
+import { CreatePostCommentReplyOutput, DeletePostCommentReplyOutput, UpdatePostCommentReplyOutput } from "./posts.output"
 
 @ApiTags("Posts")
 @ApiHeader({
@@ -46,7 +48,7 @@ import { Files } from "@common"
 })
 @Controller("api/posts")
 export class PostsController {
-    constructor(private readonly postsService: PostsService) {}
+    constructor(private readonly postsService: PostsService) { }
 
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")
@@ -73,7 +75,7 @@ export class PostsController {
     @DataFromBody() data: UpdatePostInputData,
     @UploadedFiles() { files }: Files,
   ) {
-      return await this.postsService.updatePost({ userId, data, files })
+      // return await this.postsService.updatePost({ userId, data, files })
   }
 
   @ApiBearerAuth()
@@ -100,16 +102,46 @@ export class PostsController {
 
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")
-  @ApiBody({ schema: createCommentSchema })
-  @Post("create-comment")
+  @ApiBody({ schema: createPostCommentSchema })
+  @Post("create-post-comment")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
-  async createComment(
+  async createPostComment(
     @UserId() userId: string,
-    @DataFromBody() data: CreateCommentInputData,
+    @DataFromBody() data: CreatePostCommentInputData,
     @UploadedFiles() { files }: Files,
   ) {
-      return await this.postsService.createComment({ userId, data, files })
+      return await this.postsService.createPostComment({ userId, data, files })
+  }
+
+
+  @ApiBearerAuth()
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({ schema: updateCommentSchema })
+  @Put("update-post-comment")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
+  async updatePostComment(
+    @UserId() userId: string,
+    @DataFromBody() data: UpdatePostCommentInputData,
+    @UploadedFiles() { files }: Files,
+  ) {
+      return await this.postsService.updatePostComment({ userId, data, files })
+  }
+
+  @ApiBearerAuth()
+  @Delete("delete-post-comment/:postCommentId")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async deletePostComment(
+    @UserId() userId: string,
+    @Param("postCommentId") postCommentId: string,
+  ) {
+      return await this.postsService.deletePostComment({
+          userId, data: {
+              postCommentId
+          }
+      })
   }
 
   @ApiBearerAuth()
@@ -120,35 +152,10 @@ export class PostsController {
     @UserId() userId: string,
     @Body() body: ToggleLikePostCommentInputData,
   ) {
-      return this.postsService.toggleLikePostComment({
+      return await this.postsService.toggleLikePostComment({
           userId,
           data: body,
       })
-  }
-
-  @ApiBearerAuth()
-  @ApiConsumes("multipart/form-data")
-  @ApiBody({ schema: updateCommentSchema })
-  @Put("update-comment")
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
-  async updateComment(
-    @UserId() userId: string,
-    @DataFromBody() data: UpdateCommentInputData,
-    @UploadedFiles() { files }: Files,
-  ) {
-      return await this.postsService.updateComment({ userId, data, files })
-  }
-
-  @ApiBearerAuth()
-  @Delete("delete-comment")
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor)
-  async deleteComment(
-    @UserId() userId: string,
-    @Param("commentId") postId: string,
-  ) {
-      console.log(postId)
   }
 
   @ApiBearerAuth()
@@ -158,10 +165,40 @@ export class PostsController {
   async createPostCommentReply(
     @UserId() userId: string,
     @Body() body: CreatePostCommentReplyInputData,
-  ) {
-      return this.postsService.createPostCommentReply({
+  ): Promise<CreatePostCommentReplyOutput> {
+      return await this.postsService.createPostCommentReply({
           userId,
           data: body,
+      })
+  }
+
+  @ApiBearerAuth()
+  @Put("update-post-comment-reply")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async updatePostCommentReply(
+    @UserId() userId: string,
+    @Body() body: UpdatePostCommentReplyInputData,
+  ): Promise<UpdatePostCommentReplyOutput> {
+      return await this.postsService.updatePostCommentReply({
+          userId,
+          data: body,
+      })
+  }
+
+  @ApiBearerAuth()
+  @Delete("delete-post-comment-reply/:postCommentReply")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async deletePostCommentReply(
+    @UserId() userId: string,
+    @Param("postCommentReply") postCommentReplyId: string,
+  ): Promise<DeletePostCommentReplyOutput> {
+      return await this.postsService.deletePostCommentReply({
+          userId,
+          data: {
+              postCommentReplyId
+          },
       })
   }
 }

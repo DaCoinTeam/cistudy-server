@@ -31,3 +31,4 @@ export interface ResultsWithMetadata<T, K> {
     metadata?: Partial<K>
 }
 
+export type EmptyObject = NonNullable<unknown>

@@ -40,7 +40,9 @@ export class PostCommentReplyEntity {
         content: string
 
     @Field(() => PostEntity)
-    @ManyToOne(() => PostCommentEntity, (postComment) => postComment.postCommentReplies)
+    @ManyToOne(() => PostCommentEntity, (postComment) => postComment.postCommentReplies, {
+        onDelete: "CASCADE"
+    })
     @JoinColumn({ name: "postCommentId" })
         postComment: PostCommentEntity
 

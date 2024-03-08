@@ -71,6 +71,15 @@ export class StorageService {
         )
     }
 
+    public async delete(...assetIds: Array<string>) {
+        for (const assetId of assetIds){
+            await fsPromises.rm(join(pathsConfig().storageDirectory, assetId), {
+                force: true,
+                recursive: true,
+            })
+        }
+    }
+
     async createReadStream(
         assetIdOrPath: string,
         options?: ReadStreamOptions,

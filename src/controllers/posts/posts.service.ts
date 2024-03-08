@@ -1,13 +1,15 @@
 import { StorageService } from "@global"
 import { Injectable } from "@nestjs/common"
 import {
-    CreateCommentInput,
+    CreatePostCommentInput,
     CreatePostInput,
-    UpdateCommentInput,
-    UpdatePostInput,
     ToggleLikePostInput,
     ToggleLikePostCommentInput,
     CreatePostCommentReplyInput,
+    UpdatePostCommentReplyInput,
+    DeletePostCommentReplyInput,
+    UpdatePostCommentInput,
+    DeletePostCommentInput,
 } from "./posts.input"
 import {
     PostMySqlEntity,
@@ -16,11 +18,18 @@ import {
     PostCommentMediaMySqlEntity,
     PostMediaMySqlEntity,
     PostCommentLikeMySqlEntity,
-    PostCommentReplyMySqlEntity
+    PostCommentReplyMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, DeepPartial } from "typeorm"
-import { CreatePostCommentReplyOutput } from "./posts.output"
+import { Repository, DeepPartial, DataSource } from "typeorm"
+import {
+    CreatePostCommentOutput,
+    CreatePostCommentReplyOutput,
+    DeletePostCommentOutput,
+    DeletePostCommentReplyOutput,
+    UpdatePostCommentOutput,
+    UpdatePostCommentReplyOutput,
+} from "./posts.output"
 
 @Injectable()
 export class PostsService {
@@ -33,9 +42,12 @@ export class PostsService {
         private readonly postCommentLikeMySqlRepository: Repository<PostCommentLikeMySqlEntity>,
         @InjectRepository(PostCommentMySqlEntity)
         private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
+        @InjectRepository(PostCommentMediaMySqlEntity)
+        private readonly postCommentMediaMySqlRepository: Repository<PostCommentMediaMySqlEntity>,
         @InjectRepository(PostCommentReplyMySqlEntity)
         private readonly postCommentReplyMySqlRepository: Repository<PostCommentReplyMySqlEntity>,
         private readonly storageService: StorageService,
+        private readonly dataSource: DataSource
     ) { }
 
     async createPost(input: CreatePostInput): Promise<string> {
@@ -66,7 +78,7 @@ export class PostsService {
                 post.postMedias.push({
                     position,
                     mediaId: assetId,
-                    mediaType
+                    mediaType,
                 } as PostMediaMySqlEntity)
             }
             mediaPosition++
@@ -79,44 +91,6 @@ export class PostsService {
         return `A post with id ${created.postId} has been created successfully.`
     }
 
-    async updatePost(input: UpdatePostInput): Promise<string> {
-        // const { data, files } = input
-        // const { postContents, postId, title } = data
-
-        // const post: DeepPartial<PostMySqlEntity> = {
-        //     postId,
-        //     title,
-        // }
-        // await this.postMySqlRepository.update(postId, post)
-
-        // await this.postContentsMySqlRepository.delete({
-        //     postId,
-        // })
-
-        // const promises: Array<Promise<void>> = []
-        // const appendedPostContents = this.appendIndexFile(postContents)
-
-        // for (const appendedPostContent of appendedPostContents) {
-        //     appendedPostContent.postId = postId
-        //     if (
-        //         appendedPostContent.contentType === ContentType.Image ||
-        // appendedPostContent.contentType === ContentType.Video
-        //     ) {
-        //         const promise = async () => {
-        //             const file = files.at(appendedPostContent.indexFile)
-        //           //  const { assetId } = await this.storageService.upload(file)
-        //          //   appendedPostContent.content = assetId
-        //         }
-        //         promises.push(promise())
-        //     }
-        // }
-        // await Promise.all(promises)
-
-        //await this.postContentsMySqlRepository.save(appendedPostContents)
-
-        return "A post with id  has been updated successfully."
-    }
-
     async toggleLikePost(input: ToggleLikePostInput) {
         const { userId, data } = input
         const { postId } = data
@@ -125,7 +99,7 @@ export class PostsService {
             where: {
                 userId,
                 postId,
-            }
+            },
         })
 
         const responseMessage = (postLikeId: string, liked: boolean = true) =>
@@ -144,13 +118,13 @@ export class PostsService {
 
         const { postLikeId, liked } = found
         await this.postLikeMySqlRepository.update(postLikeId, {
-            liked : !liked
+            liked: !liked,
         })
 
         return responseMessage(postLikeId, !liked)
     }
 
-    async createComment(input: CreateCommentInput) {
+    async createPostComment(input: CreatePostCommentInput): Promise<CreatePostCommentOutput> {
         const { data, files, userId } = input
         const { postCommentMedias, postId, html } = data
         const postComment: DeepPartial<PostCommentMySqlEntity> = {
@@ -174,7 +148,7 @@ export class PostsService {
                 postComment.postCommentMedias.push({
                     position,
                     mediaId: assetId,
-                    mediaType
+                    mediaType,
                 } as PostCommentMediaMySqlEntity)
             }
             mediaPosition++
@@ -183,8 +157,89 @@ export class PostsService {
 
         await Promise.all(promises)
 
-        const created = await this.postCommentMySqlRepository.save(postComment)
-        return `A post comment with id ${created.postCommentId} has been created successfully.`
+        const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
+        return {
+            postCommentId
+        }
+    }
+
+    async updatePostComment(input: UpdatePostCommentInput): Promise<UpdatePostCommentOutput> {
+        const { data, files } = input
+        const { postCommentMedias, postCommentId, html } = data
+        const postComment: DeepPartial<PostCommentMySqlEntity> = {
+            postCommentId,
+            html,
+            postCommentMedias: [],
+        }
+
+        const promises: Array<Promise<void>> = []
+
+        let mediaPosition = 0
+        for (const postCommentMedia of postCommentMedias) {
+            const { mediaIndex, mediaType } = postCommentMedia
+            const position = mediaPosition
+            const promise = async () => {
+                const file = files.at(mediaIndex)
+                const { assetId } = await this.storageService.upload({
+                    rootFile: file,
+                })
+                postComment.postCommentMedias.push({
+                    position,
+                    mediaId: assetId,
+                    mediaType,
+                } as PostCommentMediaMySqlEntity)
+            }
+            mediaPosition++
+            promises.push(promise())
+        }
+
+        await Promise.all(promises)
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const deletedPostCommentMedias = await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
+            await this.postCommentMediaMySqlRepository.delete({ postCommentId })
+            await this.postCommentMySqlRepository.save(postComment)
+
+            await queryRunner.commitTransaction()
+
+            const mediaIds = deletedPostCommentMedias.map(deletedPostCommentMedia => deletedPostCommentMedia.mediaId)
+            await this.storageService.delete(...mediaIds)
+
+            return {}
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
+    }
+
+    async deletePostComment(input: DeletePostCommentInput ): Promise<DeletePostCommentOutput> {
+        const { data } = input
+        const { postCommentId } = data
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+        try {
+            const deletedPostCommentMedias = await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
+            await this.postCommentMySqlRepository.delete({ postCommentId })
+            
+            await queryRunner.commitTransaction()
+
+            const mediaIds = deletedPostCommentMedias.map(deletedPostCommentMedia => deletedPostCommentMedia.mediaId)
+            await this.storageService.delete(...mediaIds)
+
+            return {}
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
+        return {}
     }
 
     async toggleLikePostComment(input: ToggleLikePostCommentInput) {
@@ -195,10 +250,13 @@ export class PostsService {
             where: {
                 userId,
                 postCommentId,
-            }
+            },
         })
 
-        const responseMessage = (postCommentLikeId: string, liked: boolean = true) =>
+        const responseMessage = (
+            postCommentLikeId: string,
+            liked: boolean = true,
+        ) =>
             `${liked ? "Like" : "Unlike"} post comment successfully with id ${postCommentLikeId}`
 
         if (found === null) {
@@ -214,59 +272,50 @@ export class PostsService {
 
         const { postCommentLikeId, liked } = found
         await this.postCommentLikeMySqlRepository.update(postCommentLikeId, {
-            liked : !liked
+            liked: !liked,
         })
 
         return responseMessage(postCommentLikeId, !liked)
     }
 
-    async updateComment(input: UpdateCommentInput) {
-        //     const { data, files } = input
-        //     const { postCommentContents, postCommentId } = data
-
-        //     await this.postCommentMySqlRepository.update(postCommentId, {})
-
-        //     await this.postCommentContentMySqlRepository.delete({
-        //         postCommentId,
-        //     })
-
-        //     const promises: Array<Promise<void>> = []
-        //     const appendedPostCommentContents =
-        //   this.appendIndexFile(postCommentContents)
-
-        //     for (const appendedPostCommentContent of appendedPostCommentContents) {
-        //         appendedPostCommentContent.postCommentId = postCommentId
-        //         if (
-        //             appendedPostCommentContent.contentType === ContentType.Image ||
-        //     appendedPostCommentContent.contentType === ContentType.Video
-        //         ) {
-        //             const promise = async () => {
-        //                 const file = files.at(appendedPostCommentContent.indexFile)
-        //                 //  const { assetId } = await this.storageService.upload(file)
-        //                 // appendedPostCommentContent.postCommentId = assetId
-        //             }
-        //             promises.push(promise())
-        //         }
-        //     }
-        //     await Promise.all(promises)
-
-        //     await this.postCommentContentMySqlRepository.save(appendedPostCommentContents)
-
-        return "A post comment with id has been updated successfully."
-    }
-
-    async createPostCommentReply (input: CreatePostCommentReplyInput) : Promise<CreatePostCommentReplyOutput> {
+    async createPostCommentReply(
+        input: CreatePostCommentReplyInput,
+    ): Promise<CreatePostCommentReplyOutput> {
         const { data, userId } = input
-        const { content, postCommentId} = data
-        
-        const created = await this.postCommentReplyMySqlRepository.save({
+        const { content, postCommentId } = data
+
+        const { postCommentReplyId } = await this.postCommentReplyMySqlRepository.save({
             content,
             creatorId: userId,
-            postCommentId
+            postCommentId,
         })
 
         return {
-            postCommentReplyId: created.postCommentReplyId
+            postCommentReplyId,
         }
+    }
+
+    async updatePostCommentReply(
+        input: UpdatePostCommentReplyInput,
+    ): Promise<UpdatePostCommentReplyOutput> {
+        const { data } = input
+        const { content, postCommentReplyId } = data
+
+        await this.postCommentReplyMySqlRepository.update(postCommentReplyId, {
+            content,
+        })
+
+        return {}
+    }
+
+    async deletePostCommentReply(
+        input: DeletePostCommentReplyInput,
+    ): Promise<DeletePostCommentReplyOutput> {
+        const { data } = input
+        const { postCommentReplyId } = data
+
+        await this.postCommentReplyMySqlRepository.delete(postCommentReplyId)
+
+        return {}
     }
 }
