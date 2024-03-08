@@ -73,6 +73,7 @@ export class StorageService {
 
     public async delete(...assetIds: Array<string>) {
         for (const assetId of assetIds){
+            console.log(join(pathsConfig().storageDirectory, assetId))
             await fsPromises.rm(join(pathsConfig().storageDirectory, assetId), {
                 force: true,
                 recursive: true,

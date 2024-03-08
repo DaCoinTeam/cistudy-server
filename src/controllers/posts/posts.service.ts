@@ -239,7 +239,6 @@ export class PostsService {
         } finally {
             await queryRunner.release()
         }
-        return {}
     }
 
     async toggleLikePostComment(input: ToggleLikePostCommentInput) {
