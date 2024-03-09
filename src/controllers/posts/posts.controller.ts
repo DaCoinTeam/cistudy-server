@@ -39,7 +39,11 @@ import {
 } from "./posts.schema"
 
 import { Files } from "@common"
-import { CreatePostCommentReplyOutput, DeletePostCommentReplyOutput, UpdatePostCommentReplyOutput } from "./posts.output"
+import {
+    CreatePostCommentReplyOutput,
+    DeletePostCommentReplyOutput,
+    UpdatePostCommentReplyOutput,
+} from "./posts.output"
 
 @ApiTags("Posts")
 @ApiHeader({
@@ -48,7 +52,7 @@ import { CreatePostCommentReplyOutput, DeletePostCommentReplyOutput, UpdatePostC
 })
 @Controller("api/posts")
 export class PostsController {
-    constructor(private readonly postsService: PostsService) { }
+    constructor(private readonly postsService: PostsService) {}
 
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")
@@ -75,15 +79,20 @@ export class PostsController {
     @DataFromBody() data: UpdatePostInputData,
     @UploadedFiles() { files }: Files,
   ) {
-      // return await this.postsService.updatePost({ userId, data, files })
+      return await this.postsService.updatePost({ userId, data, files })
   }
 
   @ApiBearerAuth()
-  @Delete("delete-post")
+  @Delete("delete-post/:postId")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   async deletePost(@UserId() userId: string, @Param("postId") postId: string) {
-      console.log(postId)
+      return await this.postsService.deletePost({
+          userId,
+          data: {
+              postId,
+          },
+      })
   }
 
   @ApiBearerAuth()
@@ -114,7 +123,6 @@ export class PostsController {
       return await this.postsService.createPostComment({ userId, data, files })
   }
 
-
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")
   @ApiBody({ schema: updateCommentSchema })
@@ -138,9 +146,10 @@ export class PostsController {
     @Param("postCommentId") postCommentId: string,
   ) {
       return await this.postsService.deletePostComment({
-          userId, data: {
-              postCommentId
-          }
+          userId,
+          data: {
+              postCommentId,
+          },
       })
   }
 
@@ -197,7 +206,7 @@ export class PostsController {
       return await this.postsService.deletePostCommentReply({
           userId,
           data: {
-              postCommentReplyId
+              postCommentReplyId,
           },
       })
   }

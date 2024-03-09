@@ -96,7 +96,7 @@ export class CreateLectureInputData {
     @ApiProperty()
         title: string
 }
-
+  
 export class CreateLectureInput implements AuthInput<CreateLectureInputData> {
     @IsUUID("4")
         userId: string

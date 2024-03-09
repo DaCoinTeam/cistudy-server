@@ -41,6 +41,9 @@ export class PostMediaEntity {
     @ManyToOne(
         () => PostEntity,
         (post) => post.postMedias,
+        {
+            onDelete: "CASCADE"
+        }
     )
     @JoinColumn({ name: "postId" })
         post: PostEntity

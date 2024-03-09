@@ -6,6 +6,12 @@ export class CreatePostCommentOutput {
     postCommentId: string
 }
 
+export class UpdatePostOutput {
+}
+
+export class DeletePostOutput {
+}
+
 export class UpdatePostCommentOutput {
 }
 

@@ -10,6 +10,8 @@ import {
     DeletePostCommentReplyInput,
     UpdatePostCommentInput,
     DeletePostCommentInput,
+    UpdatePostInput,
+    DeletePostInput,
 } from "./posts.input"
 import {
     PostMySqlEntity,
@@ -27,8 +29,10 @@ import {
     CreatePostCommentReplyOutput,
     DeletePostCommentOutput,
     DeletePostCommentReplyOutput,
+    DeletePostOutput,
     UpdatePostCommentOutput,
     UpdatePostCommentReplyOutput,
+    UpdatePostOutput,
 } from "./posts.output"
 
 @Injectable()
@@ -36,6 +40,8 @@ export class PostsService {
     constructor(
         @InjectRepository(PostMySqlEntity)
         private readonly postMySqlRepository: Repository<PostMySqlEntity>,
+        @InjectRepository(PostMediaMySqlEntity)
+        private readonly postMediaMySqlRepository: Repository<PostMediaMySqlEntity>,
         @InjectRepository(PostLikeMySqlEntity)
         private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
         @InjectRepository(PostCommentLikeMySqlEntity)
@@ -89,6 +95,87 @@ export class PostsService {
         const created = await this.postMySqlRepository.save(post)
 
         return `A post with id ${created.postId} has been created successfully.`
+    }
+
+    async updatePost(input: UpdatePostInput): Promise<UpdatePostOutput> {
+        const { data, files, userId } = input
+
+        const { postMedias, title, postId, html } = data
+        const post: DeepPartial<PostMySqlEntity> = {
+            postId,
+            title,
+            creatorId: userId,
+            html,
+            postMedias: [],
+        }
+
+        const promises: Array<Promise<void>> = []
+
+        let mediaPosition = 0
+        for (const postMedia of postMedias) {
+            const { mediaIndex, mediaType } = postMedia
+
+            const position = mediaPosition
+            const promise = async () => {
+                const file = files.at(mediaIndex)
+                const { assetId } = await this.storageService.upload({
+                    rootFile: file,
+                })
+                post.postMedias.push({
+                    position,
+                    mediaId: assetId,
+                    mediaType,
+                } as PostMediaMySqlEntity)
+            }
+            mediaPosition++
+            promises.push(promise())
+        }
+        await Promise.all(promises)
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const deletedPostMedias = await this.postMediaMySqlRepository.findBy({ postId })
+            await this.postMySqlRepository.delete({ postId })
+            await this.postMySqlRepository.save(post)
+
+            await queryRunner.commitTransaction()
+
+            const mediaIds = deletedPostMedias.map(deletedPostMedia => deletedPostMedia.mediaId)
+            await this.storageService.delete(...mediaIds)
+
+            return {}
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
+    }
+
+    async deletePost(input: DeletePostInput): Promise<DeletePostOutput> {
+        const { data } = input
+        const { postId } = data
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+        try {
+            const deletedPostMedias = await this.postMediaMySqlRepository.findBy({ postId })
+            await this.postMySqlRepository.delete({ postId })
+            
+            await queryRunner.commitTransaction()
+
+            const mediaIds = deletedPostMedias.map(deletedPostMedia => deletedPostMedia.mediaId)
+            await this.storageService.delete(...mediaIds)
+
+            return {}
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
     }
 
     async toggleLikePost(input: ToggleLikePostInput) {
