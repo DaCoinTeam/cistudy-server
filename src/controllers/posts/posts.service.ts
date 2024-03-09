@@ -138,7 +138,7 @@ export class PostsService {
 
         try {
             const deletedPostMedias = await this.postMediaMySqlRepository.findBy({ postId })
-            await this.postMySqlRepository.delete({ postId })
+            await this.postMediaMySqlRepository.delete({ postId })
             await this.postMySqlRepository.save(post)
 
             await queryRunner.commitTransaction()
@@ -157,7 +157,7 @@ export class PostsService {
     async deletePost(input: DeletePostInput): Promise<DeletePostOutput> {
         const { data } = input
         const { postId } = data
-
+  
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()

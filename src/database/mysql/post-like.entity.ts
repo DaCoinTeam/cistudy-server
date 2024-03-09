@@ -47,7 +47,9 @@ export class PostLikeEntity {
       user: UserEntity
 
   @Field(() => PostEntity)
-  @ManyToOne(() => PostEntity, (post) => post.postReacts)
+  @ManyToOne(() => PostEntity, (post) => post.postReacts,   {
+      onDelete: "CASCADE"
+  })
   @JoinColumn({ name: "postId" })
       post: PostEntity
 }
