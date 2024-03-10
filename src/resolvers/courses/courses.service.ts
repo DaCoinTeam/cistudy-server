@@ -34,22 +34,49 @@ export class CoursesService {
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
         const { data } = input
         const { courseId } = data
-        return await this.courseMySqlRepository.findOne({
-            where: { courseId },
-            relations: {
-                sections: {
-                    lectures: {
-                        resources: true,
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+
+            const course = await this.courseMySqlRepository.findOne({
+                where: { courseId },
+                relations: {
+                    sections: {
+                        lectures: {
+                            resources: true,
+                        },
+                    },
+                    courseTargets: true,
+                    creator: true
+                },
+                order: {
+                    courseTargets: {
+                        position: "ASC",
                     },
                 },
-                courseTargets: true,
-            },
-            order: {
-                courseTargets: {
-                    position: "ASC",
-                },
-            },
-        })
+            })
+
+            const numberOfFollowers = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(FollowMySqlEnitity, "follow")
+                .where("followedUserId = :userId", { userId: course.creator.userId })
+                .andWhere("followed = :followed", { followed: true })
+                .getRawOne()
+
+            await queryRunner.commitTransaction()
+
+            course.creator.numberOfFollowers = numberOfFollowers.count
+
+            return course
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
     }
 
     async findManyCourses(
