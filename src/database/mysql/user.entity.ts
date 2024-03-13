@@ -8,7 +8,7 @@ import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { PostEntity } from "./post.entity"
 import { CourseEntity } from "./course.entity"
 import { FollowEntity } from "./follow.entity"
-import { CryptoWalletEntity } from "./crypto_wallet.entity"
+import { CryptoWalletEntity } from "./crypto-wallet.entity"
 
 @ObjectType()
 @Entity("user")

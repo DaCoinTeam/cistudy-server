@@ -9,6 +9,10 @@ import {
     SessionMySqlEntity,
     CourseTargetMySqlEntity,
     CryptoWalletMySqlEntity,
+    SubCategoryMySqlEntity,
+    CategoryMySqlEntity,
+    TopicMySqlEntity,
+    CourseTopicMySqlEntity,
 } from "@database"
 import { CoursesResolver } from "./courses.resolver"
 import { TypeOrmModule } from "@nestjs/typeorm"
@@ -25,7 +29,12 @@ import { CoursesService } from "./courses.service"
             UserMySqlEntity,
             SessionMySqlEntity,
             CourseTargetMySqlEntity,
-            CryptoWalletMySqlEntity
+            CryptoWalletMySqlEntity,
+            SubCategoryMySqlEntity,
+            CategoryMySqlEntity,
+            SubCategoryMySqlEntity,
+            TopicMySqlEntity,
+            CourseTopicMySqlEntity
         ]),
     ],
     providers: [CoursesResolver, CoursesService],

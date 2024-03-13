@@ -3,7 +3,7 @@ import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { UserEntity } from "./user.entity"
 
 @ObjectType()
-@Entity("crypto-wallet")
+@Entity("crypto_wallet")
 export class CryptoWalletEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")

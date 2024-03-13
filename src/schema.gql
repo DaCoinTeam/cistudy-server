@@ -54,6 +54,43 @@ type CourseTargetEntity {
   course: CourseEntity!
 }
 
+type CategoryEntity {
+  categoryId: ID!
+  name: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  subCategories: [SubCategoryEntity!]!
+}
+
+type SubCategoryEntity {
+  subCategoryId: ID!
+  name: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  categoryId: ID!
+  category: CategoryEntity!
+  topics: [TopicEntity!]!
+}
+
+type TopicEntity {
+  topicId: ID!
+  name: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  subCategory: SubCategoryEntity!
+  courseTopics: [CourseTopicEntity!]!
+}
+
+type CourseTopicEntity {
+  courseTopicId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  courseId: ID!
+  topicId: ID!
+  course: CourseEntity!
+  topic: TopicEntity!
+}
+
 type CourseEntity {
   courseId: ID!
   title: String
@@ -71,6 +108,7 @@ type CourseEntity {
   includes: String
   createdAt: DateTime!
   updatedAt: DateTime!
+  courseTopics: [CourseTopicEntity!]!
   courseTargets: [CourseTargetEntity!]
   sections: [SectionEntity!]!
   numberOfEnrollments: Int!

@@ -15,6 +15,7 @@ import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { SectionEntity } from "./section.entity"
 import { UserEntity } from "./user.entity"
 import { CourseTargetEntity } from "./course-target.entity"
+import { CourseTopicEntity } from "./course_topic.entity"
 
 interface CourseIncludes {
     time: number;
@@ -91,6 +92,10 @@ export class CourseEntity {
     @Field(() => Date)
     @UpdateDateColumn()
         updatedAt: Date
+
+    @Field(() => [CourseTopicEntity])
+    @OneToMany(() => CourseTopicEntity, (courseTopic) => courseTopic.course)
+        courseTopics: Array<CourseTopicEntity>
 
     @Field(() => [CourseTargetEntity], { nullable: true })
     @OneToMany(() => CourseTargetEntity, (courseTarget) => courseTarget.course)
