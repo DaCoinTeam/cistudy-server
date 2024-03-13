@@ -9,14 +9,14 @@ import {
 } from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { CourseEntity } from "./course.entity"
-import { TopicEntity } from "./topic.entity"
+import { SubcategoryEntity } from "./subcategory.entity"
 
 @ObjectType()
-@Entity("course_topic")
-export class CourseTopicEntity {
+@Entity("course_subcategory")
+export class CourseSubcategoryEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-        courseTopicId: string
+        courseSubcategoryId: string
 
     @Field(() => Date)
     @CreateDateColumn()
@@ -26,24 +26,23 @@ export class CourseTopicEntity {
     @UpdateDateColumn()
         updatedAt: Date
 
-
+ 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
         courseId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        topicId: string
+        subcategoryId: string
 
     @Field(() => CourseEntity)
-    @ManyToOne(() => CourseEntity, (course) => course.courseTopics)
+    @ManyToOne(() => CourseEntity, (course) => course.courseSubcategories)
     @JoinColumn({ name: "courseId" })
         course: CourseEntity
 
 
-    @Field(() => TopicEntity)
-    @ManyToOne(() => CourseEntity, (course) => course.courseTopics)
-    @JoinColumn({ name: "topicId" })
-        topic: TopicEntity
-
+    @Field(() => SubcategoryEntity)
+    @ManyToOne(() => SubcategoryEntity, (subcategory) => subcategory.courseSubcategories)
+    @JoinColumn({ name: "subcategoryId" })
+        subcategory: SubcategoryEntity
 }

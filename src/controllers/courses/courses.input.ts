@@ -75,6 +75,15 @@ export class UpdateCourseInputData {
     @ApiProperty({ nullable: true })
         enableDiscount?: boolean
 
+    @ApiProperty({ nullable: true })
+        categoryId?: string
+
+    @ApiProperty({ nullable: true })
+        subcategoryIds?: Array<string>
+
+    @ApiProperty({ nullable: true })
+        topicIds?: Array<string>
+
     @IsNumber()
     @ApiProperty({ nullable: true })
         thumbnailIndex?: number

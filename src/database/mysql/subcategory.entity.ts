@@ -10,14 +10,15 @@ import {
 } from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { CategoryEntity } from "./category.entity"
-import { TopicEntity } from "./topic.entity"
+import { SubcategoryTopicEntity } from "./subcategory-topic.entity"
+import { CourseSubcategoryEntity } from "./course-subcategory.entity"
 
 @ObjectType()
-@Entity("sub_category")
-export class SubCategoryEntity {
+@Entity("subcategory")
+export class SubcategoryEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-        subCategoryId: string
+        subcategoryId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 1000, nullable: true })
@@ -36,11 +37,15 @@ export class SubCategoryEntity {
         categoryId: string
 
     @Field(() => CategoryEntity)
-    @ManyToOne(() => CategoryEntity, (category) => category.subCategories)
+    @ManyToOne(() => CategoryEntity, (category) => category.subcategories)
     @JoinColumn({ name: "categoryId" })
         category: CategoryEntity
 
-    @Field(() => [TopicEntity])
-    @OneToMany(() => TopicEntity, (topic) => topic.subCategory)
-        topics: Array<TopicEntity>
+    @Field(() => [SubcategoryTopicEntity])
+    @OneToMany(() => SubcategoryTopicEntity, (subcategoryTopic) => subcategoryTopic.subcategory)
+        subcategoryTopics: Array<SubcategoryTopicEntity>
+
+    @Field(() => [CourseSubcategoryEntity])
+        @OneToMany(() => CourseSubcategoryEntity, (courseSubcategory) => courseSubcategory.subcategory)
+        courseSubcategories: Array<CourseSubcategoryEntity>
 }

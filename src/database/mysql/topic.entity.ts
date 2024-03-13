@@ -4,13 +4,11 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
-    ManyToOne,
-    JoinColumn,
     OneToMany
 } from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
-import { SubCategoryEntity } from "./sub-category.entity"
-import { CourseTopicEntity } from "./course_topic.entity"
+import { CourseTopicEntity } from "./course-topic.entity"
+import { SubcategoryTopicEntity } from "./subcategory-topic.entity"
 
 @ObjectType()
 @Entity("topic")
@@ -31,12 +29,11 @@ export class TopicEntity {
 	@UpdateDateColumn()
 	    updatedAt: Date
 
-	@Field(() => SubCategoryEntity)
-	@ManyToOne(() => SubCategoryEntity, (subCategory) => subCategory.topics)
-	@JoinColumn({ name: "categoryId" })
-	    subCategory: SubCategoryEntity
-
 	@Field(() => [CourseTopicEntity])
 	@OneToMany(() => CourseTopicEntity, (courseTopic) => courseTopic.topic)
 	    courseTopics: Array<CourseTopicEntity>
+	
+	@Field(() => [SubcategoryTopicEntity])
+	@OneToMany(() => SubcategoryTopicEntity, (subcategoryTopic) => subcategoryTopic.topic)
+	    subcategoryTopics: Array<SubcategoryTopicEntity>
 }

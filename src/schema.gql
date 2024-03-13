@@ -59,17 +59,39 @@ type CategoryEntity {
   name: String
   createdAt: DateTime!
   updatedAt: DateTime!
-  subCategories: [SubCategoryEntity!]!
+  subcategories: [SubcategoryEntity!]!
+  courses: [CourseEntity!]!
 }
 
-type SubCategoryEntity {
-  subCategoryId: ID!
+type CourseSubcategoryEntity {
+  courseSubcategoryId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  courseId: ID!
+  subcategoryId: ID!
+  course: CourseEntity!
+  subcategory: SubcategoryEntity!
+}
+
+type SubcategoryEntity {
+  subcategoryId: ID!
   name: String
   createdAt: DateTime!
   updatedAt: DateTime!
   categoryId: ID!
   category: CategoryEntity!
-  topics: [TopicEntity!]!
+  subcategoryTopics: [SubcategoryTopicEntity!]!
+  courseSubcategories: [CourseSubcategoryEntity!]!
+}
+
+type SubcategoryTopicEntity {
+  subcategoryTopicId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  subcategoryId: ID!
+  topicId: ID!
+  subcategory: SubcategoryEntity!
+  topic: TopicEntity!
 }
 
 type TopicEntity {
@@ -77,8 +99,8 @@ type TopicEntity {
   name: String
   createdAt: DateTime!
   updatedAt: DateTime!
-  subCategory: SubCategoryEntity!
   courseTopics: [CourseTopicEntity!]!
+  subcategoryTopics: [SubcategoryTopicEntity!]!
 }
 
 type CourseTopicEntity {
@@ -109,6 +131,9 @@ type CourseEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   courseTopics: [CourseTopicEntity!]!
+  categoryId: ID!
+  category: CategoryEntity!
+  courseSubcategories: [CourseSubcategoryEntity!]!
   courseTargets: [CourseTargetEntity!]
   sections: [SectionEntity!]!
   numberOfEnrollments: Int!
@@ -346,6 +371,7 @@ type Query {
   findManyLectures(data: FindManyLecturesInputData!): [LectureEntity!]!
   findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
+  findManyCategories: [CategoryEntity!]!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!

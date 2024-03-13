@@ -1,7 +1,9 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import {
     CourseMySqlEntity,
+    CourseSubcategoryMySqlEntity,
     CourseTargetMySqlEntity,
+    CourseTopicMySqlEntity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
     SectionMySqlEntity,
@@ -28,7 +30,7 @@ import {
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import { ProcessStatus, VideoType, existKeyNotUndefined } from "@common"
-import { CreateCourseOutput, EnrollCourseOutput } from "./courses.output"
+import { CreateCourseOutput, EnrollCourseOutput, UpdateCourseOutput } from "./courses.output"
 import { EnrolledInfoEntity } from "src/database/mysql/enrolled-info.entity"
 
 @Injectable()
@@ -46,6 +48,10 @@ export class CoursesService {
         private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
         @InjectRepository(EnrolledInfoEntity)
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoEntity>,
+        @InjectRepository(CourseSubcategoryMySqlEntity)
+        private readonly courseSubcategoryMySqlRepository: Repository<CourseSubcategoryMySqlEntity>,
+        @InjectRepository(CourseTopicMySqlEntity)
+        private readonly courseTopicMySqlRepository: Repository<CourseTopicMySqlEntity>,
         private readonly storageService: StorageService,
         private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
         private readonly dataSource: DataSource
@@ -91,7 +97,7 @@ export class CoursesService {
             }
     }
 
-    async updateCourse(input: UpdateCourseInput): Promise<string> {
+    async updateCourse(input: UpdateCourseInput): Promise<UpdateCourseOutput> {
         const { data, files } = input
         const {
             thumbnailIndex,
@@ -102,15 +108,28 @@ export class CoursesService {
             discount,
             enableDiscount,
             title,
+            categoryId,
+            subcategoryIds,
+            topicIds
         } = data
 
         const course: DeepPartial<CourseMySqlEntity> = {
+            courseId,
             description,
             title,
             price,
             discount,
-            enableDiscount
+            enableDiscount,
+            categoryId,
+            courseSubcategories: subcategoryIds?.map(subcategoryId => ({
+                subcategoryId,
+                courseId
+            })),
+            courseTopics: topicIds?.map(topicId => ({
+                topicId
+            })),
         }
+        console.log(course)
 
         const promises: Array<Promise<void>> = []
 
@@ -152,9 +171,31 @@ export class CoursesService {
         }
         await Promise.all(promises)
 
-        if (existKeyNotUndefined(course))
-            await this.courseMySqlRepository.update(courseId, course)
-        return `A course wth id ${courseId} has been updated successfully`
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            if (subcategoryIds?.length)
+                await this.courseSubcategoryMySqlRepository.delete({ courseId })
+
+            if (topicIds?.length)
+                await this.courseTopicMySqlRepository.delete({ courseId })
+
+            if (existKeyNotUndefined(course))
+                await this.courseMySqlRepository.save(course)
+
+            await queryRunner.commitTransaction()
+
+            return {}
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
+
+
     }
 
     async createSection(input: CreateSectionInput): Promise<string> {

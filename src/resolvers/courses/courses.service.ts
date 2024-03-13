@@ -1,4 +1,5 @@
 import {
+    CategoryMySqlEntity,
     CourseMySqlEntity,
     CourseTargetMySqlEntity,
     EnrolledInfoMySqlEntity,
@@ -29,6 +30,8 @@ export class CoursesService {
     private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
     @InjectRepository(CourseTargetMySqlEntity)
     private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+    @InjectRepository(CategoryMySqlEntity)
+    private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
     private readonly dataSource: DataSource
     ) {}
 
@@ -187,4 +190,18 @@ export class CoursesService {
             where: data,
         })
     }
+
+    async findManyCategories(
+    ): Promise<Array<CategoryMySqlEntity>> {
+        return await this.categoryMySqlRepository.find({
+            relations: {
+                subcategories: {
+                    subcategoryTopics: {
+                        topic: true
+                    }
+                }
+            },
+        })
+    }
+
 }

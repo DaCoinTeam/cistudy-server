@@ -16,9 +16,11 @@ import { PostLikeEntity as PostLikeMySqlEntity } from "./post-like.entity"
 import { PostCommentReplyEntity as PostCommentReplyMySqlEntity } from "./post-comment-reply.entity"
 import { CryptoWalletEntity as CryptoWalletMySqlEntity } from "./crypto-wallet.entity"
 import { CategoryEntity as CategoryMySqlEntity } from "./category.entity"
-import { SubCategoryEntity as SubCategoryMySqlEntity } from "./sub-category.entity"
+import { SubcategoryEntity as SubcategoyMySqlEntity } from "./subcategory.entity"
 import { TopicEntity as TopicMySqlEntity } from "./topic.entity"
-import { CourseTopicEntity as CourseTopicMySqlEntity } from "./course_topic.entity"
+import { CourseTopicEntity as CourseTopicMySqlEntity } from "./course-topic.entity"
+import { SubcategoryTopicEntity as SubcategoyTopicMySqlEntity } from "./subcategory-topic.entity"
+import { CourseSubcategoryEntity as CourseSubcategoryMySqlEntity } from "./course-subcategory.entity"
 
 export {
     UserMySqlEntity,
@@ -39,7 +41,9 @@ export {
     PostCommentReplyMySqlEntity,
     CryptoWalletMySqlEntity,
     CategoryMySqlEntity,
-    SubCategoryMySqlEntity,
+    SubcategoyMySqlEntity,
     TopicMySqlEntity,
-    CourseTopicMySqlEntity
+    CourseTopicMySqlEntity,
+    SubcategoyTopicMySqlEntity,
+    CourseSubcategoryMySqlEntity
 }

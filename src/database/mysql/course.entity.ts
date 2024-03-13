@@ -15,7 +15,9 @@ import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { SectionEntity } from "./section.entity"
 import { UserEntity } from "./user.entity"
 import { CourseTargetEntity } from "./course-target.entity"
-import { CourseTopicEntity } from "./course_topic.entity"
+import { CourseTopicEntity } from "./course-topic.entity"
+import { CourseSubcategoryEntity } from "./course-subcategory.entity"
+import { CategoryEntity } from "./category.entity"
 
 interface CourseIncludes {
     time: number;
@@ -94,8 +96,25 @@ export class CourseEntity {
         updatedAt: Date
 
     @Field(() => [CourseTopicEntity])
-    @OneToMany(() => CourseTopicEntity, (courseTopic) => courseTopic.course)
+    @OneToMany(() => CourseTopicEntity, (courseTopic) => courseTopic.course, {
+        cascade: true,
+    })
         courseTopics: Array<CourseTopicEntity>
+
+    @Field(() => ID)
+    @Column({ type: "uuid", length: 36 })
+        categoryId: string
+
+    @Field(() => CategoryEntity)
+    @ManyToOne(() => CategoryEntity, (category) => category.courses)
+    @JoinColumn({ name: "categoryId" })
+        category: CategoryEntity
+
+    @Field(() => [CourseSubcategoryEntity])
+    @OneToMany(() => CourseSubcategoryEntity, (courseSubcategory) => courseSubcategory.course, {
+        cascade: true,
+    })
+        courseSubcategories: Array<CourseSubcategoryEntity>
 
     @Field(() => [CourseTargetEntity], { nullable: true })
     @OneToMany(() => CourseTargetEntity, (courseTarget) => courseTarget.course)
