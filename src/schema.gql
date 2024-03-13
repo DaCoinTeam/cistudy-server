@@ -27,7 +27,7 @@ type LectureEntity {
   processStatus: String!
   videoType: String!
   numberOfViews: Int!
-  description: String!
+  description: String
   createdAt: DateTime!
   updatedAt: DateTime!
   section: SectionEntity!
@@ -39,6 +39,7 @@ type SectionEntity {
   title: String!
   courseId: ID!
   createdAt: DateTime!
+  updatedAt: DateTime!
   course: CourseEntity!
   lectures: [LectureEntity!]!
 }
@@ -60,6 +61,8 @@ type CourseEntity {
   description: String
   creatorId: ID!
   price: Float!
+  discount: Float!
+  enableDiscount: Boolean!
   verifyStatus: VerifyStatus
   isDraft: Boolean!
   creator: UserEntity!
@@ -70,6 +73,7 @@ type CourseEntity {
   updatedAt: DateTime!
   courseTargets: [CourseTargetEntity!]
   sections: [SectionEntity!]!
+  numberOfEnrollments: Int!
 }
 
 enum VerifyStatus {
@@ -161,6 +165,15 @@ type FollowEntity {
   followedUser: UserEntity!
 }
 
+type CryptoWalletEntity {
+  cryptoWalletId: ID!
+  address: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  userId: ID!
+  user: UserEntity!
+}
+
 type UserEntity {
   userId: ID!
   email: String!
@@ -178,6 +191,7 @@ type UserEntity {
   verified: Boolean!
   kind: UserKind!
   externalId: String
+  cryptoWallets: [CryptoWalletEntity!]!
   posts: [PostEntity!]!
   courses: [CourseEntity!]!
   followerRelations: [FollowEntity!]!

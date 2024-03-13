@@ -5,3 +5,8 @@ export class CreateCourseOutput {
         courseId: string
 }
   
+export class EnrollCourseOutput {
+    @ApiProperty()
+        enrolledInfoId: string
+}
+  

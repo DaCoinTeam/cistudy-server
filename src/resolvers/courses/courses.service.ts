@@ -1,6 +1,7 @@
 import {
     CourseMySqlEntity,
     CourseTargetMySqlEntity,
+    EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
@@ -67,9 +68,17 @@ export class CoursesService {
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 
+            const numberOfEnrollments = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(EnrolledInfoMySqlEntity, "enrolled_info")
+                .andWhere("courseId = :courseId", { courseId })
+                .getRawOne()
+
             await queryRunner.commitTransaction()
 
             course.creator.numberOfFollowers = numberOfFollowers.count
+            course.numberOfEnrollments = numberOfEnrollments.count
 
             return course
         } catch (ex) {

@@ -14,6 +14,7 @@ import { PostCommentMediaEntity as PostCommentMediaMySqlEntity} from "./post-com
 import { FollowEntity as FollowMySqlEnitity } from "./follow.entity"
 import { PostLikeEntity as PostLikeMySqlEntity } from "./post-like.entity"
 import { PostCommentReplyEntity as PostCommentReplyMySqlEntity } from "./post-comment-reply.entity"
+import { CryptoWalletEntity as CryptoWalletMySqlEntity } from "./crypto_wallet.entity"
 
 export {
     UserMySqlEntity,
@@ -31,5 +32,6 @@ export {
     CourseTargetMySqlEntity,
     FollowMySqlEnitity,
     PostLikeMySqlEntity,
-    PostCommentReplyMySqlEntity
+    PostCommentReplyMySqlEntity,
+    CryptoWalletMySqlEntity
 }

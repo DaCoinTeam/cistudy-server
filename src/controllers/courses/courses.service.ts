@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common"
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import {
     CourseMySqlEntity,
     CourseTargetMySqlEntity,
@@ -7,7 +7,7 @@ import {
     SectionMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository } from "typeorm"
+import { Repository, DataSource } from "typeorm"
 import { StorageService } from "@global"
 import {
     CreateCourseInput,
@@ -23,11 +23,13 @@ import {
     DeleteSectionInput,
     UpdateSectionInput,
     DeleteResourceInput,
+    EnrollCourseInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import { ProcessStatus, VideoType, existKeyNotUndefined } from "@common"
-import { CreateCourseOutput } from "./courses.output"
+import { CreateCourseOutput, EnrollCourseOutput } from "./courses.output"
+import { EnrolledInfoEntity } from "src/database/mysql/enrolled-info.entity"
 
 @Injectable()
 export class CoursesService {
@@ -42,9 +44,40 @@ export class CoursesService {
         private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
         @InjectRepository(ResourceMySqlEntity)
         private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+        @InjectRepository(EnrolledInfoEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoEntity>,
         private readonly storageService: StorageService,
         private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
+        private readonly dataSource: DataSource
     ) { }
+
+    async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
+        const { data, userId } = input
+        const { courseId } = data
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const found = await this.enrolledInfoMySqlRepository.findOneBy({ userId, courseId })
+            if (found) throw new ConflictException("You have enrolled to this course.")
+
+            const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
+                courseId,
+                userId
+            })
+
+            await queryRunner.commitTransaction()
+
+            return { enrolledInfoId }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
+    }
 
     async createCourse(input: CreateCourseInput): Promise<CreateCourseOutput> {
         const { userId } = input
@@ -66,13 +99,17 @@ export class CoursesService {
             courseId,
             description,
             price,
+            discount,
+            enableDiscount,
             title,
         } = data
 
         const course: DeepPartial<CourseMySqlEntity> = {
             description,
-            price,
             title,
+            price,
+            discount,
+            enableDiscount
         }
 
         const promises: Array<Promise<void>> = []
@@ -149,14 +186,14 @@ export class CoursesService {
 
     async updateLecture(input: UpdateLectureInput): Promise<string> {
         const { data, files } = input
-        const { lectureId, title, lectureVideoIndex, thumbnailIndex } = data
+        const { lectureId, title, description, lectureVideoIndex, thumbnailIndex } = data
 
         const { thumbnailId, lectureVideoId } =
             await this.lectureMySqlRepository.findOneBy({ lectureId })
 
         const promises: Array<Promise<void>> = []
 
-        const lecture: DeepPartial<LectureMySqlEntity> = { title }
+        const lecture: DeepPartial<LectureMySqlEntity> = { title, description }
 
         if (Number.isInteger(lectureVideoIndex)) {
             const promise = async () => {

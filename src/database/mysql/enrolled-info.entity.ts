@@ -4,33 +4,43 @@ import {
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    CreateDateColumn,
+    UpdateDateColumn
 } from "typeorm"
 import { UserEntity } from "./user.entity"
 import { CourseEntity } from "./course.entity"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 
+@ObjectType()
 @Entity("enrolled_info")
 export class EnrolledInfoEntity {
+  @Field(() => ID)
   @PrimaryGeneratedColumn("uuid")
-  	enrolledId: string
-  
+      enrolledInfoId: string
+
+  @Field(() => ID)
   @Column({ type: "uuid", length: 36 })
-  	userId: string
+      userId: string
 
+  @Field(() => ID)
   @Column({ type: "uuid", length: 36 })
-  	courseId: string
+      courseId: string
 
-  @Column({
-  	type: "timestamp",
-  	default: () => "CURRENT_TIMESTAMP",
-  	onUpdate: "CURRENT_TIMESTAMP",
-  })
-  	enrolledAt: Date
+  @Field(() => Date)
+  @CreateDateColumn()
+      createdAt: Date
 
+  @Field(() => Date)
+  @UpdateDateColumn()
+      updatedAt: Date
+
+  @Field(() => CourseEntity)
   @ManyToOne(() => CourseEntity, (course) => course.enrolledInfos)
   @JoinColumn({ name: "courseId" })
-  	course: CourseEntity
+      course: CourseEntity
 
+  @Field(() => UserEntity)
   @ManyToOne(() => UserEntity, (user) => user.enrolledInfos)
   @JoinColumn({ name: "userId" })
-  	user: UserEntity
+      user: UserEntity
 }

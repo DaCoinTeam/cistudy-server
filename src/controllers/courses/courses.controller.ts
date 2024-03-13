@@ -8,6 +8,7 @@ import {
     Put,
     Delete,
     Param,
+    Patch,
 } from "@nestjs/common"
 import {
     ApiBearerAuth,
@@ -22,6 +23,7 @@ import {
     CreateLectureInputData,
     CreateResourcesInputData,
     CreateSectionInputData,
+    EnrollCourseInputData,
     UpdateCourseInputData,
     UpdateCourseTargetInputData,
     UpdateLectureInputData,
@@ -48,10 +50,24 @@ export class CoursesController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
     async createCourse(@UserId() userId: string) {
-        return this.coursesService.createCourse({
+        return await this.coursesService.createCourse({
             userId,
         })
     }
+
+  @ApiBearerAuth()
+  @Patch("enroll-course")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async enrollCourse(
+    @UserId() userId: string,
+    @Body() data: EnrollCourseInputData,
+  ) {
+      return await this.coursesService.enrollCourse({
+          userId,
+          data,
+      })
+  }
 
   @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")

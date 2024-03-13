@@ -8,6 +8,7 @@ import {
     UserMySqlEntity,
     SessionMySqlEntity,
     CourseTargetMySqlEntity,
+    CryptoWalletMySqlEntity,
 } from "@database"
 import { CoursesResolver } from "./courses.resolver"
 import { TypeOrmModule } from "@nestjs/typeorm"
@@ -23,7 +24,8 @@ import { CoursesService } from "./courses.service"
             ResourceMySqlEntity,
             UserMySqlEntity,
             SessionMySqlEntity,
-            CourseTargetMySqlEntity
+            CourseTargetMySqlEntity,
+            CryptoWalletMySqlEntity
         ]),
     ],
     providers: [CoursesResolver, CoursesService],
