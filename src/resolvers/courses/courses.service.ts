@@ -54,7 +54,17 @@ export class CoursesService {
                         },
                     },
                     courseTargets: true,
-                    creator: true
+                    creator: true,
+                    courseSubcategories: {
+                        subcategory: {
+                            subcategoryTopics: {
+                                topic: true
+                            }
+                        }
+                    },
+                    courseTopics: {
+                        topic: true
+                    }
                 },
                 order: {
                     courseTargets: {

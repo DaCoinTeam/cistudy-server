@@ -129,7 +129,6 @@ export class CoursesService {
                 topicId
             })),
         }
-        console.log(course)
 
         const promises: Array<Promise<void>> = []
 
