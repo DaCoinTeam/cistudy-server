@@ -18,6 +18,7 @@ import {
     FindOneLectureInput,
     FindManyCourseTargetsInput,
 } from "./courses.input"
+import { FindManyCoursesOutputData } from "./courses.output"
 
 @Injectable()
 export class CoursesService {
@@ -44,7 +45,6 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-
             const course = await this.courseMySqlRepository.findOne({
                 where: { courseId },
                 relations: {
@@ -103,14 +103,44 @@ export class CoursesService {
 
     async findManyCourses(
         input: FindManyCoursesInput,
-    ): Promise<Array<CourseMySqlEntity>> {
+    ): Promise<FindManyCoursesOutputData> {
         const { data } = input
-        const founds = await this.courseMySqlRepository.findAndCount({
-            relations: {
-                creator: true,
-            },
-        })
-        return founds[0]
+        const { options } = data
+        const { skip, take } = { ...options }
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const results = await this.courseMySqlRepository.find(
+                {
+                    skip,
+                    take,
+                    relations: {
+                        creator: true,
+                    }
+                })
+                
+            const numberOfCoursesResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(CourseMySqlEntity, "course")
+                .getRawOne()
+            
+            await queryRunner.commitTransaction()
+
+            return {
+                results,
+                metadata: {
+                    count: numberOfCoursesResult.count
+                }
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
     }
 
     async findOneLecture(

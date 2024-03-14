@@ -275,6 +275,15 @@ enum UserKind {
   Facebook
 }
 
+type FindManyCoursesOutputMetadata {
+  count: Int
+}
+
+type FindManyCoursesOutputData {
+  results: [CourseEntity!]!
+  metadata: FindManyCoursesOutputMetadata
+}
+
 type FindOneLectureOutput {
   data: LectureEntity!
   tokens: AuthTokens
@@ -366,7 +375,7 @@ type Query {
   init: InitOutput!
   signIn(data: SignInInputData!): SignInOutput!
   findOneCourse(data: FindOneCourseInputData!): CourseEntity!
-  findManyCourses(data: FindManyCoursesInputData): [CourseEntity!]!
+  findManyCourses(data: FindManyCoursesInputData!): FindManyCoursesOutputData!
   findOneLecture(data: FindOneLectureInputData!): FindOneLectureOutput!
   findManyLectures(data: FindManyLecturesInputData!): [LectureEntity!]!
   findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
@@ -393,11 +402,12 @@ input FindOneCourseInputData {
 }
 
 input FindManyCoursesInputData {
-  filter: CourseFilterInput
+  options: FindManyCoursesInputOptions
 }
 
-input CourseFilterInput {
-  category: String
+input FindManyCoursesInputOptions {
+  take: Int
+  skip: Int
 }
 
 input FindOneLectureInputData {

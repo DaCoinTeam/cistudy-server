@@ -1,6 +1,6 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
 import {
-  FindManyPostCommentRepliesInputData,
+    FindManyPostCommentRepliesInputData,
     FindManyPostCommentsInputData,
     FindManyPostsInputData,
     FindOnePostCommentInputData,
@@ -10,7 +10,7 @@ import { PostsService } from "./posts.service"
 import { AuthInterceptor, JwtAuthGuard, UserId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import {
-  FindManyPostCommentRepliesOutput,
+    FindManyPostCommentRepliesOutput,
     FindManyPostCommentsOutput,
     FindManyPostsOutput,
     FindOnePostCommentOutput,
