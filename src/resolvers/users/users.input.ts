@@ -11,9 +11,8 @@ export class FindOneUserInputParams {
 
 @InputType()
 export class FindOneUserInputOptions {
-    @Field(() => ID)
-    @IsUUID()
-        followerId: string
+    @Field(() => ID, { nullable: true})
+        followerId?: string
 }
 
 @InputType()

@@ -1,6 +1,5 @@
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
 import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@common"
-import { IsInt } from "class-validator"
 
 @InputType()
 export class FindOneCourseInputParams {
@@ -63,11 +62,11 @@ export class FindManyLecturesInput implements AuthInput<FindManyLecturesInputDat
 @InputType()
 export class FindManyCoursesInputOptions {
     @Field(() => Int, { nullable: true })
-    @IsInt()
         take?: number
     @Field(() => Int, { nullable: true })
-    @IsInt()
         skip?: number
+    @Field(() => String, { nullable: true })
+        searchValue?: string
 }
 
 @InputType()
@@ -76,7 +75,7 @@ implements
     OptionsOnly<FindManyCoursesInputOptions>
 {
     @Field(() => FindManyCoursesInputOptions, { nullable: true })
-        options?: Partial<FindManyCoursesInputOptions>
+        options?: FindManyCoursesInputOptions
 }
 
 export class FindManyCoursesInput implements Input<FindManyCoursesInputData> {
