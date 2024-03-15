@@ -27,7 +27,7 @@ type LectureEntity {
   processStatus: String!
   videoType: String!
   numberOfViews: Int!
-  description: String!
+  description: String
   createdAt: DateTime!
   updatedAt: DateTime!
   section: SectionEntity!
@@ -39,6 +39,7 @@ type SectionEntity {
   title: String!
   courseId: ID!
   createdAt: DateTime!
+  updatedAt: DateTime!
   course: CourseEntity!
   lectures: [LectureEntity!]!
 }
@@ -53,6 +54,65 @@ type CourseTargetEntity {
   course: CourseEntity!
 }
 
+type CategoryEntity {
+  categoryId: ID!
+  name: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  subcategories: [SubcategoryEntity!]!
+  courses: [CourseEntity!]!
+}
+
+type CourseSubcategoryEntity {
+  courseSubcategoryId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  courseId: ID!
+  subcategoryId: ID!
+  course: CourseEntity!
+  subcategory: SubcategoryEntity!
+}
+
+type SubcategoryEntity {
+  subcategoryId: ID!
+  name: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  categoryId: ID!
+  category: CategoryEntity!
+  subcategoryTopics: [SubcategoryTopicEntity!]!
+  courseSubcategories: [CourseSubcategoryEntity!]!
+}
+
+type SubcategoryTopicEntity {
+  subcategoryTopicId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  subcategoryId: ID!
+  topicId: ID!
+  subcategory: SubcategoryEntity!
+  topic: TopicEntity!
+}
+
+type TopicEntity {
+  topicId: ID!
+  name: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  courseTopics: [CourseTopicEntity!]!
+  subcategoryTopics: [SubcategoryTopicEntity!]!
+}
+
+type CourseTopicEntity {
+  courseTopicId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  courseId: ID!
+  topicId: ID!
+  course: CourseEntity!
+  topic: TopicEntity!
+}
+
 type CourseEntity {
   courseId: ID!
   title: String
@@ -60,6 +120,8 @@ type CourseEntity {
   description: String
   creatorId: ID!
   price: Float!
+  discount: Float!
+  enableDiscount: Boolean!
   verifyStatus: VerifyStatus
   isDraft: Boolean!
   creator: UserEntity!
@@ -68,8 +130,13 @@ type CourseEntity {
   includes: String
   createdAt: DateTime!
   updatedAt: DateTime!
+  courseTopics: [CourseTopicEntity!]!
+  categoryId: ID!
+  category: CategoryEntity!
+  courseSubcategories: [CourseSubcategoryEntity!]!
   courseTargets: [CourseTargetEntity!]
   sections: [SectionEntity!]!
+  numberOfEnrollments: Int!
 }
 
 enum VerifyStatus {
@@ -161,6 +228,15 @@ type FollowEntity {
   followedUser: UserEntity!
 }
 
+type CryptoWalletEntity {
+  cryptoWalletId: ID!
+  address: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  userId: ID!
+  user: UserEntity!
+}
+
 type UserEntity {
   userId: ID!
   email: String!
@@ -178,6 +254,7 @@ type UserEntity {
   verified: Boolean!
   kind: UserKind!
   externalId: String
+  cryptoWallets: [CryptoWalletEntity!]!
   posts: [PostEntity!]!
   courses: [CourseEntity!]!
   followerRelations: [FollowEntity!]!
@@ -196,6 +273,15 @@ enum UserKind {
   Local
   Google
   Facebook
+}
+
+type FindManyCoursesOutputMetadata {
+  count: Int
+}
+
+type FindManyCoursesOutputData {
+  results: [CourseEntity!]!
+  metadata: FindManyCoursesOutputMetadata
 }
 
 type FindOneLectureOutput {
@@ -289,11 +375,12 @@ type Query {
   init: InitOutput!
   signIn(data: SignInInputData!): SignInOutput!
   findOneCourse(data: FindOneCourseInputData!): CourseEntity!
-  findManyCourses(data: FindManyCoursesInputData): [CourseEntity!]!
+  findManyCourses(data: FindManyCoursesInputData!): FindManyCoursesOutputData!
   findOneLecture(data: FindOneLectureInputData!): FindOneLectureOutput!
   findManyLectures(data: FindManyLecturesInputData!): [LectureEntity!]!
   findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
+  findManyCategories: [CategoryEntity!]!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
@@ -315,11 +402,12 @@ input FindOneCourseInputData {
 }
 
 input FindManyCoursesInputData {
-  filter: CourseFilterInput
+  options: FindManyCoursesInputOptions
 }
 
-input CourseFilterInput {
-  category: String
+input FindManyCoursesInputOptions {
+  take: Int
+  skip: Int
 }
 
 input FindOneLectureInputData {

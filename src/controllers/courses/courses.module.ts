@@ -14,6 +14,10 @@ import {
     PostLikeMySqlEntity,
     PostCommentLikeMySqlEntity,
     CourseTargetMySqlEntity,
+    CourseSubcategoryMySqlEntity,
+    CourseTopicMySqlEntity,
+    TopicMySqlEntity,
+    SubcategoyMySqlEntity,
 } from "@database"
 import { CoursesService } from "./courses.service"
 
@@ -31,7 +35,11 @@ import { CoursesService } from "./courses.service"
             PostCommentMySqlEntity,
             PostLikeMySqlEntity,
             PostCommentLikeMySqlEntity,
-            CourseTargetMySqlEntity
+            CourseTargetMySqlEntity,
+            CourseSubcategoryMySqlEntity,
+            CourseTopicMySqlEntity,
+            TopicMySqlEntity,
+            SubcategoyMySqlEntity
         ]),
     ],
     controllers: [CoursesController],

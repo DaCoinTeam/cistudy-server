@@ -26,6 +26,11 @@ export interface ParamsWithOptions<T, K> {
     options?: Partial<K>
 }
 
+export interface OptionsOnly<T> {
+    options?: Partial<T>
+}
+
+
 export interface ResultsWithMetadata<T, K> {
     results: Array<T>,
     metadata?: Partial<K>

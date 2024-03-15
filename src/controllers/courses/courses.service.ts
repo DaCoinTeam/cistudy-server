@@ -1,13 +1,15 @@
-import { Injectable, NotFoundException } from "@nestjs/common"
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import {
     CourseMySqlEntity,
+    CourseSubcategoryMySqlEntity,
     CourseTargetMySqlEntity,
+    CourseTopicMySqlEntity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
     SectionMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository } from "typeorm"
+import { Repository, DataSource } from "typeorm"
 import { StorageService } from "@global"
 import {
     CreateCourseInput,
@@ -23,11 +25,13 @@ import {
     DeleteSectionInput,
     UpdateSectionInput,
     DeleteResourceInput,
+    EnrollCourseInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import { ProcessStatus, VideoType, existKeyNotUndefined } from "@common"
-import { CreateCourseOutput } from "./courses.output"
+import { CreateCourseOutput, EnrollCourseOutput, UpdateCourseOutput } from "./courses.output"
+import { EnrolledInfoEntity } from "src/database/mysql/enrolled-info.entity"
 
 @Injectable()
 export class CoursesService {
@@ -42,9 +46,44 @@ export class CoursesService {
         private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
         @InjectRepository(ResourceMySqlEntity)
         private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+        @InjectRepository(EnrolledInfoEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoEntity>,
+        @InjectRepository(CourseSubcategoryMySqlEntity)
+        private readonly courseSubcategoryMySqlRepository: Repository<CourseSubcategoryMySqlEntity>,
+        @InjectRepository(CourseTopicMySqlEntity)
+        private readonly courseTopicMySqlRepository: Repository<CourseTopicMySqlEntity>,
         private readonly storageService: StorageService,
         private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
+        private readonly dataSource: DataSource
     ) { }
+
+    async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
+        const { data, userId } = input
+        const { courseId } = data
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const found = await this.enrolledInfoMySqlRepository.findOneBy({ userId, courseId })
+            if (found) throw new ConflictException("You have enrolled to this course.")
+
+            const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
+                courseId,
+                userId
+            })
+
+            await queryRunner.commitTransaction()
+
+            return { enrolledInfoId }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
+    }
 
     async createCourse(input: CreateCourseInput): Promise<CreateCourseOutput> {
         const { userId } = input
@@ -58,7 +97,7 @@ export class CoursesService {
             }
     }
 
-    async updateCourse(input: UpdateCourseInput): Promise<string> {
+    async updateCourse(input: UpdateCourseInput): Promise<UpdateCourseOutput> {
         const { data, files } = input
         const {
             thumbnailIndex,
@@ -66,13 +105,29 @@ export class CoursesService {
             courseId,
             description,
             price,
+            discount,
+            enableDiscount,
             title,
+            categoryId,
+            subcategoryIds,
+            topicIds
         } = data
 
         const course: DeepPartial<CourseMySqlEntity> = {
+            courseId,
             description,
-            price,
             title,
+            price,
+            discount,
+            enableDiscount,
+            categoryId,
+            courseSubcategories: subcategoryIds?.map(subcategoryId => ({
+                subcategoryId,
+                courseId
+            })),
+            courseTopics: topicIds?.map(topicId => ({
+                topicId
+            })),
         }
 
         const promises: Array<Promise<void>> = []
@@ -115,9 +170,31 @@ export class CoursesService {
         }
         await Promise.all(promises)
 
-        if (existKeyNotUndefined(course))
-            await this.courseMySqlRepository.update(courseId, course)
-        return `A course wth id ${courseId} has been updated successfully`
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            if (subcategoryIds?.length)
+                await this.courseSubcategoryMySqlRepository.delete({ courseId })
+
+            if (topicIds?.length)
+                await this.courseTopicMySqlRepository.delete({ courseId })
+
+            if (existKeyNotUndefined(course))
+                await this.courseMySqlRepository.save(course)
+
+            await queryRunner.commitTransaction()
+
+            return {}
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
+
+
     }
 
     async createSection(input: CreateSectionInput): Promise<string> {
@@ -149,14 +226,14 @@ export class CoursesService {
 
     async updateLecture(input: UpdateLectureInput): Promise<string> {
         const { data, files } = input
-        const { lectureId, title, lectureVideoIndex, thumbnailIndex } = data
+        const { lectureId, title, description, lectureVideoIndex, thumbnailIndex } = data
 
         const { thumbnailId, lectureVideoId } =
             await this.lectureMySqlRepository.findOneBy({ lectureId })
 
         const promises: Array<Promise<void>> = []
 
-        const lecture: DeepPartial<LectureMySqlEntity> = { title }
+        const lecture: DeepPartial<LectureMySqlEntity> = { title, description }
 
         if (Number.isInteger(lectureVideoIndex)) {
             const promise = async () => {

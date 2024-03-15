@@ -1,11 +1,39 @@
-import { Column, Entity, ManyToMany } from "typeorm"
-import { CourseEntity } from "./course.entity"
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    CreateDateColumn,
+    UpdateDateColumn,
+    OneToMany
+} from "typeorm"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
+import { CourseTopicEntity } from "./course-topic.entity"
+import { SubcategoryTopicEntity } from "./subcategory-topic.entity"
 
-@Entity()
+@ObjectType()
+@Entity("topic")
 export class TopicEntity {
-    @Column()
-    	topicName: string
+	@Field(() => ID)
+	@PrimaryGeneratedColumn("uuid")
+	    topicId: string
 
-	// @ManyToMany(() => CourseEntity, course => course.topics)
-	// 	courses: CourseEntity[]
+	@Field(() => String, { nullable: true })
+	@Column({ type: "varchar", length: 1000, nullable: true })
+	    name: string
+
+	@Field(() => Date)
+	@CreateDateColumn()
+	    createdAt: Date
+
+	@Field(() => Date)
+	@UpdateDateColumn()
+	    updatedAt: Date
+
+	@Field(() => [CourseTopicEntity])
+	@OneToMany(() => CourseTopicEntity, (courseTopic) => courseTopic.topic)
+	    courseTopics: Array<CourseTopicEntity>
+	
+	@Field(() => [SubcategoryTopicEntity])
+	@OneToMany(() => SubcategoryTopicEntity, (subcategoryTopic) => subcategoryTopic.topic)
+	    subcategoryTopics: Array<SubcategoryTopicEntity>
 }

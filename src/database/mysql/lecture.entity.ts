@@ -48,9 +48,9 @@ export class LectureEntity {
     @Column({ type: "int", default: 0 })
         numberOfViews: number
 
-    @Field(() => String)
-    @Column({ type: "varchar" })
-        description: number
+    @Field(() => String, { nullable: true })
+    @Column({ type: "varchar", nullable: true })
+        description: string
 
     @Field(() => Date)
     @CreateDateColumn()

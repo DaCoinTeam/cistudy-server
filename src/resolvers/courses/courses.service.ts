@@ -1,6 +1,8 @@
 import {
+    CategoryMySqlEntity,
     CourseMySqlEntity,
     CourseTargetMySqlEntity,
+    EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
@@ -16,6 +18,7 @@ import {
     FindOneLectureInput,
     FindManyCourseTargetsInput,
 } from "./courses.input"
+import { FindManyCoursesOutputData } from "./courses.output"
 
 @Injectable()
 export class CoursesService {
@@ -28,6 +31,8 @@ export class CoursesService {
     private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
     @InjectRepository(CourseTargetMySqlEntity)
     private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+    @InjectRepository(CategoryMySqlEntity)
+    private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
     private readonly dataSource: DataSource
     ) {}
 
@@ -40,7 +45,6 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-
             const course = await this.courseMySqlRepository.findOne({
                 where: { courseId },
                 relations: {
@@ -50,7 +54,17 @@ export class CoursesService {
                         },
                     },
                     courseTargets: true,
-                    creator: true
+                    creator: true,
+                    courseSubcategories: {
+                        subcategory: {
+                            subcategoryTopics: {
+                                topic: true
+                            }
+                        }
+                    },
+                    courseTopics: {
+                        topic: true
+                    }
                 },
                 order: {
                     courseTargets: {
@@ -67,9 +81,17 @@ export class CoursesService {
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 
+            const numberOfEnrollments = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(EnrolledInfoMySqlEntity, "enrolled_info")
+                .andWhere("courseId = :courseId", { courseId })
+                .getRawOne()
+
             await queryRunner.commitTransaction()
 
             course.creator.numberOfFollowers = numberOfFollowers.count
+            course.numberOfEnrollments = numberOfEnrollments.count
 
             return course
         } catch (ex) {
@@ -81,14 +103,44 @@ export class CoursesService {
 
     async findManyCourses(
         input: FindManyCoursesInput,
-    ): Promise<Array<CourseMySqlEntity>> {
+    ): Promise<FindManyCoursesOutputData> {
         const { data } = input
-        const founds = await this.courseMySqlRepository.findAndCount({
-            relations: {
-                creator: true,
-            },
-        })
-        return founds[0]
+        const { options } = data
+        const { skip, take } = { ...options }
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const results = await this.courseMySqlRepository.find(
+                {
+                    skip,
+                    take,
+                    relations: {
+                        creator: true,
+                    }
+                })
+                
+            const numberOfCoursesResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(CourseMySqlEntity, "course")
+                .getRawOne()
+            
+            await queryRunner.commitTransaction()
+
+            return {
+                results,
+                metadata: {
+                    count: numberOfCoursesResult.count
+                }
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
     }
 
     async findOneLecture(
@@ -178,4 +230,18 @@ export class CoursesService {
             where: data,
         })
     }
+
+    async findManyCategories(
+    ): Promise<Array<CategoryMySqlEntity>> {
+        return await this.categoryMySqlRepository.find({
+            relations: {
+                subcategories: {
+                    subcategoryTopics: {
+                        topic: true
+                    }
+                }
+            },
+        })
+    }
+
 }

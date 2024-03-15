@@ -1,5 +1,6 @@
-import { Field, ID, InputType } from "@nestjs/graphql"
-import { AuthInput, Input, ParamsWithOptions } from "@common"
+import { Field, ID, InputType, Int } from "@nestjs/graphql"
+import { AuthInput, Input, OptionsOnly, ParamsWithOptions } from "@common"
+import { IsInt } from "class-validator"
 
 @InputType()
 export class FindOneCourseInputData {
@@ -47,15 +48,34 @@ export class FindManyLecturesInput implements Input<FindManyLecturesInputData> {
 }
 
 @InputType()
-export class CourseFilterInput {
-    @Field(() => String, { nullable: true })
-        category: string
+export class FindManyPostsInputParams {
+    @Field(() => String)
+        courseId: string
+}
+
+// @InputType()
+// export class FindManyCoursesInputParams {
+// }
+
+@InputType()
+export class FindManyCoursesInputOptions {
+    @Field(() => Int, { nullable: true })
+    @IsInt()
+        take?: number
+    @Field(() => Int, { nullable: true })
+    @IsInt()
+        skip?: number
 }
 
 @InputType()
-export class FindManyCoursesInputData {
-    @Field(() => CourseFilterInput, { nullable: true })
-        filter: CourseFilterInput
+export class FindManyCoursesInputData
+implements
+    OptionsOnly<FindManyCoursesInputOptions>
+{
+    // @Field(() => FindManyCoursesInputParams)
+    //     params: FindManyCoursesInputParams
+    @Field(() => FindManyCoursesInputOptions, { nullable: true })
+        options?: Partial<FindManyCoursesInputOptions>
 }
 
 export class FindManyCoursesInput implements Input<FindManyCoursesInputData> {

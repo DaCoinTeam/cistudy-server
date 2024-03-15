@@ -4,4 +4,10 @@ export class CreateCourseOutput {
     @ApiProperty()
         courseId: string
 }
-  
+
+export class EnrollCourseOutput {
+    @ApiProperty()
+        enrolledInfoId: string
+}
+export class UpdateCourseOutput {
+}

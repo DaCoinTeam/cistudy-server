@@ -8,6 +8,7 @@ import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { PostEntity } from "./post.entity"
 import { CourseEntity } from "./course.entity"
 import { FollowEntity } from "./follow.entity"
+import { CryptoWalletEntity } from "./crypto-wallet.entity"
 
 @ObjectType()
 @Entity("user")
@@ -93,17 +94,21 @@ export class UserEntity {
         externalId: string
 
     @OneToMany(() => SessionEntity, (session) => session.user)
-        sessions: SessionEntity[]
+        sessions: Array<SessionEntity>
 
     @OneToMany(() => PostCommentEntity, (postComment) => postComment.creator)
-        postComments: PostCommentEntity[]
+        postComments: Array<PostCommentEntity>
 
     @OneToMany(() => PostLikeEntity, (postReact) => postReact.user)
-        postReacts: PostLikeEntity[]
+        postReacts: Array<PostLikeEntity>
 
     @OneToMany(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.user)
-        enrolledInfos: EnrolledInfoEntity[]
+        enrolledInfos: Array<EnrolledInfoEntity>
 
+    @Field(() => [CryptoWalletEntity])
+        @OneToMany(() => CryptoWalletEntity, (cryptoWallet) => cryptoWallet.user)
+        cryptoWallets: Array<CourseEntity>
+    
     @Field(() => [PostEntity])
     @OneToMany(() => PostEntity, (post) => post.creator)
         posts: Array<PostEntity>

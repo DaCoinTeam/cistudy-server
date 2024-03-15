@@ -7,6 +7,18 @@ export class CreateCourseInput implements AuthEmptyDataInput {
         userId: string
 }
 
+export class EnrollCourseInputData {
+    @IsUUID()
+    @ApiProperty()
+        courseId: string
+}
+
+export class EnrollCourseInput implements AuthInput<EnrollCourseInputData> {
+    data: EnrollCourseInputData
+    @IsUUID("4")
+        userId: string
+}
+
 export class CreateCourseTargetInputData {
     @IsUUID()
     @ApiProperty()
@@ -54,9 +66,23 @@ export class UpdateCourseInputData {
     @ApiProperty({ nullable: true })
         description?: string
 
-    @IsNumber()
     @ApiProperty({ nullable: true })
         price?: number
+
+    @ApiProperty({ nullable: true })
+        discount?: number
+
+    @ApiProperty({ nullable: true })
+        enableDiscount?: boolean
+
+    @ApiProperty({ nullable: true })
+        categoryId?: string
+
+    @ApiProperty({ nullable: true })
+        subcategoryIds?: Array<string>
+
+    @ApiProperty({ nullable: true })
+        topicIds?: Array<string>
 
     @IsNumber()
     @ApiProperty({ nullable: true })
@@ -96,7 +122,7 @@ export class CreateLectureInputData {
     @ApiProperty()
         title: string
 }
-  
+
 export class CreateLectureInput implements AuthInput<CreateLectureInputData> {
     @IsUUID("4")
         userId: string
@@ -152,6 +178,8 @@ export class UpdateLectureInputData {
         lectureId: string
     @ApiProperty({ nullable: true })
         title?: string
+    @ApiProperty({ nullable: true })
+        description?: string
     @ApiProperty({ nullable: true })
         thumbnailIndex?: number
     @ApiProperty({ nullable: true })
