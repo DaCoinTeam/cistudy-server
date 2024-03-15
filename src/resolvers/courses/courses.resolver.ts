@@ -29,9 +29,11 @@ export class CoursesResolver {
         return await this.coursesService.findOneLecture({ userId, data })
     }
 
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
     @Query(() => [LectureMySqlEntity])
-    async findManyLectures(@Args("data") data: FindManyLecturesInputData) {
-        return await this.coursesService.findManyLectures({ data })
+    async findManyLectures(@UserId() userId: string,  @Args("data") data: FindManyLecturesInputData) {
+        return await this.coursesService.findManyLectures({ userId, data })
     }
 
     @UseGuards(JwtAuthGuard)

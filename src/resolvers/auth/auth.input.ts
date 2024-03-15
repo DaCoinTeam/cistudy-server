@@ -5,19 +5,25 @@ import { IsEmail, IsJWT, Length } from "class-validator"
 
 @InputType()
 export class InitInput implements AuthEmptyDataInput {
-  @Field(() => ID)
-      userId: string
+    @Field(() => ID)
+        userId: string
 }
 
 @InputType()
-export class SignInInputData {
-  @Field(() => String)
-  @IsEmail()
-      email: string
+export class SignInInputParams {
+    @Field(() => String)
+    @IsEmail()
+        email: string
 
-  @Field(() => String)
-  @Length(6, 20)
-      password: string
+    @Field(() => String)
+    @Length(6, 20)
+        password: string
+}
+
+@InputType()
+export class SignInInputData implements ParamsOnly<SignInInputParams> {
+    @Field(() => SignInInputParams)
+        params: SignInInputParams
 }
 
 export class SignInInput implements Input<SignInInputData> {
@@ -26,19 +32,19 @@ export class SignInInput implements Input<SignInInputData> {
 
 @InputType()
 export class VerifyGoogleAccessTokenParams {
-  @IsJWT()
-  @Field(() => ID)
-  @ApiProperty()
-      token: string
+    @IsJWT()
+    @Field(() => ID)
+    @ApiProperty()
+        token: string
 }
 
 @InputType()
 export class VerifyGoogleAccessTokenData
 implements ParamsOnly<VerifyGoogleAccessTokenParams>
 {
-  @Field(() => VerifyGoogleAccessTokenParams)
-  @ApiProperty()
-      params: VerifyGoogleAccessTokenParams
+    @Field(() => VerifyGoogleAccessTokenParams)
+    @ApiProperty()
+        params: VerifyGoogleAccessTokenParams
 }
 
 export class VerifyGoogleAccessTokenInput

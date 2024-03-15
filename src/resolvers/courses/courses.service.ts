@@ -23,22 +23,23 @@ import { FindManyCoursesOutputData } from "./courses.output"
 @Injectable()
 export class CoursesService {
     constructor(
-    @InjectRepository(CourseMySqlEntity)
-    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-    @InjectRepository(LectureMySqlEntity)
-    private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
-    @InjectRepository(ResourceMySqlEntity)
-    private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
-    @InjectRepository(CourseTargetMySqlEntity)
-    private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
-    @InjectRepository(CategoryMySqlEntity)
-    private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
-    private readonly dataSource: DataSource
-    ) {}
+        @InjectRepository(CourseMySqlEntity)
+        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(LectureMySqlEntity)
+        private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
+        @InjectRepository(ResourceMySqlEntity)
+        private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+        @InjectRepository(CourseTargetMySqlEntity)
+        private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+        @InjectRepository(CategoryMySqlEntity)
+        private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
+        private readonly dataSource: DataSource
+    ) { }
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
         const { data } = input
-        const { courseId } = data
+        const { params } = data
+        const { courseId } = params
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -121,13 +122,13 @@ export class CoursesService {
                         creator: true,
                     }
                 })
-                
+
             const numberOfCoursesResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(CourseMySqlEntity, "course")
                 .getRawOne()
-            
+
             await queryRunner.commitTransaction()
 
             return {
@@ -167,7 +168,8 @@ export class CoursesService {
                             }
                         }
                     }
-                }})
+                }
+            })
 
             const follow = await queryRunner.manager.findOne(
                 FollowMySqlEnitity,
@@ -178,7 +180,7 @@ export class CoursesService {
                         followed: true
                     }
                 }
-            ) 
+            )
 
             const numberOfFollowers = await queryRunner.manager
                 .createQueryBuilder()
@@ -205,8 +207,13 @@ export class CoursesService {
         input: FindManyLecturesInput,
     ): Promise<Array<LectureMySqlEntity>> {
         const { data } = input
+        const { params } = data
+        const { sectionId } = params
+
         return await this.lectureMySqlRepository.find({
-            where: data,
+            where: {
+                sectionId
+            },
             relations: {
                 resources: true,
             },
@@ -217,8 +224,13 @@ export class CoursesService {
         input: FindManyResourcesInput,
     ): Promise<Array<ResourceMySqlEntity>> {
         const { data } = input
+        const { params } = data
+        const { lectureId } = params
+
         return await this.resourceMySqlRepository.find({
-            where: data,
+            where: {
+                lectureId
+            },
         })
     }
 
@@ -226,8 +238,13 @@ export class CoursesService {
         input: FindManyCourseTargetsInput,
     ): Promise<Array<CourseTargetMySqlEntity>> {
         const { data } = input
+        const { params } = data
+        const { courseId } = params
+
         return await this.courseTargetMySqlRepository.find({
-            where: data,
+            where: {
+                courseId
+            },
         })
     }
 

@@ -1,4 +1,4 @@
-import { AuthEmptyDataInput, AuthInput } from "@common"
+import { AuthEmptyDataInput, AuthInput, OptionsOnly } from "@common"
 import { Field, InputType, Int } from "@nestjs/graphql"
 
 
@@ -11,7 +11,7 @@ export class FindManySelfCreatedCoursesInputOptions {
 }
 
 @InputType()
-export class FindManySelfCreatedCoursesInputData {
+export class FindManySelfCreatedCoursesInputData implements OptionsOnly<FindManySelfCreatedCoursesInputOptions>{
     @Field(() => FindManySelfCreatedCoursesInputOptions, { nullable: true })
         options?: FindManySelfCreatedCoursesInputOptions
 }

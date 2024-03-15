@@ -1,35 +1,41 @@
-import { AuthInput, ParamsWithOptions } from "@common"
+import { AuthInput, ParamsOnly, ParamsWithOptions } from "@common"
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
 import { IsInt } from "class-validator"
 
 @InputType()
-export class FindOnePostInputData {
+export class FindOnePostInputParams {
   @Field(() => ID)
       postId: string
 }
 
 @InputType()
+export class FindOnePostInputData implements ParamsOnly<FindOnePostInputParams> {
+  @Field(() => FindOnePostInputParams)
+      params: FindOnePostInputParams
+}
+
 export class FindOnePostInput implements AuthInput<FindOnePostInputData> {
-  @Field(() => ID)
-      userId: string
-  @Field(() => FindOnePostInputData)
-      data: FindOnePostInputData
+    userId: string
+    data: FindOnePostInputData
 }
 
 @InputType()
-export class FindOnePostCommentInputData {
+export class FindOnePostCommentInputParams {
   @Field(() => ID)
       postCommentId: string
 }
 
 @InputType()
+export class FindOnePostCommentInputData implements ParamsOnly<FindOnePostCommentInputParams> {
+  @Field(() => FindOnePostCommentInputParams)
+      params: FindOnePostCommentInputParams
+}
+
 export class FindOnePostCommentInput
 implements AuthInput<FindOnePostCommentInputData>
 {
-  @Field(() => ID)
-      userId: string
-  @Field(() => FindOnePostCommentInputData)
-      data: FindOnePostCommentInputData
+    userId: string
+    data: FindOnePostCommentInputData
 }
 
 @InputType()

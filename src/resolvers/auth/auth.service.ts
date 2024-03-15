@@ -29,7 +29,9 @@ export class AuthService {
 
     async signIn(input: SignInInput): Promise<UserMySqlEntity> {
         const { data } = input
-        const { email, password } = data
+        const { params } = data
+        const { email, password } = params
+        
         const found = await this.userMySqlRepository.findOneBy({
             email,
         })
