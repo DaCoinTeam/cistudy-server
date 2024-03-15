@@ -46,7 +46,7 @@ import { APP_PIPE } from "@nestjs/core"
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
             introspection: true,
         }),
-
+ 
         ResolversModule,
         GlobalModule,
         ControllersModule,

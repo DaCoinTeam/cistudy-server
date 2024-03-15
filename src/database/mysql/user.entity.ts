@@ -13,121 +13,125 @@ import { CryptoWalletEntity } from "./crypto-wallet.entity"
 @ObjectType()
 @Entity("user")
 export class UserEntity {
-    @Field(() => ID)
-    @PrimaryGeneratedColumn("uuid")
-        userId: string
+  @Field(() => ID)
+  @PrimaryGeneratedColumn("uuid")
+      userId: string
 
-    @Field(() => String)
-    @Column({ type: "varchar", length: 50, default: null })
-        email: string
+  @Field(() => String)
+  @Column({ type: "varchar", length: 50, default: null })
+      email: string
 
-    @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", length: 64, default: null })
-        password: string
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", length: 64, default: null })
+      password: string
 
-    @Field(() => ID, { nullable: true })
-    @Column({ type: "uuid", length: 36, default: null })
-        avatarId: string
+  @Field(() => ID, { nullable: true })
+  @Column({ type: "uuid", length: 36, default: null })
+      avatarId: string
 
-    @Field(() => ID, { nullable: true })
-    @Column({ type: "uuid", length: 36, default: null })
-        coverPhotoId: string
+  @Field(() => String, { nullable: true })
+  @Column({ type: "nvarchar", length: 200, default: null })
+      avatarUrl: string
 
-    @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", length: 12, default: null })
-        phoneNumber: string
+  @Field(() => ID, { nullable: true })
+  @Column({ type: "uuid", length: 36, default: null })
+      coverPhotoId: string
 
-    @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", length: 60, default: null })
-        username: string
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", length: 12, default: null })
+      phoneNumber: string
 
-    @Field(() => Float, { nullable: true })
-    @Column({
-        type: "decimal",
-        precision: 10,
-        scale: 5,
-        default: 0,
-    })
-        balance: number
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", length: 60, default: null })
+      username: string
 
-    @Field(() => UserRole)
-    @Column({
-        type: "enum",
-        enum: UserRole,
-        default: UserRole.User,
-    })
-        role: UserRole
+  @Field(() => Float, { nullable: true })
+  @Column({
+      type: "decimal",
+      precision: 10,
+      scale: 5,
+      default: 0,
+  })
+      balance: number
 
-    @Field(() => ID, { nullable: true })
-    @Column({
-        type: "uuid",
-        default: null,
-    })
-        walletId: string
+  @Field(() => UserRole)
+  @Column({
+      type: "enum",
+      enum: UserRole,
+      default: UserRole.User,
+  })
+      role: UserRole
 
-    @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", length: 50, default: null })
-        firstName: string
+  @Field(() => ID, { nullable: true })
+  @Column({
+      type: "uuid",
+      default: null,
+  })
+      walletId: string
 
-    @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", length: 50, default: null })
-        lastName: string
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", length: 50, default: null })
+      firstName: string
 
-    @Field(() => Date, { nullable: true })
-    @Column({ type: "date", default: null })
-        birthdate: Date
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", length: 50, default: null })
+      lastName: string
 
-    @Field(() => Boolean)
-    @Column({ type: "boolean", default: false })
-        verified: boolean
+  @Field(() => Date, { nullable: true })
+  @Column({ type: "date", default: null })
+      birthdate: Date
 
-    @Field(() => UserKind)
-    @Column({
-        type: "enum",
-        enum: UserKind,
-        default: UserKind.Local,
-    })
-        kind: UserKind
+  @Field(() => Boolean)
+  @Column({ type: "boolean", default: false })
+      verified: boolean
 
-    @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", length: 128, default: null })
-        externalId: string
+  @Field(() => String)
+  @Column({
+      type: "enum",
+      enum: UserKind,
+      default: UserKind.Local,
+  })
+      kind: UserKind
 
-    @OneToMany(() => SessionEntity, (session) => session.user)
-        sessions: Array<SessionEntity>
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", length: 128, default: null })
+      externalId: string
 
-    @OneToMany(() => PostCommentEntity, (postComment) => postComment.creator)
-        postComments: Array<PostCommentEntity>
+  @OneToMany(() => SessionEntity, (session) => session.user)
+      sessions: Array<SessionEntity>
 
-    @OneToMany(() => PostLikeEntity, (postReact) => postReact.user)
-        postReacts: Array<PostLikeEntity>
+  @OneToMany(() => PostCommentEntity, (postComment) => postComment.creator)
+      postComments: Array<PostCommentEntity>
 
-    @OneToMany(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.user)
-        enrolledInfos: Array<EnrolledInfoEntity>
+  @OneToMany(() => PostLikeEntity, (postReact) => postReact.user)
+      postReacts: Array<PostLikeEntity>
 
-    @Field(() => [CryptoWalletEntity])
-        @OneToMany(() => CryptoWalletEntity, (cryptoWallet) => cryptoWallet.user)
-        cryptoWallets: Array<CourseEntity>
-    
-    @Field(() => [PostEntity])
-    @OneToMany(() => PostEntity, (post) => post.creator)
-        posts: Array<PostEntity>
+  @OneToMany(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.user)
+      enrolledInfos: Array<EnrolledInfoEntity>
 
-    @Field(() => [CourseEntity])
-    @OneToMany(() => CourseEntity, (course) => course.creator)
-        courses: Array<CourseEntity>
+  @Field(() => [CryptoWalletEntity])
+  @OneToMany(() => CryptoWalletEntity, (cryptoWallet) => cryptoWallet.user)
+      cryptoWallets: Array<CourseEntity>
 
-    @Field(() => [FollowEntity])
-    @OneToMany(() => FollowEntity, (user) => user.follower)
-        followerRelations: Array<FollowEntity>
+  @Field(() => [PostEntity])
+  @OneToMany(() => PostEntity, (post) => post.creator)
+      posts: Array<PostEntity>
 
-    @Field(() => [FollowEntity])
-    @OneToMany(() => FollowEntity, (user) => user.followedUser)
-        followedUserRelations: Array<FollowEntity>
+  @Field(() => [CourseEntity])
+  @OneToMany(() => CourseEntity, (course) => course.creator)
+      courses: Array<CourseEntity>
 
-    //graphql
-    @Field(() => Boolean)
-        followed?: boolean
-    @Field(() => Int)
-        numberOfFollowers?: number
+  @Field(() => [FollowEntity])
+  @OneToMany(() => FollowEntity, (user) => user.follower)
+      followerRelations: Array<FollowEntity>
+
+  @Field(() => [FollowEntity])
+  @OneToMany(() => FollowEntity, (user) => user.followedUser)
+      followedUserRelations: Array<FollowEntity>
+
+  //graphql
+  @Field(() => Boolean)
+      followed?: boolean
+  @Field(() => Int)
+      numberOfFollowers?: number
 }

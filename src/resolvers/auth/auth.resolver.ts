@@ -2,8 +2,8 @@ import { Resolver, Query, Args } from "@nestjs/graphql"
 import { AuthService } from "./auth.service"
 import { AuthInterceptor, GenerateAuthTokensInterceptor, JwtAuthGuard, UserId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
-import { InitOutput, SignInOutput } from "./auth.output"
-import { SignInInputData } from "./auth.input"
+import { InitOutput, SignInOutput, VerifyGoogleAccessTokenOutput } from "./auth.output"
+import { SignInInputData, VerifyGoogleAccessTokenData } from "./auth.input"
 
 @Resolver()
 export class AuthResolver {
@@ -20,5 +20,11 @@ export class AuthResolver {
   @Query(() => SignInOutput)
   async signIn(@Args("data") data: SignInInputData ) {
       return this.authService.signIn({ data })
+  }
+
+  @UseInterceptors(GenerateAuthTokensInterceptor)
+  @Query(() => VerifyGoogleAccessTokenOutput)
+  async verifyGoogleAccessToken(@Args("data") data: VerifyGoogleAccessTokenData ) {
+      return this.authService.verifyGoogleAccessToken({ data })
   }
 }

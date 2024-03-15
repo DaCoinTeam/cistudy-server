@@ -3,8 +3,7 @@ import { UserMySqlEntity } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { FirebaseService, MailerService, Sha256Service } from "@global"
-import { SignInInput, SignUpInput, VerifyGoogleAccessTokenInput } from "./auth.input"
-import {  UserKind } from "@common"
+import { SignInInput, SignUpInput } from "./auth.input"
 
 @Injectable()
 export class AuthService {
@@ -44,26 +43,5 @@ export class AuthService {
 	
   	await this.mailerService.sendMail(created.userId, data.email)
   	return `An user with id ${created.userId} has been created`
-    }
-
-    async verifyGoogleAccessToken(input: VerifyGoogleAccessTokenInput): Promise<UserMySqlEntity> {
-        const { data } = input
-        const { token } = data
-  	const decoded = await this.firebaseService.verifyGoogleAccessToken(token)
-  	if (!decoded)
-  		throw new UnauthorizedException("Invalid Google access token.")
-  	let found = await this.userMySqlRepository.findOneBy({
-  		externalId: decoded.uid,
-  	})
-  	if (!found) {
-  		found = await this.userMySqlRepository.save({
-  			externalId: decoded.uid,
-  			email: decoded.email,
-  			avatarUrl: decoded.picture,
-  			phoneNumber: decoded.phone_number,
-  			kind: UserKind.Google,
-  		})
-  	}
-  	return found
     }
 }

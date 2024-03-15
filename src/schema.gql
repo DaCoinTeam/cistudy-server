@@ -242,6 +242,7 @@ type UserEntity {
   email: String!
   password: String
   avatarId: ID
+  avatarUrl: String
   coverPhotoId: ID
   phoneNumber: String
   username: String
@@ -252,7 +253,7 @@ type UserEntity {
   lastName: String
   birthdate: DateTime
   verified: Boolean!
-  kind: UserKind!
+  kind: String!
   externalId: String
   cryptoWallets: [CryptoWalletEntity!]!
   posts: [PostEntity!]!
@@ -267,12 +268,6 @@ enum UserRole {
   User
   Moderator
   Administrator
-}
-
-enum UserKind {
-  Local
-  Google
-  Facebook
 }
 
 type FindManyCoursesOutputMetadata {
@@ -371,9 +366,15 @@ type SignInOutput {
   tokens: AuthTokens
 }
 
+type VerifyGoogleAccessTokenOutput {
+  data: UserEntity!
+  tokens: AuthTokens
+}
+
 type Query {
   init: InitOutput!
   signIn(data: SignInInputData!): SignInOutput!
+  verifyGoogleAccessToken(data: VerifyGoogleAccessTokenData!): VerifyGoogleAccessTokenOutput!
   findOneCourse(data: FindOneCourseInputData!): CourseEntity!
   findManyCourses(data: FindManyCoursesInputData!): FindManyCoursesOutputData!
   findOneLecture(data: FindOneLectureInputData!): FindOneLectureOutput!
@@ -395,6 +396,14 @@ type Query {
 input SignInInputData {
   email: String!
   password: String!
+}
+
+input VerifyGoogleAccessTokenData {
+  params: VerifyGoogleAccessTokenParams!
+}
+
+input VerifyGoogleAccessTokenParams {
+  token: ID!
 }
 
 input FindOneCourseInputData {

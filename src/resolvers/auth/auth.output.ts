@@ -21,3 +21,13 @@ implements Output<UserMySqlEntity>
   @Field(() => AuthTokens, { nullable: true })
       tokens: AuthTokens
 }
+
+@ObjectType()
+export class VerifyGoogleAccessTokenOutput
+implements Output<UserMySqlEntity>
+{
+  @Field(() => UserMySqlEntity)
+      data: UserMySqlEntity
+  @Field(() => AuthTokens, { nullable: true })
+      tokens: AuthTokens
+}

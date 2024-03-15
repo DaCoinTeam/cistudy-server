@@ -7,5 +7,6 @@ services:
     env_file:
       - docker.env
     volumes:
-      - ./app/storage:/usr/src/app/storage
-  
+      - storage:/usr/src/app/storage
+volumes:
+    storage:
