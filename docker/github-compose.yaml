@@ -30,5 +30,7 @@ services:
       - 3001:3001
     volumes:
       - storage:/usr/src/app/storage
+      - tasks:/usr/src/app/tasks
 volumes:
     storage:
+    tasks:
