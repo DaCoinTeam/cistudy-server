@@ -28,3 +28,7 @@ services:
       SUPABASE_KEY: ${SUPABASE_KEY}
     ports:
       - 3001:3001
+    volumes:
+      - storage:/usr/src/app/storage
+volumes:
+    storage:
