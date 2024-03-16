@@ -1,7 +1,7 @@
 import { CourseMySqlEntity, FollowMySqlEnitity, UserMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { DataSource, Repository } from "typeorm"
-import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindOneUserInput } from "./users.input"
+import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindOneUserInput, } from "./users.input"
 import { InjectRepository } from "@nestjs/typeorm"
 @Injectable()
 export class UsersService {
@@ -15,7 +15,8 @@ export class UsersService {
 
     async findOneUser(input: FindOneUserInput): Promise<UserMySqlEntity> {
         const { data } = input
-        const { userId, options } = data
+        const { params, options } = data
+        const { userId } = params
         const { followerId } = options
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -49,7 +50,7 @@ export class UsersService {
             await queryRunner.commitTransaction()
 
             user.numberOfFollowers = numberOfFollowers.count
-            user.followed = follow ? follow.followed : null
+            user.followed = follow ? follow.followed : false
 
             return user
         } catch (ex) {
@@ -61,7 +62,9 @@ export class UsersService {
 
     async findManyFollowers(input: FindManyFollowersInput): Promise<Array<UserMySqlEntity>> {
         const { data } = input
-        const { userId } = data
+        const { params } = data
+        const { userId } = params
+
         const followRelations = await this.followMySqlRepository.find(
             {
                 where: {
@@ -78,10 +81,9 @@ export class UsersService {
 
     async findManyCreatedCourses(input: FindManyCreatedCoursesInput): Promise<Array<CourseMySqlEntity>> {
         const { data } = input
-        const { userId, options } = data
-        
-        const take = options?.take
-        const skip = options?.skip
+        const { params, options } = data
+        const { userId } = params
+        const { take, skip } = { ...options }
 
         return await this.courseMySqlRepository.find(
             {

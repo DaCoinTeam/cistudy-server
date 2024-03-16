@@ -32,6 +32,8 @@ export class PostsService {
 
     async findOnePost(input: FindOnePostInput): Promise<PostMySqlEntity> {
         const { data } = input
+        const { params } = data
+        const { postId } = params
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -39,7 +41,9 @@ export class PostsService {
 
         try {
             const post = await queryRunner.manager.findOne(PostMySqlEntity, {
-                where: data,
+                where: {
+                    postId
+                },
                 relations: {
                     creator: true,
                     course: true,
@@ -83,8 +87,13 @@ export class PostsService {
         input: FindOnePostCommentInput,
     ): Promise<PostCommentMySqlEntity> {
         const { data } = input
+        const { params } = data
+        const { postCommentId } = params
+
         return await this.postCommentMySqlRepository.findOne({
-            where: data,
+            where: {
+                postCommentId
+            },
             relations: {
                 creator: true,
                 postCommentMedias: true,

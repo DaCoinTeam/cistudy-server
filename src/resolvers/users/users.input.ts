@@ -1,20 +1,24 @@
-import { Input } from "@common"
-import { Field, InputType, Int } from "@nestjs/graphql"
+import { Input, ParamsOnly, ParamsWithOptions } from "@common"
+import { Field, ID, InputType, Int } from "@nestjs/graphql"
 import { IsUUID } from "class-validator"
 
 @InputType()
-export class FindOneUserInputOptions {
-    @Field(() => String)
+export class FindOneUserInputParams {
+    @Field(() => ID)
     @IsUUID()
-        followerId: string
+        userId: string
 }
 
 @InputType()
-export class FindOneUserInputData {
-    @Field(() => String)
-    @IsUUID()
-        userId: string
+export class FindOneUserInputOptions {
+    @Field(() => ID, { nullable: true})
+        followerId?: string
+}
 
+@InputType()
+export class FindOneUserInputData implements ParamsWithOptions<FindOneUserInputParams, FindOneUserInputOptions> {
+    @Field(() => FindOneUserInputParams)
+        params: FindOneUserInputParams
     @Field(() => FindOneUserInputOptions, { nullable: true })
         options?: FindOneUserInputOptions
 }
@@ -23,15 +27,29 @@ export class FindOneUserInput implements Input<FindOneUserInputData> {
     data: FindOneUserInputData
 }
 
+
 @InputType()
-export class FindManyFollowersInputData {
-    @Field(() => String)
+export class FindManyFollowersInputParams {
+    @Field(() => ID)
     @IsUUID()
         userId: string
 }
 
+@InputType()
+export class FindManyFollowersInputData implements ParamsOnly<FindManyFollowersInputParams> {
+    @Field(() => FindManyFollowersInputParams)
+        params: FindManyFollowersInputParams
+}
+
 export class FindManyFollowersInput implements Input<FindManyFollowersInputData> {
     data: FindManyFollowersInputData
+}
+
+@InputType()
+export class FindManyCreatedCoursesInputParams {
+    @Field(() => String)
+    @IsUUID()
+        userId: string
 }
 
 @InputType()
@@ -43,11 +61,10 @@ export class FindManyCreatedCoursesInputOptions {
 }
 
 @InputType()
-export class FindManyCreatedCoursesInputData {
-    @Field(() => String)
-    @IsUUID()
-        userId: string
-    @Field(() => FindManyCreatedCoursesInputOptions, { nullable: true})
+export class FindManyCreatedCoursesInputData implements ParamsWithOptions<FindManyCreatedCoursesInputParams, FindManyCreatedCoursesInputOptions> {
+    @Field(() => FindManyCreatedCoursesInputParams)
+        params: FindManyCreatedCoursesInputParams
+    @Field(() => FindManyCreatedCoursesInputOptions, { nullable: true })
         options?: FindManyCreatedCoursesInputOptions
 }
 

@@ -131,7 +131,7 @@ type CourseEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   courseTopics: [CourseTopicEntity!]!
-  categoryId: ID!
+  categoryId: ID
   category: CategoryEntity!
   courseSubcategories: [CourseSubcategoryEntity!]!
   courseTargets: [CourseTargetEntity!]
@@ -272,6 +272,9 @@ enum UserRole {
 
 type FindManyCoursesOutputMetadata {
   count: Int
+  categories: [CategoryEntity!]
+  subcategories: [SubcategoryEntity!]
+  topics: [TopicEntity!]
 }
 
 type FindManyCoursesOutputData {
@@ -281,6 +284,11 @@ type FindManyCoursesOutputData {
 
 type FindOneLectureOutput {
   data: LectureEntity!
+  tokens: AuthTokens
+}
+
+type FindManyLecturesOutput {
+  data: [LectureEntity!]!
   tokens: AuthTokens
 }
 
@@ -378,7 +386,7 @@ type Query {
   findOneCourse(data: FindOneCourseInputData!): CourseEntity!
   findManyCourses(data: FindManyCoursesInputData!): FindManyCoursesOutputData!
   findOneLecture(data: FindOneLectureInputData!): FindOneLectureOutput!
-  findManyLectures(data: FindManyLecturesInputData!): [LectureEntity!]!
+  findManyLectures(data: FindManyLecturesInputData!): FindManyLecturesOutput!
   findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findManyCategories: [CategoryEntity!]!
@@ -394,6 +402,10 @@ type Query {
 }
 
 input SignInInputData {
+  params: SignInInputParams!
+}
+
+input SignInInputParams {
   email: String!
   password: String!
 }
@@ -407,6 +419,10 @@ input VerifyGoogleAccessTokenParams {
 }
 
 input FindOneCourseInputData {
+  params: FindOneCourseInputParams!
+}
+
+input FindOneCourseInputParams {
   courseId: ID!
 }
 
@@ -417,6 +433,7 @@ input FindManyCoursesInputData {
 input FindManyCoursesInputOptions {
   take: Int
   skip: Int
+  searchValue: String
 }
 
 input FindOneLectureInputData {
@@ -433,18 +450,34 @@ input FindOneLectureInputOptions {
 }
 
 input FindManyLecturesInputData {
+  params: FindManyLecturesInputParams!
+}
+
+input FindManyLecturesInputParams {
   sectionId: ID!
 }
 
 input FindManyResourcesInputData {
+  params: FindManyResourcesInputParams!
+}
+
+input FindManyResourcesInputParams {
   lectureId: ID!
 }
 
 input FindManyCourseTargetsInputData {
+  params: FindManyCourseTargetsInputParams!
+}
+
+input FindManyCourseTargetsInputParams {
   courseId: ID!
 }
 
 input FindOnePostInputData {
+  params: FindOnePostInputParams!
+}
+
+input FindOnePostInputParams {
   postId: ID!
 }
 
@@ -463,6 +496,10 @@ input FindManyPostsInputOptions {
 }
 
 input FindOnePostCommentInputData {
+  params: FindOnePostCommentInputParams!
+}
+
+input FindOnePostCommentInputParams {
   postCommentId: ID!
 }
 
@@ -495,21 +532,33 @@ input FindManyPostsCommentRepliesInputOptions {
 }
 
 input FindOneUserInputData {
-  userId: String!
+  params: FindOneUserInputParams!
   options: FindOneUserInputOptions
 }
 
+input FindOneUserInputParams {
+  userId: ID!
+}
+
 input FindOneUserInputOptions {
-  followerId: String!
+  followerId: ID
 }
 
 input FindManyFollowersInputData {
-  userId: String!
+  params: FindManyFollowersInputParams!
+}
+
+input FindManyFollowersInputParams {
+  userId: ID!
 }
 
 input FindManyCreatedCoursesInputData {
-  userId: String!
+  params: FindManyCreatedCoursesInputParams!
   options: FindManyCreatedCoursesInputOptions
+}
+
+input FindManyCreatedCoursesInputParams {
+  userId: String!
 }
 
 input FindManyCreatedCoursesInputOptions {

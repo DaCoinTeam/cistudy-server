@@ -23,20 +23,20 @@ export interface AuthEmptyDataInput {
 
 export interface ParamsWithOptions<T, K> {
     params: T,
-    options?: Partial<K>
+    options?: K
 }
 
 export interface ParamsOnly<T> {
-    params?: Partial<T>
+    params: T
 }
 
 export interface OptionsOnly<T> {
-    options?: Partial<T>
+    options?: T
 }
 
 export interface ResultsWithMetadata<T, K> {
     results: Array<T>,
-    metadata?: Partial<K>
+    metadata?: K
 }
 
 export type EmptyObject = NonNullable<unknown>

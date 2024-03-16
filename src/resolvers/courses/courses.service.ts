@@ -6,10 +6,11 @@ import {
     FollowMySqlEnitity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
+    TopicMySqlEntity,
 } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, DataSource } from "typeorm"
+import { Repository, DataSource, Like } from "typeorm"
 import {
     FindOneCourseInput,
     FindManyCoursesInput,
@@ -19,26 +20,32 @@ import {
     FindManyCourseTargetsInput,
 } from "./courses.input"
 import { FindManyCoursesOutputData } from "./courses.output"
+import { SubcategoryEntity } from "src/database/mysql/subcategory.entity"
 
 @Injectable()
 export class CoursesService {
     constructor(
-    @InjectRepository(CourseMySqlEntity)
-    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-    @InjectRepository(LectureMySqlEntity)
-    private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
-    @InjectRepository(ResourceMySqlEntity)
-    private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
-    @InjectRepository(CourseTargetMySqlEntity)
-    private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
-    @InjectRepository(CategoryMySqlEntity)
-    private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
-    private readonly dataSource: DataSource
-    ) {}
+        @InjectRepository(CourseMySqlEntity)
+        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(LectureMySqlEntity)
+        private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
+        @InjectRepository(ResourceMySqlEntity)
+        private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+        @InjectRepository(CourseTargetMySqlEntity)
+        private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+        @InjectRepository(CategoryMySqlEntity)
+        private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
+        @InjectRepository(SubcategoryEntity)
+        private readonly subcategoryMySqlRepository: Repository<SubcategoryEntity>,
+        @InjectRepository(TopicMySqlEntity)
+        private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
+        private readonly dataSource: DataSource
+    ) { }
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
         const { data } = input
-        const { courseId } = data
+        const { params } = data
+        const { courseId } = params
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -106,34 +113,59 @@ export class CoursesService {
     ): Promise<FindManyCoursesOutputData> {
         const { data } = input
         const { options } = data
-        const { skip, take } = { ...options }
+        const { skip, take, searchValue } = { ...options }
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
 
         try {
+            const categories = await this.categoryMySqlRepository.find(
+                {
+                    where: {
+                        name: searchValue ? Like(`%${searchValue}%`) : undefined
+                    }
+                })
+
+            const subcategories = await this.subcategoryMySqlRepository.find(
+                {
+                    where: {
+                        name: searchValue ? Like(`%${searchValue}%`) : undefined
+                    }
+                })
+
+            const topics = await this.topicMySqlRepository.find(
+                {
+                    where: {
+                        name: searchValue ? Like(`%${searchValue}%`) : undefined
+                    }
+                })
+                
+            
             const results = await this.courseMySqlRepository.find(
                 {
                     skip,
                     take,
                     relations: {
                         creator: true,
-                    }
+                    },
                 })
-                
+
             const numberOfCoursesResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(CourseMySqlEntity, "course")
                 .getRawOne()
-            
+
             await queryRunner.commitTransaction()
 
             return {
                 results,
                 metadata: {
-                    count: numberOfCoursesResult.count
+                    count: numberOfCoursesResult.count,
+                    categories,
+                    subcategories,
+                    topics
                 }
             }
         } catch (ex) {
@@ -167,7 +199,8 @@ export class CoursesService {
                             }
                         }
                     }
-                }})
+                }
+            })
 
             const follow = await queryRunner.manager.findOne(
                 FollowMySqlEnitity,
@@ -175,10 +208,10 @@ export class CoursesService {
                     where: {
                         followerId: userId,
                         followedUserId: lecture.section.course.creator.userId,
-                        followed: true
+                        followed: true,
                     }
                 }
-            ) 
+            )
 
             const numberOfFollowers = await queryRunner.manager
                 .createQueryBuilder()
@@ -205,8 +238,13 @@ export class CoursesService {
         input: FindManyLecturesInput,
     ): Promise<Array<LectureMySqlEntity>> {
         const { data } = input
+        const { params } = data
+        const { sectionId } = params
+
         return await this.lectureMySqlRepository.find({
-            where: data,
+            where: {
+                sectionId
+            },
             relations: {
                 resources: true,
             },
@@ -217,8 +255,13 @@ export class CoursesService {
         input: FindManyResourcesInput,
     ): Promise<Array<ResourceMySqlEntity>> {
         const { data } = input
+        const { params } = data
+        const { lectureId } = params
+
         return await this.resourceMySqlRepository.find({
-            where: data,
+            where: {
+                lectureId
+            },
         })
     }
 
@@ -226,8 +269,13 @@ export class CoursesService {
         input: FindManyCourseTargetsInput,
     ): Promise<Array<CourseTargetMySqlEntity>> {
         const { data } = input
+        const { params } = data
+        const { courseId } = params
+
         return await this.courseTargetMySqlRepository.find({
-            where: data,
+            where: {
+                courseId
+            },
         })
     }
 

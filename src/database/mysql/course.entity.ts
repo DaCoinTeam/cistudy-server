@@ -101,8 +101,8 @@ export class CourseEntity {
     })
         courseTopics: Array<CourseTopicEntity>
 
-    @Field(() => ID)
-    @Column({ type: "uuid", length: 36 })
+    @Field(() => ID, { nullable: true })
+    @Column({ type: "uuid", length: 36, nullable: true })
         categoryId: string
 
     @Field(() => CategoryEntity)
