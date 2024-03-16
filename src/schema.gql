@@ -131,7 +131,7 @@ type CourseEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   courseTopics: [CourseTopicEntity!]!
-  categoryId: ID!
+  categoryId: ID
   category: CategoryEntity!
   courseSubcategories: [CourseSubcategoryEntity!]!
   courseTargets: [CourseTargetEntity!]
@@ -287,6 +287,11 @@ type FindOneLectureOutput {
   tokens: AuthTokens
 }
 
+type FindManyLecturesOutput {
+  data: [LectureEntity!]!
+  tokens: AuthTokens
+}
+
 type FindManyResourcesOutput {
   data: [ResourceEntity!]!
   tokens: AuthTokens
@@ -381,7 +386,7 @@ type Query {
   findOneCourse(data: FindOneCourseInputData!): CourseEntity!
   findManyCourses(data: FindManyCoursesInputData!): FindManyCoursesOutputData!
   findOneLecture(data: FindOneLectureInputData!): FindOneLectureOutput!
-  findManyLectures(data: FindManyLecturesInputData!): [LectureEntity!]!
+  findManyLectures(data: FindManyLecturesInputData!): FindManyLecturesOutput!
   findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findManyCategories: [CategoryEntity!]!

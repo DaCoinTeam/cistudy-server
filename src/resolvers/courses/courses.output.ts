@@ -46,6 +46,17 @@ implements Output<LectureMySqlEntity>
         tokens: AuthTokens
 }
 
+
+@ObjectType()
+export class FindManyLecturesOutput
+implements Output<Array<LectureMySqlEntity>>
+{
+    @Field(() => [LectureMySqlEntity])
+        data: Array<LectureMySqlEntity>
+    @Field(() => AuthTokens, { nullable: true })
+        tokens: AuthTokens
+}
+
 @ObjectType()
 export class FindManyResourcesOutput
 implements Output<Array<ResourceMySqlEntity>>
