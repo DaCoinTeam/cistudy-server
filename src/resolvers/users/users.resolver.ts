@@ -21,4 +21,5 @@ export class UsersResolver {
   async findManyCreatedCourses(@Args("data") data: FindManyCreatedCoursesInputData) {
       return this.usersService.findManyCreatedCourses({ data })
   }
+  
 }

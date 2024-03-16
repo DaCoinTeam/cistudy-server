@@ -1,9 +1,10 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
 import { ProfileService } from "./profile.service"
-import { FindManySelfCreatedCoursesInputData } from "./profile.input"
+import { FindManyEnrolledCoursesInputData, FindManySelfCreatedCoursesInputData } from "./profile.input"
 import { AuthInterceptor, JwtAuthGuard, UserId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import {
+    FindManyEnrolledCoursesOutput,
     FindManySelfCreatedCoursesOutput,
 } from "./profile.output"
 
@@ -20,4 +21,14 @@ export class ProfileResolver {
     ) {
         return this.profileService.findManySelfCreatedCourses({ userId, data })
     }
+
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @Query(() => FindManyEnrolledCoursesOutput)
+  async findManyEnrolledCourses(
+      @UserId() userId: string,
+      @Args("data") data: FindManyEnrolledCoursesInputData,
+  ) {
+      return this.profileService.findManyEnrolledCourses({ userId, data })
+  }
 }

@@ -364,6 +364,20 @@ type FindManySelfCreatedCoursesOutput {
   tokens: AuthTokens
 }
 
+type FindManyEnrolledCoursesOutputMetadata {
+  count: Int
+}
+
+type FindManyEnrolledCoursesOutputData {
+  results: [CourseEntity!]!
+  metadata: FindManyEnrolledCoursesOutputMetadata
+}
+
+type FindManyEnrolledCoursesOutput {
+  data: FindManyEnrolledCoursesOutputData!
+  tokens: AuthTokens
+}
+
 type InitOutput {
   data: UserEntity!
   tokens: AuthTokens
@@ -399,6 +413,7 @@ type Query {
   findManyFollowers(data: FindManyFollowersInputData!): [UserEntity!]!
   findManyCreatedCourses(data: FindManyCreatedCoursesInputData!): [CourseEntity!]!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
+  findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
 }
 
 input SignInInputData {
@@ -571,6 +586,15 @@ input FindManySelfCreatedCoursesInputData {
 }
 
 input FindManySelfCreatedCoursesInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManyEnrolledCoursesInputData {
+  options: FindManyEnrolledCoursesInputOptions
+}
+
+input FindManyEnrolledCoursesInputOptions {
   take: Int
   skip: Int
 }

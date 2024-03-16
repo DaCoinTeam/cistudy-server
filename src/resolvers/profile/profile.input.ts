@@ -26,3 +26,25 @@ implements AuthInput<FindManySelfCreatedCoursesInputData>
 export class FindManySelfCreatedCoursesMetadataInput implements AuthEmptyDataInput {
     userId: string
 }
+
+
+@InputType()
+export class FindManyEnrolledCoursesInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+}
+
+@InputType()
+export class FindManyEnrolledCoursesInputData implements OptionsOnly<FindManyEnrolledCoursesInputOptions> {
+    @Field(() => FindManyEnrolledCoursesInputOptions, { nullable: true })
+        options?: FindManyEnrolledCoursesInputOptions
+}
+
+export class FindManyEnrolledCoursesInput
+implements AuthInput<FindManyEnrolledCoursesInputData>
+{   
+    userId: string
+    data: FindManyEnrolledCoursesInputData
+}
