@@ -20,16 +20,13 @@ export class ProfileService {
     ): Promise<FindManySelfCreatedCoursesOutputData> {
         const { data, userId } = input
         const { options } = data
-
+        const { take, skip } = { ...options }
         
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
 
         try {
-            const take = options?.take
-            const skip = options?.skip
-
             const courses =  await this.courseMySqlRepository.find({
                 where: {
                     creatorId: userId,
