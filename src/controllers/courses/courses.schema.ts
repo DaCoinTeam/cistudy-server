@@ -82,3 +82,30 @@ export const createResourcesSchema : SchemaObject = {
         },
     }
 }
+
+export const createTopicSchema : SchemaObject = {
+    type: "object",
+    properties: {
+        data: {
+            type: "object",
+            properties: {
+                name: {
+                    type: "string",
+                },
+                subcategoryIds : {
+                    type: "array",
+                    items: {
+                        type: "string",
+                    },
+                },
+            }
+        },
+        files: {
+            type: "array",
+            items: {
+                type: "string",
+                format: "binary"
+            },
+        },
+    }
+}

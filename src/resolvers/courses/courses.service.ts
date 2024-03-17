@@ -69,6 +69,7 @@ export class CoursesService {
                             }
                         }
                     },
+                    category: true,
                     courseTopics: {
                         topic: true
                     }

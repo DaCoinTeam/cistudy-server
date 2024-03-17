@@ -62,13 +62,9 @@ export class CourseEntity {
     @Column({ type: "boolean", default: false })
         enableDiscount: boolean
 
-    @Field(() => VerifyStatus, { nullable: true })
-    @Column({ type: "enum", enum: VerifyStatus, default: null })
+    @Field(() => String)
+    @Column({ type: "enum", enum: VerifyStatus, default: VerifyStatus.Pending })
         verifyStatus: VerifyStatus
-
-    @Field(() => Boolean, { defaultValue: true })
-    @Column({ default: true })
-        isDraft: boolean
 
     @Field(() => UserEntity)
     @ManyToOne(() => UserEntity, (user) => user.courses)
@@ -105,12 +101,12 @@ export class CourseEntity {
     @Column({ type: "uuid", length: 36, nullable: true })
         categoryId: string
 
-    @Field(() => CategoryEntity)
+    @Field(() => CategoryEntity, { nullable: true })
     @ManyToOne(() => CategoryEntity, (category) => category.courses)
     @JoinColumn({ name: "categoryId" })
         category: CategoryEntity
 
-    @Field(() => [CourseSubcategoryEntity])
+    @Field(() => [CourseSubcategoryEntity], { nullable: true })
     @OneToMany(() => CourseSubcategoryEntity, (courseSubcategory) => courseSubcategory.course, {
         cascade: true,
     })

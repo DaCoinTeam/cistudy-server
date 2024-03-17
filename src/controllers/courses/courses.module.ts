@@ -18,6 +18,7 @@ import {
     CourseTopicMySqlEntity,
     TopicMySqlEntity,
     SubcategoyMySqlEntity,
+    CategoryMySqlEntity,
 } from "@database"
 import { CoursesService } from "./courses.service"
 
@@ -39,7 +40,8 @@ import { CoursesService } from "./courses.service"
             CourseSubcategoryMySqlEntity,
             CourseTopicMySqlEntity,
             TopicMySqlEntity,
-            SubcategoyMySqlEntity
+            SubcategoyMySqlEntity,
+            CategoryMySqlEntity
         ]),
     ],
     controllers: [CoursesController],

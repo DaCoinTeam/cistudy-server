@@ -1,5 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import {
+    CategoryMySqlEntity,
     CourseMySqlEntity,
     CourseSubcategoryMySqlEntity,
     CourseTargetMySqlEntity,
@@ -7,6 +8,8 @@ import {
     LectureMySqlEntity,
     ResourceMySqlEntity,
     SectionMySqlEntity,
+    SubcategoyMySqlEntity,
+    TopicMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource } from "typeorm"
@@ -26,11 +29,14 @@ import {
     UpdateSectionInput,
     DeleteResourceInput,
     EnrollCourseInput,
+    CreateCategoryInput,
+    CreateSubcategoryInput,
+    CreateTopicInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import { ProcessStatus, VideoType, existKeyNotUndefined } from "@common"
-import { CreateCourseOutput, EnrollCourseOutput, UpdateCourseOutput } from "./courses.output"
+import { CreateCategoryOutput, CreateCourseOutput, CreateSubcategoryOutput, CreateTopicOutput, EnrollCourseOutput, UpdateCourseOutput } from "./courses.output"
 import { EnrolledInfoEntity } from "src/database/mysql/enrolled-info.entity"
 
 @Injectable()
@@ -52,6 +58,12 @@ export class CoursesService {
         private readonly courseSubcategoryMySqlRepository: Repository<CourseSubcategoryMySqlEntity>,
         @InjectRepository(CourseTopicMySqlEntity)
         private readonly courseTopicMySqlRepository: Repository<CourseTopicMySqlEntity>,
+        @InjectRepository(CategoryMySqlEntity)
+        private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
+        @InjectRepository(SubcategoyMySqlEntity)
+        private readonly subcategoryMySqlRepository: Repository<SubcategoyMySqlEntity>,
+        @InjectRepository(TopicMySqlEntity)
+        private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
         private readonly storageService: StorageService,
         private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
         private readonly dataSource: DataSource
@@ -404,5 +416,59 @@ export class CoursesService {
         const { resourceId } = data
         await this.resourceMySqlRepository.delete({ resourceId })
         return `A resource with id ${resourceId} has been deleted successfully.`
+    }
+
+    //apis only
+    async createCategory(input: CreateCategoryInput): Promise<CreateCategoryOutput> {
+        const { data } = input
+        const { name } = data
+
+        const { categoryId } = await this.categoryMySqlRepository.save({
+            name
+        })
+
+        return {
+            categoryId
+        }
+    }
+
+    async createSubcategory(input: CreateSubcategoryInput): Promise<CreateSubcategoryOutput> {
+        const { data } = input
+        const { name, categoryId } = data
+
+        const { subcategoryId } = await this.subcategoryMySqlRepository.save({
+            name,
+            categoryId
+        })
+
+        return {
+            subcategoryId
+        }
+    }
+
+    async createTopic(input: CreateTopicInput): Promise<CreateTopicOutput> {
+        const { data, files } = input
+        const { name, subcategoryIds } = data
+
+        console.log(input)
+
+        const file = files.at(0)
+        if (!file) return 
+
+        const { assetId } = await this.storageService.upload({
+            rootFile: file,
+        })
+
+        const { topicId } = await this.topicMySqlRepository.save({
+            svgId: assetId,
+            name,
+            subcategoryTopics: subcategoryIds.map(subcategoryId => ({
+                subcategoryId
+            }))
+        })
+
+        return {
+            topicId
+        }
     }
 }

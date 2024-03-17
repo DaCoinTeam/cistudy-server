@@ -238,3 +238,42 @@ implements AuthInput<DeleteResourceInputData>
     @ApiProperty()
         data: DeleteResourceInputData
 }
+
+//dev only apis
+export class CreateCategoryInputData {
+    @ApiProperty()
+        name: string
+}
+
+export class CreateCategoryInput implements AuthInput<CreateCategoryInputData> {
+    @IsUUID("4")
+        userId: string
+    data: CreateCategoryInputData
+}
+
+export class CreateSubcategoryInputData {
+    @ApiProperty()
+        name: string
+    @ApiProperty()
+        categoryId: string
+}
+
+export class CreateSubcategoryInput implements AuthInput<CreateSubcategoryInputData> {
+    @IsUUID("4")
+        userId: string
+    data: CreateSubcategoryInputData
+}
+
+export class CreateTopicInputData {
+    @ApiProperty()
+        name: string
+    @ApiProperty()
+        subcategoryIds: Array<string>
+}
+
+export class CreateTopicInput implements AuthInput<CreateTopicInputData> {
+    @IsUUID("4")
+        userId: string
+    data: CreateTopicInputData
+    files: Array<Express.Multer.File>
+}

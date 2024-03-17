@@ -21,6 +21,10 @@ export class TopicEntity {
 	@Column({ type: "varchar", length: 1000, nullable: true })
 	    name: string
 
+	@Field(() => String)
+	@Column({ type: "uuid", length: 36})
+	    svgId: string
+
 	@Field(() => Date)
 	@CreateDateColumn()
 	    createdAt: Date
@@ -34,6 +38,8 @@ export class TopicEntity {
 	    courseTopics: Array<CourseTopicEntity>
 	
 	@Field(() => [SubcategoryTopicEntity])
-	@OneToMany(() => SubcategoryTopicEntity, (subcategoryTopic) => subcategoryTopic.topic)
+	@OneToMany(() => SubcategoryTopicEntity, (subcategoryTopic) => subcategoryTopic.topic, {
+	    cascade: true
+	})
 	    subcategoryTopics: Array<SubcategoryTopicEntity>
 }

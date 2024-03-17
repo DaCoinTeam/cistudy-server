@@ -30,7 +30,7 @@ export class UserEntity {
       avatarId: string
 
   @Field(() => String, { nullable: true })
-  @Column({ type: "nvarchar", length: 200, default: null })
+  @Column({ type: "varchar", length: 200, default: null })
       avatarUrl: string
 
   @Field(() => ID, { nullable: true })

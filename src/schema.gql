@@ -97,6 +97,7 @@ type SubcategoryTopicEntity {
 type TopicEntity {
   topicId: ID!
   name: String
+  svgId: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   courseTopics: [CourseTopicEntity!]!
@@ -122,8 +123,7 @@ type CourseEntity {
   price: Float!
   discount: Float!
   enableDiscount: Boolean!
-  verifyStatus: VerifyStatus
-  isDraft: Boolean!
+  verifyStatus: String!
   creator: UserEntity!
   isDeleted: Boolean!
   previewVideoId: ID
@@ -132,17 +132,11 @@ type CourseEntity {
   updatedAt: DateTime!
   courseTopics: [CourseTopicEntity!]!
   categoryId: ID
-  category: CategoryEntity!
-  courseSubcategories: [CourseSubcategoryEntity!]!
+  category: CategoryEntity
+  courseSubcategories: [CourseSubcategoryEntity!]
   courseTargets: [CourseTargetEntity!]
   sections: [SectionEntity!]!
   numberOfEnrollments: Int!
-}
-
-enum VerifyStatus {
-  Pending
-  Approved
-  Rejected
 }
 
 type PostLikeEntity {

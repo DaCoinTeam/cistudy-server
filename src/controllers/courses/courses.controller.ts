@@ -19,10 +19,13 @@ import {
 } from "@nestjs/swagger"
 import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import {
+    CreateCategoryInputData,
     CreateCourseTargetInputData,
     CreateLectureInputData,
     CreateResourcesInputData,
     CreateSectionInputData,
+    CreateSubcategoryInputData,
+    CreateTopicInputData,
     EnrollCourseInputData,
     UpdateCourseInputData,
     UpdateCourseTargetInputData,
@@ -30,7 +33,7 @@ import {
     UpdateSectionInputData,
 } from "./courses.input"
 
-import { createResourcesSchema, updateCourseSchema } from "./courses.schema"
+import { createResourcesSchema, createTopicSchema, updateCourseSchema } from "./courses.schema"
 
 import { Files } from "@common"
 import { CoursesService } from "./courses.service"
@@ -255,6 +258,55 @@ export class CoursesController {
       return this.coursesService.deleteResource({
           userId,
           data: { resourceId },
+      })
+  }
+
+  @ApiBearerAuth()
+  @Post("create-category")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async createCategory(
+    @UserId() userId: string,
+    @Body() body: CreateCategoryInputData
+  ) {
+      return this.coursesService.createCategory({
+          userId,
+          data: body,
+      })
+  }
+
+  @ApiBearerAuth()
+  @Post("create-subcategory")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async createSubcategory(
+    @UserId() userId: string,
+    @Body() body: CreateSubcategoryInputData
+  ) {
+      return this.coursesService.createSubcategory({
+          userId,
+          data: body,
+      })
+  }
+
+  @ApiBearerAuth()
+  @Post("create-topic")
+  @UseGuards(JwtAuthGuard)
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({ schema: createTopicSchema })
+  @UseInterceptors(
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
+  )
+  async createTopic(
+    @UserId() userId: string,
+    @DataFromBody() data: CreateTopicInputData,
+    @UploadedFiles() { files }: Files,
+  ) {
+      return this.coursesService.createTopic({
+          userId,
+          data,
+          files
       })
   }
 }
