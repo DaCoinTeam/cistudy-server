@@ -121,7 +121,7 @@ type CourseEntity {
   description: String
   creatorId: ID!
   price: Float!
-  discount: Float!
+  discountPrice: Float!
   enableDiscount: Boolean!
   verifyStatus: String!
   creator: UserEntity!

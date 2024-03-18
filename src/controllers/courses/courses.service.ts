@@ -117,7 +117,7 @@ export class CoursesService {
             courseId,
             description,
             price,
-            discount,
+            discountPrice,
             enableDiscount,
             title,
             categoryId,
@@ -130,7 +130,7 @@ export class CoursesService {
             description,
             title,
             price,
-            discount,
+            discountPrice,
             enableDiscount,
             categoryId,
             courseSubcategories: subcategoryIds?.map(subcategoryId => ({

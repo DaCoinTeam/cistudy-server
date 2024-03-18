@@ -70,7 +70,7 @@ export class UpdateCourseInputData {
         price?: number
 
     @ApiProperty({ nullable: true })
-        discount?: number
+        discountPrice?: number
 
     @ApiProperty({ nullable: true })
         enableDiscount?: boolean

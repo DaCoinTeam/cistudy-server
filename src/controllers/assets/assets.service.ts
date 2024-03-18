@@ -1,12 +1,11 @@
-import { extnameConfig } from "@config"
 import { StorageService } from "@global"
 import { HttpStatus, Injectable, StreamableFile } from "@nestjs/common"
-import { extname } from "path"
 import { GetAssetInput, GetFileOptions } from "./assets.input"
+import { getContentType } from "@common"
 
 @Injectable()
 export class AssetsService {
-    constructor(private readonly storageService: StorageService) {}
+    constructor(private readonly storageService: StorageService) { }
 
     async getAsset(
         input: GetAssetInput,
@@ -24,11 +23,10 @@ export class AssetsService {
     private async getStaticAsset(assetIdOrPath: string): Promise<StreamableFile> {
         const filename = await this.storageService.getFilename(assetIdOrPath)
         const readStream =
-      await this.storageService.createReadStream(assetIdOrPath)
-        const contentType = extnameConfig().extnameToContentType[extname(filename)]
+            await this.storageService.createReadStream(assetIdOrPath)
 
         return new StreamableFile(readStream, {
-            type: contentType,
+            type: getContentType(filename),
             disposition: `inline; filename="${filename}"`,
         })
     }
@@ -51,7 +49,7 @@ export class AssetsService {
 
         response.setHeader("Content-Range", `bytes ${start}-${end}/${size}`)
         response.setHeader("Accept-Ranges", "bytes")
-        
+
         response.statusCode = HttpStatus.PARTIAL_CONTENT
 
         const readStream = await this.storageService.createReadStream(
@@ -61,10 +59,8 @@ export class AssetsService {
                 end,
             },
         )
-        const contentType = extnameConfig().extnameToContentType[extname(filename)]
-
         return new StreamableFile(readStream, {
-            type: contentType,
+            type: getContentType(filename),
             length: chunksize
         })
     }

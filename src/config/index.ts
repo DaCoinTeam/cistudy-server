@@ -1,6 +1,5 @@
 export * from "./app.config"
 export * from "./database.config"
-export * from "./extname.config"
 export * from "./jwt.config"
 export * from "./paths.config"
 export * from "./services.config"

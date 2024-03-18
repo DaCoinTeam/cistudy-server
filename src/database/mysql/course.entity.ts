@@ -56,7 +56,7 @@ export class CourseEntity {
 
     @Field(() => Float, { defaultValue: 0 })
     @Column({ type: "float", default: 0 })
-        discount: number
+        discountPrice: number
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ type: "boolean", default: false })
