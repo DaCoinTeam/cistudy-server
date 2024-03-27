@@ -50,7 +50,8 @@ export class UsersService {
             await queryRunner.commitTransaction()
 
             user.numberOfFollowers = numberOfFollowers.count
-            user.followed = follow ? follow.followed : false
+            const followed = follow?.followed
+            user.followed = followed ?? false
 
             return user
         } catch (ex) {
