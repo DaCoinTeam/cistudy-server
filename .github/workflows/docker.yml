@@ -36,5 +36,12 @@ jobs:
         FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
         SUPABASE_URL: ${{ vars.SUPABASE_URL }}
         SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        EVM_PRIVATE_KEY: ${{ secrets.EVM_PRIVATE_KEY }}
+        EVM_ADDRESS: ${{ vars.EVM_ADDRESS }}
+        MONGO_USER: ${{ secrets.MONGO_USER }}
+        MONGO_PASS: ${{ secrets.MONGO_PASS }}
+        MONGO_DB_NAME: ${{ secrets.MONGO_DB_NAME }}
+        MONGO_HOST: ${{ vars.MONGO_HOST }}
+        MONGO_PORT: ${{ vars.MONGO_PORT }}
       run: docker-compose -f docker/github-compose.yaml -p cistudy-server up --build -d 
  
