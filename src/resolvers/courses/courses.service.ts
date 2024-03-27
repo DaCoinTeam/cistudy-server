@@ -39,13 +39,15 @@ export class CoursesService {
         private readonly subcategoryMySqlRepository: Repository<SubcategoryEntity>,
         @InjectRepository(TopicMySqlEntity)
         private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
+        @InjectRepository(EnrolledInfoMySqlEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         private readonly dataSource: DataSource
     ) { }
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
         const { data } = input
         const { params } = data
-        const { courseId } = params
+        const { courseId, userId } = params
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -81,7 +83,13 @@ export class CoursesService {
                 },
             })
 
-            const numberOfFollowers = await queryRunner.manager
+            const enrolledInfo = userId 
+                ? await this.enrolledInfoMySqlRepository.findOneBy({
+                    courseId,
+                    userId
+                }) : undefined
+
+            const numberOfFollowersResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(FollowMySqlEnitity, "follow")
@@ -89,7 +97,7 @@ export class CoursesService {
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 
-            const numberOfEnrollments = await queryRunner.manager
+            const numberOfEnrollmentsResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(EnrolledInfoMySqlEntity, "enrolled_info")
@@ -98,8 +106,11 @@ export class CoursesService {
 
             await queryRunner.commitTransaction()
 
-            course.creator.numberOfFollowers = numberOfFollowers.count
-            course.numberOfEnrollments = numberOfEnrollments.count
+            course.creator.numberOfFollowers = numberOfFollowersResult.count
+            course.numberOfEnrollments = numberOfEnrollmentsResult.count
+
+            const enrolled = enrolledInfo?.enrolled
+            course.enrolled = enrolled ?? false
 
             return course
         } catch (ex) {
@@ -141,8 +152,8 @@ export class CoursesService {
                         name: searchValue ? Like(`%${searchValue}%`) : undefined
                     }
                 })
-                
-            
+
+
             const results = await this.courseMySqlRepository.find(
                 {
                     skip,

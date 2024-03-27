@@ -129,6 +129,9 @@ export class CourseEntity {
         sections: Array<SectionEntity>
 
     //graphql
-    @Field(() => Int)
+    @Field(() => Int, {nullable: true})
         numberOfEnrollments?: number
+
+    @Field(() => Boolean, {nullable: true})
+        enrolled?: boolean
 }

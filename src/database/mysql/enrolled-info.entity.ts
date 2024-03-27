@@ -14,33 +14,37 @@ import { Field, ID, ObjectType } from "@nestjs/graphql"
 @ObjectType()
 @Entity("enrolled_info")
 export class EnrolledInfoEntity {
-  @Field(() => ID)
-  @PrimaryGeneratedColumn("uuid")
-      enrolledInfoId: string
+    @Field(() => ID)
+    @PrimaryGeneratedColumn("uuid")
+        enrolledInfoId: string
 
-  @Field(() => ID)
-  @Column({ type: "uuid", length: 36 })
-      userId: string
+    @Field(() => ID)
+    @Column({ type: "uuid", length: 36 })
+        userId: string
 
-  @Field(() => ID)
-  @Column({ type: "uuid", length: 36 })
-      courseId: string
+    @Field(() => ID)
+    @Column({ type: "uuid", length: 36 })
+        courseId: string
 
-  @Field(() => Date)
-  @CreateDateColumn()
-      createdAt: Date
+    @Field(() => Date)
+    @CreateDateColumn()
+        createdAt: Date
 
-  @Field(() => Date)
-  @UpdateDateColumn()
-      updatedAt: Date
+    @Field(() => Date)
+    @UpdateDateColumn()
+        updatedAt: Date
 
-  @Field(() => CourseEntity)
-  @ManyToOne(() => CourseEntity, (course) => course.enrolledInfos)
-  @JoinColumn({ name: "courseId" })
-      course: CourseEntity
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: true })
+        enrolled: boolean
 
-  @Field(() => UserEntity)
-  @ManyToOne(() => UserEntity, (user) => user.enrolledInfos)
-  @JoinColumn({ name: "userId" })
-      user: UserEntity
+    @Field(() => CourseEntity)
+    @ManyToOne(() => CourseEntity, (course) => course.enrolledInfos)
+    @JoinColumn({ name: "courseId" })
+        course: CourseEntity
+
+    @Field(() => UserEntity)
+    @ManyToOne(() => UserEntity, (user) => user.enrolledInfos)
+    @JoinColumn({ name: "userId" })
+        user: UserEntity
 }

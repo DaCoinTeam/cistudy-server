@@ -2,7 +2,7 @@ import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
 import { appConfig }  from "@config"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
-import { CoursesResolver, PostsResolver, ProfileResolver, UsersResolver } from "@resolvers"
+import { CoursesResolver, PostsResolver, ProfileResolver, UsersResolver, AuthResolver } from "@resolvers"
 import { promises as fsPromises } from "fs"
 import {
     GraphQLSchemaBuilderModule,
@@ -11,7 +11,6 @@ import {
 import { printSchema } from "graphql"
 import { join } from "path"
 import { getEnvValue } from "@common"
-import { AuthResolver } from "./resolvers/auth"
 
 const generateSchema = async () => {
     const app = await NestFactory.create(GraphQLSchemaBuilderModule)

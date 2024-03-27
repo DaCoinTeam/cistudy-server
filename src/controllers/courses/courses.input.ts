@@ -8,9 +8,11 @@ export class CreateCourseInput implements AuthEmptyDataInput {
 }
 
 export class EnrollCourseInputData {
-    @IsUUID()
+    @IsUUID("4")
     @ApiProperty()
         courseId: string
+    @ApiProperty()
+        transactionHash: string
 }
 
 export class EnrollCourseInput implements AuthInput<EnrollCourseInputData> {

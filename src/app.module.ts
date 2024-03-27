@@ -1,6 +1,6 @@
 import { Module, ValidationPipe } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { appConfig, databaseConfig, jwtConfig, servicesConfig } from "./config"
+import { appConfig, blockchainConfig, databaseConfig, jwtConfig, servicesConfig } from "./config"
 import { ConfigModule } from "@nestjs/config"
 import { GlobalModule } from "@global"
 import { ControllersModule } from "@controllers"
@@ -11,13 +11,16 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo"
 import { BullModule } from "@nestjs/bull"
 import { WorkersModule } from "./workers/workers.module"
 import { APP_PIPE } from "@nestjs/core"
+import { ScheduleModule } from "@nestjs/schedule"
+import { SchedulersModule } from "@schedulers"
+import { MongooseModule } from "@nestjs/mongoose"
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
             expandVariables: true,
-            load: [databaseConfig, jwtConfig, servicesConfig, appConfig],
+            load: [databaseConfig, jwtConfig, servicesConfig, appConfig, blockchainConfig],
         }),
 
         BullModule.forRoot({
@@ -27,6 +30,14 @@ import { APP_PIPE } from "@nestjs/core"
             },
         }),
 
+        ScheduleModule.forRoot(),
+
+        MongooseModule.forRoot(`mongodb://${databaseConfig().mongo.host}:${databaseConfig().mongo.port}`, {
+            user: databaseConfig().mongo.user,
+            pass: databaseConfig().mongo.pass,
+            dbName: databaseConfig().mongo.dbName,
+        }),
+        
         TypeOrmModule.forRoot({
             type: "mysql",
             host: databaseConfig().mysql.host,
@@ -46,7 +57,8 @@ import { APP_PIPE } from "@nestjs/core"
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
             introspection: true,
         }),
- 
+        
+        SchedulersModule,
         ResolversModule,
         GlobalModule,
         ControllersModule,

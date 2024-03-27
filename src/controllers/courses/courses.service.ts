@@ -10,6 +10,7 @@ import {
     SectionMySqlEntity,
     SubcategoyMySqlEntity,
     TopicMySqlEntity,
+    TransactionMongo,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource } from "typeorm"
@@ -35,9 +36,11 @@ import {
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
-import { ProcessStatus, VideoType, existKeyNotUndefined } from "@common"
+import { ProcessStatus, VideoType, computeRaw, existKeyNotUndefined } from "@common"
 import { CreateCategoryOutput, CreateCourseOutput, CreateSubcategoryOutput, CreateTopicOutput, EnrollCourseOutput, UpdateCourseOutput } from "./courses.output"
 import { EnrolledInfoEntity } from "src/database/mysql/enrolled-info.entity"
+import { InjectModel } from "@nestjs/mongoose"
+import { Model } from "mongoose"
 
 @Injectable()
 export class CoursesService {
@@ -64,6 +67,7 @@ export class CoursesService {
         private readonly subcategoryMySqlRepository: Repository<SubcategoyMySqlEntity>,
         @InjectRepository(TopicMySqlEntity)
         private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
+        @InjectModel(TransactionMongo.name) private readonly transactionMongoModel: Model<TransactionMongo>,
         private readonly storageService: StorageService,
         private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
         private readonly dataSource: DataSource
@@ -71,15 +75,43 @@ export class CoursesService {
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
         const { data, userId } = input
-        const { courseId } = data
+        const { courseId, transactionHash } = data
+
+        console.log("called")
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
 
         try {
-            const found = await this.enrolledInfoMySqlRepository.findOneBy({ userId, courseId })
+            const found = await this.enrolledInfoMySqlRepository.findOne({
+                where: {
+                    userId, courseId
+                }
+            }
+            )
             if (found) throw new ConflictException("You have enrolled to this course.")
+
+            const { value, isValidated, _id } = await this.transactionMongoModel.findOne({
+                transactionHash
+            })
+
+            if (isValidated) throw new ConflictException("This transaction is validated.")
+
+            const { enableDiscount, discountPrice, price: coursePrice } = await this.courseMySqlRepository.findOne({
+                where: {
+                    courseId
+                }
+            }
+            )
+
+            const price = enableDiscount ? discountPrice : coursePrice
+            if (BigInt(value) < computeRaw(price)) throw new ConflictException("Value is not enough.")
+
+            await this.transactionMongoModel.findOneAndUpdate({ _id }, {
+                isValidated: true
+            },
+            )
 
             const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
                 courseId,
@@ -453,7 +485,7 @@ export class CoursesService {
         console.log(input)
 
         const file = files.at(0)
-        if (!file) return 
+        if (!file) return
 
         const { assetId } = await this.storageService.upload({
             rootFile: file,

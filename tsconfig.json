@@ -25,7 +25,9 @@
       "@controllers": ["src/controllers"],
       "@resolvers": ["src/resolvers"],
       "@workers": ["src/workers"],
-      "@common": ["src/common"]
+      "@common": ["src/common"],
+      "@blockchain": ["src/blockchain"],
+      "@schedulers": ["src/schedulers"]
     },
   },
   "include": ["src/**/*"],

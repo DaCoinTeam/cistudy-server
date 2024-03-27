@@ -38,3 +38,6 @@ export const getContentType = (filenameOrExt: string): string | undefined => {
     const contentType = mime.contentType(filenameOrExt)
     return contentType ? contentType : undefined
 }
+
+export const sleep = (ms : number = 0) => new Promise(resolve => setTimeout(resolve, ms))
+  

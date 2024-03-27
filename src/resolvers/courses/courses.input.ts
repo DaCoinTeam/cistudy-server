@@ -5,6 +5,8 @@ import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@c
 export class FindOneCourseInputParams {
     @Field(() => ID)
         courseId: string
+    @Field(() => ID, { nullable: true})
+        userId?: string
 }
 
 @InputType()

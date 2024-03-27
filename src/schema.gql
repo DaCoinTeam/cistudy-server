@@ -136,7 +136,8 @@ type CourseEntity {
   courseSubcategories: [CourseSubcategoryEntity!]
   courseTargets: [CourseTargetEntity!]
   sections: [SectionEntity!]!
-  numberOfEnrollments: Int!
+  numberOfEnrollments: Int
+  enrolled: Boolean
 }
 
 type PostLikeEntity {
@@ -433,6 +434,7 @@ input FindOneCourseInputData {
 
 input FindOneCourseInputParams {
   courseId: ID!
+  userId: ID
 }
 
 input FindManyCoursesInputData {

@@ -19,11 +19,15 @@ import {
     TopicMySqlEntity,
     SubcategoyMySqlEntity,
     CategoryMySqlEntity,
+    TransactionMongo,
+    TransactionMongoSchema,
 } from "@database"
 import { CoursesService } from "./courses.service"
+import { MongooseModule } from "@nestjs/mongoose"
 
 @Module({
     imports: [
+        MongooseModule.forFeature([{ name: TransactionMongo.name, schema: TransactionMongoSchema }]),
         TypeOrmModule.forFeature([
             SessionMySqlEntity,
             UserMySqlEntity,
