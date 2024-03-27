@@ -1,4 +1,4 @@
-import { CourseMySqlEntity } from "@database"
+import { CourseMySqlEntity, FollowMySqlEnitity, UserMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { Repository, DataSource } from "typeorm"
 import {
@@ -7,6 +7,7 @@ import {
 } from "./profile.input"
 import { InjectRepository } from "@nestjs/typeorm"
 import { FindManyEnrolledCoursesOutputData, FindManySelfCreatedCoursesOutputData } from "./profile.output"
+
 @Injectable()
 export class ProfileService {
     constructor(
@@ -69,14 +70,35 @@ export class ProfileService {
         try {
             const courses = await this.courseMySqlRepository.find(
                 {
-                    where: {
-                        creatorId: userId,
+                    relations: {
+                        creator: true,
+                        enrolledInfos: true
                     },
                     take,
-                    skip
+                    skip,
+                    where: {
+                        enrolledInfos: {
+                            userId,
+                            enrolled: true
+                        }
+                    }
                 }
-            ) 
+            )
 
+            const numberOfFollowersResults = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(follow.followerId)", "count")
+                .addSelect("course.courseId", "courseId")
+                .from(CourseMySqlEntity, "course")
+                .innerJoin(UserMySqlEntity, 
+                    "user", "course.creatorId = user.userId")
+                .innerJoin(FollowMySqlEnitity,
+                    "follow", "user.userId = follow.followerId"
+                )
+                .where("followed = :followed", { followed: true })
+                .groupBy("course.courseId")
+                .getRawMany()
+  
             const numberOfEnrolledCouresResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
@@ -85,12 +107,20 @@ export class ProfileService {
 
             await queryRunner.commitTransaction()
             return {
-                results : courses,
+                results : courses.map(course => {
+                    const numberOfFollowers = numberOfFollowersResults.find(
+                        result => result.courseId === course.courseId,
+                    )?.count ?? 0
+
+                    course.creator.numberOfFollowers = numberOfFollowers
+                    return course
+                }),
                 metadata: {
                     count : numberOfEnrolledCouresResult.count
                 }
             }
         } catch (ex) {
+            console.log(ex)
             await queryRunner.rollbackTransaction()
         } finally {
             await queryRunner.release()
