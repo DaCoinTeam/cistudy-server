@@ -5,7 +5,7 @@ import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@c
 export class FindOneCourseInputParams {
     @Field(() => ID)
         courseId: string
-    @Field(() => ID, { nullable: true})
+    @Field(() => ID, { nullable: true })
         userId?: string
 }
 
@@ -18,6 +18,24 @@ export class FindOneCourseInputData implements ParamsOnly<FindOneCourseInputPara
 export class FindOneCourseInput implements Input<FindOneCourseInputData> {
     data: FindOneCourseInputData
 }
+
+@InputType()
+export class FindOneCourseAuthInputParams {
+    @Field(() => ID)
+        courseId: string
+}
+
+@InputType()
+export class FindOneCourseAuthInputData implements ParamsOnly<FindOneCourseAuthInputParams> {
+    @Field(() => FindOneCourseAuthInputParams)
+        params: FindOneCourseAuthInputParams
+}
+
+export class FindOneCourseAuthInput implements AuthInput<FindOneCourseAuthInputData> {
+    userId: string
+    data: FindOneCourseAuthInputData
+}
+
 
 @InputType()
 export class FindOneLectureInputParams {

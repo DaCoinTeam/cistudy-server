@@ -1,8 +1,8 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
-import { FindOneCourseInputData, FindManyCoursesInputData, FindManyLecturesInputData, FindManyResourcesInputData, FindOneLectureInputData, FindManyCourseTargetsInputData } from "./courses.input"
+import { FindOneCourseInputData, FindManyCoursesInputData, FindManyLecturesInputData, FindManyResourcesInputData, FindOneLectureInputData, FindManyCourseTargetsInputData, FindOneCourseAuthInputData } from "./courses.input"
 import { CoursesService } from "./courses.service"
 import { CategoryMySqlEntity, CourseMySqlEntity } from "@database"
-import { FindManyCourseTargetsOutput, FindManyCoursesOutputData, FindManyLecturesOutput, FindManyResourcesOutput, FindOneLectureOutput } from "./courses.output"
+import { FindManyCourseTargetsOutput, FindManyCoursesOutputData, FindManyLecturesOutput, FindManyResourcesOutput, FindOneCourseAuthOutput, FindOneLectureOutput } from "./courses.output"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { JwtAuthGuard, AuthInterceptor, UserId } from "../shared"
 
@@ -15,6 +15,13 @@ export class CoursesResolver {
     @Query(() => CourseMySqlEntity)
     async findOneCourse(@Args("data") data: FindOneCourseInputData) {
         return await this.coursesService.findOneCourse({ data })
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @Query(() => FindOneCourseAuthOutput)
+    async findOneCourseAuth(@UserId() userId: string, @Args("data") data: FindOneCourseAuthInputData) {
+        return await this.coursesService.findOneCourseAuth({ data, userId })
     }
 
     @Query(() => FindManyCoursesOutputData)
@@ -32,7 +39,7 @@ export class CoursesResolver {
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     @Query(() => FindManyLecturesOutput)
-    async findManyLectures(@UserId() userId: string,  @Args("data") data: FindManyLecturesInputData) {
+    async findManyLectures(@UserId() userId: string, @Args("data") data: FindManyLecturesInputData) {
         return await this.coursesService.findManyLectures({ userId, data })
     }
 

@@ -18,6 +18,7 @@ import {
     FindManyResourcesInput,
     FindOneLectureInput,
     FindManyCourseTargetsInput,
+    FindOneCourseAuthInput,
 } from "./courses.input"
 import { FindManyCoursesOutputData } from "./courses.output"
 import { SubcategoryEntity } from "src/database/mysql/subcategory.entity"
@@ -49,6 +50,82 @@ export class CoursesService {
         const { params } = data
         const { courseId, userId } = params
 
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const course = await this.courseMySqlRepository.findOne({
+                where: { courseId },
+                relations: {
+                    sections: {
+                        lectures: {
+                            resources: true,
+                        },
+                    },
+                    courseTargets: true,
+                    creator: true,
+                    courseSubcategories: {
+                        subcategory: {
+                            subcategoryTopics: {
+                                topic: true
+                            }
+                        }
+                    },
+                    category: true,
+                    courseTopics: {
+                        topic: true
+                    }
+                },
+                order: {
+                    courseTargets: {
+                        position: "ASC",
+                    },
+                },
+            })
+
+            const enrolledInfo = userId 
+                ? await this.enrolledInfoMySqlRepository.findOneBy({
+                    courseId,
+                    userId
+                }) : undefined
+
+            const numberOfFollowersResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(FollowMySqlEnitity, "follow")
+                .where("followedUserId = :userId", { userId: course.creator.userId })
+                .andWhere("followed = :followed", { followed: true })
+                .getRawOne()
+
+            const numberOfEnrollmentsResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(EnrolledInfoMySqlEntity, "enrolled_info")
+                .andWhere("courseId = :courseId", { courseId })
+                .getRawOne()
+
+            await queryRunner.commitTransaction()
+
+            course.creator.numberOfFollowers = numberOfFollowersResult.count
+            course.numberOfEnrollments = numberOfEnrollmentsResult.count
+
+            const enrolled = enrolledInfo?.enrolled
+            course.enrolled = enrolled ?? false
+
+            return course
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
+    }
+
+    async findOneCourseAuth(input: FindOneCourseAuthInput): Promise<CourseMySqlEntity> {
+        const { data, userId } = input
+        const { params } = data
+        const { courseId } = params
+        console.log(data, userId)
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()

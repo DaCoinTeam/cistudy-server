@@ -35,6 +35,16 @@ export class FindManyPostsOutput implements Output<FindManyCoursesOutputData> {
         tokens: AuthTokens
 }
 
+@ObjectType()
+export class FindOneCourseAuthOutput
+implements Output<CourseMySqlEntity>
+{
+    @Field(() => CourseMySqlEntity)
+        data: CourseMySqlEntity
+    @Field(() => AuthTokens, { nullable: true })
+        tokens: AuthTokens
+}
+
 
 @ObjectType()
 export class FindOneLectureOutput

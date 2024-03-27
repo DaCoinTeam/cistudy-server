@@ -277,6 +277,11 @@ type FindManyCoursesOutputData {
   metadata: FindManyCoursesOutputMetadata
 }
 
+type FindOneCourseAuthOutput {
+  data: CourseEntity!
+  tokens: AuthTokens
+}
+
 type FindOneLectureOutput {
   data: LectureEntity!
   tokens: AuthTokens
@@ -393,6 +398,7 @@ type Query {
   signIn(data: SignInInputData!): SignInOutput!
   verifyGoogleAccessToken(data: VerifyGoogleAccessTokenData!): VerifyGoogleAccessTokenOutput!
   findOneCourse(data: FindOneCourseInputData!): CourseEntity!
+  findOneCourseAuth(data: FindOneCourseAuthInputData!): FindOneCourseAuthOutput!
   findManyCourses(data: FindManyCoursesInputData!): FindManyCoursesOutputData!
   findOneLecture(data: FindOneLectureInputData!): FindOneLectureOutput!
   findManyLectures(data: FindManyLecturesInputData!): FindManyLecturesOutput!
@@ -435,6 +441,14 @@ input FindOneCourseInputData {
 input FindOneCourseInputParams {
   courseId: ID!
   userId: ID
+}
+
+input FindOneCourseAuthInputData {
+  params: FindOneCourseAuthInputParams!
+}
+
+input FindOneCourseAuthInputParams {
+  courseId: ID!
 }
 
 input FindManyCoursesInputData {
