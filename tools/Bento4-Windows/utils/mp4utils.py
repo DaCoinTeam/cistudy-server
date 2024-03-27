@@ -407,6 +407,7 @@ class Mp4Track:
         if self.type == 'video':
             # set the scan type (hardcoded for now)
             self.scan_type = 'progressive'
+            self.video_range = 'SDR'
 
             # set the width and height
             self.width  = sample_desc['width']
@@ -415,25 +416,63 @@ class Mp4Track:
             # add dolby vision signaling if present
             if 'dolby_vision' in sample_desc:
                 dv_info = sample_desc['dolby_vision']
-                if sample_desc['coding'] in ['dvav', 'dva1', 'dvhe', 'dvh1']:
-                    # non-backward-compatible
-                    self.codec = sample_desc['coding'] + ('.%02d.%02d' % (dv_info['profile'], dv_info['level']))
+                if dv_info['profile'] == 5:
+                    self.video_range = 'PQ'
+                elif dv_info['profile'] in [8, 9]:
+                    self.supplemental_codec = sample_desc['dv_codecs_string'].split(",")[1].split(".")[0] + \
+                        "." + sample_desc['dv_codecs_string'].split(",")[1].split(".")[1] + str('.%02d' % dv_info['level'])
+                    bl_compatibility_id = dv_info['dv_bl_signal_compatibility_id']
+                    if bl_compatibility_id == 1:
+                        self.video_range = 'PQ'
+                        brand = 'db1p'
+                        if brand in self.parent.info['file']['compatible_brands']:
+                            self.dv_brand = brand
+                    elif bl_compatibility_id == 2:
+                        self.video_range = 'SDR'
+                        brand = 'db2g'
+                        if brand in self.parent.info['file']['compatible_brands']:
+                            self.dv_brand = brand
+                    elif bl_compatibility_id == 4:
+                        self.video_range = 'HLG'
+                        if 'db4g' in self.parent.info['file']['compatible_brands']:
+                            self.dv_brand = 'db4g'
+                        elif 'db4h' in self.parent.info['file']['compatible_brands']:
+                            self.dv_brand = 'db4h'
+                    else:
+                        PrintErrorAndExit('ERROR: unsupported ccid for Dolby Vision profile 8/9.')
                 else:
-                    # backward-compatible
-                    coding_map = {
-                        'avc1': 'dva1',
-                        'avc3': 'dvav',
-                        'hev1': 'dvhe',
-                        'hvc1': 'dvh1'
-                    }
-                    dv_coding = coding_map.get(sample_desc['coding'])
-                    if dv_coding:
-                        dv_string = dv_coding + ('.%02d.%02d' % (dv_info['profile'], dv_info['level']))
-                        self.codec += ','+dv_string
+                    PrintErrorAndExit('ERROR: unsupported Dolby Vision profile.')
 
         if self.type == 'audio':
             self.sample_rate = sample_desc['sample_rate']
             self.channels = sample_desc['channels']
+            # Set the default values for Dolby audio codec flags
+            self.dolby_ddp_atmos = 'No'
+            self.dolby_ac4_ims   = 'No'
+            self.dolby_ac4_cbi   = 'No'
+            if self.codec_family == 'ec-3' and 'dolby_digital_plus_info' in sample_desc:
+                self.channels = GetDolbyDigitalPlusChannels(self)[0]
+                self.dolby_ddp_atmos = sample_desc['dolby_digital_plus_info']['Dolby_Atmos']
+                if (self.dolby_ddp_atmos == 'Yes'):
+                    self.complexity_index = sample_desc['dolby_digital_plus_info']['complexity_index']
+                    self.channels =  str(self.info['sample_descriptions'][0]['dolby_digital_plus_info']['complexity_index']) + '/JOC'
+            elif self.codec_family == 'ac-4' and 'dolby_ac4_info' in sample_desc:
+                self.channels = str(self.channels)
+                if sample_desc['dolby_ac4_info']['dsi version'] == 0:
+                    raise Exception("AC4 dsi version 0 is deprecated.")
+                elif sample_desc['dolby_ac4_info']['dsi version'] == 1:
+                    if sample_desc['dolby_ac4_info']['bitstream version'] == 0:
+                        raise Exception("AC4 bitstream version 0 is deprecated.")
+                    if len(sample_desc['dolby_ac4_info']['presentations']):
+                        stream_type = sample_desc['dolby_ac4_info']['presentations'][0]['Stream Type']
+                        if stream_type == 'Immersive stereo':
+                            self.dolby_ac4_ims = 'Yes'
+                            self.channels = '2/IMSA'
+                        elif stream_type == 'Channel based immsersive':
+                            self.dolby_ac4_cbi = 'Yes'
+                            self.channels = self.channels + '/IMSA'
+            elif 'mpeg_4_audio_decoder_config' in sample_desc:
+                self.channels = sample_desc['mpeg_4_audio_decoder_config']['channels']
 
         self.language = info['language']
         self.language_name = LanguageNames.get(LanguageCodeMap.get(self.language, 'und'), '')
@@ -862,14 +901,20 @@ DolbyDigital_acmod = {
 
 def GetDolbyDigitalPlusChannels(track):
     sample_desc = track.info['sample_descriptions'][0]
-    if 'dolby_digital_info' not in sample_desc:
+    if 'dolby_digital_plus_info' not in sample_desc and 'dolby_digital_info' not in sample_desc:
         return (track.channels, [])
-    dd_info = sample_desc['dolby_digital_info']['substreams'][0]
-    channels = DolbyDigital_acmod[dd_info['acmod']][:]
-    if dd_info['lfeon'] == 1:
+    elif 'dolby_digital_plus_info' in sample_desc:
+        if 'substreams' in sample_desc['dolby_digital_plus_info']:
+            ddp_or_dd_info = sample_desc['dolby_digital_plus_info']['substreams'][0]
+    elif 'dolby_digital_info' in sample_desc:
+        if 'stream_info' in sample_desc['dolby_digital_info']:
+            ddp_or_dd_info = sample_desc['dolby_digital_info']['stream_info']
+
+    channels = DolbyDigital_acmod[ddp_or_dd_info['acmod']][:]
+    if ddp_or_dd_info['lfeon'] == 1:
         channels.append('LFE')
-    if dd_info['num_dep_sub'] and 'chan_loc' in dd_info:
-        chan_loc_value = dd_info['chan_loc']
+    if 'num_dep_sub' in ddp_or_dd_info and ddp_or_dd_info['num_dep_sub'] and 'chan_loc' in ddp_or_dd_info:
+        chan_loc_value = ddp_or_dd_info['chan_loc']
         for i in range(9):
             if chan_loc_value & (1<<i):
                 channels.append(DolbyDigital_chan_loc[i])
@@ -909,6 +954,17 @@ def ComputeDolbyDigitalPlusAudioChannelConfig(track):
             config |= flags[channel]
     return hex(config).upper()[2:]
 
+# ETSI TS 102 366 V1.4.1 (2017-09) Table I.1.1
+def DolbyDigitalWithMPEGDASHScheme(mask):
+    available_mask_dict = {'4000': '1' , 'A000': '2' , 'E000': '3' , 'E100': '4' ,
+                           'F800': '5' , 'F801': '6' , 'F821': '7' , 'A100': '9' ,
+                           'B800': '10', 'E301': '11', 'FA01': '12', 'F811': '14',
+                           'F815': '16', 'F89D': '17', 'E255': '19'}
+    if mask in available_mask_dict:
+        return (True, available_mask_dict[mask])
+    else:
+        return (False, mask)
+
 def ComputeDolbyAc4AudioChannelConfig(track):
     sample_desc = track.info['sample_descriptions'][0]
     if 'dolby_ac4_info' in sample_desc:
@@ -919,6 +975,42 @@ def ComputeDolbyAc4AudioChannelConfig(track):
                 return '%06x' % presentation['presentation_channel_mask_v1']
 
     return '000000'
+
+# ETSI TS 103 190-2 V1.2.1 (2018-02) Table G.1
+def DolbyAc4WithMPEGDASHScheme(mask):
+    available_mask_dict = {
+        '000002' : '1' , '000001' : '2' , '000003' : '3' , '008003' : '4' ,
+        '000007' : '5' , '000047' : '6' , '020047' : '7' , '008001' : '9' ,
+        '000005' : '10', '008047' : '11', '00004F' : '12', '02FF7F' : '13',
+        '06FF6F' : '13', '000057' : '14', '040047' : '14', '00145F' : '15',
+        '04144F' : '15', '000077' : '16', '040067' : '16', '000A77' : '17',
+        '040A67' : '17', '000A7F' : '18', '040A6F' : '18', '00007F' : '19',
+        '04006F' : '19', '01007F' : '20', '05006F' : '2'}
+    if mask in available_mask_dict:
+        return (True, available_mask_dict[mask])
+    else:
+        return (False, mask)
+
+def ReGroupEC3Sets(audio_sets):
+    regroup_audio_sets    = {}
+    audio_adaptation_sets = {}
+    for name, audio_tracks in audio_sets.items():
+        if audio_tracks[0].codec_family == 'ec-3':
+            for track in audio_tracks:
+                if track.info['sample_descriptions'][0]['dolby_digital_plus_info']['Dolby_Atmos'] == 'Yes':
+                    adaptation_set_name = ('audio', track.language, track.codec_family, track.channels, 'ATMOS')
+                else:
+                    adaptation_set_name = ('audio', track.language, track.codec_family, track.channels)
+                adaptation_set = audio_adaptation_sets.get(adaptation_set_name, [])
+                audio_adaptation_sets[adaptation_set_name] = adaptation_set
+                adaptation_set.append(track)
+        else:
+            regroup_audio_sets[name] = audio_tracks
+
+    for name, tracks in audio_adaptation_sets.items():
+        regroup_audio_sets[name] = tracks
+
+    return regroup_audio_sets
 
 def ComputeDolbyDigitalPlusAudioChannelMask(track):
     masks = {
