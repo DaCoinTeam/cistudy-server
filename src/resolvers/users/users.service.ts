@@ -39,7 +39,7 @@ export class UsersService {
                 }
             ) 
 
-            const numberOfFollowers = await queryRunner.manager
+            const numberOfFollowersResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(FollowMySqlEnitity, "follow")
@@ -49,7 +49,7 @@ export class UsersService {
 
             await queryRunner.commitTransaction()
 
-            user.numberOfFollowers = numberOfFollowers.count
+            user.numberOfFollowers = numberOfFollowersResult.count
             const followed = follow?.followed
             user.followed = followed ?? false
 
