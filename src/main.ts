@@ -23,7 +23,7 @@ const generateSchema = async () => {
         PostsResolver,
         UsersResolver,
         ProfileResolver
-    ])
+    ]) 
     await fsPromises.writeFile(
         join(
             process.cwd(),
