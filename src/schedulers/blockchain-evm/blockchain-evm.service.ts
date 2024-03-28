@@ -28,10 +28,10 @@ export class BlockchainEvmService {
                     this.logger.verbose(connected)
                 })
                 subscriber.on("data", async (log) => {
+                    this.logger.verbose(log)
                     try {
                         const { from, to, value } = decodeTransferLog(log)
                         if (web3.utils.toChecksumAddress(to as string) !== blockchainConfig().evmAddress) return
-                        this.logger.verbose(log)
 
                         await this.transactionMongoModel.create({
                             transactionHash: log.transactionHash,

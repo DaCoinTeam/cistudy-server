@@ -90,11 +90,17 @@ export class CoursesService {
                 }
             }
             )
-            if (found) throw new ConflictException("You have enrolled to this course.")
 
-            const { value, isValidated, _id } = await this.transactionMongoModel.findOne({
+            if (found?.enrolled) throw new ConflictException("You have enrolled to this course.")
+
+            const transaction = await this.transactionMongoModel.findOne({
                 transactionHash
             })
+            if (!transaction) {
+                throw new NotFoundException("Transaction not found.") 
+            }
+            
+            const { _id, isValidated, value } = transaction
 
             if (isValidated) throw new ConflictException("This transaction is validated.")
 
@@ -114,8 +120,10 @@ export class CoursesService {
             )
 
             const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
+                enrolledInfoId: found?.enrolledInfoId,
                 courseId,
-                userId
+                userId,
+                enrolled: true
             })
 
             await queryRunner.commitTransaction()
