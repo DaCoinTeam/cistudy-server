@@ -5,6 +5,7 @@
 
 # bento 4
 /tools/Bento4-Windows
+/tools/Bento4-Docker
 
 *.env
 
