@@ -2,8 +2,8 @@ services:
   server:
     build:
       context: ..
-      image: cistudy-server:latest
-      container_name: cistudy-server
+    image: cistudy-server:latest
+    container_name: cistudy-server
     ports:
       - 3001:3001
     volumes:
@@ -12,4 +12,4 @@ services:
 volumes:
     storage:
     tasks:
-  
+ 
