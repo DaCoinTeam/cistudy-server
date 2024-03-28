@@ -16,6 +16,7 @@ FROM node:${NODE_VERSION}-alpine as base
 RUN apk add --no-cache python3
 RUN apk add --no-cache ffmpeg
 RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache 7zip
 #RUN apk add  --no-cache bento4 
 
 # Set working directory for all build stages.
@@ -64,9 +65,9 @@ RUN mkdir -p /usr/src/app/tasks/process-mpeg-dash
 # Make storage dir
 RUN mkdir -p /usr/src/app/storage
 
-# Copy tools file
-RUN mkdir -p /usr/src/app/tools/Bento4-Docker
-COPY tools/Bento4-Docker /usr/src/app/tools/Bento4-Docker
+#extract zip file
+COPY tools/Bento4-Docker.zip /usr/src/app/tools/Bento4-Docker.zip
+RUN 7z x /usr/src/app/tools/Bento4-Docker.zip -o/usr/src/app/tools
 
 #Add variables
 ENV PATH=$PATH:/usr/src/app/tools/Bento4-Docker/bin
