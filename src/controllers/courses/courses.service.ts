@@ -77,8 +77,6 @@ export class CoursesService {
         const { data, userId } = input
         const { courseId, transactionHash } = data
 
-        console.log("called")
-
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
