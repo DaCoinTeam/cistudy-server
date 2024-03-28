@@ -3,6 +3,9 @@
 /node_modules
 /storage
 
+# bento 4
+/tools/Bento4-Windows
+
 *.env
 
 # Logs
