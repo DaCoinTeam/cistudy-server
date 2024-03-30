@@ -47,7 +47,7 @@ import { MongooseModule } from "@nestjs/mongoose"
             database: databaseConfig().mysql.schema,
             autoLoadEntities: true,
             synchronize: true,
-            timezone: "Z"
+            timezone: "Z",
         }),
 
         GraphQLModule.forRoot<ApolloDriverConfig>({

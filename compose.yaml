@@ -3,10 +3,12 @@ services:
     build:
       context: .
     ports:
-      - 3001:3001
+      - 3002:3001
     env_file:
       - docker.env
     volumes:
       - storage:/usr/src/app/storage
+      - tasks:/usr/src/app/tasks
 volumes:
     storage:
+    tasks:
