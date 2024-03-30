@@ -68,6 +68,7 @@ RUN mkdir -p /usr/src/app/storage
 #extract zip file
 COPY tools/Bento4-Docker.zip /usr/src/app/tools/Bento4-Docker.zip
 RUN 7z x /usr/src/app/tools/Bento4-Docker.zip -o/usr/src/app/tools
+RUN rm /usr/src/app/tools/Bento4-Docker.zip
 
 #Add variables
 ENV PATH=$PATH:/usr/src/app/tools/Bento4-Docker/bin
