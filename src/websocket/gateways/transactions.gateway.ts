@@ -1,3 +1,4 @@
+import { Logger, OnModuleInit } from "@nestjs/common"
 import {
     MessageBody,
     SubscribeMessage,
@@ -14,9 +15,17 @@ import { Server } from "socket.io"
           origin: "*",
       },
   })
-export class TransactionsGateway {
+export class TransactionsGateway implements OnModuleInit {
+    private readonly logger = new Logger(TransactionsGateway.name)
+
     @WebSocketServer()
-        server: Server
+    private readonly server: Server
+    
+    onModuleInit() {
+        this.server.on("connection", (socket) => {
+            this.logger.verbose(socket.id)
+        })
+    }
   
     @SubscribeMessage("events")
     findAll(@MessageBody() data: any): Observable<WsResponse<number>> {
