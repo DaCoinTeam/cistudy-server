@@ -14,6 +14,7 @@ import { APP_PIPE } from "@nestjs/core"
 import { ScheduleModule } from "@nestjs/schedule"
 import { SchedulersModule } from "@schedulers"
 import { MongooseModule } from "@nestjs/mongoose"
+import { WebsocketModule } from "./websocket"
 
 @Module({
     imports: [
@@ -58,6 +59,7 @@ import { MongooseModule } from "@nestjs/mongoose"
             introspection: true,
         }),
         
+        WebsocketModule,
         SchedulersModule,
         ResolversModule,
         GlobalModule,

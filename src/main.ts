@@ -11,6 +11,7 @@ import {
 import { printSchema } from "graphql"
 import { join } from "path"
 import { getEnvValue } from "@common"
+import { RedisIoAdapter } from "@adapters"
 
 const generateSchema = async () => {
     const app = await NestFactory.create(GraphQLSchemaBuilderModule)
@@ -33,10 +34,14 @@ const generateSchema = async () => {
     )
 }
 
-async function bootstrap() {
+const bootstrap = async () => {
     const app = await NestFactory.create(AppModule)
 
     app.enableCors()
+
+    const redisIoAdapter = new RedisIoAdapter(app)
+    await redisIoAdapter.connectToRedis()
+    app.useWebSocketAdapter(redisIoAdapter)
 
     const config = new DocumentBuilder()
         .setTitle("CiStudy Server")

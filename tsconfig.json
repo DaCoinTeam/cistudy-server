@@ -27,7 +27,9 @@
       "@workers": ["src/workers"],
       "@common": ["src/common"],
       "@blockchain": ["src/blockchain"],
-      "@schedulers": ["src/schedulers"]
+      "@schedulers": ["src/schedulers"],
+      "@adapters": ["src/adapters"],
+      "@websocket": ["src/websocket"]
     },
   },
   "include": ["src/**/*"],
