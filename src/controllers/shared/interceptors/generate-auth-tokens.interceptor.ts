@@ -19,8 +19,8 @@ implements NestInterceptor<T, Output<T>>
         context: ExecutionContext,
         next: CallHandler,
     ): Promise<Observable<Output<T>>> {
-        const request = context.switchToHttp().getRequest()
-        const clientId = getClientId(request)
+        const headers = context.switchToHttp().getRequest().headers
+        const clientId = getClientId(headers)
 
         return next.handle().pipe(
             mergeMap(async (data) => {

@@ -6,11 +6,10 @@ import {
 } from "@nestjs/common"
 import { AuthManagerService } from "@global"
 import { Observable, mergeMap } from "rxjs"
-import { Output, getClientId } from "@common"
-import { GqlExecutionContext } from "@nestjs/graphql"
+import { AuthTokenType, Payload, Output, getClientId } from "@common"
 
 @Injectable()
-export class GenerateAuthTokensInterceptor<T extends object>
+export class AuthInterceptor<T extends object>
 implements NestInterceptor<T, Output<T>>
 {
     constructor(
@@ -20,16 +19,23 @@ implements NestInterceptor<T, Output<T>>
         context: ExecutionContext,
         next: CallHandler,
     ): Promise<Observable<Output<T>>> {
-        const gqlContext = GqlExecutionContext.create(context).getContext()
-        const headers = gqlContext.req.headers
+        const client = context.switchToWs().getClient()
+
+        const { userId, type } = client.user as Payload
+
+        const headers = client.handshake?.headers
         const clientId = getClientId(headers)
-        
+
+        const refresh = type === AuthTokenType.Refresh
+        if (refresh) {
+            await this.authManagerService.validateSession(userId, clientId)
+        }
         return next.handle().pipe(
             mergeMap(async (data) => {
                 return await this.authManagerService.generateOutput<T>(
-                    data.userId,
+                    userId,
                     data,
-                    true,
+                    refresh,
                     clientId,
                 )
             }),

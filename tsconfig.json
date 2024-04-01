@@ -29,7 +29,7 @@
       "@blockchain": ["src/blockchain"],
       "@schedulers": ["src/schedulers"],
       "@adapters": ["src/adapters"],
-      "@websocket": ["src/websocket"]
+      "@websockets": ["src/websockets"]
     },
   },
   "include": ["src/**/*"],

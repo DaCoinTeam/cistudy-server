@@ -22,7 +22,7 @@ implements NestInterceptor<T, Output<T>>
         const request = context.switchToHttp().getRequest()
         const { userId, type } = request.user as Payload
 
-        const clientId = getClientId(request)
+        const clientId = getClientId(request.headers)
 
         const refresh = type === AuthTokenType.Refresh
         if (refresh) {

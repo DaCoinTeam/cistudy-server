@@ -14,7 +14,9 @@ import { APP_PIPE } from "@nestjs/core"
 import { ScheduleModule } from "@nestjs/schedule"
 import { SchedulersModule } from "@schedulers"
 import { MongooseModule } from "@nestjs/mongoose"
-import { WebsocketModule } from "./websocket"
+import { WebsocketsModule } from "@websockets"
+import * as redisStore from "cache-manager-redis-store"
+import { CacheModule, CacheStore } from "@nestjs/cache-manager"
 
 @Module({
     imports: [
@@ -31,6 +33,16 @@ import { WebsocketModule } from "./websocket"
             },
         }),
 
+        CacheModule.register({
+            isGlobal: true,
+            useFactory: async () => ({
+                store: redisStore as unknown as CacheStore,
+                host: databaseConfig().redis.host,
+                port: databaseConfig().redis.port,
+                ttl: 24 * 60 * 60,
+            }),
+        }),
+
         ScheduleModule.forRoot(),
 
         MongooseModule.forRoot(`mongodb://${databaseConfig().mongo.host}:${databaseConfig().mongo.port}`, {
@@ -38,7 +50,7 @@ import { WebsocketModule } from "./websocket"
             pass: databaseConfig().mongo.pass,
             dbName: databaseConfig().mongo.dbName,
         }),
-        
+
         TypeOrmModule.forRoot({
             type: "mysql",
             host: databaseConfig().mysql.host,
@@ -58,8 +70,8 @@ import { WebsocketModule } from "./websocket"
             plugins: [ApolloServerPluginLandingPageLocalDefault()],
             introspection: true,
         }),
-        
-        WebsocketModule,
+
+        WebsocketsModule,
         SchedulersModule,
         ResolversModule,
         GlobalModule,
@@ -75,4 +87,4 @@ import { WebsocketModule } from "./websocket"
         },
     ],
 })
-export class AppModule {}
+export class AppModule { }
