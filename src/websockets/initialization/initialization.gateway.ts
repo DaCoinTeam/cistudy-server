@@ -42,7 +42,6 @@ export class InitializationGateway implements OnGatewayConnection, OnGatewayDisc
     @SubscribeMessage("initialize")
     async onInitialize(@ConnectedSocket() client: Socket, @UserId() userId: string) {
         await this.cacheManager.set(client.id, userId)
-        console.log(userId)
         return {}
     }
 }
