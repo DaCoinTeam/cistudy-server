@@ -25,7 +25,7 @@ implements NestInterceptor<T, Output<T>>
 
         const { userId, type } = request.user as Payload
 
-        const clientId = null //getClientId(request.headers)
+        const clientId = getClientId(request.headers)
         const refresh = type === AuthTokenType.Refresh
 
         if (refresh) {
