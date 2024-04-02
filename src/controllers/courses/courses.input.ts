@@ -12,7 +12,7 @@ export class EnrollCourseInputData {
     @ApiProperty()
         courseId: string
     @ApiProperty()
-        transactionHash: string
+        code: string
 }
 
 export class EnrollCourseInput implements AuthInput<EnrollCourseInputData> {

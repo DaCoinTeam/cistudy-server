@@ -18,13 +18,13 @@ import Web3 from "web3"
 export class BlockchainEvmService implements OnModuleInit {
     private readonly logger = new Logger(BlockchainEvmService.name)
 
-    redisClient: RedisClientType
+    redisPubClient: RedisClientType
     async onModuleInit() {
-        this.redisClient = createClient({
+        this.redisPubClient = createClient({
             url: `redis://${databaseConfig().redis.host}:${databaseConfig().redis.port}`,
             name: BlockchainEvmService.name,
         })
-        await this.redisClient.connect()
+        await this.redisPubClient.connect()
     }
 
     constructor(
@@ -54,19 +54,21 @@ export class BlockchainEvmService implements OnModuleInit {
                         )
                             return
 
+                        this.logger.verbose(log.transactionHash)
+
                         await this.transactionMongoModel.create({
                             transactionHash: log.transactionHash,
                             from,
                             to,
                             value,
-                            log,
+                            log
                         })
 
                         const message: BlockchainEvmServiceMessage = {
                             transactionHash: log.transactionHash,
                         }
 
-                        await this.redisClient.publish(
+                        await this.redisPubClient.publish(
                             BlockchainEvmService.name,
                             JSON.stringify(message),
                         )

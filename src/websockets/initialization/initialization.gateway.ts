@@ -1,4 +1,4 @@
-import { Logger, UseGuards, UseInterceptors } from "@nestjs/common"
+import { Inject, Logger, UseGuards, UseInterceptors } from "@nestjs/common"
 
 import {
     ConnectedSocket,
@@ -13,11 +13,10 @@ import { Server, Socket } from "socket.io"
 import { JwtAuthGuard } from "../shared"
 import { UserId } from "../shared"
 import { AuthInterceptor } from "../shared"
-import { INITIALIZE } from "./initialization.events"
+import { INITIALIZE, INITIALIZED } from "./initialization.events"
 import { InitializeOutputData } from "./initialization.output"
-import { InitializationService } from "./initialization.service"
-
-
+import { CACHE_MANAGER } from "@nestjs/cache-manager"
+import { Cache } from "cache-manager"
 
 @WebSocketGateway({
     cors: {
@@ -27,7 +26,9 @@ import { InitializationService } from "./initialization.service"
 export class InitializationGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly logger = new Logger(InitializationGateway.name)
 
-    constructor(private readonly initializationService: InitializationService) { }
+    constructor(
+        @Inject(CACHE_MANAGER) private cacheManager: Cache
+    ) { }
 
     @WebSocketServer()
     private readonly server: Server
@@ -37,16 +38,14 @@ export class InitializationGateway implements OnGatewayConnection, OnGatewayDisc
     }
 
     async handleDisconnect(client: Socket) {
-        await this.initializationService.handleDisconnect(client)
+        await this.cacheManager.del(client.id)
     }
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     @SubscribeMessage(INITIALIZE)
-    async initialize(@ConnectedSocket() client: Socket, @UserId() userId: string) : Promise<WsResponse<InitializeOutputData>> {
-        return this.initializationService.initialize({ 
-            client,
-            userId,
-        })
+    async handleInitialize(@ConnectedSocket() client: Socket, @UserId() userId: string): Promise<WsResponse<InitializeOutputData>> {
+        await this.cacheManager.set(client.id, userId)
+        return { event: INITIALIZED, data: {} }
     }
 }

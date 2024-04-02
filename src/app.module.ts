@@ -16,7 +16,8 @@ import { SchedulersModule } from "@schedulers"
 import { MongooseModule } from "@nestjs/mongoose"
 import { WebsocketsModule } from "@websockets"
 import * as redisStore from "cache-manager-redis-store"
-import { CacheModule, CacheStore } from "@nestjs/cache-manager"
+import { CacheModule } from "@nestjs/cache-manager"
+
 
 @Module({
     imports: [
@@ -35,12 +36,10 @@ import { CacheModule, CacheStore } from "@nestjs/cache-manager"
 
         CacheModule.register({
             isGlobal: true,
-            useFactory: async () => ({
-                store: redisStore as unknown as CacheStore,
-                host: databaseConfig().redis.host,
-                port: databaseConfig().redis.port,
-                ttl: 24 * 60 * 60,
-            }),
+            store: redisStore,
+            host: databaseConfig().redis.host,
+            port: databaseConfig().redis.port,
+            ttl: 24 * 60 * 60,
         }),
 
         ScheduleModule.forRoot(),

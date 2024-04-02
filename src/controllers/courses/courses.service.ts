@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
+import { ConflictException, Inject, Injectable, NotFoundException } from "@nestjs/common"
 import {
     CategoryMySqlEntity,
     CourseMySqlEntity,
@@ -41,6 +41,8 @@ import { CreateCategoryOutput, CreateCourseOutput, CreateSubcategoryOutput, Crea
 import { EnrolledInfoEntity } from "src/database/mysql/enrolled-info.entity"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
+import { CACHE_MANAGER } from "@nestjs/cache-manager"
+import { Cache } from "cache-manager"
 
 @Injectable()
 export class CoursesService {
@@ -68,6 +70,7 @@ export class CoursesService {
         @InjectRepository(TopicMySqlEntity)
         private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
         @InjectModel(TransactionMongo.name) private readonly transactionMongoModel: Model<TransactionMongo>,
+        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         private readonly storageService: StorageService,
         private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
         private readonly dataSource: DataSource
@@ -75,7 +78,7 @@ export class CoursesService {
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
         const { data, userId } = input
-        const { courseId, transactionHash } = data
+        const { courseId, code } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -91,13 +94,16 @@ export class CoursesService {
 
             if (found?.enrolled) throw new ConflictException("You have enrolled to this course.")
 
+            const { transactionHash } = (await this.cacheManager.get(code)) as CodeValue
+            if (!transactionHash) throw new NotFoundException("The code either expired or never existed.")
+
             const transaction = await this.transactionMongoModel.findOne({
                 transactionHash
             })
             if (!transaction) {
-                throw new NotFoundException("Transaction not found.") 
+                throw new NotFoundException("Transaction not found.")
             }
-            
+
             const { _id, isValidated, value } = transaction
 
             if (isValidated) throw new ConflictException("This transaction is validated.")
@@ -509,4 +515,9 @@ export class CoursesService {
             topicId
         }
     }
+}
+
+
+interface CodeValue {
+    transactionHash: string;
 }
