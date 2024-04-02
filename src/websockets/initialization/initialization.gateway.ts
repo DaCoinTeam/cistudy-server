@@ -9,18 +9,20 @@ import {
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
+    WsResponse,
 } from "@nestjs/websockets"
 import { Server, Socket } from "socket.io"
 import { JwtAuthGuard } from "../shared"
 import { UserId } from "../shared"
 import { AuthInterceptor } from "../shared"
 
+const INITIALIZE = "initialize"
+
 @WebSocketGateway({
     cors: {
         origin: "*",
     },
 })
-@UseGuards(JwtAuthGuard)
 export class InitializationGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly logger = new Logger(InitializationGateway.name)
 
@@ -39,9 +41,9 @@ export class InitializationGateway implements OnGatewayConnection, OnGatewayDisc
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    @SubscribeMessage("initialize")
-    async onInitialize(@ConnectedSocket() client: Socket, @UserId() userId: string) {
+    @SubscribeMessage(INITIALIZE)
+    async onInitialize(@ConnectedSocket() client: Socket, @UserId() userId: string) : Promise<WsResponse<unknown>> {
         await this.cacheManager.set(client.id, userId)
-        return {}
+        return { event: INITIALIZE, data: {} }
     }
 }

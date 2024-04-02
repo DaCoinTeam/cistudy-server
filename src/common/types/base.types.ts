@@ -5,6 +5,12 @@ export interface Output<T> {
     tokens?: AuthTokens
 }
 
+export interface WsOutput<T> {
+    event: string,
+    data: Output<T>
+}
+
+
 export interface AuthInput<T> {
     userId: string,
     data: T,

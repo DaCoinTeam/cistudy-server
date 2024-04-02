@@ -6,11 +6,11 @@ import {
 } from "@nestjs/common"
 import { AuthManagerService } from "@global"
 import { Observable, mergeMap } from "rxjs"
-import { AuthTokenType, Payload, Output, getClientId } from "@common"
+import { AuthTokenType, Payload, getClientId, WsOutput } from "@common"
 
 @Injectable()
 export class AuthInterceptor<T extends object>
-implements NestInterceptor<T, Output<T>>
+implements NestInterceptor<T, WsOutput<T>>
 {
     constructor(
         private readonly authManagerService: AuthManagerService) {}
@@ -18,7 +18,7 @@ implements NestInterceptor<T, Output<T>>
     async intercept(
         context: ExecutionContext,
         next: CallHandler,
-    ): Promise<Observable<Output<T>>> {
+    ): Promise<Observable<WsOutput<T>>> {
         const client = context.switchToWs().getClient()
 
         const { userId, type } = client.user as Payload
@@ -31,13 +31,14 @@ implements NestInterceptor<T, Output<T>>
             await this.authManagerService.validateSession(userId, clientId)
         }
         return next.handle().pipe(
-            mergeMap(async (data) => {
-                return await this.authManagerService.generateOutput<T>(
+            mergeMap(async ({event, data}) => {
+                data = await this.authManagerService.generateOutput<T>(
                     userId,
                     data,
                     refresh,
                     clientId,
                 )
+                return { event, data } 
             }),
         )
     }
