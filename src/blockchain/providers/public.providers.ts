@@ -18,7 +18,7 @@ export const getHttpProvider = (
 export const getWebSocketProvider = (chainId: ChainId) : WebSocketProvider<EthExecutionAPI> => {
     return new WebSocketProvider((chainInfos[chainId].websocketRpcUrl), {}, {
         autoReconnect: true,
-        maxAttempts: 10,
+        maxAttempts: Infinity,
         delay: 0
     })
 }
