@@ -12,7 +12,7 @@ export class JwtAuthGuard implements CanActivate {
         const client = context.switchToWs().getClient()
         
         const token = client.handshake?.auth?.token
-        console.log(client.handshake?.auth)
+
         if (!token) throw UnauthorizedWsException({event, data})
         try{
             const user = await this.jwtService.verifyAsync(token, {
