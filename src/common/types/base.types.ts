@@ -1,3 +1,4 @@
+import { Socket } from "socket.io"
 import { AuthTokens } from "./auth.types"
 
 export interface Output<T> {
@@ -10,10 +11,22 @@ export interface WsOutput<T> {
     data: Output<T>
 }
 
-
 export interface AuthInput<T> {
     userId: string,
     data: T,
+    files?: Array<Express.Multer.File>
+}
+
+export interface WsAuthInput<T> {
+    userId: string,
+    client: Socket,
+    data: T,
+    files?: Array<Express.Multer.File>
+}
+
+export interface WsAuthEmptyInput {
+    userId: string,
+    client: Socket,
     files?: Array<Express.Multer.File>
 }
 
