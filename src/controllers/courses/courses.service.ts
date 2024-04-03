@@ -127,7 +127,8 @@ export class CoursesService {
                 enrolledInfoId: found?.enrolledInfoId,
                 courseId,
                 userId,
-                enrolled: true
+                enrolled: true,
+                priceAtEnrolled: price
             })
 
             await queryRunner.commitTransaction()

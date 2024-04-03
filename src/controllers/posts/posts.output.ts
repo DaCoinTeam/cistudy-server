@@ -9,6 +9,11 @@ export class CreatePostCommentOutput {
 export class UpdatePostOutput {
 }
 
+export class ToggleLikePostOutputData {
+    postLikeId: string
+}
+
+
 export class DeletePostOutput {
 }
 

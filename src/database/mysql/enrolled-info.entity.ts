@@ -9,7 +9,7 @@ import {
 } from "typeorm"
 import { UserEntity } from "./user.entity"
 import { CourseEntity } from "./course.entity"
-import { Field, ID, ObjectType } from "@nestjs/graphql"
+import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
 @Entity("enrolled_info")
@@ -37,6 +37,15 @@ export class EnrolledInfoEntity {
     @Field(() => Boolean)
     @Column({ type: "boolean", default: true })
         enrolled: boolean
+
+    @Field(() => Float, { nullable: true })
+    @Column({
+        type: "decimal",
+        precision: 10,
+        scale: 5,
+        default: 0,
+    })
+        priceAtEnrolled: number
 
     @Field(() => CourseEntity)
     @ManyToOne(() => CourseEntity, (course) => course.enrolledInfos)

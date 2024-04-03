@@ -21,6 +21,9 @@ import {
     PostMediaMySqlEntity,
     PostCommentLikeMySqlEntity,
     PostCommentReplyMySqlEntity,
+    CourseMySqlEntity,
+    EnrolledInfoMySqlEntity,
+    UserMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DeepPartial, DataSource } from "typeorm"
@@ -30,31 +33,39 @@ import {
     DeletePostCommentOutput,
     DeletePostCommentReplyOutput,
     DeletePostOutput,
+    ToggleLikePostOutputData,
     UpdatePostCommentOutput,
     UpdatePostCommentReplyOutput,
     UpdatePostOutput,
 } from "./posts.output"
+import { blockchainConfig } from "@config"
 
 @Injectable()
 export class PostsService {
     constructor(
-        @InjectRepository(PostMySqlEntity)
-        private readonly postMySqlRepository: Repository<PostMySqlEntity>,
-        @InjectRepository(PostMediaMySqlEntity)
-        private readonly postMediaMySqlRepository: Repository<PostMediaMySqlEntity>,
-        @InjectRepository(PostLikeMySqlEntity)
-        private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
-        @InjectRepository(PostCommentLikeMySqlEntity)
-        private readonly postCommentLikeMySqlRepository: Repository<PostCommentLikeMySqlEntity>,
-        @InjectRepository(PostCommentMySqlEntity)
-        private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
-        @InjectRepository(PostCommentMediaMySqlEntity)
-        private readonly postCommentMediaMySqlRepository: Repository<PostCommentMediaMySqlEntity>,
-        @InjectRepository(PostCommentReplyMySqlEntity)
-        private readonly postCommentReplyMySqlRepository: Repository<PostCommentReplyMySqlEntity>,
-        private readonly storageService: StorageService,
-        private readonly dataSource: DataSource
-    ) { }
+    @InjectRepository(PostMySqlEntity)
+    private readonly postMySqlRepository: Repository<PostMySqlEntity>,
+    @InjectRepository(PostMediaMySqlEntity)
+    private readonly postMediaMySqlRepository: Repository<PostMediaMySqlEntity>,
+    @InjectRepository(UserMySqlEntity)
+    private readonly userMySqlRepository: Repository<UserMySqlEntity>,
+    @InjectRepository(CourseMySqlEntity)
+    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+    @InjectRepository(EnrolledInfoMySqlEntity)
+    private readonly enrolledInfoMySqlEntity: Repository<EnrolledInfoMySqlEntity>,
+    @InjectRepository(PostLikeMySqlEntity)
+    private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
+    @InjectRepository(PostCommentLikeMySqlEntity)
+    private readonly postCommentLikeMySqlRepository: Repository<PostCommentLikeMySqlEntity>,
+    @InjectRepository(PostCommentMySqlEntity)
+    private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
+    @InjectRepository(PostCommentMediaMySqlEntity)
+    private readonly postCommentMediaMySqlRepository: Repository<PostCommentMediaMySqlEntity>,
+    @InjectRepository(PostCommentReplyMySqlEntity)
+    private readonly postCommentReplyMySqlRepository: Repository<PostCommentReplyMySqlEntity>,
+    private readonly storageService: StorageService,
+    private readonly dataSource: DataSource,
+    ) {}
 
     async createPost(input: CreatePostInput): Promise<string> {
         console.log(input)
@@ -137,13 +148,17 @@ export class PostsService {
         await queryRunner.startTransaction()
 
         try {
-            const deletedPostMedias = await this.postMediaMySqlRepository.findBy({ postId })
+            const deletedPostMedias = await this.postMediaMySqlRepository.findBy({
+                postId,
+            })
             await this.postMediaMySqlRepository.delete({ postId })
             await this.postMySqlRepository.save(post)
 
             await queryRunner.commitTransaction()
 
-            const mediaIds = deletedPostMedias.map(deletedPostMedia => deletedPostMedia.mediaId)
+            const mediaIds = deletedPostMedias.map(
+                (deletedPostMedia) => deletedPostMedia.mediaId,
+            )
             await this.storageService.delete(...mediaIds)
 
             return {}
@@ -157,17 +172,21 @@ export class PostsService {
     async deletePost(input: DeletePostInput): Promise<DeletePostOutput> {
         const { data } = input
         const { postId } = data
-  
+
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
         try {
-            const deletedPostMedias = await this.postMediaMySqlRepository.findBy({ postId })
+            const deletedPostMedias = await this.postMediaMySqlRepository.findBy({
+                postId,
+            })
             await this.postMySqlRepository.delete({ postId })
-            
+
             await queryRunner.commitTransaction()
 
-            const mediaIds = deletedPostMedias.map(deletedPostMedia => deletedPostMedia.mediaId)
+            const mediaIds = deletedPostMedias.map(
+                (deletedPostMedia) => deletedPostMedia.mediaId,
+            )
             await this.storageService.delete(...mediaIds)
 
             return {}
@@ -178,40 +197,63 @@ export class PostsService {
         }
     }
 
-    async toggleLikePost(input: ToggleLikePostInput) {
+    //like
+    async toggleLikePost(
+        input: ToggleLikePostInput,
+    ): Promise<ToggleLikePostOutputData> {
         const { userId, data } = input
         const { postId } = data
 
-        const found = await this.postLikeMySqlRepository.findOne({
-            where: {
-                userId,
-                postId,
-            },
-        })
-
-        const responseMessage = (postLikeId: string, liked: boolean = true) =>
-            `${liked ? "Like" : "Unlike"} post successfully with id ${postLikeId}`
-
-        if (found === null) {
-            // do claim rewards action
-
-            const postLike = await this.postLikeMySqlRepository.save({
-                userId,
-                postId,
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+        try {
+            let found = await this.postLikeMySqlRepository.findOne({
+                where: {
+                    userId,
+                    postId,
+                },
             })
-            const { postLikeId, liked } = postLike
-            return responseMessage(postLikeId, liked)
+
+            if (found === null) {
+                found = await this.postLikeMySqlRepository.save({
+                    userId,
+                    postId,
+                })
+
+                const { courseId } = await this.postMySqlRepository.findOneBy({
+                    postId,
+                })
+
+                const { priceAtEnrolled } = await this.enrolledInfoMySqlEntity.findOneBy({
+                    userId,
+                    courseId
+                })
+
+                const earnAmount = priceAtEnrolled * blockchainConfig().earnPercentage / 100
+                
+                await this.userMySqlRepository.increment({ userId }, "balance", earnAmount)
+            } else {
+                const { postLikeId, liked } = found
+                await this.postLikeMySqlRepository.update(postLikeId, {
+                    liked: !liked,
+                })
+            }
+
+            const { postLikeId } = found
+            return {
+                postLikeId,
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
         }
-
-        const { postLikeId, liked } = found
-        await this.postLikeMySqlRepository.update(postLikeId, {
-            liked: !liked,
-        })
-
-        return responseMessage(postLikeId, !liked)
     }
 
-    async createPostComment(input: CreatePostCommentInput): Promise<CreatePostCommentOutput> {
+    async createPostComment(
+        input: CreatePostCommentInput,
+    ): Promise<CreatePostCommentOutput> {
         const { data, files, userId } = input
         const { postCommentMedias, postId, html } = data
         const postComment: DeepPartial<PostCommentMySqlEntity> = {
@@ -244,13 +286,16 @@ export class PostsService {
 
         await Promise.all(promises)
 
-        const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
+        const { postCommentId } =
+      await this.postCommentMySqlRepository.save(postComment)
         return {
-            postCommentId
+            postCommentId,
         }
     }
 
-    async updatePostComment(input: UpdatePostCommentInput): Promise<UpdatePostCommentOutput> {
+    async updatePostComment(
+        input: UpdatePostCommentInput,
+    ): Promise<UpdatePostCommentOutput> {
         const { data, files } = input
         const { postCommentMedias, postCommentId, html } = data
         const postComment: DeepPartial<PostCommentMySqlEntity> = {
@@ -287,13 +332,16 @@ export class PostsService {
         await queryRunner.startTransaction()
 
         try {
-            const deletedPostCommentMedias = await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
+            const deletedPostCommentMedias =
+        await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
             await this.postCommentMediaMySqlRepository.delete({ postCommentId })
             await this.postCommentMySqlRepository.save(postComment)
 
             await queryRunner.commitTransaction()
 
-            const mediaIds = deletedPostCommentMedias.map(deletedPostCommentMedia => deletedPostCommentMedia.mediaId)
+            const mediaIds = deletedPostCommentMedias.map(
+                (deletedPostCommentMedia) => deletedPostCommentMedia.mediaId,
+            )
             await this.storageService.delete(...mediaIds)
 
             return {}
@@ -304,7 +352,9 @@ export class PostsService {
         }
     }
 
-    async deletePostComment(input: DeletePostCommentInput ): Promise<DeletePostCommentOutput> {
+    async deletePostComment(
+        input: DeletePostCommentInput,
+    ): Promise<DeletePostCommentOutput> {
         const { data } = input
         const { postCommentId } = data
 
@@ -312,12 +362,15 @@ export class PostsService {
         await queryRunner.connect()
         await queryRunner.startTransaction()
         try {
-            const deletedPostCommentMedias = await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
+            const deletedPostCommentMedias =
+        await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
             await this.postCommentMySqlRepository.delete({ postCommentId })
-            
+
             await queryRunner.commitTransaction()
 
-            const mediaIds = deletedPostCommentMedias.map(deletedPostCommentMedia => deletedPostCommentMedia.mediaId)
+            const mediaIds = deletedPostCommentMedias.map(
+                (deletedPostCommentMedia) => deletedPostCommentMedia.mediaId,
+            )
             await this.storageService.delete(...mediaIds)
 
             return {}
@@ -370,11 +423,12 @@ export class PostsService {
         const { data, userId } = input
         const { content, postCommentId } = data
 
-        const { postCommentReplyId } = await this.postCommentReplyMySqlRepository.save({
-            content,
-            creatorId: userId,
-            postCommentId,
-        })
+        const { postCommentReplyId } =
+      await this.postCommentReplyMySqlRepository.save({
+          content,
+          creatorId: userId,
+          postCommentId,
+      })
 
         return {
             postCommentReplyId,
