@@ -9,4 +9,4 @@ export class VerifyTransactionInput implements WsAuthInput<VerifyTransactionInpu
     client: Socket
     userId: string
     data: VerifyTransactionInputData
-}
+} 
