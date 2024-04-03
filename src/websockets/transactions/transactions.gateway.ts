@@ -45,23 +45,23 @@ export class TransactionsGateway implements OnModuleInit {
     private readonly server: Server
 
     redisPubClient: RedisClientType
-    redisTransactionsSubClient: RedisClientType
-    redisBlockchainEvmSubClient: RedisClientType
+    redisTransactionsServiceSubClient: RedisClientType
+    redisBlockchainEvmServiceSubClient: RedisClientType
 
     async onModuleInit() {
         this.redisPubClient = createClient({
             url: `redis://${databaseConfig().redis.host}:${databaseConfig().redis.port}`,
         })
-        this.redisTransactionsSubClient = this.redisPubClient.duplicate()
-        this.redisBlockchainEvmSubClient = this.redisPubClient.duplicate()
+        this.redisTransactionsServiceSubClient = this.redisPubClient.duplicate()
+        this.redisBlockchainEvmServiceSubClient = this.redisPubClient.duplicate()
 
         await Promise.all([
             this.redisPubClient.connect(),
-            this.redisTransactionsSubClient.connect(),
-            this.redisBlockchainEvmSubClient.connect()
+            this.redisTransactionsServiceSubClient.connect(),
+            this.redisBlockchainEvmServiceSubClient.connect()
         ])
 
-        this.redisTransactionsSubClient.subscribe(
+        this.redisTransactionsServiceSubClient.subscribe(
             TransactionsGateway.name,
             async (message: string) => {
                 const parsed: TransactionsServiceMessage = JSON.parse(message)
@@ -78,7 +78,7 @@ export class TransactionsGateway implements OnModuleInit {
             }
         )
 
-        this.redisBlockchainEvmSubClient.subscribe(
+        this.redisBlockchainEvmServiceSubClient.subscribe(
             BlockchainEvmService.name,
             async (message: string) => {
                 console.log(message)
