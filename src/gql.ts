@@ -72,7 +72,7 @@ export interface UserModel {
     avatarUrl?: Nullable<string>;
     phoneNumber?: Nullable<string>;
     balance?: Nullable<number>;
-    role: UserRole;
+    userRole: UserRole;
     walletId?: Nullable<string>;
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;

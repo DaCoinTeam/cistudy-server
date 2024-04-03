@@ -1,15 +1,17 @@
 import { jwtConfig } from "@config"
-import { SessionMySqlEntity } from "@database"
+import { SessionMySqlEntity, UserMySqlEntity } from "@database"
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
 import { JsonWebTokenError, JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Payload, AuthTokens, UserRole, AuthTokenType, Output } from "@common"
+import { Payload, AuthTokens, AuthTokenType, Output, UserRole } from "@common"
 import { Repository } from "typeorm"
 
 @Injectable()
 export class AuthManagerService {
     constructor(
         private readonly jwtService: JwtService,
+        @InjectRepository(UserMySqlEntity)
+        private readonly userMySqlRepository: Repository<UserMySqlEntity>,
         @InjectRepository(SessionMySqlEntity)
         private readonly sessionMySqlRepository: Repository<SessionMySqlEntity>,
     ) { }
@@ -44,6 +46,8 @@ export class AuthManagerService {
             [AuthTokenType.Refresh]: jwtConfig().refreshTokenExpiryTime,
         }
         const expiresIn = typeToExpiresIn[type]
+
+        console.log(data.userRole)
 
         const payload: PayloadLike = {
             userId: data.userId,
@@ -89,13 +93,21 @@ export class AuthManagerService {
     }
 
     async generateOutput<T extends object>(
-        userId: string,
+        payload: PayloadLike,
         data: T,
         authTokensRequested: boolean = false,
         clientId?: string,
     ): Promise<Output<T>> {
+        const { userId } = payload
+        let { userRole } = payload
+
+        if (authTokensRequested) {
+            const user = await this.userMySqlRepository.findOneBy({ userId })
+            userRole = user.userRole
+        }
+
         const tokens = authTokensRequested
-            ? await this.generateAuthTokens({ userId }, clientId)
+            ? await this.generateAuthTokens({ userId, userRole }, clientId)
             : undefined
 
         return {
@@ -105,8 +117,8 @@ export class AuthManagerService {
     }
 }
 
-interface PayloadLike {
-    userId: string;
-    userRole?: UserRole;
-    type?: AuthTokenType;
+export interface PayloadLike {
+    userId: string,
+    userRole: UserRole,
+    type?: AuthTokenType
 }

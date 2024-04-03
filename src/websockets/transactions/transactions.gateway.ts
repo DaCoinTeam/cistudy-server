@@ -104,6 +104,9 @@ export class TransactionsGateway implements OnModuleInit {
                 this.cacheManager.get(TransactionsGateway.name) as Promise<Array<TransactionsServiceMessage>>
         ])
 
+        blockchainEvmServiceMessages = blockchainEvmServiceMessages ?? []
+        transactionGatewayMessages = transactionGatewayMessages ?? []
+
         transactionGatewayMessages.forEach(async ({ transactionHash, clientId }) => {
             if (!blockchainEvmServiceMessages.map(({ transactionHash: hash }) => hash).includes(transactionHash)) return
 
@@ -113,8 +116,7 @@ export class TransactionsGateway implements OnModuleInit {
                 transactionHash
             }, 60000)
 
-            console.log(code, clientId, TRANSACTION_VERIFIED)
-            this.server.emit(TRANSACTION_VERIFIED, { code })
+            this.server.to(clientId).emit(TRANSACTION_VERIFIED, { code })
 
             blockchainEvmServiceMessages = blockchainEvmServiceMessages.filter(
                 ({ transactionHash: hash }) => hash != transactionHash

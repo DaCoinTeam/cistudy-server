@@ -60,7 +60,7 @@ export class UserEntity {
         enum: UserRole,
         default: UserRole.User,
     })
-        role: UserRole
+        userRole: UserRole
 
     @Field(() => ID, { nullable: true })
     @Column({

@@ -54,7 +54,7 @@ import { JwtStrategy } from "./strategies"
         Sha256Service,
         ShellService,
         StorageService,
-        JwtStrategy
+        JwtStrategy,
     ],
     providers: [
         JwtService,

@@ -242,7 +242,7 @@ type UserEntity {
   phoneNumber: String
   username: String
   balance: Float
-  role: UserRole!
+  userRole: UserRole!
   walletId: ID
   firstName: String
   lastName: String
