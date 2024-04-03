@@ -27,7 +27,6 @@ import { BlockchainEvmService, BlockchainEvmServiceMessage } from "@schedulers"
 import { VerifyTransactionInputData } from "./transactions.input"
 import { Interval } from "@nestjs/schedule"
 import { v4 as uuidv4 } from "uuid"
-import { Kafka } from "kafkajs"
 
 @WebSocketGateway({
     cors: {
@@ -61,40 +60,6 @@ export class TransactionsGateway implements OnModuleInit {
             this.redisTransactionsServiceSubClient.connect(),
             this.redisBlockchainEvmServiceSubClient.connect()
         ])
-
-        const kafka = new Kafka({
-            clientId: "cistudy",
-            brokers: ["localhost:19092"]
-        })
-
-        const producer = kafka.producer()
-        const consumer = kafka.consumer({ groupId: "cistudy" })
-
-        const run = async () => {
-            // Producing
-            await producer.connect() 
-            await producer.send({
-                topic: "validated_transactions",
-                messages: [
-                    { value: "Hello KafkaJS user!" },
-                ],
-            })
-
-            await consumer.connect()
-            await consumer.subscribe({ topic: "validated_transactions", fromBeginning: true })
-
-            await consumer.run({
-                eachMessage: async ({ topic, partition, message }) => {
-                    console.log({
-                        partition,
-                        offset: message.offset,
-                        value: message.value.toString(),
-                    })
-                },
-            })
-        }
-
-        run().catch(console.error)
 
         this.redisTransactionsServiceSubClient.subscribe(
             TransactionsGateway.name,
