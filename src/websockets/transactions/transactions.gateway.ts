@@ -27,6 +27,7 @@ import { BlockchainEvmService, BlockchainEvmServiceMessage } from "@schedulers"
 import { VerifyTransactionInputData } from "./transactions.input"
 import { Interval } from "@nestjs/schedule"
 import { v4 as uuidv4 } from "uuid"
+import { Kafka } from "kafkajs"
 
 @WebSocketGateway({
     cors: {
@@ -61,15 +62,49 @@ export class TransactionsGateway implements OnModuleInit {
             this.redisBlockchainEvmServiceSubClient.connect()
         ])
 
+        const kafka = new Kafka({
+            clientId: "cistudy",
+            brokers: ["localhost:19092"]
+        })
+
+        const producer = kafka.producer()
+        const consumer = kafka.consumer({ groupId: "cistudy" })
+
+        const run = async () => {
+            // Producing
+            await producer.connect() 
+            await producer.send({
+                topic: "validated_transactions",
+                messages: [
+                    { value: "Hello KafkaJS user!" },
+                ],
+            })
+
+            await consumer.connect()
+            await consumer.subscribe({ topic: "validated_transactions", fromBeginning: true })
+
+            await consumer.run({
+                eachMessage: async ({ topic, partition, message }) => {
+                    console.log({
+                        partition,
+                        offset: message.offset,
+                        value: message.value.toString(),
+                    })
+                },
+            })
+        }
+
+        run().catch(console.error)
+
         this.redisTransactionsServiceSubClient.subscribe(
             TransactionsGateway.name,
             async (message: string) => {
                 const parsed: TransactionsServiceMessage = JSON.parse(message)
 
                 const transactionGatewayMessages =
-                    ((await this.cacheManager.get(
-                        TransactionsGateway.name,
-                    )) as Array<TransactionsServiceMessage>) ?? []
+                        ((await this.cacheManager.get(
+                            TransactionsGateway.name,
+                        )) as Array<TransactionsServiceMessage>) ?? []
 
                 await this.cacheManager.set(TransactionsGateway.name, [
                     ...transactionGatewayMessages,
@@ -85,9 +120,9 @@ export class TransactionsGateway implements OnModuleInit {
                 const parsed: BlockchainEvmServiceMessage = JSON.parse(message)
 
                 const blockchainEvmServiceMessages =
-                    ((await this.cacheManager.get(
-                        BlockchainEvmService.name,
-                    )) as Array<BlockchainEvmServiceMessage>) ?? []
+                        ((await this.cacheManager.get(
+                            BlockchainEvmService.name,
+                        )) as Array<BlockchainEvmServiceMessage>) ?? []
 
                 await this.cacheManager.set(BlockchainEvmService.name, [
                     ...blockchainEvmServiceMessages,
@@ -97,11 +132,11 @@ export class TransactionsGateway implements OnModuleInit {
         )
     }
 
-    @Interval(5000)
+        @Interval(5000)
     async verifyTransactions() {
         let [blockchainEvmServiceMessages, transactionGatewayMessages] = await Promise.all([
-            this.cacheManager.get(BlockchainEvmService.name) as Promise<Array<BlockchainEvmServiceMessage>>,
-            this.cacheManager.get(TransactionsGateway.name) as Promise<Array<TransactionsServiceMessage>>
+                this.cacheManager.get(BlockchainEvmService.name) as Promise<Array<BlockchainEvmServiceMessage>>,
+                this.cacheManager.get(TransactionsGateway.name) as Promise<Array<TransactionsServiceMessage>>
         ])
 
         transactionGatewayMessages.forEach(async ({ transactionHash, clientId }) => {
@@ -136,29 +171,29 @@ export class TransactionsGateway implements OnModuleInit {
         })
     }
 
-    @UseGuards(JwtAuthGuard)
-    @UseInterceptors(AuthInterceptor)
-    @SubscribeMessage(VERIFY_TRANSACTION)
-    async handleVerifyTransaction(
-        @ConnectedSocket() client: Socket,
-        @MessageBody() data: VerifyTransactionInputData,
-        @UserId() userId: string,
-    ): Promise<WsResponse<VerifyTransactionOutputData>> {
-        const { transactionHash } = data
+        @UseGuards(JwtAuthGuard)
+        @UseInterceptors(AuthInterceptor)
+        @SubscribeMessage(VERIFY_TRANSACTION)
+        async handleVerifyTransaction(
+            @ConnectedSocket() client: Socket,
+            @MessageBody() data: VerifyTransactionInputData,
+            @UserId() userId: string,
+        ): Promise < WsResponse < VerifyTransactionOutputData >> {
+            const { transactionHash } = data
 
-        const message: TransactionsServiceMessage = {
-            transactionHash,
-            clientId: client.id,
-            userId,
+            const message: TransactionsServiceMessage = {
+                transactionHash,
+                clientId: client.id,
+                userId,
+            }
+
+            await this.redisPubClient.publish(
+                TransactionsGateway.name,
+                JSON.stringify(message),
+            )
+
+            return { event: VERIFY_TRANSACTION, data: {} }
         }
-
-        await this.redisPubClient.publish(
-            TransactionsGateway.name,
-            JSON.stringify(message),
-        )
-
-        return { event: VERIFY_TRANSACTION, data: {} }
-    }
 }
 
 export interface TransactionsServiceMessage {
