@@ -99,16 +99,10 @@ export class TransactionsGateway implements OnModuleInit {
 
     @Interval(5000)
     async verifyTransactions() {
-        let blockchainEvmServiceMessages =
-            ((await this.cacheManager.get(
-                BlockchainEvmService.name,
-            )) as Array<BlockchainEvmServiceMessage>) ?? []
-
-        let transactionGatewayMessages =
-            ((await this.cacheManager.get(
-                TransactionsGateway.name,
-            )) as Array<TransactionsServiceMessage>) ?? []
-
+        let [blockchainEvmServiceMessages, transactionGatewayMessages] = await Promise.all([
+            this.cacheManager.get(BlockchainEvmService.name) as Promise<BlockchainEvmServiceMessage[]>,
+            this.cacheManager.get(TransactionsGateway.name) as Promise<TransactionsServiceMessage[]>
+        ])
 
         transactionGatewayMessages.forEach(async ({ transactionHash, clientId }) => {
             if (!blockchainEvmServiceMessages.map(({ transactionHash: hash }) => hash).includes(transactionHash)) return

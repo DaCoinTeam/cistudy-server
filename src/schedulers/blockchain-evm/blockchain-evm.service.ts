@@ -22,7 +22,6 @@ export class BlockchainEvmService implements OnModuleInit {
     async onModuleInit() {
         this.redisPubClient = createClient({
             url: `redis://${databaseConfig().redis.host}:${databaseConfig().redis.port}`,
-            name: BlockchainEvmService.name,
         })
         await this.redisPubClient.connect()
     }
@@ -37,10 +36,18 @@ export class BlockchainEvmService implements OnModuleInit {
         const promises: Array<Promise<void>> = []
         for (const chainId of Object.keys(chainInfos)) {
             const promise = async () => {
-                const web3 = new Web3(getWebSocketProvider(Number.parseInt(chainId)))
-
+                const provider = getWebSocketProvider(Number.parseInt(chainId))
+                const web3 = new Web3(provider)
+                
+                provider.on("disconnect", error => 
+                {
+                    this.logger.error(error)
+                    provider.connect()
+                    web3.setProvider(provider)
+                })
+              
                 const subscriber = await web3.eth.subscribe("logs", {
-                    topics: [TRANSFER_SIGNATURE],
+                    topics: [ TRANSFER_SIGNATURE ],
                 })
                 subscriber.on("connected", async (connected: string) => {
                     this.logger.verbose(connected)
