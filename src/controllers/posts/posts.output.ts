@@ -11,6 +11,7 @@ export class UpdatePostOutput {
 
 export class ToggleLikePostOutputData {
     postLikeId: string
+    earnAmount?: number
 }
 
 

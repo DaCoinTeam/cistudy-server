@@ -43,29 +43,29 @@ import { blockchainConfig } from "@config"
 @Injectable()
 export class PostsService {
     constructor(
-    @InjectRepository(PostMySqlEntity)
-    private readonly postMySqlRepository: Repository<PostMySqlEntity>,
-    @InjectRepository(PostMediaMySqlEntity)
-    private readonly postMediaMySqlRepository: Repository<PostMediaMySqlEntity>,
-    @InjectRepository(UserMySqlEntity)
-    private readonly userMySqlRepository: Repository<UserMySqlEntity>,
-    @InjectRepository(CourseMySqlEntity)
-    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-    @InjectRepository(EnrolledInfoMySqlEntity)
-    private readonly enrolledInfoMySqlEntity: Repository<EnrolledInfoMySqlEntity>,
-    @InjectRepository(PostLikeMySqlEntity)
-    private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
-    @InjectRepository(PostCommentLikeMySqlEntity)
-    private readonly postCommentLikeMySqlRepository: Repository<PostCommentLikeMySqlEntity>,
-    @InjectRepository(PostCommentMySqlEntity)
-    private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
-    @InjectRepository(PostCommentMediaMySqlEntity)
-    private readonly postCommentMediaMySqlRepository: Repository<PostCommentMediaMySqlEntity>,
-    @InjectRepository(PostCommentReplyMySqlEntity)
-    private readonly postCommentReplyMySqlRepository: Repository<PostCommentReplyMySqlEntity>,
-    private readonly storageService: StorageService,
-    private readonly dataSource: DataSource,
-    ) {}
+        @InjectRepository(PostMySqlEntity)
+        private readonly postMySqlRepository: Repository<PostMySqlEntity>,
+        @InjectRepository(PostMediaMySqlEntity)
+        private readonly postMediaMySqlRepository: Repository<PostMediaMySqlEntity>,
+        @InjectRepository(UserMySqlEntity)
+        private readonly userMySqlRepository: Repository<UserMySqlEntity>,
+        @InjectRepository(CourseMySqlEntity)
+        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(EnrolledInfoMySqlEntity)
+        private readonly enrolledInfoMySqlEntity: Repository<EnrolledInfoMySqlEntity>,
+        @InjectRepository(PostLikeMySqlEntity)
+        private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
+        @InjectRepository(PostCommentLikeMySqlEntity)
+        private readonly postCommentLikeMySqlRepository: Repository<PostCommentLikeMySqlEntity>,
+        @InjectRepository(PostCommentMySqlEntity)
+        private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
+        @InjectRepository(PostCommentMediaMySqlEntity)
+        private readonly postCommentMediaMySqlRepository: Repository<PostCommentMediaMySqlEntity>,
+        @InjectRepository(PostCommentReplyMySqlEntity)
+        private readonly postCommentReplyMySqlRepository: Repository<PostCommentReplyMySqlEntity>,
+        private readonly storageService: StorageService,
+        private readonly dataSource: DataSource,
+    ) { }
 
     async createPost(input: CreatePostInput): Promise<string> {
         console.log(input)
@@ -204,6 +204,8 @@ export class PostsService {
         const { userId, data } = input
         const { postId } = data
 
+        let earnAmount: number
+
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
@@ -230,8 +232,7 @@ export class PostsService {
                     courseId
                 })
 
-                const earnAmount = priceAtEnrolled * blockchainConfig().earnPercentage / 100
-                
+                earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient
                 await this.userMySqlRepository.increment({ userId }, "balance", earnAmount)
             } else {
                 const { postLikeId, liked } = found
@@ -243,6 +244,7 @@ export class PostsService {
             const { postLikeId } = found
             return {
                 postLikeId,
+                earnAmount
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -287,7 +289,7 @@ export class PostsService {
         await Promise.all(promises)
 
         const { postCommentId } =
-      await this.postCommentMySqlRepository.save(postComment)
+            await this.postCommentMySqlRepository.save(postComment)
         return {
             postCommentId,
         }
@@ -333,7 +335,7 @@ export class PostsService {
 
         try {
             const deletedPostCommentMedias =
-        await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
+                await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
             await this.postCommentMediaMySqlRepository.delete({ postCommentId })
             await this.postCommentMySqlRepository.save(postComment)
 
@@ -363,7 +365,7 @@ export class PostsService {
         await queryRunner.startTransaction()
         try {
             const deletedPostCommentMedias =
-        await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
+                await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
             await this.postCommentMySqlRepository.delete({ postCommentId })
 
             await queryRunner.commitTransaction()
@@ -424,11 +426,11 @@ export class PostsService {
         const { content, postCommentId } = data
 
         const { postCommentReplyId } =
-      await this.postCommentReplyMySqlRepository.save({
-          content,
-          creatorId: userId,
-          postCommentId,
-      })
+            await this.postCommentReplyMySqlRepository.save({
+                content,
+                creatorId: userId,
+                postCommentId,
+            })
 
         return {
             postCommentReplyId,

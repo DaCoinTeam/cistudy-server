@@ -80,6 +80,9 @@ export class UpdateCourseInputData {
     @ApiProperty({ nullable: true })
         categoryId?: string
 
+    @ApiProperty({ nullable: true })    
+        receivedWalletAddress?: string
+
     @ApiProperty({ nullable: true })
         subcategoryIds?: Array<string>
 

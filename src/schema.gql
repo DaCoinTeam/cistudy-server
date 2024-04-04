@@ -126,6 +126,7 @@ type CourseEntity {
   verifyStatus: String!
   creator: UserEntity!
   isDeleted: Boolean!
+  receivedWalletAddress: String
   previewVideoId: ID
   includes: String
   createdAt: DateTime!
@@ -350,6 +351,20 @@ type FindManyPostCommentRepliesOutput {
   tokens: AuthTokens
 }
 
+type FindManyUsersOutputMetadata {
+  count: Int
+}
+
+type FindManyUsersOutputData {
+  results: [UserEntity!]!
+  metadata: FindManyUsersOutputMetadata
+}
+
+type FindManyUsersOutput {
+  data: FindManyUsersOutputData!
+  tokens: AuthTokens
+}
+
 type FindManySelfCreatedCoursesOutputMetadata {
   count: Int
 }
@@ -413,6 +428,7 @@ type Query {
   findOneUser(data: FindOneUserInputData!): UserEntity!
   findManyFollowers(data: FindManyFollowersInputData!): [UserEntity!]!
   findManyCreatedCourses(data: FindManyCreatedCoursesInputData!): [CourseEntity!]!
+  findManyUsers(data: FindManyUsersInputData!): FindManyUsersOutput!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
 }
@@ -589,6 +605,16 @@ input FindManyCreatedCoursesInputParams {
 input FindManyCreatedCoursesInputOptions {
   take: Int
   skip: Int
+}
+
+input FindManyUsersInputData {
+  options: FindManyUsersInputOptions
+}
+
+input FindManyUsersInputOptions {
+  take: Int
+  skip: Int
+  searchValue: String
 }
 
 input FindManySelfCreatedCoursesInputData {

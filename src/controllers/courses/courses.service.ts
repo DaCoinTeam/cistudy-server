@@ -94,9 +94,10 @@ export class CoursesService {
 
             if (found?.enrolled) throw new ConflictException("You have enrolled to this course.")
 
-            const { transactionHash } = (await this.cacheManager.get(code)) as CodeValue
-            if (!transactionHash) throw new NotFoundException("The code either expired or never existed.")
-
+            const cachedTransaction = (await this.cacheManager.get(code)) as CodeValue
+            if (!cachedTransaction) throw new NotFoundException("The code either expired or never existed.")
+            
+            const { transactionHash } = cachedTransaction
             const transaction = await this.transactionMongoModel.findOne({
                 transactionHash
             })
@@ -167,7 +168,8 @@ export class CoursesService {
             title,
             categoryId,
             subcategoryIds,
-            topicIds
+            topicIds,
+            receivedWalletAddress
         } = data
 
         const course: DeepPartial<CourseMySqlEntity> = {
@@ -177,6 +179,7 @@ export class CoursesService {
             price,
             discountPrice,
             enableDiscount,
+            receivedWalletAddress,
             categoryId,
             courseSubcategories: subcategoryIds?.map(subcategoryId => ({
                 subcategoryId,
@@ -250,8 +253,6 @@ export class CoursesService {
         } finally {
             await queryRunner.release()
         }
-
-
     }
 
     async createSection(input: CreateSectionInput): Promise<string> {

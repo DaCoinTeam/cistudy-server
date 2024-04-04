@@ -75,6 +75,10 @@ export class CourseEntity {
     @Column({ default: false })
         isDeleted: boolean
 
+    @Field(() => String, { nullable: true })
+    @Column({ nullable: true })
+        receivedWalletAddress: string
+
     @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36, default: null })
         previewVideoId: string

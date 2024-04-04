@@ -1,17 +1,20 @@
 import { CourseMySqlEntity, FollowMySqlEnitity, UserMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { DataSource, Repository } from "typeorm"
-import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindOneUserInput, } from "./users.input"
+import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindManyUsersInput, FindOneUserInput, } from "./users.input"
 import { InjectRepository } from "@nestjs/typeorm"
+import { FindManyUsersOutputData } from "./user.output"
 @Injectable()
 export class UsersService {
     constructor(
-    @InjectRepository(FollowMySqlEnitity)
-    private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
-    @InjectRepository(CourseMySqlEntity)
-    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-    private readonly dataSource: DataSource,
-    ) {}
+        @InjectRepository(UserMySqlEntity)
+        private readonly userMySqlRepository: Repository<UserMySqlEntity>,
+        @InjectRepository(FollowMySqlEnitity)
+        private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
+        @InjectRepository(CourseMySqlEntity)
+        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        private readonly dataSource: DataSource,
+    ) { }
 
     async findOneUser(input: FindOneUserInput): Promise<UserMySqlEntity> {
         const { data } = input
@@ -37,7 +40,7 @@ export class UsersService {
                         followed: true
                     }
                 }
-            ) 
+            )
 
             const numberOfFollowersResult = await queryRunner.manager
                 .createQueryBuilder()
@@ -76,7 +79,7 @@ export class UsersService {
                     follower: true
                 }
             }
-        ) 
+        )
         return followRelations.map(followRelation => followRelation.follower)
     }
 
@@ -94,6 +97,38 @@ export class UsersService {
                 take,
                 skip
             }
-        ) 
+        )
+    }
+
+    async findManyUsers(input: FindManyUsersInput): Promise<FindManyUsersOutputData> {
+        const { data } = input
+        const { options } = data
+        const { skip, take } = { ...options }
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+        try {
+            const results = await this.userMySqlRepository.find(
+                {
+                    skip,
+                    take,
+                })
+
+            const count = await this.userMySqlRepository.count()
+
+            await queryRunner.commitTransaction()
+
+            return {
+                results,
+                metadata: {
+                    count,
+                }
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
     }
 }
