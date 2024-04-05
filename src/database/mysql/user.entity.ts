@@ -54,7 +54,7 @@ export class UserEntity {
     })
         balance: number
 
-    @Field(() => UserRole)
+    @Field(() => String)
     @Column({
         type: "enum",
         enum: UserRole,
