@@ -43,5 +43,9 @@ jobs:
         MONGO_DB_NAME: ${{ secrets.MONGO_DB_NAME }}
         MONGO_HOST: ${{ vars.MONGO_HOST }}
         MONGO_PORT: ${{ vars.MONGO_PORT }}
+        EARN_PERCENTAGE: ${{ vars.EARN_PERCENTAGE }}
+        LIKE_POST_EARN_COEFFICIENT:  ${{ vars.LIKE_POST_EARN_COEFFICIENT }}
+        COMMENT_POST_EARN_COEFFICIENT:  ${{ vars.COMMENT_POST_EARN_COEFFICIENT }}
+        LIKE_POST_COMMENT_EARN_COEFFICIENT:  ${{ vars.LIKE_POST_COMMENT_EARN_COEFFICIENT }}
       run: docker-compose -f docker/github-compose.yaml -p cistudy-server up --build -d 
  

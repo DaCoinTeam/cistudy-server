@@ -5,12 +5,13 @@ import {
     UploadedFiles,
     Put,
 } from "@nestjs/common"
-import { ApiBearerAuth, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import { Files } from "@common"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { ProfileService } from "./profile.service"
 import { UpdateProfileData } from "./profile.input"
+import { updateProfileSchema } from "./profile.schema"
 
 @ApiTags("Profile")
 @ApiHeader({
@@ -23,6 +24,7 @@ export class ProfileController{
 
     @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: updateProfileSchema })
     @Put("update-profile")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(
