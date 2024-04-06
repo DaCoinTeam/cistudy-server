@@ -243,7 +243,7 @@ type UserEntity {
   phoneNumber: String
   username: String
   balance: Float
-  userRole: UserRole!
+  userRole: String!
   walletId: ID
   firstName: String
   lastName: String
@@ -258,12 +258,6 @@ type UserEntity {
   followedUserRelations: [FollowEntity!]!
   followed: Boolean!
   numberOfFollowers: Int!
-}
-
-enum UserRole {
-  User
-  Moderator
-  Administrator
 }
 
 type FindManyCoursesOutputMetadata {
