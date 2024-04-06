@@ -260,6 +260,16 @@ type UserEntity {
   numberOfFollowers: Int!
 }
 
+type TransactionMongoEntity {
+  transactionHash: String!
+  from: String!
+  to: String!
+  value: String!
+  isValidated: Boolean
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type FindManyCoursesOutputMetadata {
   count: Int
   categories: [CategoryEntity!]
@@ -402,6 +412,15 @@ type VerifyGoogleAccessTokenOutput {
   tokens: AuthTokens
 }
 
+type FindManyTransactionsOutputMetadata {
+  count: Int
+}
+
+type FindManyTransactionsOutput {
+  results: [TransactionMongoEntity!]!
+  metadata: FindManyTransactionsOutputMetadata
+}
+
 type Query {
   init: InitOutput!
   signIn(data: SignInInputData!): SignInOutput!
@@ -425,6 +444,7 @@ type Query {
   findManyUsers(data: FindManyUsersInputData!): FindManyUsersOutput!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
+  findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
 }
 
 input SignInInputData {
@@ -625,6 +645,15 @@ input FindManyEnrolledCoursesInputData {
 }
 
 input FindManyEnrolledCoursesInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManyTransactionsInputData {
+  options: FindManyTransactionsInputOptions
+}
+
+input FindManyTransactionsInputOptions {
   take: Int
   skip: Int
 }

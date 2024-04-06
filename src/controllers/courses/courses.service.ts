@@ -10,7 +10,7 @@ import {
     SectionMySqlEntity,
     SubcategoyMySqlEntity,
     TopicMySqlEntity,
-    TransactionMongo,
+    TransactionMongoEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource } from "typeorm"
@@ -69,7 +69,7 @@ export class CoursesService {
         private readonly subcategoryMySqlRepository: Repository<SubcategoyMySqlEntity>,
         @InjectRepository(TopicMySqlEntity)
         private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
-        @InjectModel(TransactionMongo.name) private readonly transactionMongoModel: Model<TransactionMongo>,
+        @InjectModel(TransactionMongoEntity.name) private readonly transactionMongoModel: Model<TransactionMongoEntity>,
         @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         private readonly storageService: StorageService,
         private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,

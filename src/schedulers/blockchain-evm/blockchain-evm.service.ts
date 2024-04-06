@@ -5,7 +5,7 @@ import {
     getWebSocketProvider,
 } from "@blockchain"
 import { blockchainConfig, databaseConfig } from "@config"
-import { TransactionMongo } from "@database"
+import { TransactionMongoEntity } from "@database"
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Timeout } from "@nestjs/schedule"
@@ -27,8 +27,8 @@ export class BlockchainEvmService implements OnModuleInit {
     }
 
     constructor(
-    @InjectModel(TransactionMongo.name)
-    private readonly transactionMongoModel: Model<TransactionMongo>,
+    @InjectModel(TransactionMongoEntity.name)
+    private readonly transactionMongoModel: Model<TransactionMongoEntity>,
     ) {}
 
   @Timeout(0)
