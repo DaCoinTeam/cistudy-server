@@ -36,6 +36,7 @@ export class ProfileController{
         @DataFromBody() data: UpdateProfileData,
         @UploadedFiles() { files }: Files,
     ) {     
+        console.log(userId)
         console.log(data)
     	return this.profileService.updateProfile({
     		userId,

@@ -25,7 +25,7 @@ export class ProfileService {
         )
 
         const profile: DeepPartial<UserMySqlEntity> = { username, birthdate }
-        
+
         if (Number.isInteger(avatarIndex)) {
             const file = files.at(avatarIndex)
             if (avatarId) {
