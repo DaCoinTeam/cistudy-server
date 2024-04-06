@@ -17,14 +17,14 @@ export class ProfileService {
 
     async updateProfile(input: UpdateProfileInput): Promise<string> {
         const { userId, data, files } = input
-        const { username, avatarIndex, coverPhotoIndex } = data
+        const { username, birthdate, avatarIndex, coverPhotoIndex } = data
         //validate to ensure it is image
 
         const { avatarId, coverPhotoId } = await this.userMySqlRepository.findOneBy(
             { userId },
         )
 
-        const profile: DeepPartial<UserMySqlEntity> = { username}
+        const profile: DeepPartial<UserMySqlEntity> = { username, birthdate }
         
         if (Number.isInteger(avatarIndex)) {
             const file = files.at(avatarIndex)

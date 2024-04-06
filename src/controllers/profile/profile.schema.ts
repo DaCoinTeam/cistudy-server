@@ -15,6 +15,10 @@ export const updateProfileSchema : SchemaObject = {
                 coverPhotoIndex: {
                     type: "number"
                 },
+                birthdate: {
+                    type: "string",
+                    format: "date"
+                }
             },
         },
         files: {
