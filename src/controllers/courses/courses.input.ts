@@ -218,7 +218,6 @@ export class UpdateSectionInputData {
     @ApiProperty({ nullable: true })
         sectionId: string
 
-    @Length(20)
     @ApiProperty({ nullable: true })
         title?: string
 }
