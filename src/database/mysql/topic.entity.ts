@@ -34,7 +34,9 @@ export class TopicEntity {
 	    updatedAt: Date
 
 	@Field(() => [CourseTopicEntity])
-	@OneToMany(() => CourseTopicEntity, (courseTopic) => courseTopic.topic)
+	@OneToMany(() => CourseTopicEntity, (courseTopic) => courseTopic.topic, {
+	    cascade: true
+	})
 	    courseTopics: Array<CourseTopicEntity>
 	
 	@Field(() => [SubcategoryTopicEntity])

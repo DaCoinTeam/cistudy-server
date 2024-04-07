@@ -33,7 +33,11 @@ import {
     UpdateSectionInputData,
 } from "./courses.input"
 
-import { createResourcesSchema, createTopicSchema, updateCourseSchema } from "./courses.schema"
+import {
+    createResourcesSchema,
+    createTopicSchema,
+    updateCourseSchema,
+} from "./courses.schema"
 
 import { Files } from "@common"
 import { CoursesService } from "./courses.service"
@@ -267,7 +271,7 @@ export class CoursesController {
   @UseInterceptors(AuthInterceptor)
   async createCategory(
     @UserId() userId: string,
-    @Body() body: CreateCategoryInputData
+    @Body() body: CreateCategoryInputData,
   ) {
       return this.coursesService.createCategory({
           userId,
@@ -281,7 +285,7 @@ export class CoursesController {
   @UseInterceptors(AuthInterceptor)
   async createSubcategory(
     @UserId() userId: string,
-    @Body() body: CreateSubcategoryInputData
+    @Body() body: CreateSubcategoryInputData,
   ) {
       return this.coursesService.createSubcategory({
           userId,
@@ -306,7 +310,21 @@ export class CoursesController {
       return this.coursesService.createTopic({
           userId,
           data,
-          files
+          files,
+      })
+  }
+
+  @ApiBearerAuth()
+  @Delete("delete-topic/:topicId")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async deleteTopic(
+    @UserId() userId: string,
+    @Param("topicId") topicId: string,
+  ) {
+      return this.coursesService.deleteTopic({
+          userId,
+          data: { topicId },
       })
   }
 }

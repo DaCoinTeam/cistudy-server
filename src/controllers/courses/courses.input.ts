@@ -282,3 +282,15 @@ export class CreateTopicInput implements AuthInput<CreateTopicInputData> {
     data: CreateTopicInputData
     files: Array<Express.Multer.File>
 }
+
+
+export class DeleteTopicInputData {
+    @ApiProperty()
+        topicId: string
+}
+
+export class DeleteTopicInput implements AuthInput<DeleteTopicInputData> {
+    @IsUUID("4")
+        userId: string
+    data: DeleteTopicInputData
+}

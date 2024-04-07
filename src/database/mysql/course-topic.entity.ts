@@ -41,7 +41,7 @@ export class CourseTopicEntity {
 
 
     @Field(() => TopicEntity)
-    @ManyToOne(() => TopicEntity, (topic) => topic.courseTopics)
+    @ManyToOne(() => TopicEntity, (topic) => topic.courseTopics, { onDelete: "CASCADE" })
     @JoinColumn({ name: "topicId" })
         topic: TopicEntity
 

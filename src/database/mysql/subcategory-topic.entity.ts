@@ -42,7 +42,7 @@ export class SubcategoryTopicEntity {
 
 
     @Field(() => TopicEntity)
-    @ManyToOne(() => TopicEntity, (topic) => topic.subcategoryTopics)
+    @ManyToOne(() => TopicEntity, (topic) => topic.subcategoryTopics, { onDelete: "CASCADE"})
     @JoinColumn({ name: "topicId" })
         topic: TopicEntity
 }

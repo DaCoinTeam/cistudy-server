@@ -27,3 +27,7 @@ export class CreateTopicOutput {
     @ApiProperty()
         topicId: string
 }
+
+export class DeleteTopicOutputData {
+}
+

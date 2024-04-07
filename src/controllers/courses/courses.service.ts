@@ -33,11 +33,12 @@ import {
     CreateCategoryInput,
     CreateSubcategoryInput,
     CreateTopicInput,
+    DeleteTopicInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import { ProcessStatus, VideoType, computeRaw, existKeyNotUndefined } from "@common"
-import { CreateCategoryOutput, CreateCourseOutput, CreateSubcategoryOutput, CreateTopicOutput, EnrollCourseOutput, UpdateCourseOutput } from "./courses.output"
+import { CreateCategoryOutput, CreateCourseOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteTopicOutputData, EnrollCourseOutput, UpdateCourseOutput } from "./courses.output"
 import { EnrolledInfoEntity } from "src/database/mysql/enrolled-info.entity"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
@@ -496,8 +497,6 @@ export class CoursesService {
         const { data, files } = input
         const { name, subcategoryIds } = data
 
-        console.log(input)
-
         const file = files.at(0)
         if (!file) return
 
@@ -515,6 +514,27 @@ export class CoursesService {
 
         return {
             topicId
+        }
+    }
+
+    async deleteTopic(input: DeleteTopicInput): Promise<DeleteTopicOutputData> {
+        const { data } = input
+        const { topicId } = data
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const { svgId } = await this.topicMySqlRepository.findOneBy({topicId})
+            await this.storageService.delete(svgId)
+            await this.topicMySqlRepository.delete({topicId})
+            return {}
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
         }
     }
 }
