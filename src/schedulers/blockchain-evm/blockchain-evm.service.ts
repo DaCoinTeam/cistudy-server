@@ -1,5 +1,5 @@
 import {
-    TRANSFER_SIGNATURE,
+    ERC20Contract,
     chainInfos,
     decodeTransferLog,
     getWebSocketProvider,
@@ -38,17 +38,20 @@ export class BlockchainEvmService implements OnModuleInit {
             const promise = async () => {
                 const provider = getWebSocketProvider(Number.parseInt(chainId))
                 const web3 = new Web3(provider)
-                
-                provider.on("disconnect", error => 
-                {
+
+                provider.on("disconnect", (error) => {
                     this.logger.error(error)
                     provider.connect()
                     web3.setProvider(provider)
                 })
-              
-                const subscriber = await web3.eth.subscribe("logs", {
-                    topics: [ TRANSFER_SIGNATURE ],
-                })
+
+                const erc20Contract = new ERC20Contract(
+                    Number.parseInt(chainId),
+                    chainInfos[chainId].primaryToken,
+                    provider,
+                )
+
+                const subscriber =  erc20Contract.contract.events.Transfer()
                 subscriber.on("connected", async (connected: string) => {
                     this.logger.verbose(connected)
                 })
@@ -57,7 +60,7 @@ export class BlockchainEvmService implements OnModuleInit {
                         const { from, to, value } = decodeTransferLog(log)
                         if (
                             web3.utils.toChecksumAddress(to as string) !==
-              blockchainConfig().evmAddress
+                blockchainConfig().evmAddress
                         )
                             return
 
@@ -68,7 +71,7 @@ export class BlockchainEvmService implements OnModuleInit {
                             from,
                             to,
                             value,
-                            log
+                            log,
                         })
 
                         const message: BlockchainEvmServiceMessage = {
@@ -82,9 +85,6 @@ export class BlockchainEvmService implements OnModuleInit {
                     } catch (ex) {
                         this.logger.error(ex)
                     }
-                })
-                subscriber.on("error", (error) => {
-                    this.logger.error(error)
                 })
             }
             promises.push(promise())

@@ -4,9 +4,15 @@ export class CreatePostCommentReplyOutput {
 
 export class CreatePostCommentOutput {
     postCommentId: string
+    earnAmount?: number
 }
 
 export class UpdatePostOutput {
+}
+
+export class ToggleCommentLikePostOutputData {
+    postCommentLikeId: string
+    earnAmount?: number
 }
 
 export class ToggleLikePostOutputData {

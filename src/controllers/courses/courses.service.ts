@@ -94,20 +94,20 @@ export class CoursesService {
 
             if (found?.enrolled) throw new ConflictException("You have enrolled to this course.")
 
-            const cachedTransaction = (await this.cacheManager.get(code)) as CodeValue
-            if (!cachedTransaction) throw new NotFoundException("The code either expired or never existed.")
+            // const cachedTransaction = (await this.cacheManager.get(code)) as CodeValue
+            // if (!cachedTransaction) throw new NotFoundException("The code either expired or never existed.")
             
-            const { transactionHash } = cachedTransaction
-            const transaction = await this.transactionMongoModel.findOne({
-                transactionHash
-            })
-            if (!transaction) {
-                throw new NotFoundException("Transaction not found.")
-            }
+            // const { transactionHash } = cachedTransaction
+            // const transaction = await this.transactionMongoModel.findOne({
+            //     transactionHash
+            // })
+            // if (!transaction) {
+            //     throw new NotFoundException("Transaction not found.")
+            // }
 
-            const { _id, isValidated, value } = transaction
+            // const { _id, isValidated, value } = transaction
 
-            if (isValidated) throw new ConflictException("This transaction is validated.")
+            // if (isValidated) throw new ConflictException("This transaction is validated.")
 
             const { enableDiscount, discountPrice, price: coursePrice } = await this.courseMySqlRepository.findOne({
                 where: {
@@ -117,12 +117,12 @@ export class CoursesService {
             )
 
             const price = enableDiscount ? discountPrice : coursePrice
-            if (BigInt(value) < computeRaw(price)) throw new ConflictException("Value is not enough.")
+            // if (BigInt(value) < computeRaw(price)) throw new ConflictException("Value is not enough.")
 
-            await this.transactionMongoModel.findOneAndUpdate({ _id }, {
-                isValidated: true
-            },
-            )
+            // await this.transactionMongoModel.findOneAndUpdate({ _id }, {
+            //     isValidated: true
+            // },
+            // )
 
             const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
                 enrolledInfoId: found?.enrolledInfoId,

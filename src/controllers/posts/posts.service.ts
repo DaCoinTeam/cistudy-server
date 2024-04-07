@@ -33,6 +33,7 @@ import {
     DeletePostCommentOutput,
     DeletePostCommentReplyOutput,
     DeletePostOutput,
+    ToggleCommentLikePostOutputData,
     ToggleLikePostOutputData,
     UpdatePostCommentOutput,
     UpdatePostCommentReplyOutput,
@@ -204,12 +205,11 @@ export class PostsService {
         const { userId, data } = input
         const { postId } = data
 
-        let earnAmount: number
-
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
         try {
+            let earnAmount: number
             let found = await this.postLikeMySqlRepository.findOne({
                 where: {
                     userId,
@@ -288,10 +288,41 @@ export class PostsService {
 
         await Promise.all(promises)
 
-        const { postCommentId } =
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const { postCommentId } =
             await this.postCommentMySqlRepository.save(postComment)
-        return {
-            postCommentId,
+
+            const { post } = await this.postCommentMySqlRepository.findOne({
+                where: {
+                    postCommentId
+                },
+                relations: {
+                    post: {
+                        course: true
+                    }
+                }
+            })
+
+            const { priceAtEnrolled } = await this.enrolledInfoMySqlEntity.findOneBy({
+                userId,
+                courseId: post.courseId
+            })
+
+            const earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient
+            await this.userMySqlRepository.increment({ userId }, "balance", earnAmount)
+
+            return {
+                postCommentId,
+                earnAmount
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
         }
     }
 
@@ -383,40 +414,62 @@ export class PostsService {
         }
     }
 
-    async toggleLikePostComment(input: ToggleLikePostCommentInput) {
+    async toggleLikePostComment(input: ToggleLikePostCommentInput) : Promise<ToggleCommentLikePostOutputData> {
         const { userId, data } = input
         const { postCommentId } = data
 
-        const found = await this.postCommentLikeMySqlRepository.findOne({
-            where: {
-                userId,
-                postCommentId,
-            },
-        })
-
-        const responseMessage = (
-            postCommentLikeId: string,
-            liked: boolean = true,
-        ) =>
-            `${liked ? "Like" : "Unlike"} post comment successfully with id ${postCommentLikeId}`
-
-        if (found === null) {
-            // do claim rewards action
-
-            const postCommentLike = await this.postCommentLikeMySqlRepository.save({
-                userId,
-                postCommentId,
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+        try {
+            let earnAmount: number
+            let found = await this.postCommentLikeMySqlRepository.findOne({
+                where: {
+                    userId,
+                    postCommentId,
+                },
             })
-            const { postCommentLikeId, liked } = postCommentLike
-            return responseMessage(postCommentLikeId, liked)
+
+            if (found === null) {
+                found = await this.postCommentLikeMySqlRepository.save({
+                    userId,
+                    postCommentId,
+                })
+
+                const { post } = await this.postCommentMySqlRepository.findOne({
+                    where: {
+                        postCommentId
+                    },
+                    relations: {
+                        post: {
+                            course: true
+                        }
+                    }
+                })
+
+                const { priceAtEnrolled } = await this.enrolledInfoMySqlEntity.findOneBy({
+                    userId,
+                    courseId: post.courseId
+                })
+
+                earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostCommentEarnCoefficient
+                await this.userMySqlRepository.increment({ userId }, "balance", earnAmount)
+            } else {
+                const { postCommentLikeId, liked } = found
+                await this.postCommentLikeMySqlRepository.update(postCommentLikeId, {
+                    liked: !liked,
+                })
+            }
+            const { postCommentLikeId } = found
+            return {
+                postCommentLikeId,
+                earnAmount
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
         }
-
-        const { postCommentLikeId, liked } = found
-        await this.postCommentLikeMySqlRepository.update(postCommentLikeId, {
-            liked: !liked,
-        })
-
-        return responseMessage(postCommentLikeId, !liked)
     }
 
     async createPostCommentReply(
@@ -425,15 +478,24 @@ export class PostsService {
         const { data, userId } = input
         const { content, postCommentId } = data
 
-        const { postCommentReplyId } =
-            await this.postCommentReplyMySqlRepository.save({
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const { postCommentReplyId } = await this.postCommentReplyMySqlRepository.save({
                 content,
                 creatorId: userId,
                 postCommentId,
             })
 
-        return {
-            postCommentReplyId,
+            return {
+                postCommentReplyId
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
         }
     }
 

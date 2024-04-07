@@ -146,6 +146,7 @@ export class TransactionsGateway implements OnModuleInit {
             @MessageBody() data: VerifyTransactionInputData,
             @UserId() userId: string,
         ): Promise < WsResponse < VerifyTransactionOutputData >> {
+            console.log("C")
             const { transactionHash } = data
 
             const message: TransactionsServiceMessage = {

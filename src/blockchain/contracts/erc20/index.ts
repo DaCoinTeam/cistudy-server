@@ -6,7 +6,7 @@ import { getHttpProvider } from "../../providers"
 
 export class ERC20Contract {
     private web3: Web3
-    private contract: Contract<typeof abi>
+    contract: Contract<typeof abi>
     private sender?: Address
 
     constructor(

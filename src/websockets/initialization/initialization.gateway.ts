@@ -22,6 +22,7 @@ import { Cache } from "cache-manager"
     cors: {
         origin: "*",
     },
+    
 })
 export class InitializationGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly logger = new Logger(InitializationGateway.name)

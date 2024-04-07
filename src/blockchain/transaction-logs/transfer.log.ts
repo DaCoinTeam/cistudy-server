@@ -1,10 +1,10 @@
-import Web3, { LogsOutput } from "web3"
+import Web3, { EventLog } from "web3"
 import { getHttpProvider } from "../providers"
 import { ChainId } from "../chains"
 
 export const TRANSFER_SIGNATURE = Web3.utils.sha3("Transfer(address,address,uint256)")
 
-export const decodeTransferLog = (log: LogsOutput) => {
+export const decodeTransferLog = (log: EventLog) => {
     const web3 = new Web3(getHttpProvider(ChainId.KalytnTestnet))
     return web3.eth.abi.decodeLog([
         {
