@@ -202,5 +202,5 @@ type ReadStreamOptions = Partial<{
 }>;
 
 type UpdateOptions = Partial<{
-  keepDirectoryContent?: boolean;
+  keepDirectoryContent: boolean;
 }>;
