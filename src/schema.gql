@@ -250,6 +250,8 @@ type UserEntity {
   birthdate: DateTime
   verified: Boolean!
   kind: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   externalId: String
   cryptoWallets: [CryptoWalletEntity!]!
   posts: [PostEntity!]!

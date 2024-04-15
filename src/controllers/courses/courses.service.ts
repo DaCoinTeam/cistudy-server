@@ -539,7 +539,6 @@ export class CoursesService {
     }
 }
 
-
 interface CodeValue {
     transactionHash: string;
 }

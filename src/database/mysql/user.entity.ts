@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { UserKind, UserRole } from "@common"
 import { SessionEntity } from "./session.entity"
@@ -92,6 +92,14 @@ export class UserEntity {
         default: UserKind.Local,
     })
         kind: UserKind
+
+    @Field(() => Date)
+    @CreateDateColumn()
+        createdAt: Date
+    
+    @Field(() => Date)
+    @UpdateDateColumn()
+        updatedAt: Date
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 128, default: null })
