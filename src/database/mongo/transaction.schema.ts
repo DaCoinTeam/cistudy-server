@@ -8,7 +8,7 @@ export type TransactionMongoEntityDocument = HydratedDocument<TransactionMongoEn
 @ObjectType()
 @Schema({
     collection: "transaction"
-})
+}) 
 export class TransactionMongoEntity {
     @Field(() => String)
     @Prop()
