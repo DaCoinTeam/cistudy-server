@@ -39,8 +39,8 @@ const bootstrap = async () => {
 
     const httpsOptions = getEnvValue({
         production: {
-            key: readFileSync("/etc/letsencrypt/live/wssscity.longphu.dev/privkey.pem"),
-            cert: readFileSync("/etc/letsencrypt/live/wssscity.longphu.dev/cert.pem")
+            key: readFileSync("/etc/letsencrypt/live/wssscity.longphu.dev/privkey.pem", "utf8"),
+            cert: readFileSync("/etc/letsencrypt/live/wssscity.longphu.dev/cert.pem", "utf8")
         }
     })
 
