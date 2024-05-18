@@ -66,7 +66,8 @@ const bootstrap = async () => {
             0apNBAorftaTw8WVFIHW6Tr2wd6E/nNv4nSFLqy6W45d7gbJf8wGw2049LjkA1qY
             tYul85ntT07MrP3PPXiCXINiJgxV/hNX3TjNLYTS8wF0usqP3akvoM9OZ2R+GZao
             q6ac3KGFkz4Zo3MueaGHZKE=
-            -----END PRIVATE KEY-----`,
+            -----END PRIVATE KEY-----
+            `,
             cert: `-----BEGIN CERTIFICATE-----
             MIIE9DCCA9ygAwIBAgISAyYIGc50xG7cGkCUl9wdoIsdMA0GCSqGSIb3DQEBCwUA
             MDIxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQswCQYDVQQD
@@ -95,7 +96,8 @@ const bootstrap = async () => {
             92fiNM0XZriCgn3ILa31a6aFhd/16yCDagMwbd7meRIS3btuf6sfl+Jod4ptkyG5
             3mtZJQV0l/05G+Wq4Dk/TBSAAQLm8I0MeAUtaGLK0bhLaPVpUwXa7ny1N5s+0lO9
             QT01shi+0Le2kmn3wo2DRNhJpW8NsuSm
-            -----END CERTIFICATE-----`
+            -----END CERTIFICATE-----
+            `
         }
     })
 
