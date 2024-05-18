@@ -6,10 +6,10 @@ export const CLIENT_ID = "client-id"
 
 export const getClientId = (headers: Headers) => headers[CLIENT_ID] as string | undefined
 
-export const getEnvValue = (values: {
-    development: string;
-    production?: string;
-}): string => {
+export const getEnvValue = <T=string>(values: {
+    development?: T;
+    production?: T;
+}): T => {
     const { development, production } = values
     switch (appConfig().node) {
     case "production":

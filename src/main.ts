@@ -3,7 +3,7 @@ import { AppModule } from "./app.module"
 import { appConfig }  from "@config"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 import { CoursesResolver, PostsResolver, ProfileResolver, UsersResolver, AuthResolver, TransactionsResolver } from "@resolvers"
-import { promises as fsPromises } from "fs"
+import { promises as fsPromises, readFileSync } from "fs"
 import {
     GraphQLSchemaBuilderModule,
     GraphQLSchemaFactory,
@@ -36,7 +36,17 @@ const generateSchema = async () => {
 }
 
 const bootstrap = async () => {
-    const app = await NestFactory.create(AppModule)
+
+    const httpsOptions = getEnvValue({
+        production: {
+            key: readFileSync("/etc/letsencrypt/live/wssscity.longphu.dev/privkey.pem"),
+            cert: readFileSync("/etc/letsencrypt/live/wssscity.longphu.dev/cert.pem")
+        }
+    })
+
+    const app = await NestFactory.create(AppModule, {
+        httpsOptions
+    })
 
     app.enableCors()
 
