@@ -1,5 +1,5 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
-import { FindOneCourseInputData, FindManyCoursesInputData, FindManyLecturesInputData, FindManyResourcesInputData, FindOneLectureInputData, FindManyCourseTargetsInputData, FindOneCourseAuthInputData } from "./courses.input"
+import { FindOneCourseInputData, FindManyCoursesInputData, FindManyLecturesInputData, FindManyResourcesInputData, FindOneLectureInputData, FindManyCourseTargetsInputData, FindOneCourseAuthInputData, FindOneCourseReviewInputData } from "./courses.input"
 import { CoursesService } from "./courses.service"
 import { CategoryMySqlEntity, CourseMySqlEntity } from "@database"
 import { FindManyCourseTargetsOutput, FindManyCoursesOutputData, FindManyLecturesOutput, FindManyResourcesOutput, FindOneCourseAuthOutput, FindOneLectureOutput } from "./courses.output"
@@ -62,4 +62,8 @@ export class CoursesResolver {
         return await this.coursesService.findManyCategories()
     }
 
+    @Query(() => CourseMySqlEntity)
+    async findOneCourseReview(@Args("data") data: FindOneCourseReviewInputData) {
+        return await this.coursesService.findOneCourseReview({ data })
+    }
 }

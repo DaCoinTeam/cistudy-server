@@ -136,6 +136,7 @@ type CourseEntity {
   category: CategoryEntity
   courseSubcategories: [CourseSubcategoryEntity!]
   courseTargets: [CourseTargetEntity!]
+  posts: [PostEntity!]!
   sections: [SectionEntity!]!
   numberOfEnrollments: Int
   enrolled: Boolean
@@ -435,6 +436,7 @@ type Query {
   findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findManyCategories: [CategoryEntity!]!
+  findOneCourseReview(data: FindOneCourseReviewInputData!): CourseEntity!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
@@ -527,6 +529,14 @@ input FindManyCourseTargetsInputData {
 }
 
 input FindManyCourseTargetsInputParams {
+  courseId: ID!
+}
+
+input FindOneCourseReviewInputData {
+  params: FindOneCourseReviewInputParams!
+}
+
+input FindOneCourseReviewInputParams {
   courseId: ID!
 }
 

@@ -21,6 +21,7 @@ import { TopicEntity as TopicMySqlEntity } from "./topic.entity"
 import { CourseTopicEntity as CourseTopicMySqlEntity } from "./course-topic.entity"
 import { SubcategoryTopicEntity as SubcategoyTopicMySqlEntity } from "./subcategory-topic.entity"
 import { CourseSubcategoryEntity as CourseSubcategoryMySqlEntity } from "./course-subcategory.entity"
+import { TestEntity as TestMySqlEntity } from "./test.entity"
 
 export {
     UserMySqlEntity,
@@ -45,5 +46,6 @@ export {
     TopicMySqlEntity,
     CourseTopicMySqlEntity,
     SubcategoyTopicMySqlEntity,
-    CourseSubcategoryMySqlEntity
+    CourseSubcategoryMySqlEntity,
+    TestMySqlEntity
 }
