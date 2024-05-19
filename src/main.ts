@@ -3,7 +3,7 @@ import { AppModule } from "./app.module"
 import { appConfig }  from "@config"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 import { CoursesResolver, PostsResolver, ProfileResolver, UsersResolver, AuthResolver, TransactionsResolver } from "@resolvers"
-import { promises as fsPromises } from "fs"
+import { promises as fsPromises, readFileSync } from "fs"
 import {
     GraphQLSchemaBuilderModule,
     GraphQLSchemaFactory,
@@ -12,6 +12,7 @@ import { printSchema } from "graphql"
 import { join } from "path"
 import { getEnvValue } from "@common"
 import { RedisIoAdapter } from "@adapters"
+import { HttpsOptions } from "@nestjs/common/interfaces/external/https-options.interface"
 
 const generateSchema = async () => {
     const app = await NestFactory.create(GraphQLSchemaBuilderModule)
@@ -36,7 +37,16 @@ const generateSchema = async () => {
 }
 
 const bootstrap = async () => {
-    const app = await NestFactory.create(AppModule)
+    const httpsOptions: HttpsOptions = getEnvValue({
+        production: {
+            key: readFileSync(join(process.cwd(), "ssl", "private-key.pem")),
+            cert: readFileSync(join(process.cwd(), "ssl", "cert.pem"))
+        }
+    })
+
+    const app = await NestFactory.create(AppModule, {
+        httpsOptions
+    })
 
     app.enableCors()
 

@@ -12,7 +12,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2 
-
+ 
     - name: Run Docker compose command
       env:
         MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
@@ -47,5 +47,5 @@ jobs:
         LIKE_POST_EARN_COEFFICIENT:  ${{ vars.LIKE_POST_EARN_COEFFICIENT }}
         COMMENT_POST_EARN_COEFFICIENT:  ${{ vars.COMMENT_POST_EARN_COEFFICIENT }}
         LIKE_POST_COMMENT_EARN_COEFFICIENT:  ${{ vars.LIKE_POST_COMMENT_EARN_COEFFICIENT }}
-      run: docker-compose -f docker/github-compose.yaml -p cistudy-server up --build -d 
+      run: docker compose -f docker/github-compose.yaml -p cistudy-server up --build -d 
  
