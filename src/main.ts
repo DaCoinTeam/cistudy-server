@@ -1,8 +1,15 @@
 import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
-import { appConfig }  from "@config"
+import { appConfig } from "@config"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
-import { CoursesResolver, PostsResolver, ProfileResolver, UsersResolver, AuthResolver, TransactionsResolver } from "@resolvers"
+import {
+    CoursesResolver,
+    PostsResolver,
+    ProfileResolver,
+    UsersResolver,
+    AuthResolver,
+    TransactionsResolver,
+} from "@resolvers"
 import { promises as fsPromises, readFileSync } from "fs"
 import {
     GraphQLSchemaBuilderModule,
@@ -25,8 +32,8 @@ const generateSchema = async () => {
         PostsResolver,
         UsersResolver,
         ProfileResolver,
-        TransactionsResolver
-    ]) 
+        TransactionsResolver,
+    ])
     await fsPromises.writeFile(
         join(
             process.cwd(),
@@ -37,16 +44,19 @@ const generateSchema = async () => {
 }
 
 const bootstrap = async () => {
-    const httpsOptions: HttpsOptions = getEnvValue({
-        production: {
-            key: readFileSync(join(process.cwd(), "ssl", "private-key.pem")),
-            cert: readFileSync(join(process.cwd(), "ssl", "cert.pem"))
-        }
-    })
+    // const httpsOptions: HttpsOptions = getEnvValue({
+    //     production: {
+    //         key: readFileSync(join(process.cwd(), "ssl", "private-key.pem")),
+    //         cert: readFileSync(join(process.cwd(), "ssl", "cert.pem"))
+    //     }
+    // })
 
-    const app = await NestFactory.create(AppModule, {
-        httpsOptions
-    })
+    const app = await NestFactory.create(
+        AppModule,
+    //, {
+    //httpsOptions
+    //}
+    )
 
     app.enableCors()
 
@@ -56,9 +66,11 @@ const bootstrap = async () => {
 
     const config = new DocumentBuilder()
         .setTitle("CiStudy Server")
-        .setDescription("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhN2JiNTU4Zi04YTBjLTQzMGEtYTc0MS05ODZhNTBhZTE0NzMiLCJ0eXBlIjoiUmVmcmVzaCIsImlhdCI6MTcwNzQ2MjUxNSwiZXhwIjoxNzEwMDU0NTE1fQ.SsZFDKCHjn7i06L_j5WSkTEdGUu0tQ0txYyyl3l5oCc")
+        .setDescription(
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhN2JiNTU4Zi04YTBjLTQzMGEtYTc0MS05ODZhNTBhZTE0NzMiLCJ0eXBlIjoiUmVmcmVzaCIsImlhdCI6MTcwNzQ2MjUxNSwiZXhwIjoxNzEwMDU0NTE1fQ.SsZFDKCHjn7i06L_j5WSkTEdGUu0tQ0txYyyl3l5oCc",
+        )
         .setVersion("1.0")
-        .addBearerAuth()    
+        .addBearerAuth()
         .build()
     const document = SwaggerModule.createDocument(app, config)
 
