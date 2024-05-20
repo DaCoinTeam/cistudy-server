@@ -120,6 +120,7 @@ export class CourseEntity {
     @OneToMany(() => CourseTargetEntity, (courseTarget) => courseTarget.course)
         courseTargets: Array<CourseTargetEntity>
 
+    @Field(() => [PostEntity])
     @OneToMany(() => PostEntity, (post) => post.course)
         posts: Array<PostEntity>
 

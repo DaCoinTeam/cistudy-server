@@ -62,8 +62,10 @@ export class CoursesController {
         })
     }
 
+  // trang trí để cho swagger biết đây là api cần auth
   @ApiBearerAuth()
   @Patch("enroll-course")
+  // cái route này xài JWT Guard, tức là nếu jwt hợp lệ thì qua cửa, còn không hợp lệ thì 401
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   async enrollCourse(

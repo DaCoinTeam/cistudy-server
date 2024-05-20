@@ -1,4 +1,4 @@
-name: Compose Docker project
+name: Compose Docker local project
 
 on:
   push:

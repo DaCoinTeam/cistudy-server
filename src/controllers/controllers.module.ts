@@ -6,6 +6,7 @@ import { AssetsModule } from "./assets"
 import { PostsModule } from "./posts"
 import { ProfileModule } from "./profile"
 import { UsersModule } from "./users"
+import { TestModule } from "./test/test.module"
 
 @Module({
     imports: [
@@ -14,7 +15,8 @@ import { UsersModule } from "./users"
         CoursesModule,
         PostsModule,
         ProfileModule,
-        UsersModule
+        UsersModule,
+        TestModule
     ],
     providers: []
 })

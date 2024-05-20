@@ -6,7 +6,7 @@ import {
     FollowMySqlEnitity,
     LectureMySqlEntity,
     ResourceMySqlEntity,
-    TopicMySqlEntity,
+    TopicMySqlEntity
 } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
@@ -19,6 +19,7 @@ import {
     FindOneLectureInput,
     FindManyCourseTargetsInput,
     FindOneCourseAuthInput,
+    FindOneCourseReviewInput,
 } from "./courses.input"
 import { FindManyCoursesOutputData } from "./courses.output"
 import { SubcategoryEntity } from "src/database/mysql/subcategory.entity"
@@ -42,6 +43,7 @@ export class CoursesService {
         private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
         @InjectRepository(EnrolledInfoMySqlEntity)
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
+
         private readonly dataSource: DataSource
     ) { }
 
@@ -381,4 +383,28 @@ export class CoursesService {
         })
     }
 
+    async findOneCourseReview(
+        input: FindOneCourseReviewInput,
+    ) {
+        const { data } = input
+        const { params } = data
+        const { courseId } = params
+
+        return await this.courseMySqlRepository.findOne({
+            where: {
+                courseId
+            },
+            relations: {
+                creator: true,
+                sections: {
+                    lectures: {
+                        resources: true
+                    }
+                },
+                posts: {
+                    course: true
+                }
+            }
+        })
+    }
 }

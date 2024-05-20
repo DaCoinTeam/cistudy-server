@@ -1,0 +1,51 @@
+name: Compose Docker cloud project
+
+on:
+  push:
+    branches:
+      - clound
+
+jobs:
+  docker-compose:
+    runs-on: self-hosted
+    environment: docker
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2 
+
+    - name: Run Docker compose command
+      env:
+        MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+        MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        MYSQL_SCHEMA: ${{ secrets.MYSQL_SCHEMA }}
+        MYSQL_HOST: ${{ vars.MYSQL_HOST }}
+        MYSQL_PORT: ${{ vars.MYSQL_PORT }}
+        REDIS_HOST: ${{ vars.REDIS_HOST }}
+        REDIS_PORT: ${{ vars.REDIS_PORT }}
+        SALT: ${{ secrets.SALT }}
+        SECRET: ${{ secrets.SECRET }}
+        ACCESS_TOKEN_EXPIRY_TIME: ${{ vars.ACCESS_TOKEN_EXPIRY_TIME }}
+        REFRESH_TOKEN_EXPIRY_TIME: ${{ vars.REFRESH_TOKEN_EXPIRY_TIME }}
+        VERIFY_TOKEN_EXPIRY_TIME: ${{ vars.VERIFY_TOKEN_EXPIRY_TIME }}
+        PORT: ${{ vars.PORT }}
+        URL: ${{ vars.URL }}
+        MAILER_USER: ${{ secrets.MAILER_USER }}
+        MAILER_PASS: ${{ secrets.MAILER_PASS }}
+        FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+        FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+        SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        EVM_PRIVATE_KEY: ${{ secrets.EVM_PRIVATE_KEY }}
+        EVM_ADDRESS: ${{ vars.EVM_ADDRESS }}
+        MONGO_USER: ${{ secrets.MONGO_USER }}
+        MONGO_PASS: ${{ secrets.MONGO_PASS }}
+        MONGO_DB_NAME: ${{ secrets.MONGO_DB_NAME }}
+        MONGO_HOST: ${{ vars.MONGO_HOST }}
+        MONGO_PORT: ${{ vars.MONGO_PORT }}
+        EARN_PERCENTAGE: ${{ vars.EARN_PERCENTAGE }}
+        LIKE_POST_EARN_COEFFICIENT:  ${{ vars.LIKE_POST_EARN_COEFFICIENT }}
+        COMMENT_POST_EARN_COEFFICIENT:  ${{ vars.COMMENT_POST_EARN_COEFFICIENT }}
+        LIKE_POST_COMMENT_EARN_COEFFICIENT:  ${{ vars.LIKE_POST_COMMENT_EARN_COEFFICIENT }}
+      run: docker-compose -f docker/github-compose.yaml -p cistudy-server up --build -d 
+ 
