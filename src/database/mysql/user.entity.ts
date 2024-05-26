@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { UserKind, UserRole } from "@common"
 import { SessionEntity } from "./session.entity"
@@ -9,6 +9,7 @@ import { PostEntity } from "./post.entity"
 import { CourseEntity } from "./course.entity"
 import { FollowEntity } from "./follow.entity"
 import { CryptoWalletEntity } from "./crypto-wallet.entity"
+import { CourseReviewEntity } from "./course-review.entity"
 
 @ObjectType()
 @Entity("user")
@@ -137,6 +138,9 @@ export class UserEntity {
     @OneToMany(() => FollowEntity, (user) => user.followedUser)
         followedUserRelations: Array<FollowEntity>
 
+    @Field(()=> CourseReviewEntity)
+    @ManyToOne(() => CourseReviewEntity, (courseReview) => courseReview.user, {nullable: true})
+    courseReview: CourseReviewEntity
     //graphql
     @Field(() => Boolean)
         followed?: boolean

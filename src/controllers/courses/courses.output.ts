@@ -1,33 +1,70 @@
-import { ApiProperty } from "@nestjs/swagger"
+import { Output } from "@common"
+import { ApiProperty, ApiResponse } from "@nestjs/swagger"
+import { IsOptional } from "class-validator"
 
-export class CreateCourseOutput {
+export class CreateCourseOutputOthers {
     @ApiProperty()
-        courseId: string
-}
+    courseId: string
+} 
 
-export class EnrollCourseOutput {
+export class CreateCourseOutput implements Output<CreateCourseOutputOthers> {
+    message: string
+    others: CreateCourseOutputOthers
+}
+export class EnrollCourseOuputOthers {
     @ApiProperty()
-        enrolledInfoId: string
+    enrolledInfoId: string
 }
-export class UpdateCourseOutput {
+export class EnrollCourseOutput implements Output<EnrollCourseOuputOthers>{
+    message : string
+    others: EnrollCourseOuputOthers
 }
 
+export class UpdateCourseOutput implements Output {
+    message: string
+}
 
-export class CreateCategoryOutput {
+export class CreateCategoryOutputOthers {
     @ApiProperty()
-        categoryId: string
+    categoryId: string
 }
 
-export class CreateSubcategoryOutput {
+export class CreateCategoryOutput implements Output<CreateCategoryOutputOthers>{
+    message: string
+    others: CreateCategoryOutputOthers
+}
+
+export class CreateSubcategoryOutputOthers {
     @ApiProperty()
-        subcategoryId: string
+    subcategoryId: string
 }
 
-export class CreateTopicOutput {
+export class CreateSubcategoryOutput implements Output<CreateSubcategoryOutputOthers>{
+    message : string
+    others: CreateSubcategoryOutputOthers
+}
+
+export class CreateTopicOutputOthers {
     @ApiProperty()
-        topicId: string
+    topicId: string
 }
 
-export class DeleteTopicOutputData {
+export class CreateTopicOutput implements Output<CreateTopicOutputOthers>{
+    message:string
+    others: CreateTopicOutputOthers
 }
 
+export class DeleteTopicOutputData implements Output{
+    message: string
+}
+
+export class CreateCourseReviewOutput implements Output {
+    message: string
+}
+
+export class UpdateCourseReviewOutput implements Output {
+    message: string
+}
+export class DeleteCourseReviewOutput implements Output {
+    message: string
+}

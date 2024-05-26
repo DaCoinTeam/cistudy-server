@@ -1,4 +1,4 @@
-import { Output, AuthTokens, ResultsWithMetadata } from "@common"
+import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
 import { CourseMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 
@@ -19,7 +19,7 @@ export class FindManySelfCreatedCoursesOutputData
 
 @ObjectType()
 export class FindManySelfCreatedCoursesOutput
-implements Output<FindManySelfCreatedCoursesOutputData>
+implements AuthOutput<FindManySelfCreatedCoursesOutputData>
 {
   @Field(() => FindManySelfCreatedCoursesOutputData)
       data: FindManySelfCreatedCoursesOutputData
@@ -45,7 +45,7 @@ implements ResultsWithMetadata<CourseMySqlEntity, FindManyEnrolledCoursesOutputM
 
 @ObjectType()
 export class FindManyEnrolledCoursesOutput
-implements Output<FindManyEnrolledCoursesOutputData>
+implements AuthOutput<FindManyEnrolledCoursesOutputData>
 {
   @Field(() => FindManyEnrolledCoursesOutputData)
       data: FindManyEnrolledCoursesOutputData

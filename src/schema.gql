@@ -114,6 +114,18 @@ type CourseTopicEntity {
   topic: TopicEntity!
 }
 
+type CourseReviewEntity {
+  reviewId: ID!
+  courseId: ID!
+  userId: ID!
+  content: String
+  rating: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  course: CourseEntity!
+  user: UserEntity!
+}
+
 type CourseEntity {
   courseId: ID!
   title: String
@@ -139,6 +151,7 @@ type CourseEntity {
   sections: [SectionEntity!]!
   numberOfEnrollments: Int
   enrolled: Boolean
+  courseReview: CourseReviewEntity
 }
 
 type PostLikeEntity {
@@ -258,6 +271,7 @@ type UserEntity {
   courses: [CourseEntity!]!
   followerRelations: [FollowEntity!]!
   followedUserRelations: [FollowEntity!]!
+  courseReview: CourseReviewEntity!
   followed: Boolean!
   numberOfFollowers: Int!
 }
@@ -435,6 +449,7 @@ type Query {
   findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findManyCategories: [CategoryEntity!]!
+  findManyCourseReview(data: FindManyCourseReviewInputData!): [CourseReviewEntity!]!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
@@ -527,6 +542,14 @@ input FindManyCourseTargetsInputData {
 }
 
 input FindManyCourseTargetsInputParams {
+  courseId: ID!
+}
+
+input FindManyCourseReviewInputData {
+  params: FindManyCourseReviewInputParams!
+}
+
+input FindManyCourseReviewInputParams {
   courseId: ID!
 }
 

@@ -18,6 +18,7 @@ import { CourseTargetEntity } from "./course-target.entity"
 import { CourseTopicEntity } from "./course-topic.entity"
 import { CourseSubcategoryEntity } from "./course-subcategory.entity"
 import { CategoryEntity } from "./category.entity"
+import { CourseReviewEntity } from "./course-review.entity"
 
 interface CourseIncludes {
     time: number;
@@ -138,4 +139,8 @@ export class CourseEntity {
 
     @Field(() => Boolean, {nullable: true})
         enrolled?: boolean
+    
+    @Field(() => CourseReviewEntity, {nullable: true})
+    @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.course)
+    courseReview? : CourseReviewEntity
 }

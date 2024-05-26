@@ -135,3 +135,20 @@ export class FindManyCourseTargetsInput implements AuthInput<FindManyCourseTarge
     userId: string
     data: FindManyCourseTargetsInputData
 }
+
+@InputType()
+export class FindManyCourseReviewInputParams{
+    @Field(() => ID)
+    courseId : string
+}
+
+@InputType()
+export class FindManyCourseReviewInputData implements ParamsOnly<FindManyCourseReviewInputParams> {
+    @Field(() => FindManyCourseReviewInputParams)
+    params: FindManyCourseReviewInputParams
+}
+
+@InputType()
+export class FindManyCourseReviewInput{
+    data: FindManyCourseReviewInputData
+}

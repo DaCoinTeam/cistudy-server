@@ -1,14 +1,14 @@
 import { Socket } from "socket.io"
 import { AuthTokens } from "./auth.types"
 
-export interface Output<T> {
+export interface AuthOutput<T> {
     data: T,
     tokens?: AuthTokens
 }
 
 export interface WsOutput<T> {
     event: string,
-    data: Output<T>
+    data: AuthOutput<T>
 }
 
 export interface AuthInput<T> {
@@ -35,6 +35,11 @@ export interface Input<T> {
     files?: Array<Express.Multer.File>
 }
 
+export interface Output<T = undefined> {
+    message: string,
+    others?: T
+}
+
 export interface AuthEmptyDataInput {
     userId: string,
     files?: Array<Express.Multer.File>
@@ -57,5 +62,6 @@ export interface ResultsWithMetadata<T, K> {
     results: Array<T>,
     metadata?: K
 }
+
 
 export type EmptyObject = NonNullable<unknown>

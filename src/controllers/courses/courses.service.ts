@@ -1,7 +1,8 @@
-import { ConflictException, Inject, Injectable, NotFoundException } from "@nestjs/common"
+import { ConflictException, Inject, Injectable, NotFoundException, InternalServerErrorException } from "@nestjs/common"
 import {
     CategoryMySqlEntity,
     CourseMySqlEntity,
+    CourseReviewMySqlEntity,
     CourseSubcategoryMySqlEntity,
     CourseTargetMySqlEntity,
     CourseTopicMySqlEntity,
@@ -34,12 +35,15 @@ import {
     CreateSubcategoryInput,
     CreateTopicInput,
     DeleteTopicInput,
+    CreateCourseReviewInput,
+    UpdateCourseReviewInput,
+    DeleteCourseReviewInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import { ProcessStatus, VideoType, computeRaw, existKeyNotUndefined } from "@common"
-import { CreateCategoryOutput, CreateCourseOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteTopicOutputData, EnrollCourseOutput, UpdateCourseOutput } from "./courses.output"
-import { EnrolledInfoEntity } from "src/database/mysql/enrolled-info.entity"
+import { CreateCategoryOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteTopicOutputData, EnrollCourseOutput, UpdateCourseOutput, UpdateCourseReviewOutput } from "./courses.output"
+import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
@@ -70,8 +74,10 @@ export class CoursesService {
         private readonly subcategoryMySqlRepository: Repository<SubcategoyMySqlEntity>,
         @InjectRepository(TopicMySqlEntity)
         private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
-        @InjectModel(TransactionMongoEntity.name) private readonly transactionMongoModel: Model<TransactionMongoEntity>,
-        @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+        @InjectRepository(CourseReviewMySqlEntity)
+        private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
+        // @InjectModel(TransactionMongoEntity.name) private readonly transactionMongoModel: Model<TransactionMongoEntity>,
+        // @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         private readonly storageService: StorageService,
         private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
         private readonly dataSource: DataSource
@@ -97,7 +103,7 @@ export class CoursesService {
 
             // const cachedTransaction = (await this.cacheManager.get(code)) as CodeValue
             // if (!cachedTransaction) throw new NotFoundException("The code either expired or never existed.")
-            
+
             // const { transactionHash } = cachedTransaction
             // const transaction = await this.transactionMongoModel.findOne({
             //     transactionHash
@@ -110,7 +116,7 @@ export class CoursesService {
 
             // if (isValidated) throw new ConflictException("This transaction is validated.")
 
-            const { enableDiscount, discountPrice, price: coursePrice } = await this.courseMySqlRepository.findOne({
+            const { enableDiscount, discountPrice, price: coursePrice, title } = await this.courseMySqlRepository.findOne({
                 where: {
                     courseId
                 }
@@ -135,7 +141,11 @@ export class CoursesService {
 
             await queryRunner.commitTransaction()
 
-            return { enrolledInfoId }
+            return {
+                message: "Enrolled to Course " + title,
+                others: { enrolledInfoId }
+            }
+
         } catch (ex) {
             await queryRunner.rollbackTransaction()
             throw ex
@@ -152,7 +162,8 @@ export class CoursesService {
 
         if (created)
             return {
-                courseId: created.courseId
+                message: "Course " + created.title + "created Successfully",
+                others: { courseId: created.courseId }
             }
     }
 
@@ -247,13 +258,81 @@ export class CoursesService {
 
             await queryRunner.commitTransaction()
 
-            return {}
+            return { message: "Course Updated Successfully" }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
             throw ex
         } finally {
             await queryRunner.release()
         }
+    }
+
+    async createCourseReview(input: CreateCourseReviewInput): Promise<CreateCourseReviewOutput> {
+        const { data, userId } = input;
+        const { courseId, content, rating } = data;
+
+        const reviewed = await this.courseReviewMySqlRepository.findOne({
+            where: { userId, courseId }
+        });
+
+        if (reviewed) {
+            throw new ConflictException("This user already has a review on this course");
+        }
+
+        try {
+            const result = await this.courseReviewMySqlRepository.save({
+                courseId,
+                userId,
+                content,
+                rating,
+            });
+
+            if (result) {
+                return { message: "Review Created Successfully" };
+            }
+        } catch (error) {
+            throw new InternalServerErrorException("Failed due to system error")
+        }
+    }
+
+    async updateCourseReview(input: UpdateCourseReviewInput): Promise<UpdateCourseReviewOutput> {
+        const { data, userId } = input;
+        const { content, rating, reviewId } = data;
+
+        const reviewed = await this.courseReviewMySqlRepository.findOne({ where: { reviewId, userId } });
+        if (!reviewed) {
+            throw new NotFoundException("This review is not found or not owned by sender.")
+        }
+
+        if (content || rating) {
+            await this.courseReviewMySqlRepository.update(reviewId, {
+                content,
+                rating
+            });
+            return { message: "Review Updated Successfully" }
+        }
+        return { message: "No update were made." }
+
+    }
+
+    async deleteCourseReview(input: DeleteCourseReviewInput): Promise<DeleteCourseReviewOutput> {
+        const { data, userId } = input;
+        const { reviewId } = data;
+
+        const reviewed = await this.courseReviewMySqlRepository.findOne({
+            where: {
+                reviewId,
+                userId
+            }
+        });
+
+        if (!reviewed) {
+            // nó chỉ quăng lỗi khi mà cái review không tìm thấy hoặc nó không thuộc về người đó
+            throw new NotFoundException("This review is not found or not owned by sender.");
+        }
+
+        await this.courseReviewMySqlRepository.delete({ reviewId });
+        return { message: "Review deleted successfully" }
     }
 
     async createSection(input: CreateSectionInput): Promise<string> {
@@ -470,12 +549,13 @@ export class CoursesService {
         const { data } = input
         const { name } = data
 
-        const { categoryId } = await this.categoryMySqlRepository.save({
+        const created = await this.categoryMySqlRepository.save({
             name
         })
 
         return {
-            categoryId
+            message: "Category" + created.name + " Created Successfully",
+            others: { categoryId: created.categoryId }
         }
     }
 
@@ -489,7 +569,8 @@ export class CoursesService {
         })
 
         return {
-            subcategoryId
+            message: "Subcategory Created Successfully",
+            others: { subcategoryId }
         }
     }
 
@@ -513,7 +594,8 @@ export class CoursesService {
         })
 
         return {
-            topicId
+            message: "Topic Created Successfully",
+            others: { topicId }
         }
     }
 
@@ -526,10 +608,10 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            const { svgId } = await this.topicMySqlRepository.findOneBy({topicId})
+            const { svgId } = await this.topicMySqlRepository.findOneBy({ topicId })
             await this.storageService.delete(svgId)
-            await this.topicMySqlRepository.delete({topicId})
-            return {}
+            await this.topicMySqlRepository.delete({ topicId })
+            return { message: "Topic Deleted Successfully" }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
             throw ex
@@ -537,6 +619,8 @@ export class CoursesService {
             await queryRunner.release()
         }
     }
+
+
 }
 
 interface CodeValue {

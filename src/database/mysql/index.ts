@@ -10,7 +10,7 @@ import { LectureEntity as LectureMySqlEntity } from "./lecture.entity"
 import { ResourceEntity as ResourceMySqlEntity } from "./resource.entity"
 import { CourseTargetEntity as CourseTargetMySqlEntity } from "./course-target.entity"
 import { PostMediaEntity as PostMediaMySqlEntity } from "./post-media.entity"
-import { PostCommentMediaEntity as PostCommentMediaMySqlEntity} from "./post-comment-media.entity"
+import { PostCommentMediaEntity as PostCommentMediaMySqlEntity } from "./post-comment-media.entity"
 import { FollowEntity as FollowMySqlEnitity } from "./follow.entity"
 import { PostLikeEntity as PostLikeMySqlEntity } from "./post-like.entity"
 import { PostCommentReplyEntity as PostCommentReplyMySqlEntity } from "./post-comment-reply.entity"
@@ -21,6 +21,7 @@ import { TopicEntity as TopicMySqlEntity } from "./topic.entity"
 import { CourseTopicEntity as CourseTopicMySqlEntity } from "./course-topic.entity"
 import { SubcategoryTopicEntity as SubcategoyTopicMySqlEntity } from "./subcategory-topic.entity"
 import { CourseSubcategoryEntity as CourseSubcategoryMySqlEntity } from "./course-subcategory.entity"
+import { CourseReviewEntity as CourseReviewMySqlEntity } from "./course-review.entity"
 
 export {
     UserMySqlEntity,
@@ -45,5 +46,6 @@ export {
     TopicMySqlEntity,
     CourseTopicMySqlEntity,
     SubcategoyTopicMySqlEntity,
-    CourseSubcategoryMySqlEntity
+    CourseSubcategoryMySqlEntity,
+    CourseReviewMySqlEntity
 }

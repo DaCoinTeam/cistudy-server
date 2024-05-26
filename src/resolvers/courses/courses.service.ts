@@ -1,6 +1,7 @@
 import {
     CategoryMySqlEntity,
     CourseMySqlEntity,
+    CourseReviewMySqlEntity,
     CourseTargetMySqlEntity,
     EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
@@ -19,6 +20,7 @@ import {
     FindOneLectureInput,
     FindManyCourseTargetsInput,
     FindOneCourseAuthInput,
+    FindManyCourseReviewInput,
 } from "./courses.input"
 import { FindManyCoursesOutputData } from "./courses.output"
 import { SubcategoryEntity } from "src/database/mysql/subcategory.entity"
@@ -40,10 +42,31 @@ export class CoursesService {
         private readonly subcategoryMySqlRepository: Repository<SubcategoryEntity>,
         @InjectRepository(TopicMySqlEntity)
         private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
+        @InjectRepository(CourseReviewMySqlEntity)
+        private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
         @InjectRepository(EnrolledInfoMySqlEntity)
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         private readonly dataSource: DataSource
     ) { }
+
+    async findAllCourseReview(input: FindManyCourseReviewInput): Promise<Array<CourseReviewMySqlEntity>> {
+        const { data } = input;
+        const { params } = data;
+        const { courseId } = params;
+    
+
+        const result = await this.courseReviewMySqlRepository.find({
+            where: { courseId },
+            relations:{
+                course:true,
+                user:true
+            },
+            order: { createdAt: 'DESC' } 
+        });
+    
+        return result;
+    }
+    
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
         const { data } = input
@@ -84,7 +107,7 @@ export class CoursesService {
                 },
             })
 
-            const enrolledInfo = userId 
+            const enrolledInfo = userId
                 ? await this.enrolledInfoMySqlRepository.findOneBy({
                     courseId,
                     userId
@@ -160,7 +183,7 @@ export class CoursesService {
                 },
             })
 
-            const enrolledInfo = userId 
+            const enrolledInfo = userId
                 ? await this.enrolledInfoMySqlRepository.findOneBy({
                     courseId,
                     userId

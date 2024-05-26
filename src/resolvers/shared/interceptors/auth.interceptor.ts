@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common"
 import { AuthManagerService } from "@global"
 import { Observable, mergeMap } from "rxjs"
-import { AuthTokenType, Payload, Output, getClientId } from "@common"
+import { AuthTokenType, Payload, AuthOutput, getClientId } from "@common"
 import { GqlExecutionContext } from "@nestjs/graphql"
 import { InjectRepository } from "@nestjs/typeorm"
 import { UserMySqlEntity } from "@database"
@@ -14,7 +14,7 @@ import { Repository} from "typeorm"
 
 @Injectable()
 export class AuthInterceptor<T extends object>
-implements NestInterceptor<T, Output<T>>
+implements NestInterceptor<T, AuthOutput<T>>
 {
     constructor(
         private readonly authManagerService: AuthManagerService,
@@ -25,7 +25,7 @@ implements NestInterceptor<T, Output<T>>
     async intercept(
         context: ExecutionContext,
         next: CallHandler,
-    ): Promise<Observable<Output<T>>> {
+    ): Promise<Observable<AuthOutput<T>>> {
         const gqlContext = GqlExecutionContext.create(context).getContext()
         const request = gqlContext.req
 
