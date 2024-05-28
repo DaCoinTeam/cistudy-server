@@ -162,7 +162,7 @@ export class PostsService {
             )
             await this.storageService.delete(...mediaIds)
 
-            return {}
+            return {message : "Post Updated Successfully"}
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {
@@ -190,7 +190,7 @@ export class PostsService {
             )
             await this.storageService.delete(...mediaIds)
 
-            return {}
+            return {message: "Post Deleted Successfully"}
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {
@@ -243,8 +243,11 @@ export class PostsService {
 
             const { postLikeId } = found
             return {
-                postLikeId,
-                earnAmount
+                message: "",
+                others:{
+                    postLikeId :postLikeId,
+                    earnAmount: earnAmount
+                }
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -316,8 +319,12 @@ export class PostsService {
             await this.userMySqlRepository.increment({ userId }, "balance", earnAmount)
 
             return {
-                postCommentId,
-                earnAmount
+                message: "Comment Posted Successfully",
+                others:{
+                    postCommentId,
+                    earnAmount
+                }
+                
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -377,7 +384,7 @@ export class PostsService {
             )
             await this.storageService.delete(...mediaIds)
 
-            return {}
+            return {message :"Comment updated successfully"}
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {
@@ -406,7 +413,7 @@ export class PostsService {
             )
             await this.storageService.delete(...mediaIds)
 
-            return {}
+            return {message: "Comment deleted successfully"}
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {
@@ -462,8 +469,12 @@ export class PostsService {
             }
             const { postCommentLikeId } = found
             return {
-                postCommentLikeId,
-                earnAmount
+                message:"",
+                others:{
+                    postCommentLikeId,
+                    earnAmount
+                }
+                
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -490,7 +501,8 @@ export class PostsService {
             })
 
             return {
-                postCommentReplyId
+                message:"Reply created successfully",
+                others: {postCommentReplyId}
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -509,7 +521,7 @@ export class PostsService {
             content,
         })
 
-        return {}
+        return {message : "Reply Updated Successfully"}
     }
 
     async deletePostCommentReply(
@@ -520,6 +532,6 @@ export class PostsService {
 
         await this.postCommentReplyMySqlRepository.delete(postCommentReplyId)
 
-        return {}
+        return {message : "Reply deleted successfully"}
     }
 }

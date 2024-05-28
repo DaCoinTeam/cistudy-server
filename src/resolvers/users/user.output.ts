@@ -1,4 +1,4 @@
-import { AuthTokens, Output, ResultsWithMetadata } from "@common"
+import { AuthTokens, AuthOutput, ResultsWithMetadata } from "@common"
 import { UserMySqlEntity } from "@database"
 import { ObjectType, Int, Field } from "@nestjs/graphql"
 
@@ -19,7 +19,7 @@ implements ResultsWithMetadata<UserMySqlEntity, FindManyUsersOutputMetadata>
 }
 
 @ObjectType()
-export class FindManyUsersOutput implements Output<FindManyUsersOutputData> {
+export class FindManyUsersOutput implements AuthOutput<FindManyUsersOutputData> {
     @Field(() => FindManyUsersOutputData)
         data: FindManyUsersOutputData
     @Field(() => AuthTokens, { nullable: true })

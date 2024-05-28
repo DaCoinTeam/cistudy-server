@@ -6,11 +6,11 @@ import {
 } from "@nestjs/common"
 import { AuthManagerService } from "@global"
 import { Observable, mergeMap } from "rxjs"
-import { AuthTokenType, Payload, Output, getClientId } from "@common"
+import { AuthTokenType, Payload, AuthOutput, getClientId } from "@common"
 
 @Injectable()
 export class AuthInterceptor<T extends object>
-implements NestInterceptor<T, Output<T>>
+implements NestInterceptor<T, AuthOutput<T>>
 {
     constructor(
         private readonly authManagerService: AuthManagerService,

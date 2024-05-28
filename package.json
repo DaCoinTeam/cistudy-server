@@ -36,7 +36,7 @@
     "@nestjs/schedule": "^4.0.1",
     "@nestjs/swagger": "^7.2.0",
     "@nestjs/throttler": "^5.1.2",
-    "@nestjs/typeorm": "^10.0.1",
+    "@nestjs/typeorm": "^10.0.2",
     "@nestjs/websockets": "^10.3.7",
     "@socket.io/redis-adapter": "^8.3.0",
     "@supabase/supabase-js": "^2.39.3",
@@ -52,7 +52,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "graphql": "^16.8.1",
     "mime-types": "^2.1.35",
-    "mongoose": "^8.2.3",
+    "mongoose": "^8.3.4",
     "mysql2": "^3.9.1",
     "nest-cli": "^0.0.5",
     "nodemailer": "^6.9.9",
@@ -60,6 +60,7 @@
     "passport-jwt": "^4.0.1",
     "react-toastify": "^10.0.5",
     "redis": "^4.6.13",
+    "redis-server": "^1.2.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "socket.io-client": "^4.7.5",
@@ -76,7 +77,7 @@
     "@types/cache-manager-redis-store": "^2.0.4",
     "@types/express": "^4.17.17",
     "@types/fluent-ffmpeg": "^2.1.24",
-    "@types/jest": "^29.5.2",
+    "@types/jest": "^29.5.12",
     "@types/mime-types": "^2.1.4",
     "@types/multer": "^1.4.11",
     "@types/node": "^20.3.1",
@@ -113,6 +114,13 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "@global": "<rootDir>global/index",
+      "@config": "<rootDir>config/index",
+      "@database": "<rootDir>database/index",
+      "@common": "<rootDir>common/index",
+      "@workers": "<rootDir>workers/index"
+    }
   }
 }
