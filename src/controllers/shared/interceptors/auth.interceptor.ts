@@ -19,7 +19,7 @@ implements NestInterceptor<T, AuthOutput<T>>
     async intercept(
         context: ExecutionContext,
         next: CallHandler,
-    ): Promise<Observable<Output<T>>> {
+    ): Promise<Observable<AuthOutput<T>>> {
         // xử lý tiền request
         // check xem token là refresh hay là access, từ đó đưa ra những lựa chọn
 

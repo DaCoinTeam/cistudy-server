@@ -20,6 +20,9 @@ export class AuthService {
             email: data.email,
         })
         if (!found) throw new NotFoundException("User not found.")
+        else {
+            //create cart here
+        }
         if (!this.sha256Service.verifyHash(data.password, found.password))
             throw new UnauthorizedException("Invalid credentials.")
         return found
@@ -39,7 +42,7 @@ export class AuthService {
   	}
   	data.password = this.sha256Service.createHash(data.password)
   	const created = await this.userMySqlRepository.save(data)
-	
+	//create cart here
   	await this.mailerService.sendMail(created.userId, data.email)
   	return `An user with id ${created.userId} has been created`
     }

@@ -252,12 +252,18 @@ export class CoursesService {
                 {
                     where: {
                         name: searchValue ? Like(`%${searchValue}%`) : undefined
+                    },
+                    relations:{
+                        courseTopics : true
                     }
                 })
 
 
             const results = await this.courseMySqlRepository.find(
-                {
+                {   
+                    where :{
+                        title : Like(`%${searchValue}%`)
+                    },
                     skip,
                     take,
                     relations: {

@@ -7,6 +7,8 @@ import { PostsModule } from "./posts"
 import { ProfileModule } from "./profile"
 import { UsersModule } from "./users"
 import { TestModule } from "./test/test.module"
+import { CartModule } from "./cart"
+
 
 
 @Module({
@@ -17,7 +19,8 @@ import { TestModule } from "./test/test.module"
         PostsModule,
         ProfileModule,
         UsersModule,
-        TestModule
+        TestModule,
+        CartModule
     ],
     providers: []
 })

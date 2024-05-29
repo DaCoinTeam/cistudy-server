@@ -151,6 +151,7 @@ export class FindOneCourseReviewInputData implements ParamsOnly<FindOneCourseRev
 export class FindOneCourseReviewInput implements Input<FindOneCourseReviewInputData> {
     data: FindOneCourseReviewInputData
 }
+@InputType()
 export class FindManyCourseReviewInputParams{
     @Field(() => ID)
     courseId : string

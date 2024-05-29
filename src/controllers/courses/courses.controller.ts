@@ -111,7 +111,7 @@ export class CoursesController {
         @UserId() userId: string,
         @Body() body: CreateCourseReviewInputData,
     ) {
-        return this.coursesService.createCourseReview({ 
+        return this.coursesService.createCourseReview({
             userId,
             data : body,
         })
