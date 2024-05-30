@@ -1,9 +1,9 @@
 import { CartMySqlEntity, CartProductMySqlEntity, CourseMySqlEntity } from "@database";
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { AddProductCartInput, CreateCartInput } from "./cart.input";
-import { AddProductCartOutput, CreateCartOutput } from "./cart.output";
+import { In, Repository } from "typeorm";
+import { AddProductCartInput, CreateCartInput, DeleteCartDataInput, DeleteCartProductDataInput } from "./cart.input";
+import { AddProductCartOutput, CreateCartOutput, DeleteCartProductOutput, DeleteUserCartOutput } from "./cart.output";
 
 @Injectable()
 export class CartService {
@@ -18,14 +18,18 @@ export class CartService {
 
     async createCart(input: CreateCartInput): Promise<CreateCartOutput> {
         const { userId } = input
-        const { isDeleted } = await this.cartMySqlRepository.findOne({
+        const currentcart = await this.cartMySqlRepository.findOne({
             where: {
                 userId: userId,
             }
         });
-        if (!isDeleted) {
-            return { message: "User cart is in use" }
+
+        if(currentcart){
+            if (!currentcart.isDeleted) {
+                throw new ConflictException("User Cart is in use")
+            }
         }
+        
         const created = await this.cartMySqlRepository.save({
             userId: userId,
         })
@@ -38,51 +42,110 @@ export class CartService {
     }
 
     async addProductCart(input: AddProductCartInput): Promise<AddProductCartOutput> {
-        const { data } = input;
+        const { data, userId } = input;
         const { cartId, courseId } = data
+
+        const usercart = await this.cartMySqlRepository.findOne({
+            where: {
+                cartId,
+                userId
+            },
+        })
+
+        if (!usercart) {
+            throw new NotFoundException("User cart not found ore not owned by user")
+        }
 
         const productExist = await this.cartProductMySqlRepository.findOne({
             where: {
-                courseId: data.courseId,
-                cartId: cartId,
+                courseId,
+                cartId,
             },
-            relations: {
-                course: true
-            }
         });
 
         if (productExist) {
-            return { message: "Product already exists in the cart" };
+            throw new ConflictException("This Course already exist in cart")
         }
 
         const { productId } = await this.cartProductMySqlRepository.save({
             cartId,
-            courseId: courseId
+            courseId
         })
+
+        // const addedProduct = await this.cartProductMySqlRepository.findOne({
+        //     where: {
+        //         productId
+        //     },
+        //     relations: {
+        //         course: true
+        //     }
+        // })
+        const { price } = await this.courseMySqlRepository.findOne({ where: { courseId } })
+
+        usercart.totalprice += price
+
+
+        await this.cartMySqlRepository.save(usercart)
+
+        return { message: "Product added to cart successfully", others: { productId } };
+    }
+
+    async deleteCartProduct(input: DeleteCartProductDataInput): Promise<DeleteCartProductOutput> {
+        const { userId, data } = input;
+        const { productId } = data
 
         const usercart = await this.cartMySqlRepository.findOne({
             where: {
-                cartId
+                userId
             },
         })
 
-        const addedProduct = await this.cartProductMySqlRepository.findOne({
+        if (!usercart) {
+            throw new NotFoundException("User cart not found ore not owned by user")
+        }
+
+        const productArray = await this.cartProductMySqlRepository.find({
             where: {
-                productId
+                productId : In(productId)
             },
             relations: {
+                cart: true,
                 course: true
             }
         })
+        
+        for (const product of productArray) {
+            usercart.totalprice -= product.course.price
+        }
 
+        await this.cartMySqlRepository.save(usercart)
+        await this.cartProductMySqlRepository.delete({ productId : In(productId) })
 
-        usercart.totalprice += addedProduct.course.price
-        usercart.products = []
-        usercart.products.push(addedProduct)
-        console.log(usercart.totalprice + " + " + usercart.cartId)
+        return { message: "Product Removed Successfully", others: { cartId: usercart.cartId } }
+    }
 
-        await this.cartMySqlRepository.update(cartId,{})
+    async deleteUserCart(input: DeleteCartDataInput): Promise<DeleteUserCartOutput> {
+        const { userId, data } = input
+        const { cartId } = data
 
-        return { message: "Product added to cart successfully" };
+        const usercart = await this.cartMySqlRepository.findOne({
+            where: {
+                cartId,
+                userId
+            },
+        })
+
+        if (!usercart) {
+            throw new NotFoundException("User cart not found ore not owned by user")
+        }
+
+        await this.cartMySqlRepository.delete({ cartId })
+        const newcart = await this.cartMySqlRepository.save({ userId })
+        return {
+            message: "User Cart Deleted Successfully, New cart have been initialized",
+            others: {
+                cartId: newcart.cartId
+            }
+        }
     }
 }

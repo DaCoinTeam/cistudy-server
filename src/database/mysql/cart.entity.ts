@@ -32,7 +32,7 @@ export class CartEntity {
     products: Array<CartProductEntity>;
 
     @Field(() => UserEntity)
-    @OneToMany(() => UserEntity, (user) => user.cart)
+    @OneToMany(() => UserEntity, (user) => user.cart, { onDelete: "CASCADE"})
     @JoinColumn({ name: "userId" })
     user: UserEntity
 

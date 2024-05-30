@@ -39,12 +39,12 @@ export class CartProductEntity {
     updatedAt: Date
     // Relations
     @Field(() => CourseEntity)
-    @ManyToOne(() => CourseEntity, (course) => course.products)
+    @ManyToOne(() => CourseEntity, (course) => course.products, { onDelete: "CASCADE"})
     @JoinColumn({ name: "courseId" })
     course: CourseEntity;
 
     @Field(() => CartEntity)
-    @ManyToOne(() => CartEntity, (cart) => cart.products)
+    @ManyToOne(() => CartEntity, (cart) => cart.products, { onDelete: "CASCADE"})
     @JoinColumn({ name: "cartId" })
     cart: CartEntity;
 

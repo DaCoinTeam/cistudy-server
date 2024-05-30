@@ -1,7 +1,7 @@
 import { CourseMySqlEntity, FollowMySqlEnitity, UserMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { DataSource, Repository } from "typeorm"
-import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindManyUsersInput, FindOneUserInput, } from "./users.input"
+import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindManyUsersInput, FindOneUserInput } from "./users.input"
 import { InjectRepository } from "@nestjs/typeorm"
 import { FindManyUsersOutputData } from "./user.output"
 @Injectable()
@@ -29,6 +29,9 @@ export class UsersService {
         try {
             const user = await queryRunner.manager.findOne(UserMySqlEntity, {
                 where: { userId },
+                relations: {
+                    cart: true
+                }
             })
 
             const follow = await queryRunner.manager.findOne(

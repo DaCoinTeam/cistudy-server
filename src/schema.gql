@@ -473,7 +473,7 @@ type Query {
   findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findManyCategories: [CategoryEntity!]!
-  findOneCourseReview(data: FindOneCourseReviewInputData!): CourseEntity!
+  findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
   findManyCourseReview(data: FindManyCourseReviewInputData!): [CourseReviewEntity!]!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
@@ -487,6 +487,7 @@ type Query {
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
+  findOneCart(data: FindOneCartInputData!): CartEntity!
 }
 
 input SignInInputData {
@@ -714,4 +715,13 @@ input FindManyTransactionsInputData {
 input FindManyTransactionsInputOptions {
   take: Int
   skip: Int
+}
+
+input FindOneCartInputData {
+  params: FindOneCartInputParams!
+}
+
+input FindOneCartInputParams {
+  cartId: ID!
+  userId: ID
 }

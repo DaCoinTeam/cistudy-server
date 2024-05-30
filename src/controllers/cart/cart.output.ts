@@ -14,11 +14,33 @@ export class CreateCartOutput implements Output<CreateCartOutputOthers> {
 
 export class AddProductCartOthers {
     @ApiProperty()
-    cartId : string;
+    productId : string;
 }
 
 export class AddProductCartOutput implements Output<AddProductCartOthers> {
     @ApiProperty()
     message: string;
-    others?: CreateCartOutputOthers;
+    others?: AddProductCartOthers;
+}
+
+export class DeleteCartProductOthers {
+    @ApiProperty()
+    cartId : string;
+}
+
+export class DeleteCartProductOutput implements Output<DeleteCartProductOthers> {
+    @ApiProperty()
+    message: string;
+    others?: DeleteCartProductOthers;
+}
+
+export class DeleteUserCartOthers {
+    @ApiProperty()
+    cartId : string;
+}
+
+export class DeleteUserCartOutput implements Output<DeleteUserCartOthers> {
+    @ApiProperty()
+    message: string;
+    others?: DeleteUserCartOthers;
 }

@@ -62,7 +62,7 @@ export class CoursesResolver {
         return await this.coursesService.findManyCategories()
     }
 
-    @Query(() => CourseMySqlEntity)
+    @Query(() => CourseReviewMySqlEntity)
     async findOneCourseReview(@Args("data") data: FindOneCourseReviewInputData) {
         return await this.coursesService.findOneCourseReview({ data })
     }

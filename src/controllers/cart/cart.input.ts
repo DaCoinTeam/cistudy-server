@@ -21,3 +21,26 @@ export class AddProductCartInput implements AuthInput<CreateProductCartInputData
     @ApiProperty()
     data: CreateProductCartInputData
 }
+
+export class DeleteCartProductData {
+    @ApiProperty()
+    productId : string[]
+}
+
+export class DeleteCartProductDataInput implements AuthInput<DeleteCartProductData>{
+    @IsUUID("4")
+    userId: string;
+    data: DeleteCartProductData;
+}
+
+export class DeleteCartData {
+    @IsUUID("4")
+    @ApiProperty()
+    cartId : string
+}
+
+export class DeleteCartDataInput implements AuthInput<DeleteCartData>{
+    @IsUUID("4")
+    userId: string;
+    data: DeleteCartData;
+}

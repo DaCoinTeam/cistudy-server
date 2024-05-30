@@ -9,7 +9,7 @@ import { UseGuards, UseInterceptors } from "@nestjs/common"
 @Resolver()
 export class UsersResolver {
     constructor(private readonly usersService: UsersService) { }
-
+    
   @Query(() => UserMySqlEntity)
     async findOneUser(@Args("data") data: FindOneUserInputData) {
         return this.usersService.findOneUser({ data })
