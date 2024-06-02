@@ -2,10 +2,11 @@ import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     CartMySqlEntity,
-    CartProductMySqlEntity,
+    CartCourseMySqlEntity,
     CourseMySqlEntity,
     TransactionMongoEntity,
     TransactionMongoEntitySchema,
+    OrderMySqlEntity,
 } from "@database"
 
 import { MongooseModule } from "@nestjs/mongoose"
@@ -17,8 +18,9 @@ import { CartService } from "./cart.service"
         MongooseModule.forFeature([{ name: TransactionMongoEntity.name, schema: TransactionMongoEntitySchema }]),
         TypeOrmModule.forFeature([
             CartMySqlEntity,
-            CartProductMySqlEntity,
-            CourseMySqlEntity
+            CartCourseMySqlEntity,
+            CourseMySqlEntity,
+            OrderMySqlEntity
         ]),
     ],
     controllers: [CartController],

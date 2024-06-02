@@ -126,19 +126,31 @@ type CourseReviewEntity {
   user: UserEntity!
 }
 
+type OrderEntity {
+  orderId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  cartId: ID!
+  totalprice: Float!
+  userId: ID!
+  user: UserEntity!
+  cart: CartEntity!
+}
+
 type CartEntity {
   cartId: ID!
   userId: ID!
   totalprice: Float!
-  products: [CartProductEntity!]
-  user: UserEntity!
+  courses: [CartCourseEntity!]
   isDeleted: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
+  user: UserEntity!
+  order: OrderEntity!
 }
 
-type CartProductEntity {
-  productId: ID!
+type CartCourseEntity {
+  cartCourseId: ID!
   cartId: ID!
   courseId: ID!
   createdAt: DateTime!
@@ -171,7 +183,7 @@ type CourseEntity {
   courseTargets: [CourseTargetEntity!]
   posts: [PostEntity!]!
   sections: [SectionEntity!]!
-  products: [CartProductEntity!]!
+  cartCourses: [CartCourseEntity!]!
   numberOfEnrollments: Int
   enrolled: Boolean
   courseReview: CourseReviewEntity
@@ -296,6 +308,7 @@ type UserEntity {
   followedUserRelations: [FollowEntity!]!
   courseReview: CourseReviewEntity!
   cart: CartEntity!
+  orders: OrderEntity!
   followed: Boolean!
   numberOfFollowers: Int!
 }
@@ -488,6 +501,7 @@ type Query {
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
   findOneCart(data: FindOneCartInputData!): CartEntity!
+  findOneOrder(data: FindOneOrderInputData!): CartEntity!
 }
 
 input SignInInputData {
@@ -723,5 +737,14 @@ input FindOneCartInputData {
 
 input FindOneCartInputParams {
   cartId: ID!
+  userId: ID
+}
+
+input FindOneOrderInputData {
+  params: FindOneOrderInputParams!
+}
+
+input FindOneOrderInputParams {
+  orderId: ID!
   userId: ID
 }

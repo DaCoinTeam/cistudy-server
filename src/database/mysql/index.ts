@@ -22,9 +22,9 @@ import { CourseTopicEntity as CourseTopicMySqlEntity } from "./course-topic.enti
 import { SubcategoryTopicEntity as SubcategoyTopicMySqlEntity } from "./subcategory-topic.entity"
 import { CourseSubcategoryEntity as CourseSubcategoryMySqlEntity } from "./course-subcategory.entity"
 import { CourseReviewEntity as CourseReviewMySqlEntity } from "./course-review.entity"
-import { TestEntity as TestMySqlEntity } from "./test.entity"
 import { CartEntity as CartMySqlEntity } from "./cart.entity"
-import { CartProductEntity as CartProductMySqlEntity } from "./cart-product.enity"
+import { CartCourseEntity as CartCourseMySqlEntity } from "./cart-course.enity"
+import { OrderEntity as OrderMySqlEntity } from "./order.entity"
 
 export {
     UserMySqlEntity,
@@ -51,7 +51,7 @@ export {
     SubcategoyTopicMySqlEntity,
     CourseSubcategoryMySqlEntity,
     CourseReviewMySqlEntity,
-    TestMySqlEntity,
     CartMySqlEntity,
-    CartProductMySqlEntity
+    CartCourseMySqlEntity,
+    OrderMySqlEntity
 }

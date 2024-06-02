@@ -1,19 +1,21 @@
-import { CartMySqlEntity, CartProductMySqlEntity, CourseMySqlEntity } from "@database";
+import { CartMySqlEntity, CartCourseMySqlEntity, CourseMySqlEntity, OrderMySqlEntity } from "@database";
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
-import { AddProductCartInput, CreateCartInput, DeleteCartDataInput, DeleteCartProductDataInput } from "./cart.input";
-import { AddProductCartOutput, CreateCartOutput, DeleteCartProductOutput, DeleteUserCartOutput } from "./cart.output";
+import { AddCourseCartInput, CreateCartInput, DeleteCartDataInput, DeleteCartCourseDataInput, CreateOrderInput } from "./cart.input";
+import { AddCourseCartOutput, CreateCartOutput, CreateOrderOutput, DeleteCartCourseOutput, DeleteUserCartOutput } from "./cart.output";
 
 @Injectable()
 export class CartService {
     constructor(
         @InjectRepository(CartMySqlEntity)
         private readonly cartMySqlRepository: Repository<CartMySqlEntity>,
-        @InjectRepository(CartProductMySqlEntity)
-        private readonly cartProductMySqlRepository: Repository<CartProductMySqlEntity>,
+        @InjectRepository(CartCourseMySqlEntity)
+        private readonly cartCourseMySqlRepository: Repository<CartCourseMySqlEntity>,
         @InjectRepository(CourseMySqlEntity)
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(OrderMySqlEntity)
+        private readonly orderMySqlRepository: Repository<OrderMySqlEntity>,
     ) { }
 
     async createCart(input: CreateCartInput): Promise<CreateCartOutput> {
@@ -24,12 +26,12 @@ export class CartService {
             }
         });
 
-        if(currentcart){
+        if (currentcart) {
             if (!currentcart.isDeleted) {
                 throw new ConflictException("User Cart is in use")
             }
         }
-        
+
         const created = await this.cartMySqlRepository.save({
             userId: userId,
         })
@@ -41,7 +43,7 @@ export class CartService {
             }
     }
 
-    async addProductCart(input: AddProductCartInput): Promise<AddProductCartOutput> {
+    async addProductCart(input: AddCourseCartInput): Promise<AddCourseCartOutput> {
         const { data, userId } = input;
         const { cartId, courseId } = data
 
@@ -56,7 +58,7 @@ export class CartService {
             throw new NotFoundException("User cart not found ore not owned by user")
         }
 
-        const productExist = await this.cartProductMySqlRepository.findOne({
+        const productExist = await this.cartCourseMySqlRepository.findOne({
             where: {
                 courseId,
                 cartId,
@@ -67,12 +69,12 @@ export class CartService {
             throw new ConflictException("This Course already exist in cart")
         }
 
-        const { productId } = await this.cartProductMySqlRepository.save({
+        const { cartCourseId } = await this.cartCourseMySqlRepository.save({
             cartId,
             courseId
         })
 
-        // const addedProduct = await this.cartProductMySqlRepository.findOne({
+        // const addedProduct = await this.cartCourseMySqlRepository.findOne({
         //     where: {
         //         productId
         //     },
@@ -87,12 +89,12 @@ export class CartService {
 
         await this.cartMySqlRepository.save(usercart)
 
-        return { message: "Product added to cart successfully", others: { productId } };
+        return { message: "Product added to cart successfully", others: { cartCourseId } };
     }
 
-    async deleteCartProduct(input: DeleteCartProductDataInput): Promise<DeleteCartProductOutput> {
+    async deleteCartCourse(input: DeleteCartCourseDataInput): Promise<DeleteCartCourseOutput> {
         const { userId, data } = input;
-        const { productId } = data
+        const { cartCourseId } = data
 
         const usercart = await this.cartMySqlRepository.findOne({
             where: {
@@ -104,22 +106,22 @@ export class CartService {
             throw new NotFoundException("User cart not found ore not owned by user")
         }
 
-        const productArray = await this.cartProductMySqlRepository.find({
+        const productArray = await this.cartCourseMySqlRepository.find({
             where: {
-                productId : In(productId)
+                cartCourseId: In(cartCourseId)
             },
             relations: {
                 cart: true,
                 course: true
             }
         })
-        
+
         for (const product of productArray) {
             usercart.totalprice -= product.course.price
         }
 
         await this.cartMySqlRepository.save(usercart)
-        await this.cartProductMySqlRepository.delete({ productId : In(productId) })
+        await this.cartCourseMySqlRepository.delete({ cartCourseId: In(cartCourseId) })
 
         return { message: "Product Removed Successfully", others: { cartId: usercart.cartId } }
     }
@@ -145,6 +147,39 @@ export class CartService {
             message: "User Cart Deleted Successfully, New cart have been initialized",
             others: {
                 cartId: newcart.cartId
+            }
+        }
+    }
+
+    async createOrder(input: CreateOrderInput): Promise<CreateOrderOutput> {
+        const { data, userId } = input
+        const { cartId } = data
+
+        const usercart = await this.cartMySqlRepository.findOne({
+            where: {
+                cartId,
+                userId
+            }
+        })
+        if (!usercart) {
+            throw new NotFoundException("This cart cannot be found or it not belongs to user")
+        }
+
+        // Hàm discount/trừ tiền
+
+        //Ghi Order
+        const cartdetails = await this.cartMySqlRepository.findOne({ where: { cartId } })
+
+        const { orderId } = await this.orderMySqlRepository.save({
+            cartId,
+            userId,
+            totalprice: cartdetails.totalprice
+        })
+
+        return {
+            message: "Order Created Successfully",
+            others: {
+                orderId
             }
         }
     }

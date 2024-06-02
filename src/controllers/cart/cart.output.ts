@@ -12,35 +12,46 @@ export class CreateCartOutput implements Output<CreateCartOutputOthers> {
     others?: CreateCartOutputOthers;
 }
 
-export class AddProductCartOthers {
+export class AddCourseCartOthers {
     @ApiProperty()
-    productId : string;
+    cartCourseId : string;
 }
 
-export class AddProductCartOutput implements Output<AddProductCartOthers> {
+export class AddCourseCartOutput implements Output<AddCourseCartOthers> {
     @ApiProperty()
     message: string;
-    others?: AddProductCartOthers;
+    others?: AddCourseCartOthers;
 }
 
-export class DeleteCartProductOthers {
+export class DeleteCartCourseOthers {
     @ApiProperty()
     cartId : string;
 }
 
-export class DeleteCartProductOutput implements Output<DeleteCartProductOthers> {
+export class DeleteCartCourseOutput implements Output<DeleteCartCourseOthers> {
     @ApiProperty()
     message: string;
-    others?: DeleteCartProductOthers;
+    others?: DeleteCartCourseOthers;
 }
 
-export class DeleteUserCartOthers {
+export class DeleteUserCartOutputOthers {
     @ApiProperty()
     cartId : string;
 }
 
-export class DeleteUserCartOutput implements Output<DeleteUserCartOthers> {
+export class DeleteUserCartOutput implements Output<DeleteUserCartOutputOthers> {
     @ApiProperty()
     message: string;
-    others?: DeleteUserCartOthers;
+    others?: DeleteUserCartOutputOthers;
+}
+
+export class CreateOrderOutputOthers {
+    @ApiProperty()
+    orderId : string;
+}
+
+export class CreateOrderOutput implements Output<CreateOrderOutputOthers> {
+    @ApiProperty()
+    message: string;
+    others?: CreateOrderOutputOthers;
 }

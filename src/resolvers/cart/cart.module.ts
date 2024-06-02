@@ -2,8 +2,9 @@ import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     CartMySqlEntity,
-    CartProductMySqlEntity,
+    CartCourseMySqlEntity,
     CourseMySqlEntity,
+    OrderMySqlEntity,
 } from "@database"
 
 import { CartResolver } from "./cart.resolver"
@@ -13,8 +14,9 @@ import { CartService } from "./cart.service"
     imports: [
         TypeOrmModule.forFeature([
             CartMySqlEntity,
-            CartProductMySqlEntity,
-            CourseMySqlEntity
+            CartCourseMySqlEntity,
+            CourseMySqlEntity,
+            OrderMySqlEntity
         ]),
     ],
     providers: [CartResolver, CartService],

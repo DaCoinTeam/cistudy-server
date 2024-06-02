@@ -1,7 +1,7 @@
 import { Args, Query, Resolver } from "@nestjs/graphql";
 import { CartService } from "./cart.service";
-import { CartProductMySqlEntity, CartMySqlEntity } from "@database";
-import { FindOneCartInputData } from "./cart.input";
+import { CartMySqlEntity } from "@database";
+import { FindOneCartInputData, FindOneOrderInputData } from "./cart.input";
 
 
 
@@ -15,5 +15,10 @@ export class CartResolver {
     @Query(() => CartMySqlEntity)
     async findOneCart(@Args("data") data: FindOneCartInputData) {
         return await this.cartService.findOneCart({data})
+    }
+
+    @Query(() => CartMySqlEntity)
+    async findOneOrder(@Args("data") data: FindOneOrderInputData) {
+        return await this.cartService.findOneOrder({data})
     }
 }

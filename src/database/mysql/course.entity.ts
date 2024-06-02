@@ -19,7 +19,7 @@ import { CourseTopicEntity } from "./course-topic.entity"
 import { CourseSubcategoryEntity } from "./course-subcategory.entity"
 import { CategoryEntity } from "./category.entity"
 import { CourseReviewEntity } from "./course-review.entity"
-import { CartProductEntity } from "./cart-product.enity"
+import { CartCourseEntity } from "./cart-course.enity"
 
 interface CourseIncludes {
     time: number;
@@ -135,9 +135,9 @@ export class CourseEntity {
     })
     sections: Array<SectionEntity>
 
-    @Field(() => [CartProductEntity])
-    @OneToMany(() => CartProductEntity, (cartProduct) => cartProduct.course)
-    products?: CartProductEntity;
+    @Field(() => [CartCourseEntity])
+    @OneToMany(() => CartCourseEntity, (cartCourse) => cartCourse.course)
+    cartCourses?: CartCourseEntity;
 
     //graphql
     @Field(() => Int, { nullable: true })

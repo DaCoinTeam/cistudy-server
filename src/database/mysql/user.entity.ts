@@ -11,6 +11,7 @@ import { FollowEntity } from "./follow.entity"
 import { CryptoWalletEntity } from "./crypto-wallet.entity"
 import { CourseReviewEntity } from "./course-review.entity"
 import { CartEntity } from "./cart.entity"
+import { OrderEntity } from "./order.entity"
 
 @ObjectType()
 @Entity("user")
@@ -147,6 +148,9 @@ export class UserEntity {
     @OneToMany(() => CartEntity, (cart) => cart.user)
     cart: CartEntity;
 
+    @Field(() => OrderEntity)
+    @OneToMany(()=> OrderEntity, (userorder) => userorder.user)
+    orders: OrderEntity
     //graphql
     @Field(() => Boolean)
         followed?: boolean

@@ -15,12 +15,12 @@ import { CartEntity } from "./cart.entity"
 
 
 @ObjectType()
-@Entity("cart-product")
-export class CartProductEntity {
+@Entity("cart-course")
+export class CartCourseEntity {
     //Main fields
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    productId: string
+    cartCourseId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
@@ -39,12 +39,12 @@ export class CartProductEntity {
     updatedAt: Date
     // Relations
     @Field(() => CourseEntity)
-    @ManyToOne(() => CourseEntity, (course) => course.products, { onDelete: "CASCADE"})
+    @ManyToOne(() => CourseEntity, (course) => course.cartCourses, { onDelete: "CASCADE"})
     @JoinColumn({ name: "courseId" })
     course: CourseEntity;
 
     @Field(() => CartEntity)
-    @ManyToOne(() => CartEntity, (cart) => cart.products, { onDelete: "CASCADE"})
+    @ManyToOne(() => CartEntity, (cart) => cart.courses, { onDelete: "CASCADE"})
     @JoinColumn({ name: "cartId" })
     cart: CartEntity;
 

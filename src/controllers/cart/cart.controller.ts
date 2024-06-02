@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Param, Post, UseGuards, UseInterceptors } fro
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard, AuthInterceptor, UserId } from "../shared";
 import { CartService } from "./cart.service";
-import { CreateProductCartInputData, DeleteCartProductData } from "./cart.input";
+import { CreateCourseCartInputData, CreateOrderInputData, DeleteCartCourseData } from "./cart.input";
 
 @ApiTags("Cart")
 @ApiHeader({
@@ -18,7 +18,7 @@ export class CartController {
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     async createCart(@UserId() userId: string) {
-        return await this.cartService.createCart({userId})
+        return await this.cartService.createCart({ userId })
     }
 
     @ApiBearerAuth()
@@ -27,7 +27,7 @@ export class CartController {
     @UseInterceptors(AuthInterceptor)
     async addtoCart(
         @UserId() userId: string,
-        @Body() body : CreateProductCartInputData,
+        @Body() body: CreateCourseCartInputData,
     ) {
         return await this.cartService.addProductCart({
             userId,
@@ -39,13 +39,13 @@ export class CartController {
     @Delete("delete-cart-product")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    async deleteCartProduct(
+    async deleteCartCourse(
         @UserId() userId: string,
-        @Body() body : DeleteCartProductData,
+        @Body() body: DeleteCartCourseData,
     ) {
-        return this.cartService.deleteCartProduct({ 
+        return this.cartService.deleteCartCourse({
             userId,
-            data : body
+            data: body
         })
     }
 
@@ -55,11 +55,25 @@ export class CartController {
     @UseInterceptors(AuthInterceptor)
     async deleteUserCart(
         @UserId() userId: string,
-        @Param("cartId") cartId : string,
+        @Param("cartId") cartId: string,
     ) {
-        return this.cartService.deleteUserCart({ 
+        return this.cartService.deleteUserCart({
             userId,
-            data : {cartId}
+            data: { cartId }
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-order")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async createOrder(
+        @UserId() userId: string,
+        @Body() body: CreateOrderInputData
+    ) {
+        return this.cartService.createOrder({
+            userId,
+            data: body
         })
     }
 }

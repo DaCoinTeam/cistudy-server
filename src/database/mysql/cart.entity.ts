@@ -5,16 +5,19 @@ import {
     JoinColumn,
     ManyToOne,
     OneToMany,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm"
 import { UserEntity } from "./user.entity"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
-import { CartProductEntity } from "./cart-product.enity"
+import { CartCourseEntity } from "./cart-course.enity"
+import { OrderEntity } from "./order.entity"
 
 @ObjectType()
 @Entity("cart")
 export class CartEntity {
+    //Fields
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
     cartId: string
@@ -27,14 +30,9 @@ export class CartEntity {
     @Column({ type: "float", default: 0 })
     totalprice: number
 
-    @Field(() => [CartProductEntity], { nullable: true })
-    @OneToMany(() => CartProductEntity, (product) => product.cart)
-    products: Array<CartProductEntity>;
-
-    @Field(() => UserEntity)
-    @OneToMany(() => UserEntity, (user) => user.cart, { onDelete: "CASCADE"})
-    @JoinColumn({ name: "userId" })
-    user: UserEntity
+    @Field(() => [CartCourseEntity], { nullable: true })
+    @OneToMany(() => CartCourseEntity, (product) => product.cart)
+    courses: Array<CartCourseEntity>;
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ type: "boolean", default: false })
@@ -47,5 +45,15 @@ export class CartEntity {
     @Field(() => Date)
     @UpdateDateColumn()
     updatedAt: Date
+
+    //relations
+    @Field(() => UserEntity)
+    @OneToMany(() => UserEntity, (user) => user.cart, { onDelete: "CASCADE"})
+    @JoinColumn({ name: "userId" })
+    user: UserEntity
+
+    @Field(() => OrderEntity)
+    @OneToOne(() => OrderEntity, (order) => order.cart)
+    order: OrderEntity;
 
 }

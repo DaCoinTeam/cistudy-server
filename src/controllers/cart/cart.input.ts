@@ -7,7 +7,7 @@ export class CreateCartInput implements AuthEmptyDataInput{
     userId: string
 }
 
-export class CreateProductCartInputData {
+export class CreateCourseCartInputData {
     @IsUUID(4)
     @ApiProperty()
     courseId : string
@@ -15,22 +15,22 @@ export class CreateProductCartInputData {
     cartId : string
 }
 
-export class AddProductCartInput implements AuthInput<CreateProductCartInputData>{
+export class AddCourseCartInput implements AuthInput<CreateCourseCartInputData>{
     @IsUUID("4")
     userId: string
     @ApiProperty()
-    data: CreateProductCartInputData
+    data: CreateCourseCartInputData
 }
 
-export class DeleteCartProductData {
+export class DeleteCartCourseData {
     @ApiProperty()
-    productId : string[]
+    cartCourseId : string[]
 }
 
-export class DeleteCartProductDataInput implements AuthInput<DeleteCartProductData>{
+export class DeleteCartCourseDataInput implements AuthInput<DeleteCartCourseData>{
     @IsUUID("4")
     userId: string;
-    data: DeleteCartProductData;
+    data: DeleteCartCourseData;
 }
 
 export class DeleteCartData {
@@ -43,4 +43,16 @@ export class DeleteCartDataInput implements AuthInput<DeleteCartData>{
     @IsUUID("4")
     userId: string;
     data: DeleteCartData;
+}
+
+export class CreateOrderInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    cartId: string
+}
+
+export class CreateOrderInput implements AuthInput<CreateOrderInputData>{
+    @IsUUID("4")
+    userId: string
+    data: CreateOrderInputData;
 }
