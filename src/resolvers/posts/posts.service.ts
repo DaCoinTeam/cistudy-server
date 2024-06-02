@@ -34,7 +34,7 @@ export class PostsService {
         const { data } = input
         const { params } = data
         const { postId } = params
-
+  
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
@@ -55,21 +55,21 @@ export class PostsService {
                     postMedias: true,
                 },
             })
-
+            console.log(post ? "co tim thay post" : "ko tim thay post")
             const numberOfLikes = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(PostLikeMySqlEntity, "postLike")
                 .where("postLikeId = :postLikeId", { postLikeId: true })
                 .getRawOne()
-
+                console.log(numberOfLikes ? "co tim thay numberOfLikes" : "ko tim thay numberOfLikes")
             const numberOfComments = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(PostCommentMySqlEntity, "postComment")
-                .where("postLikeId = :postLikeId", { postLikeId: true })
+                .where("postCommentId = :postCommentId", { postCommentId: true })
                 .getRawOne()
-
+                console.log(numberOfComments ? "co tim thay numberOfComments" : "ko tim thay numberOfComments")
             await queryRunner.commitTransaction()
 
             post.numberOfLikes = numberOfLikes.count

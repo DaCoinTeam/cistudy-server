@@ -132,6 +132,7 @@ type OrderEntity {
   updatedAt: DateTime!
   cartId: ID!
   totalprice: Float!
+  discountprice: Float!
   userId: ID!
   user: UserEntity!
   cart: CartEntity!
@@ -360,11 +361,6 @@ type FindManyCourseTargetsOutput {
   tokens: AuthTokens
 }
 
-type FindOnePostOutput {
-  data: PostEntity!
-  tokens: AuthTokens
-}
-
 type FindManyPostsOutputMetadata {
   count: Int
 }
@@ -488,7 +484,7 @@ type Query {
   findManyCategories: [CategoryEntity!]!
   findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
   findManyCourseReview(data: FindManyCourseReviewInputData!): [CourseReviewEntity!]!
-  findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
+  findOnePost(data: FindOnePostInputData!): PostEntity!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
   findManyPostComments(data: FindManyPostCommentsInputData!): FindManyPostCommentsOutput!

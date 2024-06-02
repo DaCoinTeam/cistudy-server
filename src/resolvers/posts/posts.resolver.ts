@@ -16,6 +16,7 @@ import {
     FindOnePostCommentOutput,
     FindOnePostOutput,
 } from "./posts.output"
+import { PostMySqlEntity } from "@database"
 
 @Resolver()
 export class PostsResolver {
@@ -23,7 +24,7 @@ export class PostsResolver {
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
-  @Query(() => FindOnePostOutput)
+  @Query(() => PostMySqlEntity)
     async findOnePost(
     @UserId() userId: string,
     @Args("data") data: FindOnePostInputData,
