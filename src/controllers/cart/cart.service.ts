@@ -164,7 +164,9 @@ export class CartService {
         if (!usercart) {
             throw new NotFoundException("This cart cannot be found or it not belongs to user")
         }
-
+        if(usercart.courses.length === 0){
+            throw new ConflictException("There arent any courses in cart")
+        }
         // Hàm discount/trừ tiền
 
         //Ghi Order

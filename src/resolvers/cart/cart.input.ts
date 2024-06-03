@@ -36,3 +36,19 @@ export class FindOneOrderInputData implements ParamsOnly<FindOneOrderInputParams
 export class FindOneOrderInput implements Input<FindOneOrderInputData> {
     data: FindOneOrderInputData
 }
+
+@InputType()
+export class FindManyUserOrderInputParams {
+    @Field(() => ID, { nullable: true })
+        userId: string
+}
+
+@InputType()
+export class FindManyUserOrderInputData implements ParamsOnly<FindManyUserOrderInputParams> {
+    @Field(() => FindOneOrderInputParams)
+        params: FindManyUserOrderInputParams
+}
+
+export class FindManyUserOrderInput implements Input<FindManyUserOrderInputData> {
+    data: FindManyUserOrderInputData
+}

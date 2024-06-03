@@ -34,7 +34,7 @@ export class PostsService {
         const { data } = input
         const { params } = data
         const { postId } = params
-  
+
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
@@ -55,28 +55,25 @@ export class PostsService {
                     postMedias: true,
                 },
             })
-            console.log(post ? "co tim thay post" : "ko tim thay post")
+
             const numberOfLikes = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
-                .from(PostLikeMySqlEntity, "postLike")
-                .where("postLikeId = :postLikeId", { postLikeId: true })
-                .getRawOne()
-                console.log(numberOfLikes ? "co tim thay numberOfLikes" : "ko tim thay numberOfLikes")
+                .from(PostLikeMySqlEntity, "post_like")
+                .where("post_like.postId = :postId", { postId })
+                .getRawOne();
             const numberOfComments = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
-                .from(PostCommentMySqlEntity, "postComment")
-                .where("postCommentId = :postCommentId", { postCommentId: true })
+                .from(PostCommentMySqlEntity, "post_comment")
+                .where("post_comment.postId = :postId", { postId })
                 .getRawOne()
-                console.log(numberOfComments ? "co tim thay numberOfComments" : "ko tim thay numberOfComments")
+
             await queryRunner.commitTransaction()
 
             post.numberOfLikes = numberOfLikes.count
             post.numberOfComments = numberOfComments.count
-            console.log(post ? "van co post" : "deo co post")
-            console.log(post.title ? "co title" : "deo co title")
-            console.log(post.title)
+
             return {
                 data: post,
             }
@@ -251,7 +248,7 @@ export class PostsService {
                 .andWhere("postId = :postId", { postId })
                 .groupBy("post_comment.postCommentId")
                 .getRawMany()
-            
+
             const likedResults = await queryRunner.manager
                 .createQueryBuilder()
                 .select("post_comment.postCommentId", "postCommentId")
@@ -264,7 +261,7 @@ export class PostsService {
 
             const numberOfPostCommentsResult = await queryRunner.manager
                 .createQueryBuilder()
-                .select("COUNT(*)", "count")   
+                .select("COUNT(*)", "count")
                 .from(PostCommentMySqlEntity, "post_comment")
                 .where("post_comment.postId = :postId", { postId })
                 .getRawOne()
@@ -347,7 +344,7 @@ export class PostsService {
 
             const numberOfPostCommentRepliesResult = await queryRunner.manager
                 .createQueryBuilder()
-                .select("COUNT(*)", "count")   
+                .select("COUNT(*)", "count")
                 .from(PostCommentReplyMySqlEntity, "post_comment_reply")
                 .where("post_comment_reply.postCommentId = :postCommentId", { postCommentId })
                 .getRawOne()

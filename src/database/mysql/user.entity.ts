@@ -151,6 +151,7 @@ export class UserEntity {
     @Field(() => OrderEntity)
     @OneToMany(()=> OrderEntity, (userorder) => userorder.user)
     orders: OrderEntity
+    
     //graphql
     @Field(() => Boolean)
         followed?: boolean

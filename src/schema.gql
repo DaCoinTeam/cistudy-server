@@ -475,6 +475,10 @@ type FindManyTransactionsOutput {
   metadata: FindManyTransactionsOutputMetadata
 }
 
+type FindManyUserOrderOutput {
+  results: [OrderEntity!]!
+}
+
 type Query {
   init: InitOutput!
   signIn(data: SignInInputData!): SignInOutput!
@@ -502,7 +506,8 @@ type Query {
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
   findOneCart(data: FindOneCartInputData!): CartEntity!
-  findOneOrder(data: FindOneOrderInputData!): CartEntity!
+  findOneOrder(data: FindOneOrderInputData!): OrderEntity!
+  findManyUserOrder(data: FindManyUserOrderInputData!): FindManyUserOrderOutput!
 }
 
 input SignInInputData {
@@ -748,4 +753,8 @@ input FindOneOrderInputData {
 input FindOneOrderInputParams {
   orderId: ID!
   userId: ID
+}
+
+input FindManyUserOrderInputData {
+  params: FindOneOrderInputParams!
 }

@@ -3,7 +3,7 @@ import { CartMySqlEntity, CartCourseMySqlEntity, OrderMySqlEntity } from "@datab
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { FindOneCartInput, FindOneOrderInput } from "./cart.input";
+import { FindManyUserOrderInput, FindOneCartInput, FindOneOrderInput } from "./cart.input";
 
 
 @Injectable()
@@ -29,7 +29,7 @@ export class CartService {
             },
             relations: {
                 courses: {
-                    course : true
+                    course: true
                 }
             }
         });
@@ -38,18 +38,44 @@ export class CartService {
     }
 
     async findOneOrder(input: FindOneOrderInput): Promise<OrderMySqlEntity> {
-        const {data} = input
-        const { params} = data
+        const { data } = input
+        const { params } = data
         const { orderId } = params
 
         const order = await this.orderMySqlEntity.findOne({
-            where:{
+            where: {
                 orderId,
             },
-            relations:{
-                cart : true
+            relations: {
+                cart: {
+                    courses: {
+                        course: true
+                    }
+                }
+
             }
         })
         return order
+    }
+
+    async findManyUserOrder(input: FindManyUserOrderInput): Promise<Array<OrderMySqlEntity>> {
+        const { data } = input
+        const { params } = data
+        const { userId } = params
+
+        return await this.orderMySqlEntity.find({
+            where: {
+                userId
+            },
+            relations: {
+                cart: {
+                    courses: {
+                        course: true
+                    }
+                }
+
+            }
+        })
+
     }
 }
