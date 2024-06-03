@@ -15,7 +15,7 @@ import {
     FindOnePostCommentInput,
     FindOnePostInput,
 } from "./posts.input"
-import { FindManyPostCommentRepliesOutputData, FindManyPostCommentsOutputData, FindManyPostsOutputData } from "./posts.output"
+import { FindManyPostCommentRepliesOutputData, FindManyPostCommentsOutputData, FindManyPostsOutputData, FindOnePostOutput } from "./posts.output"
 import { PostCommentReplyEntity } from "src/database/mysql/post-comment-reply.entity"
 
 @Injectable()
@@ -30,7 +30,7 @@ export class PostsService {
         private readonly dataSource: DataSource,
     ) { }
 
-    async findOnePost(input: FindOnePostInput): Promise<PostMySqlEntity> {
+    async findOnePost(input: FindOnePostInput): Promise<FindOnePostOutput> {
         const { data } = input
         const { params } = data
         const { postId } = params
@@ -74,8 +74,12 @@ export class PostsService {
 
             post.numberOfLikes = numberOfLikes.count
             post.numberOfComments = numberOfComments.count
-
-            return post
+            console.log(post ? "van co post" : "deo co post")
+            console.log(post.title ? "co title" : "deo co title")
+            console.log(post.title)
+            return {
+                data: post,
+            }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {

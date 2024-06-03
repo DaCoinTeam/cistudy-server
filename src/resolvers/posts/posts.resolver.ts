@@ -24,12 +24,12 @@ export class PostsResolver {
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
-  @Query(() => PostMySqlEntity)
+  @Query(() => FindOnePostOutput)
     async findOnePost(
     @UserId() userId: string,
     @Args("data") data: FindOnePostInputData,
     ) {
-        return this.postsService.findOnePost({ userId, data })
+        return (await this.postsService.findOnePost({ userId, data })).data
     }
 
   @UseGuards(JwtAuthGuard)

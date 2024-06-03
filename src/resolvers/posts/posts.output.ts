@@ -7,7 +7,7 @@ export class FindOnePostOutput implements AuthOutput<PostMySqlEntity> {
   @Field(() => PostMySqlEntity)
       data: PostMySqlEntity
   @Field(() => AuthTokens, { nullable: true })
-      tokens: AuthTokens
+      tokens?: AuthTokens
 }
 
 @ObjectType()
