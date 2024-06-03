@@ -140,8 +140,8 @@ export class PostsService {
                 .addSelect("post.postId", "postId")
                 .from(PostMySqlEntity, "post")
                 .innerJoin(PostLikeMySqlEntity, "post_like", "post.postId = post_like.postId")
-                .where("liked = :liked", { liked: true })
-                .andWhere("courseId = :courseId", { courseId })
+                //.where("liked = :liked", { liked: true })
+                .where("courseId = :courseId", { courseId })
                 .groupBy("post.postId")
                 .getRawMany()
 
