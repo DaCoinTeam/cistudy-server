@@ -1,4 +1,4 @@
-import { UserMySqlEntity } from "@database"
+import { CartMySqlEntity, UserMySqlEntity } from "@database"
 import {
     Injectable,
     NotFoundException,
@@ -20,6 +20,8 @@ export class AuthService {
     private readonly sha256Service: Sha256Service,
     @InjectRepository(UserMySqlEntity)
     private readonly userMySqlRepository: Repository<UserMySqlEntity>,
+    @InjectRepository(CartMySqlEntity)
+    private readonly cartMySqlRepository: Repository<CartMySqlEntity>,
     private readonly firebaseService: FirebaseService,
     ) {}
 
@@ -62,6 +64,7 @@ export class AuthService {
                 avatarUrl: decoded.picture,
                 kind: UserKind.Google,
             })
+            await this.cartMySqlRepository.save({userId : found.userId})
         }
         return found
     }

@@ -50,20 +50,6 @@ export class CartController {
     }
 
     @ApiBearerAuth()
-    @Delete("delete-user-cart/:cartId")
-    @UseGuards(JwtAuthGuard)
-    @UseInterceptors(AuthInterceptor)
-    async deleteUserCart(
-        @UserId() userId: string,
-        @Param("cartId") cartId: string,
-    ) {
-        return this.cartService.deleteUserCart({
-            userId,
-            data: { cartId }
-        })
-    }
-
-    @ApiBearerAuth()
     @Post("create-order")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)

@@ -127,31 +127,6 @@ export class CartService {
         return { message: "Product Removed Successfully", others: { cartId: usercart.cartId } }
     }
 
-    async deleteUserCart(input: DeleteCartDataInput): Promise<DeleteUserCartOutput> {
-        const { userId, data } = input
-        const { cartId } = data
-
-        const usercart = await this.cartMySqlRepository.findOne({
-            where: {
-                cartId,
-                userId
-            },
-        })
-
-        if (!usercart) {
-            throw new NotFoundException("User cart not found ore not owned by user")
-        }
-
-        await this.cartMySqlRepository.delete({ cartId })
-        const newcart = await this.cartMySqlRepository.save({ userId })
-        return {
-            message: "User Cart Deleted Successfully, New cart have been initialized",
-            others: {
-                cartId: newcart.cartId
-            }
-        }
-    }
-
     async createOrder(input: CreateOrderInput): Promise<CreateOrderOutput> {
         const { data, userId } = input
         const { courseIds } = data
