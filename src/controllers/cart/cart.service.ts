@@ -1,4 +1,4 @@
-import { CartMySqlEntity, CartCourseMySqlEntity, CourseMySqlEntity, OrderMySqlEntity } from "@database";
+import { CartMySqlEntity, CartCourseMySqlEntity, CourseMySqlEntity, OrderMySqlEntity, OrderCoursesMySqlEntity, UserMySqlEntity } from "@database";
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
@@ -16,6 +16,8 @@ export class CartService {
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
         @InjectRepository(OrderMySqlEntity)
         private readonly orderMySqlRepository: Repository<OrderMySqlEntity>,
+        @InjectRepository(OrderCoursesMySqlEntity)
+        private readonly orderCoursesMySqlRepository: Repository<OrderCoursesMySqlEntity>,
     ) { }
 
     async createCart(input: CreateCartInput): Promise<CreateCartOutput> {
@@ -43,13 +45,12 @@ export class CartService {
             }
     }
 
-    async addProductCart(input: AddCourseCartInput): Promise<AddCourseCartOutput> {
+    async addCourseCart(input: AddCourseCartInput): Promise<AddCourseCartOutput> {
         const { data, userId } = input;
-        const { cartId, courseId } = data
+        const { courseId } = data
 
         const usercart = await this.cartMySqlRepository.findOne({
             where: {
-                cartId,
                 userId
             },
         })
@@ -57,11 +58,11 @@ export class CartService {
         if (!usercart) {
             throw new NotFoundException("User cart not found ore not owned by user")
         }
-
+        const { cartId } = usercart
         const productExist = await this.cartCourseMySqlRepository.findOne({
             where: {
                 courseId,
-                cartId,
+                cartId
             },
         });
 
@@ -94,7 +95,7 @@ export class CartService {
 
     async deleteCartCourse(input: DeleteCartCourseDataInput): Promise<DeleteCartCourseOutput> {
         const { userId, data } = input;
-        const { cartCourseId } = data
+        const { cartCourseIds } = data
 
         const usercart = await this.cartMySqlRepository.findOne({
             where: {
@@ -108,7 +109,7 @@ export class CartService {
 
         const productArray = await this.cartCourseMySqlRepository.find({
             where: {
-                cartCourseId: In(cartCourseId)
+                cartCourseId: In(cartCourseIds)
             },
             relations: {
                 cart: true,
@@ -121,7 +122,7 @@ export class CartService {
         }
 
         await this.cartMySqlRepository.save(usercart)
-        await this.cartCourseMySqlRepository.delete({ cartCourseId: In(cartCourseId) })
+        await this.cartCourseMySqlRepository.delete({ cartCourseId: In(cartCourseIds) })
 
         return { message: "Product Removed Successfully", others: { cartId: usercart.cartId } }
     }
@@ -153,35 +154,44 @@ export class CartService {
 
     async createOrder(input: CreateOrderInput): Promise<CreateOrderOutput> {
         const { data, userId } = input
-        const { cartId } = data
+        const { courseIds } = data
 
-        const usercart = await this.cartMySqlRepository.findOne({
+        const order = await this.orderMySqlRepository.save({
+            userId,
+        })
+        const orderCourses = await this.courseMySqlRepository.find({
             where: {
-                cartId,
-                userId
+                courseId: In(courseIds)
             }
         })
-        if (!usercart) {
-            throw new NotFoundException("This cart cannot be found or it not belongs to user")
-        }
-        if(usercart.courses.length === 0){
-            throw new ConflictException("There arent any courses in cart")
-        }
-        // Hàm discount/trừ tiền
 
-        //Ghi Order
-        const cartdetails = await this.cartMySqlRepository.findOne({ where: { cartId } })
+        let discountPrice = 0, totalPrice = 0
 
-        const { orderId } = await this.orderMySqlRepository.save({
-            cartId,
-            userId,
-            totalprice: cartdetails.totalprice
+        for (const course of orderCourses) {
+            discountPrice += course.discountPrice
+            totalPrice += course.price
+            await this.orderCoursesMySqlRepository.save({
+                orderId: order.orderId,
+                courseId: course.courseId,
+                price: course.price,
+                discountPrice: course.discountPrice
+            })
+        }
+
+        await this.orderMySqlRepository.update(order.orderId, {
+            totalPrice,
+            discountPrice
         })
+
+
+        //Payment here
+
+        //If payment success, delete courses ordered in cart
 
         return {
             message: "Order Created Successfully",
             others: {
-                orderId
+                orderId: order.orderId
             }
         }
     }

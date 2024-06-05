@@ -29,7 +29,7 @@ export class CartController {
         @UserId() userId: string,
         @Body() body: CreateCourseCartInputData,
     ) {
-        return await this.cartService.addProductCart({
+        return await this.cartService.addCourseCart({
             userId,
             data: body
         })

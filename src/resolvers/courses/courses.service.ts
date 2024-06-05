@@ -150,7 +150,7 @@ export class CoursesService {
         const { data, userId } = input
         const { params } = data
         const { courseId } = params
-        console.log(data, userId)
+        //console.log(data, userId)
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()

@@ -23,7 +23,8 @@ import {
     TransactionMongoEntitySchema,
     CourseReviewMySqlEntity,
     CartMySqlEntity,
-    CartCourseMySqlEntity
+    CartCourseMySqlEntity,
+    CourseCertificateMySqlEntity
 } from "@database"
 import { CoursesService } from "./courses.service"
 import { MongooseModule } from "@nestjs/mongoose"
@@ -51,7 +52,8 @@ import { MongooseModule } from "@nestjs/mongoose"
             CategoryMySqlEntity,
             CourseReviewMySqlEntity,
             CartMySqlEntity,
-            CartCourseMySqlEntity
+            CartCourseMySqlEntity,
+            CourseCertificateMySqlEntity
         ]),
     ],
     controllers: [CoursesController],

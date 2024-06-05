@@ -31,7 +31,7 @@ export class CartEntity {
     totalprice: number
 
     @Field(() => [CartCourseEntity], { nullable: true })
-    @OneToMany(() => CartCourseEntity, (product) => product.cart)
+    @OneToMany(() => CartCourseEntity, (course) => course.cart)
     courses: Array<CartCourseEntity>;
 
     @Field(() => Boolean, { defaultValue: false })
@@ -48,12 +48,9 @@ export class CartEntity {
 
     //relations
     @Field(() => UserEntity)
-    @OneToMany(() => UserEntity, (user) => user.cart, { onDelete: "CASCADE"})
+    @OneToOne(() => UserEntity, (user) => user.cart, { onDelete: "CASCADE"})
     @JoinColumn({ name: "userId" })
     user: UserEntity
 
-    @Field(() => OrderEntity)
-    @OneToOne(() => OrderEntity, (order) => order.cart)
-    order: OrderEntity;
 
 }

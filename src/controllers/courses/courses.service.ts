@@ -1,6 +1,7 @@
 import { ConflictException, Inject, Injectable, NotFoundException, InternalServerErrorException } from "@nestjs/common"
 import {
     CategoryMySqlEntity,
+    CourseCertificateMySqlEntity,
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
     CourseSubcategoryMySqlEntity,
@@ -38,11 +39,12 @@ import {
     CreateCourseReviewInput,
     UpdateCourseReviewInput,
     DeleteCourseReviewInput,
+    CreateCourseCertificateInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import { ProcessStatus, VideoType, computeRaw, existKeyNotUndefined } from "@common"
-import { CreateCategoryOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteTopicOutputData, EnrollCourseOutput, UpdateCourseOutput, UpdateCourseReviewOutput } from "./courses.output"
+import { CreateCategoryOutput, CreateCourseCertificateOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteTopicOutputData, EnrollCourseOutput, UpdateCourseOutput, UpdateCourseReviewOutput } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
@@ -76,6 +78,8 @@ export class CoursesService {
         private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
         @InjectRepository(CourseReviewMySqlEntity)
         private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
+        @InjectRepository(CourseCertificateMySqlEntity)
+        private readonly courseCertificateMySqlEntity: Repository<CourseCertificateMySqlEntity>,
         // @InjectModel(TransactionMongoEntity.name) private readonly transactionMongoModel: Model<TransactionMongoEntity>,
         // @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         private readonly storageService: StorageService,
@@ -620,6 +624,46 @@ export class CoursesService {
         }
     }
 
+    async createCourseCertificate(input: CreateCourseCertificateInput): Promise<CreateCourseCertificateOutput> {
+        const { userId, data } = input
+        const { courseId } = data
+
+        const found = await this.courseCertificateMySqlEntity.findOne({
+            where: {
+                userId,
+                courseId
+            }
+        })
+
+        if (found) {
+            throw new ConflictException("This user already get certificate of this course")
+        }
+
+        const course = await this.courseMySqlRepository.findOne({
+            where:{
+                courseId
+            }
+        })
+
+        const achievedDate = new Date()
+        const expireDate = new Date(achievedDate)
+        expireDate.setDate(expireDate.getDate() + 90)
+
+        const created = await this.courseCertificateMySqlEntity.save({
+            userId,
+            courseName: course.title,
+            course,
+            achievedDate,
+            expireDate
+        })
+        
+        return {
+            message: "Certificate Created Successfully",
+            others: {
+                courseCertificateId: created.courseCertificateId,
+            }
+        }
+    }
 
 }
 

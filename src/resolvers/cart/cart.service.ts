@@ -3,7 +3,7 @@ import { CartMySqlEntity, CartCourseMySqlEntity, OrderMySqlEntity } from "@datab
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { FindManyUserOrderInput, FindOneCartInput, FindOneOrderInput } from "./cart.input";
+import { FindManyUserOrdersInput, FindOneCartInput, FindOneOrderInput } from "./cart.input";
 
 
 @Injectable()
@@ -20,16 +20,16 @@ export class CartService {
     async findOneCart(input: FindOneCartInput): Promise<CartMySqlEntity> {
         const { data } = input
         const { params } = data
-        const { cartId, userId } = params
+        const { cartId } = params
 
         const cart = await this.cartMySqlRepository.findOne({
             where: {
                 cartId,
-                userId
             },
             relations: {
                 courses: {
-                    course: true
+                    course: true,
+                    cart: true
                 }
             }
         });
@@ -47,35 +47,29 @@ export class CartService {
                 orderId,
             },
             relations: {
-                cart: {
-                    courses: {
-                        course: true
-                    }
+                orderCourses: {
+                    course: true
                 }
-
             }
         })
+
         return order
     }
 
-    async findManyUserOrder(input: FindManyUserOrderInput): Promise<Array<OrderMySqlEntity>> {
-        const { data } = input
-        const { params } = data
-        const { userId } = params
-
-        return await this.orderMySqlEntity.find({
+    async findManyUserOrder(input: FindManyUserOrdersInput): Promise<Array<OrderMySqlEntity>> {
+        const { userId, data } = input
+        const { options } = data
+        const { skip, take } = { ...options }
+        
+        const orders = await this.orderMySqlEntity.find({
             where: {
                 userId
             },
-            relations: {
-                cart: {
-                    courses: {
-                        course: true
-                    }
-                }
-
-            }
+            skip,
+            take,
         })
+        console.log(orders)
+        return orders
 
     }
 }

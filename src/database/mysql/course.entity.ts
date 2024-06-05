@@ -7,6 +7,7 @@ import {
     PrimaryGeneratedColumn,
     CreateDateColumn,
     UpdateDateColumn,
+    OneToOne,
 } from "typeorm"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { VerifyStatus } from "@common"
@@ -20,6 +21,9 @@ import { CourseSubcategoryEntity } from "./course-subcategory.entity"
 import { CategoryEntity } from "./category.entity"
 import { CourseReviewEntity } from "./course-review.entity"
 import { CartCourseEntity } from "./cart-course.enity"
+import { CourseCertificateEntity } from "./course-certificate"
+import { OrderEntity } from "./order.entity"
+import { OrderCoursesEntity } from "./order-course.entity"
 
 interface CourseIncludes {
     time: number;
@@ -138,6 +142,14 @@ export class CourseEntity {
     @Field(() => [CartCourseEntity])
     @OneToMany(() => CartCourseEntity, (cartCourse) => cartCourse.course)
     cartCourses?: CartCourseEntity;
+
+    @Field(() => [CourseCertificateEntity])
+    @OneToMany(() => CourseCertificateEntity, (certificate) => certificate.course)
+    courseCertificate?: CourseCertificateEntity;
+
+    @Field(() => [OrderCoursesEntity])
+    @OneToMany(() => OrderCoursesEntity, (orders) => orders.course)
+    orders: OrderCoursesEntity
 
     //graphql
     @Field(() => Int, { nullable: true })

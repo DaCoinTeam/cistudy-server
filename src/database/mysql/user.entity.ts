@@ -12,6 +12,8 @@ import { CryptoWalletEntity } from "./crypto-wallet.entity"
 import { CourseReviewEntity } from "./course-review.entity"
 import { CartEntity } from "./cart.entity"
 import { OrderEntity } from "./order.entity"
+import { CourseCertificateEntity } from "./course-certificate"
+
 
 @ObjectType()
 @Entity("user")
@@ -145,13 +147,17 @@ export class UserEntity {
     courseReview: CourseReviewEntity
 
     @Field(() => CartEntity)
-    @OneToMany(() => CartEntity, (cart) => cart.user)
+    @OneToOne(() => CartEntity, (cart) => cart.user)
     cart: CartEntity;
 
     @Field(() => OrderEntity)
-    @OneToMany(()=> OrderEntity, (userorder) => userorder.user)
+    @OneToMany(()=> OrderEntity, (orders) => orders.user)
     orders: OrderEntity
     
+    @Field(() => CourseCertificateEntity)
+    @OneToMany(()=> CourseCertificateEntity, (certificates) => certificates.user)
+    certificates: CourseCertificateEntity
+
     //graphql
     @Field(() => Boolean)
         followed?: boolean

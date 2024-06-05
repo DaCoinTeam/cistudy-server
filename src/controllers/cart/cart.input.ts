@@ -24,7 +24,7 @@ export class AddCourseCartInput implements AuthInput<CreateCourseCartInputData>{
 
 export class DeleteCartCourseData {
     @ApiProperty()
-    cartCourseId : string[]
+    cartCourseIds : string[]
 }
 
 export class DeleteCartCourseDataInput implements AuthInput<DeleteCartCourseData>{
@@ -46,9 +46,8 @@ export class DeleteCartDataInput implements AuthInput<DeleteCartData>{
 }
 
 export class CreateOrderInputData {
-    @IsUUID("4")
     @ApiProperty()
-    cartId: string
+    courseIds: string[]
 }
 
 export class CreateOrderInput implements AuthInput<CreateOrderInputData>{

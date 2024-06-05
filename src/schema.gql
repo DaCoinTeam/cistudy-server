@@ -126,18 +126,6 @@ type CourseReviewEntity {
   user: UserEntity!
 }
 
-type OrderEntity {
-  orderId: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  cartId: ID!
-  totalprice: Float!
-  discountprice: Float!
-  userId: ID!
-  user: UserEntity!
-  cart: CartEntity!
-}
-
 type CartEntity {
   cartId: ID!
   userId: ID!
@@ -147,7 +135,6 @@ type CartEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   user: UserEntity!
-  order: OrderEntity!
 }
 
 type CartCourseEntity {
@@ -158,6 +145,41 @@ type CartCourseEntity {
   updatedAt: DateTime!
   course: CourseEntity!
   cart: CartEntity!
+}
+
+type CourseCertificateEntity {
+  courseCertificateId: ID!
+  userId: ID!
+  courseId: ID!
+  createdAt: DateTime!
+  achievedDate: DateTime
+  expireDate: DateTime
+  user: UserEntity!
+  course: CourseEntity
+}
+
+type OrderEntity {
+  orderId: ID!
+  userId: ID!
+  orderStatus: String!
+  orderCourses: [OrderCoursesEntity!]
+  createdAt: DateTime!
+  completeDate: DateTime
+  updatedAt: DateTime!
+  discountPrice: Float!
+  totalPrice: Float!
+  isDeleted: Boolean!
+  user: UserEntity!
+}
+
+type OrderCoursesEntity {
+  orderCourseId: ID!
+  orderId: ID!
+  courseId: ID!
+  discountPrice: Float!
+  price: Float!
+  order: OrderEntity!
+  course: CourseEntity!
 }
 
 type CourseEntity {
@@ -185,6 +207,8 @@ type CourseEntity {
   posts: [PostEntity!]!
   sections: [SectionEntity!]!
   cartCourses: [CartCourseEntity!]!
+  courseCertificate: [CourseCertificateEntity!]!
+  orders: [OrderCoursesEntity!]!
   numberOfEnrollments: Int
   enrolled: Boolean
   courseReview: CourseReviewEntity
@@ -310,6 +334,7 @@ type UserEntity {
   courseReview: CourseReviewEntity!
   cart: CartEntity!
   orders: OrderEntity!
+  certificates: CourseCertificateEntity!
   followed: Boolean!
   numberOfFollowers: Int!
 }
@@ -476,7 +501,18 @@ type FindManyTransactionsOutput {
 }
 
 type FindManyUserOrderOutput {
-  results: [OrderEntity!]!
+  data: [OrderEntity!]!
+  tokens: AuthTokens
+}
+
+type FindOneCartOutput {
+  data: CartEntity!
+  tokens: AuthTokens
+}
+
+type FindOneOrderOutput {
+  data: OrderEntity!
+  tokens: AuthTokens
 }
 
 type Query {
@@ -505,9 +541,9 @@ type Query {
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
-  findOneCart(data: FindOneCartInputData!): CartEntity!
-  findOneOrder(data: FindOneOrderInputData!): OrderEntity!
-  findManyUserOrder(data: FindManyUserOrderInputData!): FindManyUserOrderOutput!
+  findOneCart(data: FindOneCartInputData!): FindOneCartOutput!
+  findOneOrder(data: FindOneOrderInputData!): FindOneOrderOutput!
+  findManyUserOrder(data: FindManyUserOrdersInputData!): FindManyUserOrderOutput!
 }
 
 input SignInInputData {
@@ -743,7 +779,6 @@ input FindOneCartInputData {
 
 input FindOneCartInputParams {
   cartId: ID!
-  userId: ID
 }
 
 input FindOneOrderInputData {
@@ -752,9 +787,13 @@ input FindOneOrderInputData {
 
 input FindOneOrderInputParams {
   orderId: ID!
-  userId: ID
 }
 
-input FindManyUserOrderInputData {
-  params: FindOneOrderInputParams!
+input FindManyUserOrdersInputData {
+  options: FindManyUserOrdersInputOptions
+}
+
+input FindManyUserOrdersInputOptions {
+  take: Int
+  skip: Int
 }

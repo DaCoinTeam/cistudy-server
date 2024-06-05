@@ -1,12 +1,12 @@
-import { ParamsOnly, Input } from "@common";
-import { Field, ID, InputType } from "@nestjs/graphql";
+import { ParamsOnly, Input, AuthInput, OptionsOnly } from "@common";
+import { OrderMySqlEntity } from "@database";
+import { Field, ID, InputType, Int } from "@nestjs/graphql";
+import { IsOptional } from "class-validator";
 
 @InputType()
 export class FindOneCartInputParams {
     @Field(() => ID)
         cartId: string
-    @Field(() => ID, { nullable: true })
-        userId?: string
 }
 
 @InputType()
@@ -15,7 +15,8 @@ export class FindOneCartInputData implements ParamsOnly<FindOneCartInputParams> 
         params: FindOneCartInputParams
 }
 
-export class FindOneCartInput implements Input<FindOneCartInputData> {
+export class FindOneCartInput implements AuthInput<FindOneCartInputData> {
+    userId: string;
     data: FindOneCartInputData
 }
 
@@ -23,8 +24,6 @@ export class FindOneCartInput implements Input<FindOneCartInputData> {
 export class FindOneOrderInputParams {
     @Field(() => ID)
         orderId: string
-    @Field(() => ID, { nullable: true })
-        userId?: string
 }
 
 @InputType()
@@ -33,22 +32,31 @@ export class FindOneOrderInputData implements ParamsOnly<FindOneOrderInputParams
         params: FindOneOrderInputParams
 }
 
-export class FindOneOrderInput implements Input<FindOneOrderInputData> {
+export class FindOneOrderInput implements AuthInput<FindOneOrderInputData> {
+    userId: string;
     data: FindOneOrderInputData
 }
 
+
 @InputType()
-export class FindManyUserOrderInputParams {
-    @Field(() => ID, { nullable: true })
-        userId: string
+export class FindManyUserOrdersInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
 }
 
 @InputType()
-export class FindManyUserOrderInputData implements ParamsOnly<FindManyUserOrderInputParams> {
-    @Field(() => FindOneOrderInputParams)
-        params: FindManyUserOrderInputParams
+export class FindManyUserOrdersInputData
+implements
+    OptionsOnly<FindManyUserOrdersInputOptions>
+{
+    @Field(() => FindManyUserOrdersInputOptions, { nullable: true })
+    @IsOptional()
+        options?: FindManyUserOrdersInputOptions
 }
 
-export class FindManyUserOrderInput implements Input<FindManyUserOrderInputData> {
-    data: FindManyUserOrderInputData
+export class FindManyUserOrdersInput implements AuthInput<FindManyUserOrdersInputData> {
+    userId: string;
+    data: FindManyUserOrdersInputData
 }

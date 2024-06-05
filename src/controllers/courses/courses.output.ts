@@ -65,6 +65,17 @@ export class CreateCourseReviewOutput implements Output {
 export class UpdateCourseReviewOutput implements Output {
     message: string
 }
+
 export class DeleteCourseReviewOutput implements Output {
     message: string
+}
+
+export class CreateCourseCertificateOutputOthers {
+    @ApiProperty()
+    courseCertificateId: string
+}
+
+export class CreateCourseCertificateOutput implements Output<CreateCourseCertificateOutputOthers> {
+    message: string
+    others?: CreateCourseCertificateOutputOthers;
 }

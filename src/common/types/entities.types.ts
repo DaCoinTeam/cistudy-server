@@ -26,6 +26,16 @@ export enum VerifyStatus {
   Rejected = "rejected",
 }
 
+export enum OrderStatus {
+  Pending = "pending",
+  Completed = "completed",
+  Canceled = "canceled",
+}
+
+registerEnumType(OrderStatus, {
+  name: "OrderStatus"
+})
+
 registerEnumType(VerifyStatus, {
     name: "VerifyStatus",
 })

@@ -20,6 +20,7 @@ import {
 import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import {
     CreateCategoryInputData,
+    CreateCourseCertificateInputData,
     CreateCourseInput,
     CreateCourseReviewInput,
     CreateCourseReviewInputData,
@@ -66,21 +67,21 @@ export class CoursesController {
         })
     }
 
-  // trang trí để cho swagger biết đây là api cần auth
-  @ApiBearerAuth()
-  @Patch("enroll-course")
-  // cái route này xài JWT Guard, tức là nếu jwt hợp lệ thì qua cửa, còn không hợp lệ thì 401
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(AuthInterceptor)
-  async enrollCourse(
-    @UserId() userId: string,
-    @Body() data: EnrollCourseInputData,
-  ) {
-      return await this.coursesService.enrollCourse({
-          userId,
-          data,
-      })
-  }
+    // trang trí để cho swagger biết đây là api cần auth
+    @ApiBearerAuth()
+    @Patch("enroll-course")
+    // cái route này xài JWT Guard, tức là nếu jwt hợp lệ thì qua cửa, còn không hợp lệ thì 401
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async enrollCourse(
+        @UserId() userId: string,
+        @Body() data: EnrollCourseInputData,
+    ) {
+        return await this.coursesService.enrollCourse({
+            userId,
+            data,
+        })
+    }
 
     @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
@@ -113,7 +114,7 @@ export class CoursesController {
     ) {
         return this.coursesService.createCourseReview({
             userId,
-            data : body,
+            data: body,
         })
     }
 
@@ -125,9 +126,9 @@ export class CoursesController {
         @UserId() userId: string,
         @Body() body: UpdateCourseReviewInputData,
     ) {
-        return this.coursesService.updateCourseReview({ 
+        return this.coursesService.updateCourseReview({
             userId,
-            data : body,
+            data: body,
         })
     }
 
@@ -137,11 +138,11 @@ export class CoursesController {
     @UseInterceptors(AuthInterceptor)
     async deleteCourseReview(
         @UserId() userId: string,
-        @Param("reviewId") reviewId : string,
+        @Param("reviewId") reviewId: string,
     ) {
-        return this.coursesService.deleteCourseReview({ 
+        return this.coursesService.deleteCourseReview({
             userId,
-            data : {reviewId}
+            data: { reviewId }
         })
     }
 
@@ -374,5 +375,16 @@ export class CoursesController {
             userId,
             data: { topicId },
         })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-course-certificate")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async createCourseCertificate(
+        @UserId() userId: string,
+        @Body() data: CreateCourseCertificateInputData,
+    ) {
+        return await this.coursesService.createCourseCertificate({ userId, data })
     }
 }

@@ -25,6 +25,8 @@ import { CourseReviewEntity as CourseReviewMySqlEntity } from "./course-review.e
 import { CartEntity as CartMySqlEntity } from "./cart.entity"
 import { CartCourseEntity as CartCourseMySqlEntity } from "./cart-course.enity"
 import { OrderEntity as OrderMySqlEntity } from "./order.entity"
+import { CourseCertificateEntity as CourseCertificateMySqlEntity } from "./course-certificate"
+import { OrderCoursesEntity as OrderCoursesMySqlEntity } from "./order-course.entity"
 
 export {
     UserMySqlEntity,
@@ -53,5 +55,8 @@ export {
     CourseReviewMySqlEntity,
     CartMySqlEntity,
     CartCourseMySqlEntity,
-    OrderMySqlEntity
+    OrderMySqlEntity,
+    OrderCoursesMySqlEntity,
+    CourseCertificateMySqlEntity
+
 }

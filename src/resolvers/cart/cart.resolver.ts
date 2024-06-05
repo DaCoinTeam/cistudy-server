@@ -1,13 +1,10 @@
 import { Args, Query, Resolver } from "@nestjs/graphql";
 import { CartService } from "./cart.service";
 import { CartMySqlEntity, OrderMySqlEntity } from "@database";
-import { FindManyUserOrderInputData, FindOneCartInputData, FindOneOrderInputData } from "./cart.input";
+import { FindManyUserOrdersInputData, FindOneCartInputData, FindOneOrderInputData } from "./cart.input";
 import { UseGuards, UseInterceptors } from "@nestjs/common";
-import { JwtAuthGuard, AuthInterceptor } from "../shared";
-import { FindManyUserOrderOutput } from "./cart.output";
-
-
-
+import { JwtAuthGuard, AuthInterceptor, UserId } from "../shared";
+import { FindManyUserOrderOutput, FindOneCartOutput, FindOneOrderOutput } from "./cart.output";
 
 @Resolver()
 export class CartResolver {
@@ -17,22 +14,32 @@ export class CartResolver {
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    @Query(() => CartMySqlEntity)
-    async findOneCart(@Args("data") data: FindOneCartInputData) {
-        return await this.cartService.findOneCart({ data })
+    @Query(() => FindOneCartOutput)
+    async findOneCart(
+        @UserId() userId: string,
+        @Args("data") data: FindOneCartInputData
+    ) {
+        return await this.cartService.findOneCart({ userId, data })
     }
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    @Query(() => OrderMySqlEntity)
-    async findOneOrder(@Args("data") data: FindOneOrderInputData) {
-        return await this.cartService.findOneOrder({ data })
+    @Query(() => FindOneOrderOutput)
+    async findOneOrder(
+        @UserId() userId: string,
+        @Args("data") data: FindOneOrderInputData
+    ) {
+        return await this.cartService.findOneOrder({ userId, data })
     }
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     @Query(() => FindManyUserOrderOutput)
-    async findManyUserOrder(@Args("data") data: FindManyUserOrderInputData) {
-        return await this.cartService.findManyUserOrder({ data })
+    async findManyUserOrder(
+        @UserId() userId : string,
+        @Args("data") data: FindManyUserOrdersInputData) {
+        return await this.cartService.findManyUserOrder({ userId, data })
     }
+
+    
 }

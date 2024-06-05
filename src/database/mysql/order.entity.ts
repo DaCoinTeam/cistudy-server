@@ -5,13 +5,13 @@ import {
     JoinColumn,
     ManyToOne,
     OneToMany,
-    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm"
 import { UserEntity } from "./user.entity"
 import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
-import { CartEntity } from "./cart.entity"
+import { OrderCoursesEntity } from "./order-course.entity"
+import { OrderStatus } from "@common"
 
 @ObjectType()
 @Entity("order")
@@ -21,40 +21,45 @@ export class OrderEntity {
     @PrimaryGeneratedColumn("uuid")
     orderId: string
 
+    @Field(() => ID)
+    @Column({ type: "uuid", length: 36 })
+    userId: string
+
+    @Field(() => String)
+    @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.Pending })
+    orderStatus: OrderStatus
+
+    @Field(() => [OrderCoursesEntity], {nullable: true})
+    @OneToMany(() => OrderCoursesEntity, (order) => order.order)
+    orderCourses: OrderCoursesEntity
+
     @Field(() => Date)
     @CreateDateColumn()
     createdAt: Date
+
+    @Field(() => Date, { nullable: true })
+    @Column({ type: "date", nullable: true })
+    completeDate: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
     updatedAt: Date
 
-    //Course Ordered (Courses, Total price)
-    @Field(() => ID)
-    @Column({ type: "uuid", length: 36 })
-    cartId: string
+    @Field(() => Float, { defaultValue: 0 })
+    @Column({ type: "float", default: 0 })
+    discountPrice: number
 
     @Field(() => Float, { defaultValue: 0 })
     @Column({ type: "float", default: 0 })
-    totalprice: number
+    totalPrice: number
 
-    @Field(() => Float, { defaultValue: 0 })
-    @Column({ type: "float", default: 0 })
-    discountprice: number
-    //Billing Informations (User)
-
-    @Field(() => ID)
-    @Column({ type: "uuid", length: 36 })
-    userId: string
+    @Field(() => Boolean, { defaultValue: false })
+    @Column({ type: "boolean", default: false })
+    isDeleted: Boolean
 
     //relations
     @Field(() => UserEntity)
     @ManyToOne(() => UserEntity, (user) => user.orders)
     @JoinColumn({ name: "userId" })
-    user?: UserEntity
-
-    @Field(() => CartEntity)
-    @OneToOne(() => CartEntity, (cart) => cart.courses)
-    @JoinColumn({ name: "cartId" })
-    cart: CartEntity;
+    user: UserEntity
 }

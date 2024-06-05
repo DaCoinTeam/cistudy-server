@@ -338,3 +338,15 @@ export class DeleteCourseReviewInput implements AuthInput<DeleteCourseReviewInpu
     userId: string;
     data: DeleteCourseReviewInputData;
 }
+
+export class CreateCourseCertificateInputData {
+    @IsUUID()
+    @ApiProperty()
+    courseId : string
+}
+
+export class CreateCourseCertificateInput implements AuthInput<CreateCourseCertificateInputData>{
+    @IsUUID("4")
+    userId: string
+    data: CreateCourseCertificateInputData  
+}
