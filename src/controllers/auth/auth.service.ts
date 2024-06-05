@@ -22,12 +22,7 @@ export class AuthService {
             email: data.email,
         })
         if (!found) throw new NotFoundException("User not found.")
-        else {
-            const existcart = await this.cartMySqlRepository.findOneBy({userId: found.userId})
-            if(!existcart){
-                await this.cartMySqlRepository.save({userId: found.userId})
-            }
-        }
+
         if (!this.sha256Service.verifyHash(data.password, found.password))
             throw new UnauthorizedException("Invalid credentials.")
         return found

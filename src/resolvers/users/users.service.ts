@@ -18,9 +18,9 @@ export class UsersService {
 
     async findOneUser(input: FindOneUserInput): Promise<UserMySqlEntity> {
         const { data } = input
-        const { params } = data
-        const { userId } = params
-        //const { followerId } = options
+        const { params, options } = data
+        const { userId} = params
+        const { followerId } = options
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -34,30 +34,30 @@ export class UsersService {
                 }
             })
 
-            // const follow = await queryRunner.manager.findOne(
-            //     FollowMySqlEnitity,
-            //     {
-            //         where: {
-            //             followerId,
-            //             followedUserId: userId,
-            //             followed: true
-            //         }
-            //     }
-            // )
+            const follow = await queryRunner.manager.findOne(
+                FollowMySqlEnitity,
+                {
+                    where: {
+                        followerId,
+                        followedUserId: userId,
+                        followed: true
+                    }
+                }
+            )
 
-            // const numberOfFollowersResult = await queryRunner.manager
-            //     .createQueryBuilder()
-            //     .select("COUNT(*)", "count")
-            //     .from(FollowMySqlEnitity, "follow")
-            //     .where("followedUserId = :userId", { userId })
-            //     .andWhere("followed = :followed", { followed: true })
-            //     .getRawOne()
+            const numberOfFollowersResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(FollowMySqlEnitity, "follow")
+                .where("followedUserId = :userId", { userId })
+                .andWhere("followed = :followed", { followed: true })
+                .getRawOne()
 
             await queryRunner.commitTransaction()
 
-            // user.numberOfFollowers = numberOfFollowersResult.count
-            // const followed = follow?.followed
-            // user.followed = followed ?? false
+            user.numberOfFollowers = numberOfFollowersResult.count
+            const followed = follow?.followed
+            user.followed = followed ?? false
 
             return user
         } catch (ex) {
