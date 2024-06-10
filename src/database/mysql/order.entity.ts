@@ -10,7 +10,7 @@ import {
 } from "typeorm"
 import { UserEntity } from "./user.entity"
 import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
-import { OrderCoursesEntity } from "./order-course.entity"
+import { OrderCourseEntity } from "./order-course.entity"
 import { OrderStatus } from "@common"
 
 @ObjectType()
@@ -29,9 +29,9 @@ export class OrderEntity {
     @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.Pending })
     orderStatus: OrderStatus
 
-    @Field(() => [OrderCoursesEntity], {nullable: true})
-    @OneToMany(() => OrderCoursesEntity, (order) => order.order)
-    orderCourses: OrderCoursesEntity
+    @Field(() => [OrderCourseEntity], {nullable: true})
+    @OneToMany(() => OrderCourseEntity, (orderCourse) => orderCourse.order)
+    orderCourses: Array<OrderCourseEntity>
 
     @Field(() => Date)
     @CreateDateColumn()
@@ -45,13 +45,9 @@ export class OrderEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @Field(() => Float, { defaultValue: 0 })
-    @Column({ type: "float", default: 0 })
-    discountPrice: number
-
-    @Field(() => Float, { defaultValue: 0 })
-    @Column({ type: "float", default: 0 })
-    totalPrice: number
+    @Field(() => Date, { nullable: true })
+    @Column({ type: "datetime", nullable: true })
+    paymentDue: Date
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ type: "boolean", default: false })

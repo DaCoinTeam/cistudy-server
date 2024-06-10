@@ -7,67 +7,78 @@ import {
     PrimaryGeneratedColumn,
     CreateDateColumn,
     UpdateDateColumn,
+    OneToOne,
 } from "typeorm"
 import { SectionEntity } from "./section.entity"
 import { ResourceEntity } from "./resource.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { ProcessStatus, VideoType } from "@common"
+import { QuizEntity } from "./quiz.entity"
+import { UserProgressEntity } from "./user-progress.entity"
 
 @ObjectType()
 @Entity("lecture")
 export class LectureEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-        lectureId: string
+    lectureId: string
 
     @Field(() => String)
     @Column({ type: "varchar", length: 150 })
-        title: string
+    title: string
 
     @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36, nullable: true })
-        thumbnailId?: string
+    thumbnailId?: string
 
     @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36, nullable: true })
-        lectureVideoId?: string
+    lectureVideoId?: string
 
     @Field(() => ID)
     @Column({ name: "sectionId", type: "uuid", length: 36 })
-        sectionId: string
+    sectionId: string
 
     @Field(() => String)
     @Column({ type: "enum", enum: ProcessStatus, default: ProcessStatus.Pending })
-        processStatus: ProcessStatus
+    processStatus: ProcessStatus
 
     @Field(() => String)
     @Column({ type: "enum", enum: VideoType, default: VideoType.MP4 })
-        videoType: VideoType
+    videoType: VideoType
 
     @Field(() => Int)
     @Column({ type: "int", default: 0 })
-        numberOfViews: number
+    numberOfViews: number
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", nullable: true })
-        description: string
+    description: string
 
     @Field(() => Date)
     @CreateDateColumn()
-        createdAt: Date
+    createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-        updatedAt: Date
+    updatedAt: Date
 
     @Field(() => SectionEntity)
     @ManyToOne(() => SectionEntity, (section) => section.lectures, {
         onDelete: "CASCADE",
     })
     @JoinColumn({ name: "sectionId" })
-        section: SectionEntity
+    section: SectionEntity
 
     @Field(() => [ResourceEntity])
     @OneToMany(() => ResourceEntity, (resource) => resource.lecture)
-        resources: Array<ResourceEntity>
+    resources: Array<ResourceEntity>
+
+    @Field(() => [QuizEntity], { nullable: true })
+    @OneToOne(() => QuizEntity, (quiz) => quiz.quizId, { nullable: true })
+    quiz?: QuizEntity
+
+    @Field(() => UserProgressEntity)
+    @OneToMany(() => UserProgressEntity, (userProgress) => userProgress.lecture)
+    userProgresses? : UserProgressEntity
 }

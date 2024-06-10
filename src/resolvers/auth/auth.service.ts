@@ -17,23 +17,31 @@ import { UserKind } from "@common"
 @Injectable()
 export class AuthService {
     constructor(
-    private readonly sha256Service: Sha256Service,
-    @InjectRepository(UserMySqlEntity)
-    private readonly userMySqlRepository: Repository<UserMySqlEntity>,
-    @InjectRepository(CartMySqlEntity)
-    private readonly cartMySqlRepository: Repository<CartMySqlEntity>,
-    private readonly firebaseService: FirebaseService,
-    ) {}
+        private readonly sha256Service: Sha256Service,
+        @InjectRepository(UserMySqlEntity)
+        private readonly userMySqlRepository: Repository<UserMySqlEntity>,
+        @InjectRepository(CartMySqlEntity)
+        private readonly firebaseService: FirebaseService,
+    ) { }
 
     async init(input: InitInput): Promise<UserMySqlEntity> {
-        return await this.userMySqlRepository.findOneBy(input)
+        const user = await this.userMySqlRepository.findOne({
+            where: {
+                userId: input.userId,
+            },
+           relations:{
+             cart :true,
+           }
+        })
+        console.log(user)
+        return user
     }
 
     async signIn(input: SignInInput): Promise<UserMySqlEntity> {
         const { data } = input
         const { params } = data
         const { email, password } = params
-        
+
         const found = await this.userMySqlRepository.findOneBy({
             email,
         })
@@ -64,7 +72,6 @@ export class AuthService {
                 avatarUrl: decoded.picture,
                 kind: UserKind.Google,
             })
-            await this.cartMySqlRepository.save({userId : found.userId})
         }
         return found
     }

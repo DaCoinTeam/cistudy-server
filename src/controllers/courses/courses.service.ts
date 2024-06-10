@@ -1,21 +1,25 @@
-import { ConflictException, Inject, Injectable, NotFoundException, InternalServerErrorException } from "@nestjs/common"
+import { ConflictException, Injectable, NotFoundException, InternalServerErrorException, ConsoleLogger } from "@nestjs/common"
 import {
     CategoryMySqlEntity,
-    CourseCertificateMySqlEntity,
+    CertificateMySqlEntity,
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
     CourseSubcategoryMySqlEntity,
     CourseTargetMySqlEntity,
     CourseTopicMySqlEntity,
     LectureMySqlEntity,
+    QuizQuestionAnswerMySqlEntity,
+    QuizMySqlEntity,
     ResourceMySqlEntity,
     SectionMySqlEntity,
     SubcategoyMySqlEntity,
     TopicMySqlEntity,
-    TransactionMongoEntity,
+    QuizQuestionMySqlEntity,
+    QuizQuestionMediaMySqlEntity,
+    UserProgressMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, DataSource } from "typeorm"
+import { Repository, DataSource, In } from "typeorm"
 import { StorageService } from "@global"
 import {
     CreateCourseInput,
@@ -39,17 +43,21 @@ import {
     CreateCourseReviewInput,
     UpdateCourseReviewInput,
     DeleteCourseReviewInput,
-    CreateCourseCertificateInput,
+    CreateCertificateInput,
+    CreateQuizInput,
+
+    UpdateQuizInput,
+    MarkLectureAsCompletedInput,
+
+
+
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
-import { ProcessStatus, VideoType, computeRaw, existKeyNotUndefined } from "@common"
-import { CreateCategoryOutput, CreateCourseCertificateOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteTopicOutputData, EnrollCourseOutput, UpdateCourseOutput, UpdateCourseReviewOutput } from "./courses.output"
+import { ProcessStatus, VideoType, existKeyNotUndefined } from "@common"
+import { CreateCategoryOutput, CreateCertificateOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteQuizOutput, DeleteTopicOutputData, EnrollCourseOutput, MarkLectureAsCompletedOutput, UpdateCourseOutput, UpdateCourseReviewOutput, UpdateQuizOutput } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
-import { InjectModel } from "@nestjs/mongoose"
-import { Model } from "mongoose"
-import { CACHE_MANAGER } from "@nestjs/cache-manager"
-import { Cache } from "cache-manager"
+import { QuizQuestionEntity } from "src/database/mysql/quiz-question.entity"
 
 @Injectable()
 export class CoursesService {
@@ -78,8 +86,18 @@ export class CoursesService {
         private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
         @InjectRepository(CourseReviewMySqlEntity)
         private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
-        @InjectRepository(CourseCertificateMySqlEntity)
-        private readonly courseCertificateMySqlEntity: Repository<CourseCertificateMySqlEntity>,
+        @InjectRepository(CertificateMySqlEntity)
+        private readonly courseCertificateMySqlEntity: Repository<CertificateMySqlEntity>,
+        @InjectRepository(QuizMySqlEntity)
+        private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+        @InjectRepository(QuizQuestionMySqlEntity)
+        private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
+        @InjectRepository(QuizQuestionAnswerMySqlEntity)
+        private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
+        @InjectRepository(QuizQuestionMediaMySqlEntity)
+        private readonly quizQuestionMediaMySqlRepository: Repository<QuizQuestionMediaMySqlEntity>,
+        @InjectRepository(UserProgressMySqlEntity)
+        private readonly userProgressMySqlRepository: Repository<UserProgressMySqlEntity>,
         // @InjectModel(TransactionMongoEntity.name) private readonly transactionMongoModel: Model<TransactionMongoEntity>,
         // @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         private readonly storageService: StorageService,
@@ -89,7 +107,7 @@ export class CoursesService {
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
         const { data, userId } = input
-        const { courseId, code } = data
+        const { courseId } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -142,7 +160,27 @@ export class CoursesService {
                 enrolled: true,
                 priceAtEnrolled: price
             })
+            const course = await this.courseMySqlRepository.findOne({
+                where: {
+                    courseId
+                },
+                relations: {
+                    sections: {
+                        lectures: true
+                    }
+                }
+            });
 
+            const userProgressData = course.sections.flatMap(section =>
+                section.lectures.map(lecture => ({
+                    userId,
+                    courseId,
+                    sectionId: section.sectionId,
+                    lectureId: lecture.lectureId,
+                }))
+            );
+
+            await this.userProgressMySqlRepository.save(userProgressData);
             await queryRunner.commitTransaction()
 
             return {
@@ -301,15 +339,15 @@ export class CoursesService {
 
     async updateCourseReview(input: UpdateCourseReviewInput): Promise<UpdateCourseReviewOutput> {
         const { data, userId } = input;
-        const { content, rating, reviewId } = data;
+        const { content, rating, courseReviewId } = data;
 
-        const reviewed = await this.courseReviewMySqlRepository.findOne({ where: { reviewId, userId } });
+        const reviewed = await this.courseReviewMySqlRepository.findOne({ where: { courseReviewId, userId } });
         if (!reviewed) {
             throw new NotFoundException("This review is not found or not owned by sender.")
         }
 
         if (content || rating) {
-            await this.courseReviewMySqlRepository.update(reviewId, {
+            await this.courseReviewMySqlRepository.update(courseReviewId, {
                 content,
                 rating
             });
@@ -321,11 +359,11 @@ export class CoursesService {
 
     async deleteCourseReview(input: DeleteCourseReviewInput): Promise<DeleteCourseReviewOutput> {
         const { data, userId } = input;
-        const { reviewId } = data;
+        const { courseReviewId } = data;
 
         const reviewed = await this.courseReviewMySqlRepository.findOne({
             where: {
-                reviewId,
+                courseReviewId,
                 userId
             }
         });
@@ -335,7 +373,7 @@ export class CoursesService {
             throw new NotFoundException("This review is not found or not owned by sender.");
         }
 
-        await this.courseReviewMySqlRepository.delete({ reviewId });
+        await this.courseReviewMySqlRepository.delete({ courseReviewId });
         return { message: "Review deleted successfully" }
     }
 
@@ -624,7 +662,7 @@ export class CoursesService {
         }
     }
 
-    async createCourseCertificate(input: CreateCourseCertificateInput): Promise<CreateCourseCertificateOutput> {
+    async createCourseCertificate(input: CreateCertificateInput): Promise<CreateCertificateOutput> {
         const { userId, data } = input
         const { courseId } = data
 
@@ -639,34 +677,328 @@ export class CoursesService {
             throw new ConflictException("This user already get certificate of this course")
         }
 
-        const course = await this.courseMySqlRepository.findOne({
-            where:{
-                courseId
-            }
-        })
 
         const achievedDate = new Date()
         const expireDate = new Date(achievedDate)
         expireDate.setDate(expireDate.getDate() + 90)
 
-        const created = await this.courseCertificateMySqlEntity.save({
+        const { certificateId } = await this.courseCertificateMySqlEntity.save({
             userId,
-            courseName: course.title,
-            course,
+            courseId,
             achievedDate,
             expireDate
         })
-        
+
         return {
             message: "Certificate Created Successfully",
             others: {
-                courseCertificateId: created.courseCertificateId,
+                certificateId
             }
         }
     }
 
+    async createQuiz(input: CreateQuizInput): Promise<string> {
+        const { data, files } = input;
+        const { lectureId, quizQuestions, timeLimit } = data;
+        //Tìm quiz trong db, nếu chưa có thì tạo mới, nếu có thì chỉ thêm question và answer
+        let availableQuiz = await this.quizMySqlRepository.findOneBy({ quizId: lectureId })
+
+        if (!availableQuiz) {
+            availableQuiz = await this.quizMySqlRepository.save({ quizId: lectureId, timeLimit })
+        }
+
+        if (!quizQuestions || quizQuestions.length === 0) {
+            throw new ConflictException("Please provide more than 1 question for the question");
+        }
+
+        const questionPromises: Array<Promise<void>> = []
+
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            for (const questions of quizQuestions) {
+                const { questionMedias, answers, question } = questions
+
+                const quizQuestion: DeepPartial<QuizQuestionMySqlEntity> = {
+                    quizId: lectureId,
+                    question,
+                    questionMedias: [],
+                }
+                if (files) {
+                    const mediaPromises: Array<Promise<void>> = []
+                    let mediaPosition = 0
+                    for (const questionMedia of questionMedias) {
+                        const { mediaIndex, mediaType } = questionMedia;
+
+                        const position = mediaPosition;
+                        const promise = async () => {
+                            const file = files.at(mediaIndex);
+                            const { assetId } = await this.storageService.upload({
+                                rootFile: file,
+                            });
+                            quizQuestion.questionMedias.push({
+                                position,
+                                mediaId: assetId,
+                                mediaType,
+                            } as QuizQuestionMediaMySqlEntity);
+                        };
+                        mediaPosition++;
+                        mediaPromises.push(promise());
+                    }
+                    await Promise.all(mediaPromises);
+                }
+
+                if (!answers || answers.length < 2) {
+                    throw new ConflictException("Question must have at least 2 answers");
+                }
+
+                const { quizQuestionId } = await this.quizQuestionMySqlRepository.save(quizQuestion)
+                const questionAnswers = answers.map(({ content, isCorrect }) => ({
+                    quizQuestionId,
+                    content,
+                    isCorrect,
+                }));
+
+                const hasCorrectAnswer = questionAnswers.some(answer => answer.isCorrect);
+
+                if (!hasCorrectAnswer) {
+                    throw new ConflictException("Quiz must have at least 1 correct answer");
+                }
+
+                await this.quizQuestionAnswerMySqlRepository.save(questionAnswers)
+                questionPromises.push()
+            }
+            await Promise.all(questionPromises)
+
+            return `A quiz with id ${availableQuiz.quizId} has been created successfully.`;
+
+        } catch (ex) {
+            await queryRunner.rollbackTransaction();
+            throw ex;
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
+    async updateQuiz(input: UpdateQuizInput): Promise<UpdateQuizOutput> {
+        const { data, files } = input
+        const { quizId, timeLimit, newQuestions, quizQuestionIdsToDelete, quizQuestionIdsToUpdate } = data
+
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            if (timeLimit) {
+                await this.quizMySqlRepository.update(quizId, { timeLimit })
+            }
+
+            if (newQuestions) {
+                const questionPromises: Array<Promise<void>> = []
+                for (const questions of newQuestions) {
+                    const { questionMedias, answers, question } = questions
+                    const quizQuestion: DeepPartial<QuizQuestionMySqlEntity> = {
+                        quizId,
+                        question,
+                        questionMedias: [],
+                    }
+
+                    if (files) {
+                        const mediaPromises: Array<Promise<void>> = []
+                        let mediaPosition = 0
+                        for (const questionMedia of questionMedias) {
+                            const { mediaIndex, mediaType } = questionMedia;
+
+                            const position = mediaPosition;
+                            const promise = async () => {
+                                const file = files.at(mediaIndex);
+                                const { assetId } = await this.storageService.upload({
+                                    rootFile: file,
+                                });
+                                quizQuestion.questionMedias.push({
+                                    position,
+                                    mediaId: assetId,
+                                    mediaType,
+                                } as QuizQuestionMediaMySqlEntity);
+                            };
+                            mediaPosition++;
+                            mediaPromises.push(promise());
+                        }
+                        await Promise.all(mediaPromises);
+                    }
+
+                    if (!answers || answers.length < 2) {
+                        throw new ConflictException("Question must have at least 2 answers");
+                    }
+
+                    const { quizQuestionId } = await this.quizQuestionMySqlRepository.save(quizQuestion)
+                    const questionAnswers = answers.map(({ content, isCorrect }) => ({
+                        quizQuestionId,
+                        content,
+                        isCorrect,
+                    }));
+
+                    const hasCorrectAnswer = questionAnswers.some(answer => answer.isCorrect);
+
+                    if (!hasCorrectAnswer) {
+                        throw new ConflictException("Quiz must have at least 1 correct answer");
+                    }
+
+                    await this.quizQuestionAnswerMySqlRepository.save(questionAnswers)
+                    questionPromises.push()
+                }
+                await Promise.all(questionPromises)
+            }
+
+            if (quizQuestionIdsToDelete) {
+
+                const numberOfQuizQuestions = await queryRunner.manager
+                    .createQueryBuilder()
+                    .select("COUNT(*)", "count")
+                    .from(QuizQuestionMySqlEntity, "quiz-question")
+                    .where("quiz-question.quizId = :quizId", { quizId })
+                    .getRawOne()
+
+                if (numberOfQuizQuestions.count - quizQuestionIdsToDelete.length < 1) {
+                    throw new ConflictException("Quiz must have at least 1 question")
+                }
+
+                const deletedQuizQuestionMedias = await this.quizQuestionMediaMySqlRepository.findBy({
+                    quizQuestionId: In(quizQuestionIdsToDelete)
+                })
+
+                const mediaIds = deletedQuizQuestionMedias.map((quizQuestionMediaIdsToDelete) => quizQuestionMediaIdsToDelete.mediaId)
+                await this.storageService.delete(...mediaIds)
+                await queryRunner.manager.delete(QuizQuestionMediaMySqlEntity, { mediaId: In(mediaIds) })
+                //await this.quizQuestionMediaMySqlRepository.delete({ mediaId: In(mediaIds) })
+                await queryRunner.manager.delete(QuizQuestionMySqlEntity, { quizQuestionId: In(quizQuestionIdsToDelete) })
+                //await this.quizQuestionMySqlRepository.delete({ quizQuestionId: In(quizQuestionIdsToDelete) })
+            }
+
+            if (quizQuestionIdsToUpdate) {
+                for (const updateQuestion of quizQuestionIdsToUpdate) {
+                    const {
+                        quizQuestionId,
+                        question,
+                        questionMedias,
+                        quizAnswerIdsToUpdate,
+                        quizAnswerIdsToDelete,
+                        newQuizQuestionAnswer,
+                        mediaIdsToDelete
+                    } = updateQuestion
+
+                    const currentQuestion: DeepPartial<QuizQuestionMySqlEntity> = {
+                        quizQuestionId,
+                        question,
+                    }
+
+                    if (files) {
+                        const promises: Array<Promise<void>> = []
+                        const mediaToSave = []
+                        let mediaPosition = 0
+                        for (const media of questionMedias) {
+                            const { mediaIndex, mediaType } = media
+
+                            const position = mediaPosition
+                            const promise = async () => {
+                                const file = files.at(mediaIndex)
+                                const { assetId } = await this.storageService.upload({
+                                    rootFile: file,
+                                })
+                                await queryRunner.manager.save(QuizQuestionMediaMySqlEntity, {
+                                    quizQuestionId,
+                                    mediaId: assetId,
+                                    position,
+                                    mediaType
+                                })
+                                // await this.quizQuestionMediaMySqlRepository.save({
+                                //     quizQuestionId,
+                                //     mediaId: assetId,
+                                //     position,
+                                //     mediaType
+                                // })
+                            }
+                            mediaPosition++
+                            promises.push(promise())
+                        }
+                        await Promise.all(promises)
+                    }
+
+                    if (newQuizQuestionAnswer) {
+                        const newQuizAnswers = newQuizQuestionAnswer.map(({ content, isCorrect }) => ({
+                            quizQuestionId,
+                            content,
+                            isCorrect
+                        }));
+
+                        //await queryRunner.manager.save(QuizQuestionAnswerMySqlEntity, newQuizAnswers)
+                        await this.quizQuestionAnswerMySqlRepository.save(newQuizAnswers)
+                    }
+
+                    if (quizAnswerIdsToUpdate) {
+                        let updateAnswers = []
+                        for (const answer of quizAnswerIdsToUpdate) {
+                            updateAnswers.push({
+                                quizQuestionAnswerId: answer.quizQuestionAnswerId,
+                                content: answer.content,
+                                isCorrect: answer.isCorrect
+                            })
+                        }
+
+                        await queryRunner.manager.save(QuizQuestionAnswerMySqlEntity, updateAnswers)
+                    }
+
+                    if (quizAnswerIdsToDelete) {
+                        await queryRunner.manager.delete(QuizQuestionAnswerMySqlEntity, { quizQuestionAnswerId: In(quizAnswerIdsToDelete) })
+                    }
+                    const numberOfCorrectQuizQuestionAnswersResult = await queryRunner.manager
+                        .createQueryBuilder()
+                        .select("COUNT(*)", "count")
+                        .from(QuizQuestionAnswerMySqlEntity, "quiz-question-answer")
+                        .where("quiz-question-answer.quizQuestionId = :quizQuestionId", { quizQuestionId })
+                        .andWhere("quiz-question-answer.isCorrect = :isCorrect", { isCorrect: true })
+                        .getRawOne()
+                    const numberOfQuizQuestionAnswersResult = await queryRunner.manager
+                        .createQueryBuilder()
+                        .select("COUNT(*)", "count")
+                        .from(QuizQuestionAnswerMySqlEntity, "quiz-question-answer")
+                        .where("quiz-question-answer.quizQuestionId = :quizQuestionId", { quizQuestionId })
+                        .getRawOne()
+
+                    if (numberOfQuizQuestionAnswersResult.count < 2) {
+                        throw new ConflictException("Question must have at least 2 answers")
+                    }
+                    console.log(numberOfCorrectQuizQuestionAnswersResult.count)
+                    if (numberOfCorrectQuizQuestionAnswersResult.count < 1) {
+                        throw new ConflictException("Quiz must have at least 1 correct answer")
+                    }
+
+                    if (mediaIdsToDelete) {
+                        await this.storageService.delete(...mediaIdsToDelete)
+                        await queryRunner.manager.delete(QuizQuestionMediaMySqlEntity, { mediaId: In(mediaIdsToDelete) })
+                    }
+
+                    await this.quizQuestionMySqlRepository.save(currentQuestion)
+                }
+            }
+            await queryRunner.commitTransaction()
+            return { message: "Quiz Updated Successfully" }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
+
+    }
+
+    async markLectureAsCompleted(input : MarkLectureAsCompletedInput) : Promise<MarkLectureAsCompletedOutput>{
+        const {data, userId} = input
+        const {lectureId} = data
+        await this.userProgressMySqlRepository.update({userId, lectureId}, {isCompleted : true})
+        return { message: "User had completed this lecture"}
+    }
+
 }
 
-interface CodeValue {
-    transactionHash: string;
-}

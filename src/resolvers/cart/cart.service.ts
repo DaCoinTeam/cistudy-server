@@ -2,8 +2,9 @@
 import { CartMySqlEntity, CartCourseMySqlEntity, OrderMySqlEntity } from "@database";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { FindManyUserOrdersInput, FindOneCartInput, FindOneOrderInput } from "./cart.input";
+import { FindManyUserOrdersOutputData } from "./cart.output";
 
 
 @Injectable()
@@ -15,19 +16,18 @@ export class CartService {
         private readonly cartCourseMySqlEntity: Repository<CartCourseMySqlEntity>,
         @InjectRepository(OrderMySqlEntity)
         private readonly orderMySqlEntity: Repository<OrderMySqlEntity>,
+        private readonly dataSource: DataSource
     ) { }
 
     async findOneCart(input: FindOneCartInput): Promise<CartMySqlEntity> {
-        const { data } = input
-        const { params } = data
-        const { cartId } = params
+        const { userId } = input
 
         const cart = await this.cartMySqlRepository.findOne({
             where: {
-                cartId,
+                cartId: userId,
             },
             relations: {
-                courses: {
+                cartCourses: {
                     course: true,
                     cart: true
                 }
@@ -49,27 +49,57 @@ export class CartService {
             relations: {
                 orderCourses: {
                     course: true
-                }
+                },
+
             }
         })
 
         return order
     }
 
-    async findManyUserOrder(input: FindManyUserOrdersInput): Promise<Array<OrderMySqlEntity>> {
+    async findManyUserOrders(input: FindManyUserOrdersInput): Promise<FindManyUserOrdersOutputData> {
         const { userId, data } = input
         const { options } = data
-        const { skip, take } = { ...options }
-        
-        const orders = await this.orderMySqlEntity.find({
-            where: {
-                userId
-            },
-            skip,
-            take,
-        })
-        console.log(orders)
-        return orders
+        const { skip, take, orderStatus } = { ...options }
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+        console.log(orderStatus)
+        try {
+            const results = await this.orderMySqlEntity.find(
+                {
+                    where: {
+                        userId,
+                        orderStatus
+                    },
+                    skip,
+                    take,
+                    relations: {
+                        orderCourses: {
+                            course: true
+                        }
+                    },
+                })
+            const numberOfUserOrdersResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(OrderMySqlEntity, "order")
+                .where("order.orderStatus = :orderStatus", { orderStatus })
+                .getRawOne()
+            return {
+                results,
+                metadata: {
+                    count: numberOfUserOrdersResult.count,
+                }
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
+
+        return
 
     }
 }

@@ -20,28 +20,33 @@ import {
 import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import {
     CreateCategoryInputData,
-    CreateCourseCertificateInputData,
-    CreateCourseInput,
-    CreateCourseReviewInput,
+    CreateCertificateInputData,
     CreateCourseReviewInputData,
     CreateCourseTargetInputData,
     CreateLectureInputData,
+    CreateQuizInputData,
     CreateResourcesInputData,
     CreateSectionInputData,
     CreateSubcategoryInputData,
     CreateTopicInputData,
+    DeleteQuizInputData,
     EnrollCourseInputData,
+    MarkLectureAsCompletedInputData,
     UpdateCourseInputData,
     UpdateCourseReviewInputData,
     UpdateCourseTargetInputData,
     UpdateLectureInputData,
+    UpdateQuizInputData,
+    //UpdateQuizInputData,
     UpdateSectionInputData,
 } from "./courses.input"
 
 import {
+    createQuizSchema,
     createResourcesSchema,
     createTopicSchema,
     updateCourseSchema,
+    updateQuizSchema,
 } from "./courses.schema"
 
 import { Files } from "@common"
@@ -133,16 +138,16 @@ export class CoursesController {
     }
 
     @ApiBearerAuth()
-    @Delete("delete-course-review/:reviewId")
+    @Delete("delete-course-review/:courseReviewId")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     async deleteCourseReview(
         @UserId() userId: string,
-        @Param("reviewId") reviewId: string,
+        @Param("courseReviewId") courseReviewId: string,
     ) {
         return this.coursesService.deleteCourseReview({
             userId,
-            data: { reviewId }
+            data: { courseReviewId }
         })
     }
 
@@ -383,8 +388,49 @@ export class CoursesController {
     @UseInterceptors(AuthInterceptor)
     async createCourseCertificate(
         @UserId() userId: string,
-        @Body() data: CreateCourseCertificateInputData,
+        @Body() data: CreateCertificateInputData,
     ) {
         return await this.coursesService.createCourseCertificate({ userId, data })
+    }
+
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: createQuizSchema })
+    @Post("create-quiz")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
+    async createQuiz(
+        @UserId() userId: string,
+        @DataFromBody() data: CreateQuizInputData,
+        @UploadedFiles() { files }: Files,
+    ) {
+        return await this.coursesService.createQuiz({ userId, data, files })
+    }
+
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: updateQuizSchema })
+    @Put("update-quiz")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
+    async updateQuiz(
+        @UserId() userId: string,
+        @DataFromBody() data: UpdateQuizInputData,
+        @UploadedFiles() { files }: Files,
+    ) {
+        return await this.coursesService.updateQuiz({ userId, data, files })
+    }
+
+    @ApiBearerAuth()
+    @Post("mark-lecture-complete")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async deleteQuiz(
+        @UserId() userId: string,
+        @Body() data: MarkLectureAsCompletedInputData
+    ) {
+        return await this.coursesService.markLectureAsCompleted({
+            userId, data
+        })
     }
 }

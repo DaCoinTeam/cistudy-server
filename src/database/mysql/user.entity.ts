@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToOne } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToOne, JoinColumn, Generated } from "typeorm"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { UserKind, UserRole } from "@common"
 import { SessionEntity } from "./session.entity"
@@ -12,7 +12,9 @@ import { CryptoWalletEntity } from "./crypto-wallet.entity"
 import { CourseReviewEntity } from "./course-review.entity"
 import { CartEntity } from "./cart.entity"
 import { OrderEntity } from "./order.entity"
-import { CourseCertificateEntity } from "./course-certificate"
+import { CertificateEntity } from "./certificate"
+import { UserProgressEntity } from "./user-progress.entity"
+import { QuizAttemptEntity } from "./quiz-attempt.entity"
 
 
 @ObjectType()
@@ -20,35 +22,35 @@ import { CourseCertificateEntity } from "./course-certificate"
 export class UserEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-        userId: string
+    userId: string
 
     @Field(() => String)
     @Column({ type: "varchar", length: 50, default: null })
-        email: string
+    email: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 64, default: null })
-        password: string
+    password: string
 
     @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36, default: null })
-        avatarId: string
+    avatarId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 200, default: null })
-        avatarUrl: string
+    avatarUrl: string
 
     @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36, default: null })
-        coverPhotoId: string
+    coverPhotoId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 12, default: null })
-        phoneNumber: string
+    phoneNumber: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 60, default: null })
-        username: string
+    username: string
 
     @Field(() => Float, { nullable: true })
     @Column({
@@ -57,7 +59,7 @@ export class UserEntity {
         scale: 5,
         default: 0,
     })
-        balance: number
+    balance: number
 
     @Field(() => String)
     @Column({
@@ -65,30 +67,30 @@ export class UserEntity {
         enum: UserRole,
         default: UserRole.User,
     })
-        userRole: UserRole
+    userRole: UserRole
 
     @Field(() => ID, { nullable: true })
     @Column({
         type: "uuid",
         default: null,
     })
-        walletId: string
+    walletId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 50, default: null })
-        firstName: string
+    firstName: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 50, default: null })
-        lastName: string
+    lastName: string
 
     @Field(() => Date, { nullable: true })
     @Column({ type: "date", default: null })
-        birthdate: Date
+    birthdate: Date
 
     @Field(() => Boolean)
     @Column({ type: "boolean", default: false })
-        verified: boolean
+    verified: boolean
 
     @Field(() => String)
     @Column({
@@ -96,71 +98,80 @@ export class UserEntity {
         enum: UserKind,
         default: UserKind.Local,
     })
-        kind: UserKind
+    kind: UserKind
 
     @Field(() => Date)
     @CreateDateColumn()
-        createdAt: Date
-    
+    createdAt: Date
+
     @Field(() => Date)
     @UpdateDateColumn()
-        updatedAt: Date
+    updatedAt: Date
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 128, default: null })
-        externalId: string
+    externalId: string
 
     @OneToMany(() => SessionEntity, (session) => session.user)
-        sessions: Array<SessionEntity>
+    sessions: Array<SessionEntity>
 
     @OneToMany(() => PostCommentEntity, (postComment) => postComment.creator)
-        postComments: Array<PostCommentEntity>
+    postComments: Array<PostCommentEntity>
 
     @OneToMany(() => PostLikeEntity, (postReact) => postReact.user)
-        postReacts: Array<PostLikeEntity>
+    postReacts: Array<PostLikeEntity>
 
     @OneToMany(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.user)
-        enrolledInfos: Array<EnrolledInfoEntity>
+    enrolledInfos: Array<EnrolledInfoEntity>
 
     @Field(() => [CryptoWalletEntity])
     @OneToMany(() => CryptoWalletEntity, (cryptoWallet) => cryptoWallet.user)
-        cryptoWallets: Array<CourseEntity>
+    cryptoWallets: Array<CourseEntity>
 
     @Field(() => [PostEntity])
     @OneToMany(() => PostEntity, (post) => post.creator)
-        posts: Array<PostEntity>
+    posts: Array<PostEntity>
 
     @Field(() => [CourseEntity])
     @OneToMany(() => CourseEntity, (course) => course.creator)
-        courses: Array<CourseEntity>
+    courses: Array<CourseEntity>
 
     @Field(() => [FollowEntity])
     @OneToMany(() => FollowEntity, (user) => user.follower)
-        followerRelations: Array<FollowEntity>
+    followerRelations: Array<FollowEntity>
 
     @Field(() => [FollowEntity])
     @OneToMany(() => FollowEntity, (user) => user.followedUser)
-        followedUserRelations: Array<FollowEntity>
+    followedUserRelations: Array<FollowEntity>
 
-    @Field(()=> CourseReviewEntity)
-    @ManyToOne(() => CourseReviewEntity, (courseReview) => courseReview.user, {nullable: true})
+    @Field(() => CourseReviewEntity)
+    @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.user, { nullable: true })
     courseReview: CourseReviewEntity
 
     @Field(() => CartEntity)
-    @OneToOne(() => CartEntity, (cart) => cart.user)
+    @OneToOne(() => CartEntity, (cart) => cart.cartId)
+    @JoinColumn()
     cart: CartEntity;
 
     @Field(() => OrderEntity)
-    @OneToMany(()=> OrderEntity, (orders) => orders.user)
+    @OneToMany(() => OrderEntity, (orders) => orders.user)
     orders: OrderEntity
-    
-    @Field(() => CourseCertificateEntity)
-    @OneToMany(()=> CourseCertificateEntity, (certificates) => certificates.user)
-    certificates: CourseCertificateEntity
+
+    @Field(() => CertificateEntity)
+    @OneToMany(() => CertificateEntity, (certificates) => certificates.user, { nullable: true })
+    certificates?: Array<CertificateEntity>
+
+    @Field(() => UserProgressEntity)
+    @OneToMany(() => UserProgressEntity, (progress) => progress.user, {nullable: true })
+    courseProgresses? : Array<UserProgressEntity>
+
+    @Field(() => QuizAttemptEntity)
+    @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.user, {nullable : true})
+    quizAttempts? : Array<QuizAttemptEntity>
 
     //graphql
     @Field(() => Boolean)
-        followed?: boolean
+    followed?: boolean
     @Field(() => Int)
-        numberOfFollowers?: number
+    numberOfFollowers?: number
 }

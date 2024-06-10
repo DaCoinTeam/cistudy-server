@@ -25,9 +25,14 @@ import { CourseReviewEntity as CourseReviewMySqlEntity } from "./course-review.e
 import { CartEntity as CartMySqlEntity } from "./cart.entity"
 import { CartCourseEntity as CartCourseMySqlEntity } from "./cart-course.enity"
 import { OrderEntity as OrderMySqlEntity } from "./order.entity"
-import { CourseCertificateEntity as CourseCertificateMySqlEntity } from "./course-certificate"
-import { OrderCoursesEntity as OrderCoursesMySqlEntity } from "./order-course.entity"
-
+import { CertificateEntity as CertificateMySqlEntity } from "./certificate"
+import { OrderCourseEntity as OrderCourseMySqlEntity } from "./order-course.entity"
+import { QuizEntity as QuizMySqlEntity } from "./quiz.entity"
+import { QuizQuestionEntity as QuizQuestionMySqlEntity } from "./quiz-question.entity"
+import { QuizQuestionAnswerEntity as QuizQuestionAnswerMySqlEntity } from "./quiz-question-answer.entity"
+import { QuizQuestionMediaEntity as QuizQuestionMediaMySqlEntity } from "./quiz-question-media.entity"
+import { UserProgressEntity as UserProgressMySqlEntity } from "./user-progress.entity"
+import { QuizAttemptEntity as QuizAttemptMySqlEntity} from "./quiz-attempt.entity"
 export {
     UserMySqlEntity,
     PostMySqlEntity,
@@ -56,7 +61,12 @@ export {
     CartMySqlEntity,
     CartCourseMySqlEntity,
     OrderMySqlEntity,
-    OrderCoursesMySqlEntity,
-    CourseCertificateMySqlEntity
-
+    OrderCourseMySqlEntity,
+    CertificateMySqlEntity,
+    QuizMySqlEntity,
+    QuizQuestionMySqlEntity,
+    QuizQuestionAnswerMySqlEntity,
+    QuizQuestionMediaMySqlEntity,
+    QuizAttemptMySqlEntity,
+    UserProgressMySqlEntity
 }

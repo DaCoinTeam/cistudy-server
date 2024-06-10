@@ -152,18 +152,18 @@ export class FindOneCourseReviewInput implements Input<FindOneCourseReviewInputD
     data: FindOneCourseReviewInputData
 }
 @InputType()
-export class FindManyCourseReviewInputParams{
+export class FindManyCourseReviewsInputParams{
     @Field(() => ID)
     courseId : string
 }
 
 @InputType()
-export class FindManyCourseReviewInputData implements ParamsOnly<FindManyCourseReviewInputParams> {
-    @Field(() => FindManyCourseReviewInputParams)
-    params: FindManyCourseReviewInputParams
+export class FindManyCourseReviewsInputData implements ParamsOnly<FindManyCourseReviewsInputParams> {
+    @Field(() => FindManyCourseReviewsInputParams)
+    params: FindManyCourseReviewsInputParams
 }
 
 @InputType()
-export class FindManyCourseReviewInput{
-    data: FindManyCourseReviewInputData
+export class FindManyCourseReviewsInput{
+    data: FindManyCourseReviewsInputData
 }

@@ -21,7 +21,7 @@ import {
     FindManyCourseTargetsInput,
     FindOneCourseAuthInput,
     FindOneCourseReviewInput,
-    FindManyCourseReviewInput,
+    FindManyCourseReviewsInput,
 } from "./courses.input"
 import { FindManyCoursesOutputData } from "./courses.output"
 import { SubcategoryEntity } from "src/database/mysql/subcategory.entity"
@@ -51,7 +51,7 @@ export class CoursesService {
         private readonly dataSource: DataSource
     ) { }
 
-    async findAllCourseReview(input: FindManyCourseReviewInput): Promise<Array<CourseReviewMySqlEntity>> {
+    async findManyCourseReviews(input: FindManyCourseReviewsInput): Promise<Array<CourseReviewMySqlEntity>> {
         const { data } = input;
         const { params } = data;
         const { courseId } = params;
@@ -365,10 +365,20 @@ export class CoursesService {
             where: {
                 sectionId
             },
+            
             relations: {
                 resources: true,
+                quiz:{
+                    questions:{
+                        questionMedias: true,
+                        answers: true
+                    }
+                }
             },
+
         })
+        
+        
     }
 
     async findManyResources(

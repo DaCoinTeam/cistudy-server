@@ -17,7 +17,7 @@ import { UserEntity } from "./user.entity"
 export class CourseReviewEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-        reviewId: string
+        courseReviewId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })

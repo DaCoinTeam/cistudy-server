@@ -21,9 +21,10 @@ import { CourseSubcategoryEntity } from "./course-subcategory.entity"
 import { CategoryEntity } from "./category.entity"
 import { CourseReviewEntity } from "./course-review.entity"
 import { CartCourseEntity } from "./cart-course.enity"
-import { CourseCertificateEntity } from "./course-certificate"
+import { CertificateEntity } from "./certificate"
 import { OrderEntity } from "./order.entity"
-import { OrderCoursesEntity } from "./order-course.entity"
+import { OrderCourseEntity } from "./order-course.entity"
+import { UserProgressEntity } from "./user-progress.entity"
 
 interface CourseIncludes {
     time: number;
@@ -143,13 +144,13 @@ export class CourseEntity {
     @OneToMany(() => CartCourseEntity, (cartCourse) => cartCourse.course)
     cartCourses?: CartCourseEntity;
 
-    @Field(() => [CourseCertificateEntity])
-    @OneToMany(() => CourseCertificateEntity, (certificate) => certificate.course)
-    courseCertificate?: CourseCertificateEntity;
+    @Field(() => [CertificateEntity])
+    @OneToMany(() => CertificateEntity, (certificate) => certificate.course)
+    certificate?: CertificateEntity;
 
-    @Field(() => [OrderCoursesEntity])
-    @OneToMany(() => OrderCoursesEntity, (orders) => orders.course)
-    orders: OrderCoursesEntity
+    @Field(() => [OrderCourseEntity])
+    @OneToMany(() => OrderCourseEntity, (orders) => orders.course)
+    orderCourses: OrderCourseEntity
 
     //graphql
     @Field(() => Int, { nullable: true })
@@ -161,4 +162,8 @@ export class CourseEntity {
     @Field(() => CourseReviewEntity, { nullable: true })
     @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.course)
     courseReview?: CourseReviewEntity
+
+    @Field(() => UserProgressEntity)
+    @OneToMany(() => UserProgressEntity, (userProgress) => userProgress.course, {nullable: true})
+    progresses? : Array<UserProgressEntity>
 }

@@ -30,7 +30,7 @@ export class UsersService {
             const user = await queryRunner.manager.findOne(UserMySqlEntity, {
                 where: { userId },
                 relations: {
-                    cart: true
+                    //cart: true
                 }
             })
 

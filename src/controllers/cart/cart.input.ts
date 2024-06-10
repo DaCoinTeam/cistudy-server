@@ -2,56 +2,39 @@ import { AuthEmptyDataInput, AuthInput } from "@common";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsUUID } from "class-validator";
 
-export class CreateCartInput implements AuthEmptyDataInput{
-    @IsUUID("4")
-    userId: string
-}
 
-export class CreateCourseCartInputData {
-    @IsUUID(4)
+export class AddToCartInputData {
+    @IsUUID("4")
     @ApiProperty()
     courseId : string
-    @ApiProperty()
-    cartId : string
 }
 
-export class AddCourseCartInput implements AuthInput<CreateCourseCartInputData>{
+export class AddToCartInput implements AuthInput<AddToCartInputData>{
     @IsUUID("4")
     userId: string
     @ApiProperty()
-    data: CreateCourseCartInputData
+    data: AddToCartInputData
 }
 
-export class DeleteCartCourseData {
+export class DeleteFromCartInputData {
     @ApiProperty()
     cartCourseIds : string[]
 }
 
-export class DeleteCartCourseDataInput implements AuthInput<DeleteCartCourseData>{
+export class DeleteFromCartInput implements AuthInput<DeleteFromCartInputData>{
     @IsUUID("4")
     userId: string;
-    data: DeleteCartCourseData;
+    data: DeleteFromCartInputData;
 }
 
-export class DeleteCartData {
-    @IsUUID("4")
+
+export class CheckOutInputData {
     @ApiProperty()
-    cartId : string
+    cartCourseIds: string[]
 }
 
-export class DeleteCartDataInput implements AuthInput<DeleteCartData>{
-    @IsUUID("4")
-    userId: string;
-    data: DeleteCartData;
-}
-
-export class CreateOrderInputData {
-    @ApiProperty()
-    courseIds: string[]
-}
-
-export class CreateOrderInput implements AuthInput<CreateOrderInputData>{
+export class CheckOutInput implements AuthInput<CheckOutInputData>{
     @IsUUID("4")
     userId: string
-    data: CreateOrderInputData;
+    data: CheckOutInputData;
 }

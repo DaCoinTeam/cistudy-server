@@ -1,6 +1,6 @@
-import { Output } from "@common"
+import { AuthOutput, Output } from "@common"
 import { ApiProperty, ApiResponse } from "@nestjs/swagger"
-import { IsOptional } from "class-validator"
+import { IsOptional, IsUUID } from "class-validator"
 
 export class CreateCourseOutputOthers {
     @ApiProperty()
@@ -70,12 +70,24 @@ export class DeleteCourseReviewOutput implements Output {
     message: string
 }
 
-export class CreateCourseCertificateOutputOthers {
+export class CreateCertificateOutputOthers {
     @ApiProperty()
-    courseCertificateId: string
+    certificateId: string
 }
 
-export class CreateCourseCertificateOutput implements Output<CreateCourseCertificateOutputOthers> {
+export class CreateCertificateOutput implements Output<CreateCertificateOutputOthers> {
     message: string
-    others?: CreateCourseCertificateOutputOthers;
+    others?: CreateCertificateOutputOthers;
+}
+
+export class DeleteQuizOutput implements Output {
+    message: string
+}
+
+export class UpdateQuizOutput implements Output{
+    message: string;
+}
+
+export class MarkLectureAsCompletedOutput implements Output{
+    message: string
 }

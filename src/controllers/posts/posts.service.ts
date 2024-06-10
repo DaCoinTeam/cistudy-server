@@ -82,7 +82,7 @@ export class PostsService {
         }
 
         const promises: Array<Promise<void>> = []
-
+        console.log("tong so hinh la :" + postMedias.length)
         let mediaPosition = 0
         for (const postMedia of postMedias) {
             const { mediaIndex, mediaType } = postMedia

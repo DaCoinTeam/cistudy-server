@@ -4,13 +4,15 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
+    OneToOne,
+    PrimaryColumn,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 
 } from "typeorm"
 import { CourseEntity } from "./course.entity"
 
-import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { CartEntity } from "./cart.entity"
 
 
@@ -25,7 +27,7 @@ export class CartCourseEntity {
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
     cartId: string
-
+    
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
     courseId: string
@@ -39,12 +41,12 @@ export class CartCourseEntity {
     updatedAt: Date
     // Relations
     @Field(() => CourseEntity)
-    @ManyToOne(() => CourseEntity, (course) => course.cartCourses, { onDelete: "CASCADE"})
+    @ManyToOne(() => CourseEntity, (course) => course.cartCourses)
     @JoinColumn({ name: "courseId" })
     course: CourseEntity;
 
     @Field(() => CartEntity)
-    @ManyToOne(() => CartEntity, (cart) => cart.courses, { onDelete: "CASCADE"})
+    @ManyToOne(() => CartEntity, (cart) => cart.cartCourses, { onDelete: "CASCADE"})
     @JoinColumn({ name: "cartId" })
     cart: CartEntity;
 

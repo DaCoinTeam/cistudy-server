@@ -15,7 +15,8 @@ import {
     PostCommentLikeMySqlEntity,
     FollowMySqlEnitity,
     CartMySqlEntity,
-    CourseCertificateMySqlEntity,
+    CertificateMySqlEntity,
+    QuizAttemptMySqlEntity,
 
 } from "@database"
 import { UsersService } from "./users.service"
@@ -36,7 +37,8 @@ import { UsersService } from "./users.service"
             PostCommentLikeMySqlEntity,
             FollowMySqlEnitity,
             CartMySqlEntity,
-            CourseCertificateMySqlEntity
+            CertificateMySqlEntity,
+            QuizAttemptMySqlEntity
         ]),
     ],
     controllers: [UsersController],

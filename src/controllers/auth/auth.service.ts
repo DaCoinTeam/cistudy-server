@@ -44,7 +44,6 @@ export class AuthService {
   	const created = await this.userMySqlRepository.save(data)
 	//create cart here
   	await this.mailerService.sendMail(created.userId, data.email)
-    await this.cartMySqlRepository.save({ userId: created.userId})
   	return `An user with id ${created.userId} has been created`
     }
 }

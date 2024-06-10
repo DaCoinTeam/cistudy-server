@@ -6,6 +6,7 @@ import {
     ManyToOne,
     OneToMany,
     OneToOne,
+    PrimaryColumn,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm"
@@ -19,20 +20,12 @@ import { OrderEntity } from "./order.entity"
 export class CartEntity {
     //Fields
     @Field(() => ID)
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryColumn("uuid")
     cartId: string
-
-    @Field(() => ID)
-    @Column({ type: "uuid", length: 36 })
-    userId: string
-
-    @Field(() => Float, { defaultValue: 0 })
-    @Column({ type: "float", default: 0 })
-    totalprice: number
 
     @Field(() => [CartCourseEntity], { nullable: true })
     @OneToMany(() => CartCourseEntity, (course) => course.cart)
-    courses: Array<CartCourseEntity>;
+    cartCourses: Array<CartCourseEntity>;
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ type: "boolean", default: false })
@@ -46,11 +39,8 @@ export class CartEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    //relations
     @Field(() => UserEntity)
-    @OneToOne(() => UserEntity, (user) => user.cart, { onDelete: "CASCADE"})
-    @JoinColumn({ name: "userId" })
+    @OneToOne(() => UserEntity, (user) => user.cart)
+    @JoinColumn({ name: "cartId" })
     user: UserEntity
-
-
 }

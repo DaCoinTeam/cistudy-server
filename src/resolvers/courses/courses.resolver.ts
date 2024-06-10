@@ -1,5 +1,5 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
-import { FindOneCourseInputData, FindManyCoursesInputData, FindManyLecturesInputData, FindManyResourcesInputData, FindOneLectureInputData, FindManyCourseTargetsInputData, FindOneCourseAuthInputData, FindOneCourseReviewInputData, FindManyCourseReviewInputData } from "./courses.input"
+import { FindOneCourseInputData, FindManyCoursesInputData, FindManyLecturesInputData, FindManyResourcesInputData, FindOneLectureInputData, FindManyCourseTargetsInputData, FindOneCourseAuthInputData, FindOneCourseReviewInputData, FindManyCourseReviewsInputData } from "./courses.input"
 import { CoursesService } from "./courses.service"
 import { CategoryMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity } from "@database"
 import { FindManyCourseTargetsOutput, FindManyCoursesOutputData, FindManyLecturesOutput, FindManyResourcesOutput, FindOneCourseAuthOutput, FindOneLectureOutput } from "./courses.output"
@@ -66,9 +66,10 @@ export class CoursesResolver {
     async findOneCourseReview(@Args("data") data: FindOneCourseReviewInputData) {
         return await this.coursesService.findOneCourseReview({ data })
     }
+    
     @Query(() => [CourseReviewMySqlEntity])
-    async findManyCourseReview(@Args("data") data : FindManyCourseReviewInputData) {
-        return await this.coursesService.findAllCourseReview({data})
+    async findManyCourseReviews(@Args("data") data : FindManyCourseReviewsInputData) {
+        return await this.coursesService.findManyCourseReviews({data})
     }
 
 }

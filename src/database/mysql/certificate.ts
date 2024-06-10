@@ -1,33 +1,29 @@
 import {
-    BeforeInsert,
     Column,
     CreateDateColumn,
     Entity,
-    JoinColumn, ManyToOne, OneToMany,
-    OneToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from "typeorm"
+    JoinColumn, ManyToOne, 
+    PrimaryGeneratedColumn} from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { CourseEntity } from "./course.entity"
 import { UserEntity } from "./user.entity"
 
 
 @ObjectType()
-@Entity("course-certificate")
-export class CourseCertificateEntity {
+@Entity("certificate")
+export class CertificateEntity {
 
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    courseCertificateId: string
-
-    @Field(() => ID)
-    @Column({ type: "uuid", length: 36 })
-    userId: string
+    certificateId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
     courseId: string
+
+    @Field(() => ID)
+    @Column({ type: "uuid", length: 36 })
+    userId: string
 
     @Field(() => Date)
     @CreateDateColumn()
@@ -48,7 +44,7 @@ export class CourseCertificateEntity {
     user: UserEntity
 
     @Field(() => CourseEntity, { nullable: true })
-    @ManyToOne(() => CourseEntity, (course) => course.courseCertificate)
+    @ManyToOne(() => CourseEntity, (course) => course.certificate)
     @JoinColumn({ name: "courseId" })
     course: CourseEntity
 

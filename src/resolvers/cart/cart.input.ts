@@ -1,35 +1,23 @@
-import { ParamsOnly, Input, AuthInput, OptionsOnly } from "@common";
+import { ParamsOnly, Input, AuthInput, OptionsOnly, AuthEmptyDataInput, OrderStatus } from "@common";
 import { OrderMySqlEntity } from "@database";
 import { Field, ID, InputType, Int } from "@nestjs/graphql";
 import { IsOptional } from "class-validator";
 
-@InputType()
-export class FindOneCartInputParams {
-    @Field(() => ID)
-        cartId: string
-}
 
-@InputType()
-export class FindOneCartInputData implements ParamsOnly<FindOneCartInputParams> {
-    @Field(() => FindOneCartInputParams)
-        params: FindOneCartInputParams
-}
-
-export class FindOneCartInput implements AuthInput<FindOneCartInputData> {
+export class FindOneCartInput implements AuthEmptyDataInput {
     userId: string;
-    data: FindOneCartInputData
 }
 
 @InputType()
 export class FindOneOrderInputParams {
     @Field(() => ID)
-        orderId: string
+    orderId: string
 }
 
 @InputType()
 export class FindOneOrderInputData implements ParamsOnly<FindOneOrderInputParams> {
     @Field(() => FindOneOrderInputParams)
-        params: FindOneOrderInputParams
+    params: FindOneOrderInputParams
 }
 
 export class FindOneOrderInput implements AuthInput<FindOneOrderInputData> {
@@ -41,22 +29,23 @@ export class FindOneOrderInput implements AuthInput<FindOneOrderInputData> {
 @InputType()
 export class FindManyUserOrdersInputOptions {
     @Field(() => Int, { nullable: true })
-        take?: number
+    take?: number
     @Field(() => Int, { nullable: true })
-        skip?: number
+    skip?: number
+    @Field(() => String)
+    orderStatus: OrderStatus
 }
 
 @InputType()
 export class FindManyUserOrdersInputData
-implements
-    OptionsOnly<FindManyUserOrdersInputOptions>
-{
+    implements
+    OptionsOnly<FindManyUserOrdersInputOptions> {
     @Field(() => FindManyUserOrdersInputOptions, { nullable: true })
-    @IsOptional()
-        options?: FindManyUserOrdersInputOptions
+    options?: FindManyUserOrdersInputOptions
 }
 
 export class FindManyUserOrdersInput implements AuthInput<FindManyUserOrdersInputData> {
     userId: string;
     data: FindManyUserOrdersInputData
 }
+

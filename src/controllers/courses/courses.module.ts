@@ -24,7 +24,12 @@ import {
     CourseReviewMySqlEntity,
     CartMySqlEntity,
     CartCourseMySqlEntity,
-    CourseCertificateMySqlEntity
+    CertificateMySqlEntity,
+    QuizMySqlEntity,
+    QuizQuestionMediaMySqlEntity,
+    QuizQuestionMySqlEntity,
+    QuizQuestionAnswerMySqlEntity,
+    UserProgressMySqlEntity
 } from "@database"
 import { CoursesService } from "./courses.service"
 import { MongooseModule } from "@nestjs/mongoose"
@@ -53,7 +58,13 @@ import { MongooseModule } from "@nestjs/mongoose"
             CourseReviewMySqlEntity,
             CartMySqlEntity,
             CartCourseMySqlEntity,
-            CourseCertificateMySqlEntity
+            CertificateMySqlEntity,
+            QuizMySqlEntity,
+            QuizQuestionMediaMySqlEntity,
+            QuizQuestionMySqlEntity,
+            QuizQuestionAnswerMySqlEntity,
+            QuizQuestionMediaMySqlEntity,
+            UserProgressMySqlEntity,
         ]),
     ],
     controllers: [CoursesController],
