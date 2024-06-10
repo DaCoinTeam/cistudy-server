@@ -717,10 +717,16 @@ input FindOneCourseReviewInputParams {
 
 input FindManyCourseReviewsInputData {
   params: FindManyCourseReviewsInputParams!
+  options: FindManyCourseReviewsInputOptions
 }
 
 input FindManyCourseReviewsInputParams {
   courseId: ID!
+}
+
+input FindManyCourseReviewsInputOptions {
+  take: Int
+  skip: Int
 }
 
 input FindOnePostInputData {

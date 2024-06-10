@@ -53,22 +53,24 @@ export class CoursesService {
 
     async findManyCourseReviews(input: FindManyCourseReviewsInput): Promise<Array<CourseReviewMySqlEntity>> {
         const { data } = input;
-        const { params } = data;
+        const { params, options } = data;
         const { courseId } = params;
-    
+        const { skip, take } = options
 
         const result = await this.courseReviewMySqlRepository.find({
             where: { courseId },
-            relations:{
-                course:true,
-                user:true
+            skip,
+            take,
+            relations: {
+                course: true,
+                user: true
             },
-            order: { createdAt: 'DESC' } 
+            order: { createdAt: 'DESC' }
         });
-    
+
         return result;
     }
-    
+
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
         const { data } = input
@@ -253,16 +255,16 @@ export class CoursesService {
                     where: {
                         name: searchValue ? Like(`%${searchValue}%`) : undefined
                     },
-                    relations:{
-                        courseTopics : true
+                    relations: {
+                        courseTopics: true
                     }
                 })
 
 
             const results = await this.courseMySqlRepository.find(
-                {   
-                    where :{
-                        title : Like(`%${searchValue}%`)
+                {
+                    where: {
+                        title: Like(`%${searchValue}%`)
                     },
                     skip,
                     take,
@@ -365,11 +367,11 @@ export class CoursesService {
             where: {
                 sectionId
             },
-            
+
             relations: {
                 resources: true,
-                quiz:{
-                    questions:{
+                quiz: {
+                    questions: {
                         questionMedias: true,
                         answers: true
                     }
@@ -377,8 +379,8 @@ export class CoursesService {
             },
 
         })
-        
-        
+
+
     }
 
     async findManyResources(
