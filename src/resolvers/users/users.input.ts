@@ -1,6 +1,7 @@
 import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@common"
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
-import { IsUUID } from "class-validator"
+import { IsOptional, IsUUID } from "class-validator"
+
 
 @InputType()
 export class FindOneUserInputParams {
@@ -12,6 +13,7 @@ export class FindOneUserInputParams {
 @InputType()
 export class FindOneUserInputOptions {
     @Field(() => ID, { nullable: true })
+    @IsOptional()
         followerId?: string
 }
 
@@ -20,6 +22,7 @@ export class FindOneUserInputData implements ParamsWithOptions<FindOneUserInputP
     @Field(() => FindOneUserInputParams)
         params: FindOneUserInputParams
     @Field(() => FindOneUserInputOptions, { nullable: true })
+    @IsOptional()
         options?: FindOneUserInputOptions
 }
 

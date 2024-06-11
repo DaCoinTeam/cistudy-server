@@ -1,10 +1,10 @@
-import { Output, AuthTokens } from "@common"
+import { AuthOutput, AuthTokens } from "@common"
 import { UserMySqlEntity } from "@database"
 import { Field, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
 export class InitOutput
-implements Output<UserMySqlEntity>
+implements AuthOutput<UserMySqlEntity>
 {
   @Field(() => UserMySqlEntity)
       data: UserMySqlEntity
@@ -14,7 +14,7 @@ implements Output<UserMySqlEntity>
 
 @ObjectType()
 export class SignInOutput
-implements Output<UserMySqlEntity>
+implements AuthOutput<UserMySqlEntity>
 {
   @Field(() => UserMySqlEntity)
       data: UserMySqlEntity
@@ -24,7 +24,7 @@ implements Output<UserMySqlEntity>
 
 @ObjectType()
 export class VerifyGoogleAccessTokenOutput
-implements Output<UserMySqlEntity>
+implements AuthOutput<UserMySqlEntity>
 {
   @Field(() => UserMySqlEntity)
       data: UserMySqlEntity

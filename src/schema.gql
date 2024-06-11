@@ -18,6 +18,72 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type QuizQuestionAnswerEntity {
+  quizQuestionAnswerId: ID!
+  quizQuestionId: ID!
+  content: String!
+  isCorrect: Boolean!
+  quizQuestion: [QuizQuestionEntity!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type QuizQuestionMediaEntity {
+  quizQuestionMediaId: ID!
+  position: Int!
+  mediaId: ID!
+  quizQuestionId: ID!
+  mediaType: String!
+  quiz: QuizQuestionEntity!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type QuizQuestionEntity {
+  quizQuestionId: ID!
+  quizId: ID!
+  question: String!
+  questionMedias: [QuizQuestionMediaEntity!]
+  answers: [QuizQuestionAnswerEntity!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  quiz: QuizEntity!
+}
+
+type QuizAttemptEntity {
+  quizAttemptId: ID!
+  quizId: ID!
+  userId: ID!
+  score: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: UserEntity!
+  quiz: QuizEntity!
+}
+
+type QuizEntity {
+  quizId: ID!
+  questions: QuizQuestionEntity!
+  timeLimit: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  lecture: LectureEntity!
+  quizAttempts: QuizAttemptEntity!
+}
+
+type UserProgressEntity {
+  userProgressId: ID!
+  courseId: ID!
+  sectionId: ID!
+  lectureId: ID!
+  userId: ID!
+  isCompleted: Boolean!
+  course: CourseEntity!
+  user: UserEntity!
+  section: SectionEntity!
+  lecture: LectureEntity!
+}
+
 type LectureEntity {
   lectureId: ID!
   title: String!
@@ -32,6 +98,8 @@ type LectureEntity {
   updatedAt: DateTime!
   section: SectionEntity!
   resources: [ResourceEntity!]!
+  quiz: [QuizEntity!]
+  userProgresses: UserProgressEntity!
 }
 
 type SectionEntity {
@@ -42,6 +110,7 @@ type SectionEntity {
   updatedAt: DateTime!
   course: CourseEntity!
   lectures: [LectureEntity!]!
+  userProgresses: [UserProgressEntity!]!
 }
 
 type CourseTargetEntity {
@@ -114,6 +183,73 @@ type CourseTopicEntity {
   topic: TopicEntity!
 }
 
+type CourseReviewEntity {
+  courseReviewId: ID!
+  courseId: ID!
+  userId: ID!
+  content: String
+  rating: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  course: CourseEntity!
+  user: UserEntity!
+}
+
+type CartEntity {
+  cartId: ID!
+  cartCourses: [CartCourseEntity!]
+  isDeleted: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: UserEntity!
+}
+
+type CartCourseEntity {
+  cartCourseId: ID!
+  cartId: ID!
+  courseId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  course: CourseEntity!
+  cart: CartEntity!
+}
+
+type CertificateEntity {
+  certificateId: ID!
+  courseId: ID!
+  userId: ID!
+  createdAt: DateTime!
+  achievedDate: DateTime
+  expireDate: DateTime
+  user: UserEntity!
+  course: CourseEntity
+}
+
+type OrderEntity {
+  orderId: ID!
+  userId: ID!
+  orderStatus: String!
+  orderCourses: [OrderCourseEntity!]
+  createdAt: DateTime!
+  completeDate: DateTime
+  updatedAt: DateTime!
+  paymentDue: DateTime
+  isDeleted: Boolean!
+  user: UserEntity!
+}
+
+type OrderCourseEntity {
+  orderCourseId: ID!
+  courseId: ID!
+  orderId: ID!
+  discountedPrice: Float!
+  price: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  order: OrderEntity!
+  course: CourseEntity!
+}
+
 type CourseEntity {
   courseId: ID!
   title: String
@@ -138,8 +274,13 @@ type CourseEntity {
   courseTargets: [CourseTargetEntity!]
   posts: [PostEntity!]!
   sections: [SectionEntity!]!
+  cartCourses: [CartCourseEntity!]!
+  certificate: [CertificateEntity!]!
+  orderCourses: [OrderCourseEntity!]!
   numberOfEnrollments: Int
   enrolled: Boolean
+  courseReview: CourseReviewEntity
+  progresses: UserProgressEntity!
 }
 
 type PostLikeEntity {
@@ -259,6 +400,12 @@ type UserEntity {
   courses: [CourseEntity!]!
   followerRelations: [FollowEntity!]!
   followedUserRelations: [FollowEntity!]!
+  courseReview: CourseReviewEntity!
+  cart: CartEntity!
+  orders: OrderEntity!
+  certificates: CertificateEntity!
+  courseProgresses: UserProgressEntity!
+  quizAttempts: QuizAttemptEntity!
   followed: Boolean!
   numberOfFollowers: Int!
 }
@@ -424,6 +571,30 @@ type FindManyTransactionsOutput {
   metadata: FindManyTransactionsOutputMetadata
 }
 
+type FindOneCartOutput {
+  data: CartEntity!
+  tokens: AuthTokens
+}
+
+type FindOneOrderOutput {
+  data: OrderEntity!
+  tokens: AuthTokens
+}
+
+type FindManyUserOrdersOutputMetadata {
+  count: Int
+}
+
+type FindManyUserOrdersOutputData {
+  results: [OrderEntity!]!
+  metadata: FindManyUserOrdersOutputMetadata
+}
+
+type FindManyUserOrdersOutput {
+  data: FindManyUserOrdersOutputData!
+  tokens: AuthTokens
+}
+
 type Query {
   init: InitOutput!
   signIn(data: SignInInputData!): SignInOutput!
@@ -436,7 +607,8 @@ type Query {
   findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findManyCategories: [CategoryEntity!]!
-  findOneCourseReview(data: FindOneCourseReviewInputData!): CourseEntity!
+  findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
+  findManyCourseReviews(data: FindManyCourseReviewsInputData!): [CourseReviewEntity!]!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
@@ -449,6 +621,9 @@ type Query {
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
+  findOneCart: FindOneCartOutput!
+  findOneOrder(data: FindOneOrderInputData!): FindOneOrderOutput!
+  findManyUserOrders(data: FindManyUserOrdersInputData!): FindManyUserOrdersOutput!
 }
 
 input SignInInputData {
@@ -538,6 +713,20 @@ input FindOneCourseReviewInputData {
 
 input FindOneCourseReviewInputParams {
   courseId: ID!
+}
+
+input FindManyCourseReviewsInputData {
+  params: FindManyCourseReviewsInputParams!
+  options: FindManyCourseReviewsInputOptions
+}
+
+input FindManyCourseReviewsInputParams {
+  courseId: ID!
+}
+
+input FindManyCourseReviewsInputOptions {
+  take: Int
+  skip: Int
 }
 
 input FindOnePostInputData {
@@ -668,4 +857,22 @@ input FindManyTransactionsInputData {
 input FindManyTransactionsInputOptions {
   take: Int
   skip: Int
+}
+
+input FindOneOrderInputData {
+  params: FindOneOrderInputParams!
+}
+
+input FindOneOrderInputParams {
+  orderId: ID!
+}
+
+input FindManyUserOrdersInputData {
+  options: FindManyUserOrdersInputOptions
+}
+
+input FindManyUserOrdersInputOptions {
+  take: Int
+  skip: Int
+  orderStatus: String!
 }

@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
-import { UserMySqlEntity } from "@database"
+import { CartMySqlEntity, UserMySqlEntity } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { MailerService, Sha256Service } from "@global"
@@ -10,6 +10,8 @@ export class AuthService {
     constructor(
     @InjectRepository(UserMySqlEntity)
     private readonly userMySqlRepository: Repository<UserMySqlEntity>,
+    @InjectRepository(CartMySqlEntity)
+    private readonly cartMySqlRepository: Repository<CartMySqlEntity>,
     private readonly sha256Service: Sha256Service,
     private readonly mailerService: MailerService,
     ) {}
@@ -20,6 +22,7 @@ export class AuthService {
             email: data.email,
         })
         if (!found) throw new NotFoundException("User not found.")
+
         if (!this.sha256Service.verifyHash(data.password, found.password))
             throw new UnauthorizedException("Invalid credentials.")
         return found
@@ -39,7 +42,7 @@ export class AuthService {
   	}
   	data.password = this.sha256Service.createHash(data.password)
   	const created = await this.userMySqlRepository.save(data)
-	
+	//create cart here
   	await this.mailerService.sendMail(created.userId, data.email)
   	return `An user with id ${created.userId} has been created`
     }

@@ -7,6 +7,7 @@ import {
     PrimaryGeneratedColumn,
     CreateDateColumn,
     UpdateDateColumn,
+    OneToOne,
 } from "typeorm"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { VerifyStatus } from "@common"
@@ -18,6 +19,12 @@ import { CourseTargetEntity } from "./course-target.entity"
 import { CourseTopicEntity } from "./course-topic.entity"
 import { CourseSubcategoryEntity } from "./course-subcategory.entity"
 import { CategoryEntity } from "./category.entity"
+import { CourseReviewEntity } from "./course-review.entity"
+import { CartCourseEntity } from "./cart-course.enity"
+import { CertificateEntity } from "./certificate"
+import { OrderEntity } from "./order.entity"
+import { OrderCourseEntity } from "./order-course.entity"
+import { UserProgressEntity } from "./user-progress.entity"
 
 interface CourseIncludes {
     time: number;
@@ -28,11 +35,11 @@ interface CourseIncludes {
 export class CourseEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-        courseId: string
+    courseId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 1000, nullable: true })
-        title: string
+    title: string
 
     @Field(() => ID, { nullable: true })
     @Column({
@@ -40,103 +47,123 @@ export class CourseEntity {
         length: 36,
         default: null,
     })
-        thumbnailId: string
+    thumbnailId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 5000, nullable: true })
-        description: string
+    description: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        creatorId: string
+    creatorId: string
 
     @Field(() => Float, { defaultValue: 0 })
     @Column({ type: "float", default: 0 })
-        price: number
+    price: number
 
     @Field(() => Float, { defaultValue: 0 })
     @Column({ type: "float", default: 0 })
-        discountPrice: number
+    discountPrice: number
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ type: "boolean", default: false })
-        enableDiscount: boolean
+    enableDiscount: boolean
 
     @Field(() => String)
     @Column({ type: "enum", enum: VerifyStatus, default: VerifyStatus.Pending })
-        verifyStatus: VerifyStatus
+    verifyStatus: VerifyStatus
 
     @Field(() => UserEntity)
     @ManyToOne(() => UserEntity, (user) => user.courses)
     @JoinColumn({ name: "creatorId" })
-        creator: UserEntity
+    creator: UserEntity
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ default: false })
-        isDeleted: boolean
+    isDeleted: boolean
 
     @Field(() => String, { nullable: true })
     @Column({ nullable: true })
-        receivedWalletAddress: string
+    receivedWalletAddress: string
 
     @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36, default: null })
-        previewVideoId: string
+    previewVideoId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "json", default: null })
-        includes: CourseIncludes
+    includes: CourseIncludes
 
     @Field(() => Date)
     @CreateDateColumn()
-        createdAt: Date
+    createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-        updatedAt: Date
+    updatedAt: Date
 
     @Field(() => [CourseTopicEntity])
     @OneToMany(() => CourseTopicEntity, (courseTopic) => courseTopic.course, {
         cascade: true,
     })
-        courseTopics: Array<CourseTopicEntity>
+    courseTopics: Array<CourseTopicEntity>
 
     @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36, nullable: true })
-        categoryId: string
+    categoryId: string
 
     @Field(() => CategoryEntity, { nullable: true })
     @ManyToOne(() => CategoryEntity, (category) => category.courses)
     @JoinColumn({ name: "categoryId" })
-        category: CategoryEntity
+    category: CategoryEntity
 
     @Field(() => [CourseSubcategoryEntity], { nullable: true })
     @OneToMany(() => CourseSubcategoryEntity, (courseSubcategory) => courseSubcategory.course, {
         cascade: true,
     })
-        courseSubcategories: Array<CourseSubcategoryEntity>
+    courseSubcategories: Array<CourseSubcategoryEntity>
 
     @Field(() => [CourseTargetEntity], { nullable: true })
     @OneToMany(() => CourseTargetEntity, (courseTarget) => courseTarget.course)
-        courseTargets: Array<CourseTargetEntity>
+    courseTargets: Array<CourseTargetEntity>
 
     @Field(() => [PostEntity])
     @OneToMany(() => PostEntity, (post) => post.course)
-        posts: Array<PostEntity>
+    posts: Array<PostEntity>
 
     @OneToMany(() => EnrolledInfoEntity, (enrolled) => enrolled.course)
-        enrolledInfos: Array<EnrolledInfoEntity>
+    enrolledInfos: Array<EnrolledInfoEntity>
 
     @Field(() => [SectionEntity])
     @OneToMany(() => SectionEntity, (section) => section.course, {
         onDelete: "CASCADE",
     })
-        sections: Array<SectionEntity>
+    sections: Array<SectionEntity>
+
+    @Field(() => [CartCourseEntity])
+    @OneToMany(() => CartCourseEntity, (cartCourse) => cartCourse.course)
+    cartCourses?: CartCourseEntity;
+
+    @Field(() => [CertificateEntity])
+    @OneToMany(() => CertificateEntity, (certificate) => certificate.course)
+    certificate?: CertificateEntity;
+
+    @Field(() => [OrderCourseEntity])
+    @OneToMany(() => OrderCourseEntity, (orders) => orders.course)
+    orderCourses: OrderCourseEntity
 
     //graphql
-    @Field(() => Int, {nullable: true})
-        numberOfEnrollments?: number
+    @Field(() => Int, { nullable: true })
+    numberOfEnrollments?: number
 
-    @Field(() => Boolean, {nullable: true})
-        enrolled?: boolean
+    @Field(() => Boolean, { nullable: true })
+    enrolled?: boolean
+
+    @Field(() => CourseReviewEntity, { nullable: true })
+    @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.course)
+    courseReview?: CourseReviewEntity
+
+    @Field(() => UserProgressEntity)
+    @OneToMany(() => UserProgressEntity, (userProgress) => userProgress.course, {nullable: true})
+    progresses? : Array<UserProgressEntity>
 }

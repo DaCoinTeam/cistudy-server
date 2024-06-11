@@ -15,7 +15,7 @@ import {
     FindOnePostCommentInput,
     FindOnePostInput,
 } from "./posts.input"
-import { FindManyPostCommentRepliesOutputData, FindManyPostCommentsOutputData, FindManyPostsOutputData } from "./posts.output"
+import { FindManyPostCommentRepliesOutputData, FindManyPostCommentsOutputData, FindManyPostsOutputData, FindOnePostOutput } from "./posts.output"
 import { PostCommentReplyEntity } from "src/database/mysql/post-comment-reply.entity"
 
 @Injectable()
@@ -30,7 +30,7 @@ export class PostsService {
         private readonly dataSource: DataSource,
     ) { }
 
-    async findOnePost(input: FindOnePostInput): Promise<PostMySqlEntity> {
+    async findOnePost(input: FindOnePostInput): Promise<FindOnePostOutput> {
         const { data } = input
         const { params } = data
         const { postId } = params
@@ -59,15 +59,14 @@ export class PostsService {
             const numberOfLikes = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
-                .from(PostLikeMySqlEntity, "postLike")
-                .where("postLikeId = :postLikeId", { postLikeId: true })
-                .getRawOne()
-
+                .from(PostLikeMySqlEntity, "post_like")
+                .where("post_like.postId = :postId", { postId })
+                .getRawOne();
             const numberOfComments = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
-                .from(PostCommentMySqlEntity, "postComment")
-                .where("postLikeId = :postLikeId", { postLikeId: true })
+                .from(PostCommentMySqlEntity, "post_comment")
+                .where("post_comment.postId = :postId", { postId })
                 .getRawOne()
 
             await queryRunner.commitTransaction()
@@ -75,7 +74,9 @@ export class PostsService {
             post.numberOfLikes = numberOfLikes.count
             post.numberOfComments = numberOfComments.count
 
-            return post
+            return {
+                data: post,
+            }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {
@@ -247,7 +248,7 @@ export class PostsService {
                 .andWhere("postId = :postId", { postId })
                 .groupBy("post_comment.postCommentId")
                 .getRawMany()
-            
+
             const likedResults = await queryRunner.manager
                 .createQueryBuilder()
                 .select("post_comment.postCommentId", "postCommentId")
@@ -260,7 +261,7 @@ export class PostsService {
 
             const numberOfPostCommentsResult = await queryRunner.manager
                 .createQueryBuilder()
-                .select("COUNT(*)", "count")   
+                .select("COUNT(*)", "count")
                 .from(PostCommentMySqlEntity, "post_comment")
                 .where("post_comment.postId = :postId", { postId })
                 .getRawOne()
@@ -343,7 +344,7 @@ export class PostsService {
 
             const numberOfPostCommentRepliesResult = await queryRunner.manager
                 .createQueryBuilder()
-                .select("COUNT(*)", "count")   
+                .select("COUNT(*)", "count")
                 .from(PostCommentReplyMySqlEntity, "post_comment_reply")
                 .where("post_comment_reply.postCommentId = :postCommentId", { postCommentId })
                 .getRawOne()

@@ -1,13 +1,13 @@
-import { Output, AuthTokens, ResultsWithMetadata } from "@common"
+import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
 import { PostCommentMySqlEntity, PostCommentReplyMySqlEntity, PostMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
-export class FindOnePostOutput implements Output<PostMySqlEntity> {
+export class FindOnePostOutput implements AuthOutput<PostMySqlEntity> {
   @Field(() => PostMySqlEntity)
       data: PostMySqlEntity
   @Field(() => AuthTokens, { nullable: true })
-      tokens: AuthTokens
+      tokens?: AuthTokens
 }
 
 @ObjectType()
@@ -27,7 +27,7 @@ implements ResultsWithMetadata<PostMySqlEntity, FindManyPostsOutputMetadata>
 }
 
 @ObjectType()
-export class FindManyPostsOutput implements Output<FindManyPostsOutputData> {
+export class FindManyPostsOutput implements AuthOutput<FindManyPostsOutputData> {
   @Field(() => FindManyPostsOutputData)
       data: FindManyPostsOutputData
   @Field(() => AuthTokens, { nullable: true })
@@ -42,7 +42,7 @@ export class FindOnePostCommentOutputMetadata {
 
 @ObjectType()
 export class FindOnePostCommentOutput
-implements Output<PostCommentMySqlEntity>
+implements AuthOutput<PostCommentMySqlEntity>
 {
   @Field(() => PostCommentMySqlEntity)
       data: PostCommentMySqlEntity
@@ -66,7 +66,7 @@ implements
 
 @ObjectType()
 export class FindManyPostCommentsOutput
-implements Output<FindManyPostCommentsOutputData>
+implements AuthOutput<FindManyPostCommentsOutputData>
 {
   @Field(() => FindManyPostCommentsOutputData)
       data: FindManyPostCommentsOutputData
@@ -90,7 +90,7 @@ implements
 
 @ObjectType()
 export class FindManyPostCommentRepliesOutput
-implements Output<FindManyPostCommentRepliesOutputData>
+implements AuthOutput<FindManyPostCommentRepliesOutputData>
 {
   @Field(() => FindManyPostCommentRepliesOutputData)
       data: FindManyPostCommentRepliesOutputData

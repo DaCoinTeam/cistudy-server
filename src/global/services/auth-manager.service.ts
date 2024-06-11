@@ -3,7 +3,7 @@ import { SessionMySqlEntity, UserMySqlEntity } from "@database"
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
 import { JsonWebTokenError, JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Payload, AuthTokens, AuthTokenType, Output, UserRole } from "@common"
+import { Payload, AuthTokens, AuthTokenType, AuthOutput, UserRole } from "@common"
 import { Repository } from "typeorm"
 
 @Injectable()
@@ -38,7 +38,7 @@ export class AuthManagerService {
     }
 
     async generateToken<T extends PayloadLike>(
-        data: T,
+        data: T,d,
         type: AuthTokenType = AuthTokenType.Access,
     ) {
         const typeToExpiresIn: Record<AuthTokenType, string> = {
@@ -65,7 +65,7 @@ export class AuthManagerService {
         data: T,
         clientId?: string,
     ): Promise<AuthTokens> {
-        const accessToken = await this.generateToken(data)
+        const accessToken = await this.generateToken(data, AuthTokenType.Access)
         const refreshToken = await this.generateToken(data, AuthTokenType.Refresh)
         if (clientId) {
             let found = await this.sessionMySqlRepository.findOneBy({
@@ -97,7 +97,7 @@ export class AuthManagerService {
         data: T,
         authTokensRequested: boolean = false,
         clientId?: string,
-    ): Promise<Output<T>> {
+    ): Promise<AuthOutput<T>> {
         const { userId } = payload
         let { userRole } = payload
 

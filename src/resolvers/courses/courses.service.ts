@@ -1,6 +1,7 @@
 import {
     CategoryMySqlEntity,
     CourseMySqlEntity,
+    CourseReviewMySqlEntity,
     CourseTargetMySqlEntity,
     EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
@@ -20,6 +21,7 @@ import {
     FindManyCourseTargetsInput,
     FindOneCourseAuthInput,
     FindOneCourseReviewInput,
+    FindManyCourseReviewsInput,
 } from "./courses.input"
 import { FindManyCoursesOutputData } from "./courses.output"
 import { SubcategoryEntity } from "src/database/mysql/subcategory.entity"
@@ -41,11 +43,34 @@ export class CoursesService {
         private readonly subcategoryMySqlRepository: Repository<SubcategoryEntity>,
         @InjectRepository(TopicMySqlEntity)
         private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
+        @InjectRepository(CourseReviewMySqlEntity)
+        private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
         @InjectRepository(EnrolledInfoMySqlEntity)
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
 
         private readonly dataSource: DataSource
     ) { }
+
+    async findManyCourseReviews(input: FindManyCourseReviewsInput): Promise<Array<CourseReviewMySqlEntity>> {
+        const { data } = input;
+        const { params, options } = data;
+        const { courseId } = params;
+        const { skip, take } = options
+
+        const result = await this.courseReviewMySqlRepository.find({
+            where: { courseId },
+            skip,
+            take,
+            relations: {
+                course: true,
+                user: true
+            },
+            order: { createdAt: 'DESC' }
+        });
+
+        return result;
+    }
+
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
         const { data } = input
@@ -86,7 +111,7 @@ export class CoursesService {
                 },
             })
 
-            const enrolledInfo = userId 
+            const enrolledInfo = userId
                 ? await this.enrolledInfoMySqlRepository.findOneBy({
                     courseId,
                     userId
@@ -127,7 +152,7 @@ export class CoursesService {
         const { data, userId } = input
         const { params } = data
         const { courseId } = params
-        console.log(data, userId)
+        //console.log(data, userId)
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
@@ -162,7 +187,7 @@ export class CoursesService {
                 },
             })
 
-            const enrolledInfo = userId 
+            const enrolledInfo = userId
                 ? await this.enrolledInfoMySqlRepository.findOneBy({
                     courseId,
                     userId
@@ -229,12 +254,18 @@ export class CoursesService {
                 {
                     where: {
                         name: searchValue ? Like(`%${searchValue}%`) : undefined
+                    },
+                    relations: {
+                        courseTopics: true
                     }
                 })
 
 
             const results = await this.courseMySqlRepository.find(
                 {
+                    where: {
+                        title: Like(`%${searchValue}%`)
+                    },
                     skip,
                     take,
                     relations: {
@@ -336,10 +367,20 @@ export class CoursesService {
             where: {
                 sectionId
             },
+
             relations: {
                 resources: true,
+                quiz: {
+                    questions: {
+                        questionMedias: true,
+                        answers: true
+                    }
+                }
             },
+
         })
+
+
     }
 
     async findManyResources(

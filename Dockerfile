@@ -94,7 +94,7 @@ RUN chown -R node:node ./storage
 USER node
  
 # Expose the port that the application listens on.
-EXPOSE 3001
+EXPOSE 3002
 
 # Run the application.
 CMD npm run start:prod

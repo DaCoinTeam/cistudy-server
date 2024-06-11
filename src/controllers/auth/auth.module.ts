@@ -13,6 +13,7 @@ import {
     PostCommentMySqlEntity,
     PostLikeMySqlEntity,
     PostCommentLikeMySqlEntity,
+    CartMySqlEntity,
 } from "@database"
 import { AuthService } from "./auth.service"
 
@@ -30,6 +31,7 @@ import { AuthService } from "./auth.service"
             PostCommentMySqlEntity,
             PostLikeMySqlEntity,
             PostCommentLikeMySqlEntity,
+            CartMySqlEntity
         ]),
     ],
     controllers: [AuthController],

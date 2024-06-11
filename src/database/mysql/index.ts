@@ -10,7 +10,7 @@ import { LectureEntity as LectureMySqlEntity } from "./lecture.entity"
 import { ResourceEntity as ResourceMySqlEntity } from "./resource.entity"
 import { CourseTargetEntity as CourseTargetMySqlEntity } from "./course-target.entity"
 import { PostMediaEntity as PostMediaMySqlEntity } from "./post-media.entity"
-import { PostCommentMediaEntity as PostCommentMediaMySqlEntity} from "./post-comment-media.entity"
+import { PostCommentMediaEntity as PostCommentMediaMySqlEntity } from "./post-comment-media.entity"
 import { FollowEntity as FollowMySqlEnitity } from "./follow.entity"
 import { PostLikeEntity as PostLikeMySqlEntity } from "./post-like.entity"
 import { PostCommentReplyEntity as PostCommentReplyMySqlEntity } from "./post-comment-reply.entity"
@@ -21,8 +21,18 @@ import { TopicEntity as TopicMySqlEntity } from "./topic.entity"
 import { CourseTopicEntity as CourseTopicMySqlEntity } from "./course-topic.entity"
 import { SubcategoryTopicEntity as SubcategoyTopicMySqlEntity } from "./subcategory-topic.entity"
 import { CourseSubcategoryEntity as CourseSubcategoryMySqlEntity } from "./course-subcategory.entity"
-import { TestEntity as TestMySqlEntity } from "./test.entity"
-
+import { CourseReviewEntity as CourseReviewMySqlEntity } from "./course-review.entity"
+import { CartEntity as CartMySqlEntity } from "./cart.entity"
+import { CartCourseEntity as CartCourseMySqlEntity } from "./cart-course.enity"
+import { OrderEntity as OrderMySqlEntity } from "./order.entity"
+import { CertificateEntity as CertificateMySqlEntity } from "./certificate"
+import { OrderCourseEntity as OrderCourseMySqlEntity } from "./order-course.entity"
+import { QuizEntity as QuizMySqlEntity } from "./quiz.entity"
+import { QuizQuestionEntity as QuizQuestionMySqlEntity } from "./quiz-question.entity"
+import { QuizQuestionAnswerEntity as QuizQuestionAnswerMySqlEntity } from "./quiz-question-answer.entity"
+import { QuizQuestionMediaEntity as QuizQuestionMediaMySqlEntity } from "./quiz-question-media.entity"
+import { UserProgressEntity as UserProgressMySqlEntity } from "./user-progress.entity"
+import { QuizAttemptEntity as QuizAttemptMySqlEntity} from "./quiz-attempt.entity"
 export {
     UserMySqlEntity,
     PostMySqlEntity,
@@ -47,5 +57,16 @@ export {
     CourseTopicMySqlEntity,
     SubcategoyTopicMySqlEntity,
     CourseSubcategoryMySqlEntity,
-    TestMySqlEntity
+    CourseReviewMySqlEntity,
+    CartMySqlEntity,
+    CartCourseMySqlEntity,
+    OrderMySqlEntity,
+    OrderCourseMySqlEntity,
+    CertificateMySqlEntity,
+    QuizMySqlEntity,
+    QuizQuestionMySqlEntity,
+    QuizQuestionAnswerMySqlEntity,
+    QuizQuestionMediaMySqlEntity,
+    QuizAttemptMySqlEntity,
+    UserProgressMySqlEntity
 }

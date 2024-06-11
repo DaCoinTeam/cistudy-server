@@ -1,37 +1,79 @@
-export class CreatePostCommentReplyOutput {
+import { Output } from "@common"
+import { ApiProperty } from "@nestjs/swagger"
+import { IsOptional } from "class-validator";
+
+export class CreatePostCommentReplyOutputOthers {
+    @ApiProperty()
     postCommentReplyId: string
 }
 
-export class CreatePostCommentOutput {
+export class CreatePostCommentReplyOutput implements Output<CreatePostCommentReplyOutputOthers>{
+    message: string;
+    others: CreatePostCommentReplyOutputOthers
+}
+
+export class CreatePostCommentOutputOthers {
+    @ApiProperty()
     postCommentId: string
-    earnAmount?: number
+    @ApiProperty()
+    @IsOptional()
+    earnAmount: number
 }
 
-export class UpdatePostOutput {
+export class CreatePostCommentOutput implements Output<CreatePostCommentOutputOthers>{
+    message: string;
+    others: CreatePostCommentOutputOthers
 }
 
-export class ToggleCommentLikePostOutputData {
+export class UpdatePostOutput implements Output{
+    message: string;
+}
+
+export class ToggleCommentLikePostOutputOthers {
+    @ApiProperty()
     postCommentLikeId: string
-    earnAmount?: number
+    @ApiProperty()
+    @IsOptional()
+    earnAmount: number
 }
 
-export class ToggleLikePostOutputData {
+
+export class ToggleCommentLikePostOutputData implements Output<ToggleCommentLikePostOutputOthers>{
+    message: string;
+    others?: ToggleCommentLikePostOutputOthers;
+}
+
+export class ToggleLikePostOutputOthers {
+    @ApiProperty()
     postLikeId: string
-    earnAmount?: number
+    @ApiProperty()
+    @IsOptional()
+    earnAmount: number
+}
+
+export class ToggleLikePostOutputData implements Output<ToggleLikePostOutputOthers>{
+    message: string;
+    @IsOptional()
+    others: ToggleLikePostOutputOthers;
 }
 
 
-export class DeletePostOutput {
+export class DeletePostOutput implements Output{
+    message: string;
 }
 
-export class UpdatePostCommentOutput {
+export class UpdatePostCommentOutput implements Output{
+    message: string;
 }
 
-export class DeletePostCommentOutput {
+export class DeletePostCommentOutput implements Output{
+    message: string;
 }
 
-export class UpdatePostCommentReplyOutput {
+export class UpdatePostCommentReplyOutput implements Output{
+    message: string;
 }
 
-export class DeletePostCommentReplyOutput {
+export class DeletePostCommentReplyOutput implements Output{
+    message: string;
 }

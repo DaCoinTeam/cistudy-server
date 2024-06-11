@@ -26,7 +26,7 @@ export class PostLikeEntity {
   @Column({ type: "uuid", length: 36 })
       postId: string
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, {defaultValue : true})
   @Column({
       type: "boolean",
       default: true,

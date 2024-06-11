@@ -1,106 +1,104 @@
-import { AuthEmptyDataInput, AuthInput } from "@common"
+import { AuthEmptyDataInput, AuthInput, MediaType } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsNumber, IsUUID, Length } from "class-validator"
+import { IsInt, IsNumber, IsOptional, IsUUID, Length, Max, Min, max, min } from "class-validator"
 
 export class CreateCourseInput implements AuthEmptyDataInput {
     @IsUUID("4")
-        userId: string
+    userId: string
 }
 
 export class EnrollCourseInputData {
     @IsUUID("4")
     @ApiProperty()
-        courseId: string
+    courseId: string
     @ApiProperty()
-        code: string
+    code: string
 }
 
 export class EnrollCourseInput implements AuthInput<EnrollCourseInputData> {
     data: EnrollCourseInputData
     @IsUUID("4")
-        userId: string
+    userId: string
 }
 
 export class CreateCourseTargetInputData {
     @IsUUID()
     @ApiProperty()
-        courseId: string
+    courseId: string
     @ApiProperty()
-        content: string
+    content: string
 }
 
 export class CreateCourseTargetInput
-implements AuthInput<CreateCourseTargetInputData>
-{
+    implements AuthInput<CreateCourseTargetInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     data: CreateCourseTargetInputData
 }
 
 export class UpdateCourseTargetInputData {
     @IsUUID()
     @ApiProperty()
-        courseTargetId: string
+    courseTargetId: string
     @ApiProperty({ nullable: true })
-        content?: string
+    content?: string
     @ApiProperty({ nullable: true })
-        position?: number
+    position?: number
 }
 
 export class UpdateCourseTargetInput
-implements AuthInput<UpdateCourseTargetInputData>
-{
+    implements AuthInput<UpdateCourseTargetInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     data: UpdateCourseTargetInputData
 }
 
 export class UpdateCourseInputData {
     @IsUUID("4")
     @ApiProperty({ nullable: true })
-        courseId: string
+    courseId: string
 
     @Length(20)
     @ApiProperty({ nullable: true })
-        title?: string
+    title?: string
 
     @Length(100)
     @ApiProperty({ nullable: true })
-        description?: string
+    description?: string
 
     @ApiProperty({ nullable: true })
-        price?: number
+    price?: number
 
     @ApiProperty({ nullable: true })
-        discountPrice?: number
+    discountPrice?: number
 
     @ApiProperty({ nullable: true })
-        enableDiscount?: boolean
+    enableDiscount?: boolean
 
     @ApiProperty({ nullable: true })
-        categoryId?: string
-
-    @ApiProperty({ nullable: true })    
-        receivedWalletAddress?: string
+    categoryId?: string
 
     @ApiProperty({ nullable: true })
-        subcategoryIds?: Array<string>
+    receivedWalletAddress?: string
 
     @ApiProperty({ nullable: true })
-        topicIds?: Array<string>
+    subcategoryIds?: Array<string>
+
+    @ApiProperty({ nullable: true })
+    topicIds?: Array<string>
 
     @IsNumber()
     @ApiProperty({ nullable: true })
-        thumbnailIndex?: number
+    thumbnailIndex?: number
 
     @IsNumber()
     @ApiProperty({ nullable: true })
-        previewVideoIndex?: number
+    previewVideoIndex?: number
 }
 
 export class UpdateCourseInput implements AuthInput<UpdateCourseInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     data: UpdateCourseInputData
     files: Array<Express.Multer.File>
 }
@@ -108,71 +106,69 @@ export class UpdateCourseInput implements AuthInput<UpdateCourseInputData> {
 export class DeleteCourseTargetInputData {
     @IsUUID()
     @ApiProperty()
-        courseTargetId: string
+    courseTargetId: string
 }
 
 export class DeleteCourseTargetInput
-implements AuthInput<DeleteCourseTargetInputData>
-{
+    implements AuthInput<DeleteCourseTargetInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     @ApiProperty()
-        data: DeleteCourseTargetInputData
+    data: DeleteCourseTargetInputData
 }
 
 export class CreateLectureInputData {
     @IsUUID("4")
     @ApiProperty()
-        sectionId: string
+    sectionId: string
     @ApiProperty()
-        title: string
+    title: string
 }
 
 export class CreateLectureInput implements AuthInput<CreateLectureInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     data: CreateLectureInputData
 }
 
 export class DeleteLectureInputData {
     @IsUUID()
     @ApiProperty()
-        lectureId: string
+    lectureId: string
 }
 
 export class DeleteLectureInput
-implements AuthInput<DeleteLectureInputData>
-{
+    implements AuthInput<DeleteLectureInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     @ApiProperty()
-        data: DeleteLectureInputData
+    data: DeleteLectureInputData
 }
 
 
 export class CreateSectionInputData {
     @IsUUID("4")
     @ApiProperty()
-        courseId: string
+    courseId: string
 
     @ApiProperty()
-        title: string
+    title: string
 }
 
 export class CreateSectionInput implements AuthInput<CreateSectionInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     data: CreateSectionInputData
 }
 
 export class CreateResourcesInputData {
     @IsUUID("4")
     @ApiProperty()
-        lectureId: string
+    lectureId: string
 }
 export class CreateResourcesInput implements AuthInput<CreateResourcesInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     data: CreateResourcesInputData
     files: Express.Multer.File[]
 }
@@ -180,20 +176,20 @@ export class CreateResourcesInput implements AuthInput<CreateResourcesInputData>
 export class UpdateLectureInputData {
     @IsUUID("4")
     @ApiProperty()
-        lectureId: string
+    lectureId: string
     @ApiProperty({ nullable: true })
-        title?: string
+    title?: string
     @ApiProperty({ nullable: true })
-        description?: string
+    description?: string
     @ApiProperty({ nullable: true })
-        thumbnailIndex?: number
+    thumbnailIndex?: number
     @ApiProperty({ nullable: true })
-        lectureVideoIndex?: number
+    lectureVideoIndex?: number
 }
 
 export class UpdateLectureInput implements AuthInput<UpdateLectureInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     data: UpdateLectureInputData
     files: Express.Multer.File[]
 }
@@ -201,83 +197,80 @@ export class UpdateLectureInput implements AuthInput<UpdateLectureInputData> {
 export class DeleteSectionInputData {
     @IsUUID()
     @ApiProperty()
-        sectionId: string
+    sectionId: string
 }
 
 export class DeleteSectionInput
-implements AuthInput<DeleteSectionInputData>
-{
+    implements AuthInput<DeleteSectionInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     @ApiProperty()
-        data: DeleteSectionInputData
+    data: DeleteSectionInputData
 }
 
 export class UpdateSectionInputData {
     @IsUUID("4")
     @ApiProperty({ nullable: true })
-        sectionId: string
-
+    sectionId: string
     @ApiProperty({ nullable: true })
-        title?: string
+    title?: string
 }
 
 export class UpdateSectionInput implements AuthInput<UpdateSectionInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     data: UpdateSectionInputData
 }
 
 export class DeleteResourceInputData {
     @IsUUID()
     @ApiProperty()
-        resourceId: string
+    resourceId: string
 }
 
 export class DeleteResourceInput
-implements AuthInput<DeleteResourceInputData>
-{
+    implements AuthInput<DeleteResourceInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     @ApiProperty()
-        data: DeleteResourceInputData
+    data: DeleteResourceInputData
 }
 
 //dev only apis
 export class CreateCategoryInputData {
     @ApiProperty()
-        name: string
+    name: string
 }
 
 export class CreateCategoryInput implements AuthInput<CreateCategoryInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     data: CreateCategoryInputData
 }
 
 export class CreateSubcategoryInputData {
     @ApiProperty()
-        name: string
+    name: string
     @ApiProperty()
-        categoryId: string
+    categoryId: string
 }
 
 export class CreateSubcategoryInput implements AuthInput<CreateSubcategoryInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     data: CreateSubcategoryInputData
 }
 
 export class CreateTopicInputData {
     @ApiProperty()
-        name: string
+    name: string
     @ApiProperty()
-        subcategoryIds: Array<string>
+    subcategoryIds: Array<string>
 }
 
 export class CreateTopicInput implements AuthInput<CreateTopicInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     data: CreateTopicInputData
     files: Array<Express.Multer.File>
 }
@@ -285,11 +278,225 @@ export class CreateTopicInput implements AuthInput<CreateTopicInputData> {
 
 export class DeleteTopicInputData {
     @ApiProperty()
-        topicId: string
+    topicId: string
 }
 
 export class DeleteTopicInput implements AuthInput<DeleteTopicInputData> {
     @IsUUID("4")
-        userId: string
+    userId: string
     data: DeleteTopicInputData
+}
+
+export class CreateCourseReviewInputData {
+    @IsUUID()
+    @ApiProperty()
+    courseId: string
+    @Length(10, 1000)
+    @ApiProperty()
+    content: string
+    @Min(1)
+    @Max(5)
+    @ApiProperty()
+    rating: number
+}
+export class CreateCourseReviewInput implements AuthInput<CreateCourseReviewInputData> {
+    @IsUUID("4")
+    userId: string;
+    data: CreateCourseReviewInputData;
+}
+
+export class UpdateCourseReviewInputData {
+    @IsUUID()
+    @ApiProperty()
+    courseReviewId: string
+
+    @IsOptional()
+    @Length(10, 1000)
+    @ApiProperty({ nullable: true })
+    content: string
+
+    @IsOptional()
+    @Min(1)
+    @Max(5)
+    @ApiProperty({ nullable: true })
+    rating: number
+}
+
+export class UpdateCourseReviewInput implements AuthInput<UpdateCourseReviewInputData> {
+    @IsUUID("4")
+    userId: string;
+    data: UpdateCourseReviewInputData
+}
+
+export class DeleteCourseReviewInputData {
+    @IsUUID()
+    @ApiProperty()
+    courseReviewId: string
+}
+export class DeleteCourseReviewInput implements AuthInput<DeleteCourseReviewInputData> {
+    @IsUUID("4")
+    userId: string;
+    data: DeleteCourseReviewInputData;
+}
+
+export class CreateCertificateInputData {
+    @IsUUID()
+    @ApiProperty()
+    courseId: string
+}
+
+export class CreateCertificateInput implements AuthInput<CreateCertificateInputData> {
+    @IsUUID("4")
+    userId: string
+    data: CreateCertificateInputData
+}
+
+export class QuizQuestionAnswerInputData {
+
+    @ApiProperty()
+    content: string
+
+    @ApiProperty()
+    isCorrect: boolean
+}
+
+export class QuizQuestionMediaInputData {
+    @IsInt()
+    @ApiProperty()
+    mediaIndex: number
+
+    @ApiProperty()
+    mediaType: MediaType
+}
+
+export class QuizQuestionInputData {
+    @ApiProperty()
+    question: string
+
+    @ApiProperty()
+    answers: Array<QuizQuestionAnswerInputData>
+
+    @ApiProperty({ nullable: true })
+    questionMedias?: Array<QuizQuestionMediaInputData>
+}
+
+export class CreateQuizInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    lectureId: string
+
+    @ApiProperty()
+    quizQuestions: Array<QuizQuestionInputData>
+
+    @ApiProperty()
+    timeLimit: number
+
+}
+
+export class CreateQuizInput implements AuthInput<CreateQuizInputData> {
+    @IsUUID("4")
+    userId: string
+    data: CreateQuizInputData
+    files?: Array<Express.Multer.File>
+}
+
+export class UpdateQuizQuestionAnswerInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    quizQuestionAnswerId: string
+
+    @ApiProperty()
+    content?: string
+
+    @ApiProperty()
+    isCorrect?: boolean
+}
+
+export class UpdateQuizQuestionInputData {
+    @IsUUID("4")
+    @ApiProperty({ nullable: true })
+    quizQuestionId?: string
+
+    @ApiProperty({ nullable: true })
+    question: string
+
+    @ApiProperty({ nullable: true })
+    questionMedias?: Array<QuizQuestionMediaInputData>
+
+    @ApiProperty({ nullable: true })
+    quizAnswerIdsToUpdate?: Array<UpdateQuizQuestionAnswerInputData>
+
+    @ApiProperty({ nullable: true })
+    quizAnswerIdsToDelete?: Array<string>
+
+    @ApiProperty({ nullable: true })
+    mediaIdsToDelete?: Array<string>
+
+    @ApiProperty({ nullable: true })
+    newQuizQuestionAnswer: Array<QuizQuestionAnswerInputData>
+}
+
+export class UpdateQuizInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    quizId: string
+
+    @ApiProperty()
+    timeLimit: number
+
+    @ApiProperty({ nullable: true })
+    newQuestions?: Array<QuizQuestionInputData>
+
+    @ApiProperty({ nullable: true })
+    quizQuestionIdsToUpdate?: Array<UpdateQuizQuestionInputData>
+
+    @ApiProperty({ nullable: true })
+    quizQuestionIdsToDelete?: Array<string>
+}
+
+export class UpdateQuizInput implements AuthInput<UpdateQuizInputData> {
+    @IsUUID("4")
+    @ApiProperty()
+    userId: string
+    data: UpdateQuizInputData
+    files?: Array<Express.Multer.File>
+}
+
+
+export class DeleteQuizInputData {
+    @ApiProperty()
+    quizIds: Array<string>
+}
+
+export class DeleteQuizInput
+    implements AuthInput<DeleteQuizInputData> {
+    @IsUUID("4")
+    @ApiProperty()
+    userId: string
+    data: DeleteQuizInputData
+}
+
+export class CeateUserProgressInputData {
+    @ApiProperty()
+    lectureId: string
+}
+
+export class CeateUserProgressInput implements AuthInput<CeateUserProgressInputData> {
+    @IsUUID("4")
+    @ApiProperty()
+    userId: string
+    data: CeateUserProgressInputData
+}
+
+export class MarkLectureAsCompletedInputData{
+    @IsUUID("4")
+    @ApiProperty()
+    lectureId: string
+}
+
+export class MarkLectureAsCompletedInput implements AuthInput<MarkLectureAsCompletedInputData>{
+    @IsUUID("4")
+    @ApiProperty()
+    userId: string
+    data: MarkLectureAsCompletedInputData
 }

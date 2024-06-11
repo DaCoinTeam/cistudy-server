@@ -16,6 +16,7 @@ import {
     FindOnePostCommentOutput,
     FindOnePostOutput,
 } from "./posts.output"
+import { PostMySqlEntity } from "@database"
 
 @Resolver()
 export class PostsResolver {
@@ -28,7 +29,7 @@ export class PostsResolver {
     @UserId() userId: string,
     @Args("data") data: FindOnePostInputData,
     ) {
-        return this.postsService.findOnePost({ userId, data })
+        return (await this.postsService.findOnePost({ userId, data })).data
     }
 
   @UseGuards(JwtAuthGuard)

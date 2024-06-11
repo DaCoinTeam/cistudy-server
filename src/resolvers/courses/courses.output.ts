@@ -1,4 +1,4 @@
-import { AuthTokens, Output, ResultsWithMetadata } from "@common"
+import { AuthTokens, AuthOutput, ResultsWithMetadata } from "@common"
 import { LectureMySqlEntity, ResourceMySqlEntity, CourseMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 import { CategoryEntity } from "src/database/mysql/category.entity"
@@ -28,7 +28,7 @@ implements ResultsWithMetadata<CourseMySqlEntity, FindManyCoursesOutputMetadata>
 }
 
 @ObjectType()
-export class FindManyPostsOutput implements Output<FindManyCoursesOutputData> {
+export class FindManyPostsOutput implements AuthOutput<FindManyCoursesOutputData> {
     @Field(() => FindManyCoursesOutputData)
         data: FindManyCoursesOutputData
     @Field(() => AuthTokens, { nullable: true })
@@ -37,7 +37,7 @@ export class FindManyPostsOutput implements Output<FindManyCoursesOutputData> {
 
 @ObjectType()
 export class FindOneCourseAuthOutput
-implements Output<CourseMySqlEntity>
+implements AuthOutput<CourseMySqlEntity>
 {
     @Field(() => CourseMySqlEntity)
         data: CourseMySqlEntity
@@ -48,7 +48,7 @@ implements Output<CourseMySqlEntity>
 
 @ObjectType()
 export class FindOneLectureOutput
-implements Output<LectureMySqlEntity>
+implements AuthOutput<LectureMySqlEntity>
 {
     @Field(() => LectureMySqlEntity)
         data: LectureMySqlEntity
@@ -59,7 +59,7 @@ implements Output<LectureMySqlEntity>
 
 @ObjectType()
 export class FindManyLecturesOutput
-implements Output<Array<LectureMySqlEntity>>
+implements AuthOutput<Array<LectureMySqlEntity>>
 {
     @Field(() => [LectureMySqlEntity])
         data: Array<LectureMySqlEntity>
@@ -69,7 +69,7 @@ implements Output<Array<LectureMySqlEntity>>
 
 @ObjectType()
 export class FindManyResourcesOutput
-implements Output<Array<ResourceMySqlEntity>>
+implements AuthOutput<Array<ResourceMySqlEntity>>
 {
     @Field(() => [ResourceMySqlEntity])
         data: Array<ResourceMySqlEntity>
@@ -79,7 +79,7 @@ implements Output<Array<ResourceMySqlEntity>>
 
 @ObjectType()
 export class FindManyCourseTargetsOutput
-implements Output<Array<CourseTargetEntity>>
+implements AuthOutput<Array<CourseTargetEntity>>
 {
     @Field(() => [CourseTargetEntity])
         data: Array<CourseTargetEntity>
