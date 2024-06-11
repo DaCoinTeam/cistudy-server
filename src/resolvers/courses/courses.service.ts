@@ -66,7 +66,8 @@ export class CoursesService {
             const results = await this.courseReviewMySqlRepository.find({
                 where: { courseId },
                 relations: {
-                    course: true
+                    course: true,
+                    user: true,
                 },
                 skip,
                 take,

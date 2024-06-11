@@ -29,9 +29,13 @@ export class AuthService {
             where: {
                 userId: input.userId,
             },
-           relations:{
-             cart :true,
-           }
+            relations: {
+                cart: {
+                    cartCourses: {
+                        course: true
+                    }
+                }
+            }
         })
         console.log(user)
         return user
