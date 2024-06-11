@@ -22,9 +22,8 @@ import { CategoryEntity } from "./category.entity"
 import { CourseReviewEntity } from "./course-review.entity"
 import { CartCourseEntity } from "./cart-course.enity"
 import { CertificateEntity } from "./certificate"
-import { OrderEntity } from "./order.entity"
 import { OrderCourseEntity } from "./order-course.entity"
-import { UserProgressEntity } from "./user-progress.entity"
+
 
 interface CourseIncludes {
     time: number;
@@ -152,6 +151,10 @@ export class CourseEntity {
     @OneToMany(() => OrderCourseEntity, (orders) => orders.course)
     orderCourses: OrderCourseEntity
 
+    @Field(() => CourseReviewEntity, { nullable: true })
+    @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.course)
+    courseReview?: CourseReviewEntity
+
     //graphql
     @Field(() => Int, { nullable: true })
     numberOfEnrollments?: number
@@ -159,11 +162,7 @@ export class CourseEntity {
     @Field(() => Boolean, { nullable: true })
     enrolled?: boolean
 
-    @Field(() => CourseReviewEntity, { nullable: true })
-    @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.course)
-    courseReview?: CourseReviewEntity
+    @Field(() => Float, {nullable: true})
+    courseProgress? : number
 
-    @Field(() => UserProgressEntity)
-    @OneToMany(() => UserProgressEntity, (userProgress) => userProgress.course, {nullable: true})
-    progresses? : Array<UserProgressEntity>
 }

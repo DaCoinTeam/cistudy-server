@@ -54,7 +54,8 @@ type QuizAttemptEntity {
   quizAttemptId: ID!
   quizId: ID!
   userId: ID!
-  score: Int!
+  score: Float
+  attemptStatus: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   user: UserEntity!
@@ -71,16 +72,12 @@ type QuizEntity {
   quizAttempts: QuizAttemptEntity!
 }
 
-type UserProgressEntity {
-  userProgressId: ID!
-  courseId: ID!
-  sectionId: ID!
+type ProgressEntity {
+  progressId: ID!
   lectureId: ID!
   userId: ID!
   isCompleted: Boolean!
-  course: CourseEntity!
   user: UserEntity!
-  section: SectionEntity!
   lecture: LectureEntity!
 }
 
@@ -99,7 +96,7 @@ type LectureEntity {
   section: SectionEntity!
   resources: [ResourceEntity!]!
   quiz: [QuizEntity!]
-  userProgresses: UserProgressEntity!
+  userProgresses: ProgressEntity!
 }
 
 type SectionEntity {
@@ -110,7 +107,6 @@ type SectionEntity {
   updatedAt: DateTime!
   course: CourseEntity!
   lectures: [LectureEntity!]!
-  userProgresses: [UserProgressEntity!]!
 }
 
 type CourseTargetEntity {
@@ -277,10 +273,10 @@ type CourseEntity {
   cartCourses: [CartCourseEntity!]!
   certificate: [CertificateEntity!]!
   orderCourses: [OrderCourseEntity!]!
+  courseReview: CourseReviewEntity
   numberOfEnrollments: Int
   enrolled: Boolean
-  courseReview: CourseReviewEntity
-  progresses: UserProgressEntity!
+  courseProgress: Float
 }
 
 type PostLikeEntity {
@@ -404,7 +400,7 @@ type UserEntity {
   cart: CartEntity!
   orders: OrderEntity!
   certificates: CertificateEntity!
-  courseProgresses: UserProgressEntity!
+  courseProgresses: ProgressEntity!
   quizAttempts: QuizAttemptEntity!
   followed: Boolean!
   numberOfFollowers: Int!
@@ -455,6 +451,15 @@ type FindManyResourcesOutput {
 type FindManyCourseTargetsOutput {
   data: [CourseTargetEntity!]!
   tokens: AuthTokens
+}
+
+type FindManyCourseReviewsOutputMetadata {
+  count: Int
+}
+
+type FindManyCourseReviewsOutputData {
+  results: [CourseReviewEntity!]!
+  metadata: FindManyCourseReviewsOutputMetadata
 }
 
 type FindOnePostOutput {
@@ -608,7 +613,7 @@ type Query {
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findManyCategories: [CategoryEntity!]!
   findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
-  findManyCourseReviews(data: FindManyCourseReviewsInputData!): [CourseReviewEntity!]!
+  findManyCourseReviews(data: FindManyCourseReviewsInputData!): FindManyCourseReviewsOutputData!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!

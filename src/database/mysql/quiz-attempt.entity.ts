@@ -1,14 +1,15 @@
-import { Field, ID, Int, ObjectType } from "@nestjs/graphql";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserEntity } from "./user.entity";
 import { QuizEntity } from "./quiz.entity";
+import { QuizAttemptStatus } from "@common";
 
 @ObjectType()
 @Entity("quiz-attempt")
 export class QuizAttemptEntity {
 
     @Field(() => ID)
-    @PrimaryColumn("uuid")
+    @PrimaryGeneratedColumn("uuid")
     quizAttemptId: string
 
     @Field(() => ID)
@@ -19,9 +20,13 @@ export class QuizAttemptEntity {
     @Column({ type: "uuid", length: 36 })
     userId: string
 
-    @Field(() => Int)
-    @Column({ type: "int", nullable: true })
+    @Field(() => Float, { nullable: true })
+    @Column({ type: "float", default: 0, nullable: true })
     score: Number;
+
+    @Field(() => String)
+    @Column({ type: "enum", enum: QuizAttemptStatus, default: QuizAttemptStatus.Started })
+    attemptStatus : QuizAttemptStatus
 
     @Field(() => Date)
     @CreateDateColumn()
@@ -32,12 +37,12 @@ export class QuizAttemptEntity {
     updatedAt: Date
 
     @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (user) => user.quizAttempts)
+    @ManyToOne(() => UserEntity, (user) => user.quizAttempts, {onDelete: "CASCADE"})
     @JoinColumn({ name: "userId" })
     user: UserEntity
 
     @Field(() => QuizEntity)
-    @ManyToOne(() => QuizEntity, (quiz) => quiz.quizAttempts)
+    @ManyToOne(() => QuizEntity, (quiz) => quiz.quizAttempts, {onDelete: "CASCADE"})
     @JoinColumn({ name: "quizId" })
     quiz: QuizEntity
 }

@@ -5,7 +5,7 @@ import { IsOptional, IsUUID } from "class-validator"
 export class CreateCourseOutputOthers {
     @ApiProperty()
     courseId: string
-} 
+}
 
 export class CreateCourseOutput implements Output<CreateCourseOutputOthers> {
     message: string
@@ -15,8 +15,8 @@ export class EnrollCourseOuputOthers {
     @ApiProperty()
     enrolledInfoId: string
 }
-export class EnrollCourseOutput implements Output<EnrollCourseOuputOthers>{
-    message : string
+export class EnrollCourseOutput implements Output<EnrollCourseOuputOthers> {
+    message: string
     others: EnrollCourseOuputOthers
 }
 
@@ -29,7 +29,7 @@ export class CreateCategoryOutputOthers {
     categoryId: string
 }
 
-export class CreateCategoryOutput implements Output<CreateCategoryOutputOthers>{
+export class CreateCategoryOutput implements Output<CreateCategoryOutputOthers> {
     message: string
     others: CreateCategoryOutputOthers
 }
@@ -39,8 +39,8 @@ export class CreateSubcategoryOutputOthers {
     subcategoryId: string
 }
 
-export class CreateSubcategoryOutput implements Output<CreateSubcategoryOutputOthers>{
-    message : string
+export class CreateSubcategoryOutput implements Output<CreateSubcategoryOutputOthers> {
+    message: string
     others: CreateSubcategoryOutputOthers
 }
 
@@ -49,12 +49,12 @@ export class CreateTopicOutputOthers {
     topicId: string
 }
 
-export class CreateTopicOutput implements Output<CreateTopicOutputOthers>{
-    message:string
+export class CreateTopicOutput implements Output<CreateTopicOutputOthers> {
+    message: string
     others: CreateTopicOutputOthers
 }
 
-export class DeleteTopicOutputData implements Output{
+export class DeleteTopicOutputData implements Output {
     message: string
 }
 
@@ -84,10 +84,31 @@ export class DeleteQuizOutput implements Output {
     message: string
 }
 
-export class UpdateQuizOutput implements Output{
+export class UpdateQuizOutput implements Output {
     message: string;
 }
 
-export class MarkLectureAsCompletedOutput implements Output{
+export class MarkLectureAsCompletedOutput implements Output {
     message: string
+}
+
+export class CreateQuizAttemptOutputOthers {
+    @IsUUID()
+    @ApiProperty()
+    quizAttemptId: string
+}
+
+export class CreateQuizAttemptOutput implements Output<CreateQuizAttemptOutputOthers> {
+    message: string;
+    others?: CreateQuizAttemptOutputOthers;
+}
+
+export class FinishQuizAttemptOutputOther {
+    @ApiProperty()
+    score: number
+}
+
+export class FinishQuizAttemptOutput implements Output<FinishQuizAttemptOutputOther> {
+    message: string;
+    others?: FinishQuizAttemptOutputOther;
 }

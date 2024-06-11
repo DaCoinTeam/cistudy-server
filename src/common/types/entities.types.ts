@@ -68,3 +68,12 @@ export enum VideoType {
 registerEnumType(VideoType, {
     name: "VideoType",
 })
+
+export enum QuizAttemptStatus {
+  Started = "started",
+  Ended = "ended"
+}
+
+registerEnumType(QuizAttemptStatus, {
+  name: "QuizAttemptStatus",
+})

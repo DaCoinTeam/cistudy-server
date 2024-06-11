@@ -14,7 +14,7 @@ import { ResourceEntity } from "./resource.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { ProcessStatus, VideoType } from "@common"
 import { QuizEntity } from "./quiz.entity"
-import { UserProgressEntity } from "./user-progress.entity"
+import { ProgressEntity } from "./progress.entity"
 
 @ObjectType()
 @Entity("lecture")
@@ -78,7 +78,7 @@ export class LectureEntity {
     @OneToOne(() => QuizEntity, (quiz) => quiz.quizId, { nullable: true })
     quiz?: QuizEntity
 
-    @Field(() => UserProgressEntity)
-    @OneToMany(() => UserProgressEntity, (userProgress) => userProgress.lecture)
-    userProgresses? : UserProgressEntity
+    @Field(() => ProgressEntity)
+    @OneToMany(() => ProgressEntity, (userProgress) => userProgress.lecture)
+    userProgresses? : ProgressEntity
 }

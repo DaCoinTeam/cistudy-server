@@ -500,3 +500,28 @@ export class MarkLectureAsCompletedInput implements AuthInput<MarkLectureAsCompl
     userId: string
     data: MarkLectureAsCompletedInputData
 }
+
+export class CreateQuizAttemptInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    quizId : string
+}
+
+export class CreateQuizAttemptInput implements AuthInput<CreateQuizAttemptInputData> {
+    userId: string
+    data: CreateQuizAttemptInputData
+}
+
+export class FinishQuizAttemptInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    quizAttemptId : string
+
+    @ApiProperty()
+    score: number
+}
+
+export class FinishQuizAttemptInput implements AuthInput<FinishQuizAttemptInputData>{
+    userId: string
+    data: FinishQuizAttemptInputData
+}

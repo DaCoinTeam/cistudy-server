@@ -13,7 +13,7 @@ import { CourseReviewEntity } from "./course-review.entity"
 import { CartEntity } from "./cart.entity"
 import { OrderEntity } from "./order.entity"
 import { CertificateEntity } from "./certificate"
-import { UserProgressEntity } from "./user-progress.entity"
+import { ProgressEntity } from "./progress.entity"
 import { QuizAttemptEntity } from "./quiz-attempt.entity"
 
 
@@ -161,9 +161,9 @@ export class UserEntity {
     @OneToMany(() => CertificateEntity, (certificates) => certificates.user, { nullable: true })
     certificates?: Array<CertificateEntity>
 
-    @Field(() => UserProgressEntity)
-    @OneToMany(() => UserProgressEntity, (progress) => progress.user, {nullable: true })
-    courseProgresses? : Array<UserProgressEntity>
+    @Field(() => ProgressEntity)
+    @OneToMany(() => ProgressEntity, (progress) => progress.user, {nullable: true })
+    courseProgresses? : Array<ProgressEntity>
 
     @Field(() => QuizAttemptEntity)
     @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.user, {nullable : true})

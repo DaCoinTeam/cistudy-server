@@ -2,7 +2,7 @@ import { Resolver, Query, Args } from "@nestjs/graphql"
 import { FindOneCourseInputData, FindManyCoursesInputData, FindManyLecturesInputData, FindManyResourcesInputData, FindOneLectureInputData, FindManyCourseTargetsInputData, FindOneCourseAuthInputData, FindOneCourseReviewInputData, FindManyCourseReviewsInputData } from "./courses.input"
 import { CoursesService } from "./courses.service"
 import { CategoryMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity } from "@database"
-import { FindManyCourseTargetsOutput, FindManyCoursesOutputData, FindManyLecturesOutput, FindManyResourcesOutput, FindOneCourseAuthOutput, FindOneLectureOutput } from "./courses.output"
+import { FindManyCourseReviewsOutputData, FindManyCourseTargetsOutput, FindManyCoursesOutputData, FindManyLecturesOutput, FindManyResourcesOutput, FindOneCourseAuthOutput, FindOneLectureOutput } from "./courses.output"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { JwtAuthGuard, AuthInterceptor, UserId } from "../shared"
 
@@ -67,7 +67,7 @@ export class CoursesResolver {
         return await this.coursesService.findOneCourseReview({ data })
     }
     
-    @Query(() => [CourseReviewMySqlEntity])
+    @Query(() => FindManyCourseReviewsOutputData)
     async findManyCourseReviews(@Args("data") data : FindManyCourseReviewsInputData) {
         return await this.coursesService.findManyCourseReviews({data})
     }

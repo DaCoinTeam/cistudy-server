@@ -11,7 +11,6 @@ import {
 import { LectureEntity } from "./lecture.entity"
 import { CourseEntity } from "./course.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
-import { UserProgressEntity } from "./user-progress.entity"
 
 @ObjectType()
 @Entity("section")
@@ -45,7 +44,4 @@ export class SectionEntity {
     @OneToMany(() => LectureEntity, (video) => video.section, { cascade: true })
     lectures: Array<LectureEntity>
 
-    @Field(() => [UserProgressEntity])
-    @OneToMany(() => UserProgressEntity, (userProgress) => userProgress.section)
-    userProgresses: Array<UserProgressEntity>
 }

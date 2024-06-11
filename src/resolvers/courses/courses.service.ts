@@ -23,7 +23,7 @@ import {
     FindOneCourseReviewInput,
     FindManyCourseReviewsInput,
 } from "./courses.input"
-import { FindManyCoursesOutputData } from "./courses.output"
+import { FindManyCourseReviewsOutputData, FindManyCoursesOutputData } from "./courses.output"
 import { SubcategoryEntity } from "src/database/mysql/subcategory.entity"
 
 @Injectable()
@@ -51,24 +51,47 @@ export class CoursesService {
         private readonly dataSource: DataSource
     ) { }
 
-    async findManyCourseReviews(input: FindManyCourseReviewsInput): Promise<Array<CourseReviewMySqlEntity>> {
+    async findManyCourseReviews(input: FindManyCourseReviewsInput): Promise<FindManyCourseReviewsOutputData> {
         const { data } = input;
         const { params, options } = data;
         const { courseId } = params;
         const { skip, take } = options
 
-        const result = await this.courseReviewMySqlRepository.find({
-            where: { courseId },
-            skip,
-            take,
-            relations: {
-                course: true,
-                user: true
-            },
-            order: { createdAt: 'DESC' }
-        });
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
 
-        return result;
+        try {
+            console.log(courseId)
+            const results = await this.courseReviewMySqlRepository.find({
+                where: { courseId },
+                relations: {
+                    course: true
+                },
+                skip,
+                take,
+                order: { createdAt: 'DESC' }
+            });
+            console.log(results.length)
+            const numberOfCourseReviewsResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(CourseReviewMySqlEntity, "course-review")
+                .where("courseId = :courseId ", { courseId })
+                .getRawOne()
+
+            return {
+                results,
+                metadata: {
+                    count: numberOfCourseReviewsResult.count,
+                }
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
     }
 
 

@@ -1,6 +1,7 @@
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
 import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
+import { IsOptional } from "class-validator"
 
 @InputType()
 export class FindOneCourseInputParams {
@@ -151,6 +152,7 @@ export class FindOneCourseReviewInputData implements ParamsOnly<FindOneCourseRev
 export class FindOneCourseReviewInput implements Input<FindOneCourseReviewInputData> {
     data: FindOneCourseReviewInputData
 }
+
 @InputType()
 export class FindManyCourseReviewsInputParams {
     @Field(() => ID)
@@ -170,33 +172,10 @@ export class FindManyCourseReviewsInputData implements ParamsWithOptions<FindMan
     @Field(() => FindManyCourseReviewsInputParams)
     params: FindManyCourseReviewsInputParams
     @Field(() => FindManyCourseReviewsInputOptions, { nullable: true })
+    @IsOptional()
     options?: FindManyCourseReviewsInputOptions
 }
 
-@InputType()
 export class FindManyCourseReviewsInput implements Input<FindManyCourseReviewsInputData> {
     data: FindManyCourseReviewsInputData
 }
-
-// @InputType()
-// export class FindManyCoursesInputOptions {
-//     @Field(() => Int, { nullable: true })
-//         take?: number
-//     @Field(() => Int, { nullable: true })
-//         skip?: number
-//     @Field(() => String, { nullable: true })
-//         searchValue?: string
-// }
-
-// @InputType()
-// export class FindManyCoursesInputData
-// implements
-//     OptionsOnly<FindManyCoursesInputOptions>
-// {
-//     @Field(() => FindManyCoursesInputOptions, { nullable: true })
-//         options?: FindManyCoursesInputOptions
-// }
-
-// export class FindManyCoursesInput implements Input<FindManyCoursesInputData> {
-//     data: FindManyCoursesInputData
-// }

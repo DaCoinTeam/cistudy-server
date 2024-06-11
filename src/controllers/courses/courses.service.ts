@@ -16,7 +16,8 @@ import {
     TopicMySqlEntity,
     QuizQuestionMySqlEntity,
     QuizQuestionMediaMySqlEntity,
-    UserProgressMySqlEntity,
+    ProgressMySqlEntity,
+    QuizAttemptMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, In } from "typeorm"
@@ -48,14 +49,16 @@ import {
 
     UpdateQuizInput,
     MarkLectureAsCompletedInput,
+    CreateQuizAttemptInput,
+    FinishQuizAttemptInput,
 
 
 
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
-import { ProcessStatus, VideoType, existKeyNotUndefined } from "@common"
-import { CreateCategoryOutput, CreateCertificateOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteQuizOutput, DeleteTopicOutputData, EnrollCourseOutput, MarkLectureAsCompletedOutput, UpdateCourseOutput, UpdateCourseReviewOutput, UpdateQuizOutput } from "./courses.output"
+import { ProcessStatus, QuizAttemptStatus, VideoType, existKeyNotUndefined } from "@common"
+import { CreateCategoryOutput, CreateCertificateOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateQuizAttemptOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteQuizOutput, DeleteTopicOutputData, EnrollCourseOutput, FinishQuizAttemptOutput, MarkLectureAsCompletedOutput, UpdateCourseOutput, UpdateCourseReviewOutput, UpdateQuizOutput } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
 import { QuizQuestionEntity } from "src/database/mysql/quiz-question.entity"
 
@@ -96,8 +99,10 @@ export class CoursesService {
         private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
         @InjectRepository(QuizQuestionMediaMySqlEntity)
         private readonly quizQuestionMediaMySqlRepository: Repository<QuizQuestionMediaMySqlEntity>,
-        @InjectRepository(UserProgressMySqlEntity)
-        private readonly userProgressMySqlRepository: Repository<UserProgressMySqlEntity>,
+        @InjectRepository(ProgressMySqlEntity)
+        private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
+        @InjectRepository(QuizAttemptMySqlEntity)
+        private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
         // @InjectModel(TransactionMongoEntity.name) private readonly transactionMongoModel: Model<TransactionMongoEntity>,
         // @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         private readonly storageService: StorageService,
@@ -171,16 +176,19 @@ export class CoursesService {
                 }
             });
 
-            const userProgressData = course.sections.flatMap(section =>
-                section.lectures.map(lecture => ({
-                    userId,
-                    courseId,
-                    sectionId: section.sectionId,
-                    lectureId: lecture.lectureId,
-                }))
-            );
+            const userProgressData = course.sections.reduce((acc, section) => {
+                section.lectures.forEach(lecture => {
+                    acc.push({
+                        userId,
+                        lectureId: lecture.lectureId,
+                        isCompleted: false // Giả sử bạn muốn khởi tạo với `isCompleted` là false
+                    });
+                });
+                return acc;
+            }, []);
 
-            await this.userProgressMySqlRepository.save(userProgressData);
+            await this.progressMySqlRepository.save(userProgressData);
+
             await queryRunner.commitTransaction()
 
             return {
@@ -993,12 +1001,86 @@ export class CoursesService {
 
     }
 
-    async markLectureAsCompleted(input : MarkLectureAsCompletedInput) : Promise<MarkLectureAsCompletedOutput>{
-        const {data, userId} = input
-        const {lectureId} = data
-        await this.userProgressMySqlRepository.update({userId, lectureId}, {isCompleted : true})
-        return { message: "User had completed this lecture"}
+    async markLectureAsCompleted(input: MarkLectureAsCompletedInput): Promise<MarkLectureAsCompletedOutput> {
+        const { data, userId } = input
+        const { lectureId } = data
+        await this.progressMySqlRepository.update({ userId, lectureId }, { isCompleted: true })
+        return { message: "User had completed this lecture" }
     }
 
+    async createQuizAttempt(input: CreateQuizAttemptInput): Promise<CreateQuizAttemptOutput> {
+        const { data, userId } = input
+        const { quizId } = data
+
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            const doing = await this.quizAttemptMySqlRepository.findOne({
+                where: {
+                    quizId,
+                    userId,
+                    attemptStatus: QuizAttemptStatus.Started
+                }
+            })
+
+            if (doing) {
+                throw new ConflictException("User havent completed the last attempt.")
+            }
+
+            // await queryRunner.manager.save(QuizAttemptMySqlEntity, {
+            //     quizId,
+            //     userId,
+            // })
+            const { quizAttemptId } = await this.quizAttemptMySqlRepository.save({ userId, quizId })
+            return {
+                message: "Attempt Started Successfully!",
+                others: {
+                    quizAttemptId
+                }
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
+    }
+
+    async finishQuizAttempt(input: FinishQuizAttemptInput): Promise<FinishQuizAttemptOutput> {
+        const { data } = input
+        const { quizAttemptId, score } = data
+
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            const attempt = await this.quizAttemptMySqlRepository.findOneBy({ quizAttemptId })
+
+            if (!attempt) {
+                throw new NotFoundException("Attempt not found")
+            }
+
+            if (attempt.attemptStatus === QuizAttemptStatus.Ended) {
+                throw new NotFoundException("Attempt already ended")
+            }
+
+            await this.quizAttemptMySqlRepository.update(quizAttemptId, { score, attemptStatus: QuizAttemptStatus.Ended })
+
+            return {
+                message: "Quiz ended successfully!",
+                others: {
+                    score
+                }
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
+    }
 }
 

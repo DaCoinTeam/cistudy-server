@@ -24,6 +24,7 @@ import {
     CreateCourseReviewInputData,
     CreateCourseTargetInputData,
     CreateLectureInputData,
+    CreateQuizAttemptInputData,
     CreateQuizInputData,
     CreateResourcesInputData,
     CreateSectionInputData,
@@ -31,6 +32,7 @@ import {
     CreateTopicInputData,
     DeleteQuizInputData,
     EnrollCourseInputData,
+    FinishQuizAttemptInputData,
     MarkLectureAsCompletedInputData,
     UpdateCourseInputData,
     UpdateCourseReviewInputData,
@@ -432,5 +434,27 @@ export class CoursesController {
         return await this.coursesService.markLectureAsCompleted({
             userId, data
         })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-quiz-attempt")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async createQuizAttempt(
+        @UserId() userId: string,
+        @Body() data: CreateQuizAttemptInputData,
+    ) {
+        return await this.coursesService.createQuizAttempt({ userId, data })
+    }
+
+    @ApiBearerAuth()
+    @Post("finish-quiz-attempt")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async finishQuizAttempt(
+        @UserId() userId: string,
+        @Body() data: FinishQuizAttemptInputData,
+    ) {
+        return await this.coursesService.finishQuizAttempt({ userId, data })
     }
 }
