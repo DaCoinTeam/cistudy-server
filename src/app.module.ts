@@ -1,6 +1,6 @@
 import { Module, ValidationPipe } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { appConfig, blockchainConfig, databaseConfig, jwtConfig, servicesConfig } from "./config"
+import { appConfig, blockchainConfig, databaseConfig, jwtConfig, keysConfig, servicesConfig } from "./config"
 import { ConfigModule } from "@nestjs/config"
 import { GlobalModule } from "@global"
 import { ControllersModule } from "@controllers"
@@ -24,7 +24,7 @@ import { CacheModule } from "@nestjs/cache-manager"
         ConfigModule.forRoot({
             isGlobal: true,
             expandVariables: true,
-            load: [databaseConfig, jwtConfig, servicesConfig, appConfig, blockchainConfig],
+            load: [databaseConfig, jwtConfig, servicesConfig, appConfig, blockchainConfig, keysConfig],
         }),
 
         BullModule.forRoot({

@@ -47,5 +47,7 @@ jobs:
         LIKE_POST_EARN_COEFFICIENT:  ${{ vars.LIKE_POST_EARN_COEFFICIENT }}
         COMMENT_POST_EARN_COEFFICIENT:  ${{ vars.COMMENT_POST_EARN_COEFFICIENT }}
         LIKE_POST_COMMENT_EARN_COEFFICIENT:  ${{ vars.LIKE_POST_COMMENT_EARN_COEFFICIENT }}
+        SSL_CERT:  ${{ secrets.SSL_CERT }}
+        SSL_KEY:  ${{ secrets.SSL_KEY }}
       run: docker compose -f docker/github-compose.yaml -p cistudy-server up --build -d 
  

@@ -1,6 +1,6 @@
 import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
-import { appConfig }  from "@config"
+import { appConfig, keysConfig }  from "@config"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 import { CoursesResolver, PostsResolver, ProfileResolver, UsersResolver, AuthResolver, TransactionsResolver } from "@resolvers"
 import { promises as fsPromises, readFileSync } from "fs"
@@ -39,9 +39,9 @@ const generateSchema = async () => {
 const bootstrap = async () => {
     const httpsOptions: HttpsOptions = getEnvValue({
         production: {
-            key: readFileSync(join(process.cwd(), "ssl", "private-key.pem")),
-            cert: readFileSync(join(process.cwd(), "ssl", "cert.pem"))
-        }
+            cert: keysConfig().ssl.cert,
+            key: keysConfig().ssl.key,
+        },
     })
 
     const app = await NestFactory.create(AppModule, {
