@@ -55,7 +55,7 @@ export class PostsService {
                     postMedias: true,
                 },
             })
-
+            console.log(post ? "tim ra" : "ko thay")
             const numberOfLikes = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
@@ -105,7 +105,7 @@ export class PostsService {
     async findManyPosts(
         input: FindManyPostsInput,
     ): Promise<FindManyPostsOutputData> {
-        const { data, userId } = input
+        const { data, accountId } = input
         const { params, options } = data
         const { courseId } = params
         const { take, skip } = { ...options }
@@ -165,7 +165,7 @@ export class PostsService {
                 .addSelect("post_like.liked", "liked")
                 .from(PostMySqlEntity, "post")
                 .innerJoin(PostLikeMySqlEntity, "post_like", "post.postId = post_like.postId")
-                .where("post_like.userId = :userId", { userId })
+                .where("post_like.accountId = :accountId", { accountId })
                 .andWhere("post_like.liked = :liked", { liked: true })
                 .getRawMany()
 
@@ -213,7 +213,7 @@ export class PostsService {
     async findManyPostComments(
         input: FindManyPostCommentsInput,
     ): Promise<FindManyPostCommentsOutputData> {
-        const { userId, data } = input
+        const { accountId, data } = input
         const { params, options } = data
         const { postId } = params
         const { take, skip } = { ...options }
@@ -255,7 +255,7 @@ export class PostsService {
                 .addSelect("post_comment_like.liked", "liked")
                 .from(PostCommentMySqlEntity, "post_comment")
                 .innerJoin(PostCommentLikeMySqlEntity, "post_comment_like", "post_comment.postCommentId = post_comment_like.postCommentId")
-                .where("post_comment_like.userId = :userId", { userId })
+                .where("post_comment_like.accountId = :accountId", { accountId })
                 .andWhere("post_comment_like.liked = :liked", { liked: true })
                 .getRawMany()
 

@@ -3,28 +3,27 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DeepPartial } from "typeorm"
 import { StorageService } from "@global"
 import { UpdateProfileInput } from "./profile.input"
-import { UserEntity } from "src/database/mysql/user.entity"
-import { UserMySqlEntity } from "@database"
+import { AccountMySqlEntity } from "@database"
 import { existKeyNotUndefined } from "@common"
 
 @Injectable()
 export class ProfileService {
     constructor(
-    @InjectRepository(UserEntity)
-    private readonly userMySqlRepository: Repository<UserEntity>,
+    @InjectRepository(AccountMySqlEntity)
+    private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
     private readonly storageService: StorageService,
     ) {}
 
     async updateProfile(input: UpdateProfileInput): Promise<string> {
-        const { userId, data, files } = input
+        const { accountId, data, files } = input
         const { username, birthdate, avatarIndex, coverPhotoIndex } = data
         //validate to ensure it is image
 
-        const { avatarId, coverPhotoId } = await this.userMySqlRepository.findOneBy(
-            { userId },
+        const { avatarId, coverPhotoId } = await this.accountMySqlRepository.findOneBy(
+            { accountId },
         )
 
-        const profile: DeepPartial<UserMySqlEntity> = { username, birthdate }
+        const profile: DeepPartial<AccountMySqlEntity> = { username, birthdate }
 
         if (Number.isInteger(avatarIndex)) {
             const file = files.at(avatarIndex)
@@ -61,8 +60,10 @@ export class ProfileService {
         }
 
         if (existKeyNotUndefined(profile))
-            await this.userMySqlRepository.update(userId, profile)
+            await this.accountMySqlRepository.update(accountId, profile)
 
-        return `A profile with id ${userId} has updated successfully.`
+        return `A profile with id ${accountId} has updated successfully.`
     }
+
+    
 }

@@ -1,10 +1,10 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
-import { FindOneCourseInputData, FindManyCoursesInputData, FindManyLecturesInputData, FindManyResourcesInputData, FindOneLectureInputData, FindManyCourseTargetsInputData, FindOneCourseAuthInputData, FindOneCourseReviewInputData, FindManyCourseReviewsInputData } from "./courses.input"
+import { FindOneCourseInputData, FindManyCoursesInputData, FindManyLessonsInputData, FindManyResourcesInputData, FindOneLessonInputData, FindManyCourseTargetsInputData, FindOneCourseAuthInputData, FindOneCourseReviewInputData, FindManyCourseReviewsInputData, FindManyCoursesTopicInputData } from "./courses.input"
 import { CoursesService } from "./courses.service"
-import { CategoryMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity } from "@database"
-import { FindManyCourseReviewsOutputData, FindManyCourseTargetsOutput, FindManyCoursesOutputData, FindManyLecturesOutput, FindManyResourcesOutput, FindOneCourseAuthOutput, FindOneLectureOutput } from "./courses.output"
+import { CategoryMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity, TopicMySqlEntity } from "@database"
+import { FindManyCourseReviewsOutputData, FindManyCourseTargetsOutput, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindManyLessonsOutput, FindManyResourcesOutput, FindOneCourseAuthOutput, FindOneLessonOutput } from "./courses.output"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
-import { JwtAuthGuard, AuthInterceptor, UserId } from "../shared"
+import { JwtAuthGuard, AuthInterceptor, AccountId } from "../shared"
 
 @Resolver()
 export class CoursesResolver {
@@ -20,8 +20,8 @@ export class CoursesResolver {
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     @Query(() => FindOneCourseAuthOutput)
-    async findOneCourseAuth(@UserId() userId: string, @Args("data") data: FindOneCourseAuthInputData) {
-        return await this.coursesService.findOneCourseAuth({ data, userId })
+    async findOneCourseAuth(@AccountId() accountId: string, @Args("data") data: FindOneCourseAuthInputData) {
+        return await this.coursesService.findOneCourseAuth({ data, accountId })
     }
 
     @Query(() => FindManyCoursesOutputData)
@@ -31,30 +31,30 @@ export class CoursesResolver {
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    @Query(() => FindOneLectureOutput)
-    async findOneLecture(@UserId() userId: string, @Args("data") data: FindOneLectureInputData) {
-        return await this.coursesService.findOneLecture({ userId, data })
+    @Query(() => FindOneLessonOutput)
+    async findOneLesson(@AccountId() accountId: string, @Args("data") data: FindOneLessonInputData) {
+        return await this.coursesService.findOneLesson({ accountId, data })
     }
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    @Query(() => FindManyLecturesOutput)
-    async findManyLectures(@UserId() userId: string, @Args("data") data: FindManyLecturesInputData) {
-        return await this.coursesService.findManyLectures({ userId, data })
+    @Query(() => FindManyLessonsOutput)
+    async findManyLessons(@AccountId() accountId: string, @Args("data") data: FindManyLessonsInputData) {
+        return await this.coursesService.findManyLessons({ accountId, data })
     }
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     @Query(() => FindManyResourcesOutput)
-    async findManyResources(@UserId() userId: string, @Args("data") data: FindManyResourcesInputData) {
-        return await this.coursesService.findManyResources({ userId, data })
+    async findManyResources(@AccountId() accountId: string, @Args("data") data: FindManyResourcesInputData) {
+        return await this.coursesService.findManyResources({ accountId, data })
     }
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     @Query(() => FindManyCourseTargetsOutput)
-    async findManyCourseTargets(@UserId() userId: string, @Args("data") data: FindManyCourseTargetsInputData) {
-        return await this.coursesService.findManyCourseTargets({ userId, data })
+    async findManyCourseTargets(@AccountId() accountId: string, @Args("data") data: FindManyCourseTargetsInputData) {
+        return await this.coursesService.findManyCourseTargets({ accountId, data })
     }
 
     @Query(() => [CategoryMySqlEntity])
@@ -70,6 +70,16 @@ export class CoursesResolver {
     @Query(() => FindManyCourseReviewsOutputData)
     async findManyCourseReviews(@Args("data") data : FindManyCourseReviewsInputData) {
         return await this.coursesService.findManyCourseReviews({data})
+    }
+
+    // @Query(() => [TopicMySqlEntity])
+    // async findManyTopics() {
+    //     return await this.coursesService.findManyCoursesTopic({data})
+    // }
+
+    @Query(() => FindManyCoursesTopicOutputData)
+    async findManyCoursesTopic(@Args("data") data : FindManyCoursesTopicInputData) {
+        return await this.coursesService.findManyCoursesTopic({data})
     }
 
 }

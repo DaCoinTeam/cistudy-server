@@ -4,14 +4,14 @@ import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     CourseMySqlEntity,
     FollowMySqlEnitity,
-    UserMySqlEntity,
+    AccountMySqlEntity,
 } from "@database"
 import { ProfileService } from "./profile.service"
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
-            UserMySqlEntity,
+            AccountMySqlEntity,
             FollowMySqlEnitity,
             CourseMySqlEntity
         ]),

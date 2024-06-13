@@ -1,6 +1,6 @@
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql";
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
-import { LectureEntity } from "./lecture.entity";
+import { LessonEntity } from "./lesson.entity";
 import { QuizQuestionEntity } from "./quiz-question.entity";
 import { QuizAttemptEntity } from "./quiz-attempt.entity";
 
@@ -28,10 +28,10 @@ export class QuizEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @Field(() => LectureEntity)
-    @OneToOne(() => LectureEntity, (lecture) => lecture.quiz, {onDelete : "CASCADE"})
+    @Field(() => LessonEntity)
+    @OneToOne(() => LessonEntity, (lesson) => lesson.quiz, {onDelete : "CASCADE"})
     @JoinColumn({ name: "quizId" })
-    lecture: LectureEntity
+    lesson: LessonEntity
 
     @Field(() => QuizAttemptEntity)
     @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.quiz)

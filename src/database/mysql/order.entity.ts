@@ -8,7 +8,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm"
-import { UserEntity } from "./user.entity"
+import { AccountEntity } from "./account.entity"
 import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
 import { OrderCourseEntity } from "./order-course.entity"
 import { OrderStatus } from "@common"
@@ -23,7 +23,7 @@ export class OrderEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    userId: string
+    accountId: string
 
     @Field(() => String)
     @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.Pending })
@@ -54,8 +54,8 @@ export class OrderEntity {
     isDeleted: Boolean
 
     //relations
-    @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (user) => user.orders)
-    @JoinColumn({ name: "userId" })
-    user: UserEntity
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (account) => account.orders)
+    @JoinColumn({ name: "accountId" })
+    account: AccountEntity
 }

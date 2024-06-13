@@ -2,13 +2,14 @@ import { Field, ID, InputType, Int } from "@nestjs/graphql"
 import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsOptional } from "class-validator"
+import { CourseMySqlEntity } from "@database"
 
 @InputType()
 export class FindOneCourseInputParams {
     @Field(() => ID)
     courseId: string
     @Field(() => ID, { nullable: true })
-    userId?: string
+    accountId?: string
 }
 
 @InputType()
@@ -34,51 +35,51 @@ export class FindOneCourseAuthInputData implements ParamsOnly<FindOneCourseAuthI
 }
 
 export class FindOneCourseAuthInput implements AuthInput<FindOneCourseAuthInputData> {
-    userId: string
+    accountId: string
     data: FindOneCourseAuthInputData
 }
 
 
 @InputType()
-export class FindOneLectureInputParams {
+export class FindOneLessonInputParams {
     @Field(() => ID)
-    lectureId: string
+    lessonId: string
 }
 
 @InputType()
-export class FindOneLectureInputOptions {
+export class FindOneLessonInputOptions {
     @Field(() => ID, { nullable: true })
     followerId?: string
 }
 
 @InputType()
-export class FindOneLectureInputData implements ParamsWithOptions<FindOneLectureInputParams, FindOneLectureInputOptions> {
-    @Field(() => FindOneLectureInputParams)
-    params: FindOneLectureInputParams
-    @Field(() => FindOneLectureInputOptions, { nullable: true })
-    options?: FindOneLectureInputOptions
+export class FindOneLessonInputData implements ParamsWithOptions<FindOneLessonInputParams, FindOneLessonInputOptions> {
+    @Field(() => FindOneLessonInputParams)
+    params: FindOneLessonInputParams
+    @Field(() => FindOneLessonInputOptions, { nullable: true })
+    options?: FindOneLessonInputOptions
 }
 
-export class FindOneLectureInput implements AuthInput<FindOneLectureInputData> {
-    userId: string
-    data: FindOneLectureInputData
+export class FindOneLessonInput implements AuthInput<FindOneLessonInputData> {
+    accountId: string
+    data: FindOneLessonInputData
 }
 
 @InputType()
-export class FindManyLecturesInputParams {
+export class FindManyLessonsInputParams {
     @Field(() => ID)
     sectionId: string
 }
 
 @InputType()
-export class FindManyLecturesInputData implements ParamsOnly<FindManyLecturesInputParams> {
-    @Field(() => FindManyLecturesInputParams)
-    params: FindManyLecturesInputParams
+export class FindManyLessonsInputData implements ParamsOnly<FindManyLessonsInputParams> {
+    @Field(() => FindManyLessonsInputParams)
+    params: FindManyLessonsInputParams
 }
 
-export class FindManyLecturesInput implements AuthInput<FindManyLecturesInputData> {
-    userId: string
-    data: FindManyLecturesInputData
+export class FindManyLessonsInput implements AuthInput<FindManyLessonsInputData> {
+    accountId: string
+    data: FindManyLessonsInputData
 }
 
 @InputType()
@@ -106,7 +107,7 @@ export class FindManyCoursesInput implements Input<FindManyCoursesInputData> {
 @InputType()
 export class FindManyResourcesInputParams {
     @Field(() => ID)
-    lectureId: string
+    lessonId: string
 }
 
 @InputType()
@@ -116,7 +117,7 @@ export class FindManyResourcesInputData implements ParamsOnly<FindManyResourcesI
 }
 
 export class FindManyResourcesInput implements AuthInput<FindManyResourcesInputData> {
-    userId: string
+    accountId: string
     data: FindManyResourcesInputData
 }
 
@@ -133,7 +134,7 @@ export class FindManyCourseTargetsInputData implements ParamsOnly<FindManyCourse
 }
 
 export class FindManyCourseTargetsInput implements AuthInput<FindManyCourseTargetsInputData> {
-    userId: string
+    accountId: string
     data: FindManyCourseTargetsInputData
 }
 
@@ -178,4 +179,32 @@ export class FindManyCourseReviewsInputData implements ParamsWithOptions<FindMan
 
 export class FindManyCourseReviewsInput implements Input<FindManyCourseReviewsInputData> {
     data: FindManyCourseReviewsInputData
+}
+
+@InputType()
+export class FindManyCoursesTopicInputOptions{
+    @Field(() => Int, { nullable: true })
+    take?: number
+    @Field(() => Int, { nullable: true })
+    skip?: number
+}
+
+@InputType()
+export class FindManyCoursesTopicInputParams {
+    @Field(() => ID)
+    topicId: string
+}
+
+@InputType()
+export class FindManyCoursesTopicInputData implements ParamsWithOptions<FindManyCoursesTopicInputParams, FindManyCoursesTopicInputOptions>{
+    @Field(() => FindManyCoursesTopicInputParams)
+    params: FindManyCoursesTopicInputParams;
+
+    @Field(() => FindManyCoursesTopicInputOptions, { nullable: true })
+    @IsOptional()
+    options?: FindManyCoursesTopicInputOptions;
+}
+
+export class FindManyCoursesTopicInput implements Input<FindManyCoursesTopicInputData>{
+    data: FindManyCoursesTopicInputData
 }

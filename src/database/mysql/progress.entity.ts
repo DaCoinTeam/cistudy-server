@@ -8,8 +8,8 @@ import {
     UpdateDateColumn,
     JoinColumn
 } from 'typeorm';
-import { UserEntity } from './user.entity';
-import { LectureEntity } from './lecture.entity';
+import { AccountEntity } from './account.entity';
+import { LessonEntity } from './lesson.entity';
 
 @ObjectType()
 @Entity("progress")
@@ -21,25 +21,25 @@ export class ProgressEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    lectureId: string
+    lessonId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    userId: string
+    accountId: string
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ type: "boolean", default: false })
     isCompleted: Boolean;
 
-    @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (user) => user.courseProgresses, {onDelete: "CASCADE"})
-    @JoinColumn({ name: "userId" })
-    user: UserEntity;
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (account) => account.courseProgresses, {onDelete: "CASCADE"})
+    @JoinColumn({ name: "accountId" })
+    account: AccountEntity;
 
-    @Field(() => LectureEntity)
-    @ManyToOne(() => LectureEntity, (lecture) => lecture.userProgresses, {onDelete: "CASCADE"} )
-    @JoinColumn({ name: "lectureId" })
-    lecture: LectureEntity;
+    @Field(() => LessonEntity)
+    @ManyToOne(() => LessonEntity, (lesson) => lesson.userProgresses, {onDelete: "CASCADE"} )
+    @JoinColumn({ name: "lessonId" })
+    lesson: LessonEntity;
 
     @CreateDateColumn()
     createdAt: Date;

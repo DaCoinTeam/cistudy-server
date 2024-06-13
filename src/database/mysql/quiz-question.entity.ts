@@ -1,7 +1,7 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { QuizQuestionAnswerEntity } from "./quiz-question-answer.entity";
-import { LectureEntity } from "./lecture.entity";
+import { LessonEntity } from "./lesson.entity";
 import { QuizEntity } from "./quiz.entity";
 import { QuizQuestionMediaEntity } from "./quiz-question-media.entity";
 

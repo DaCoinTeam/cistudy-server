@@ -6,8 +6,8 @@ export const DataFromBody = createParamDecorator((_, ctx: ExecutionContext) => {
     return JSON.parse(request.body.data)
 })
 
-export const UserId = createParamDecorator((_, ctx: ExecutionContext) : string => {
+export const AccountId = createParamDecorator((_, ctx: ExecutionContext) : string => {
     const request = ctx.switchToHttp().getRequest()
-    const { userId } = request.user as Payload
-    return userId
+    const { accountId } = request.user as Payload
+    return accountId
 })

@@ -7,10 +7,10 @@ type ResourceEntity {
   resourceId: ID!
   name: String!
   fileId: String!
-  lectureId: ID!
+  lessonId: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  lecture: LectureEntity!
+  lesson: LessonEntity!
 }
 
 """
@@ -53,12 +53,12 @@ type QuizQuestionEntity {
 type QuizAttemptEntity {
   quizAttemptId: ID!
   quizId: ID!
-  userId: ID!
+  accountId: ID!
   score: Float
   attemptStatus: String!
   createdAt: DateTime!
   updatedAt: DateTime!
-  user: UserEntity!
+  account: AccountEntity!
   quiz: QuizEntity!
 }
 
@@ -68,24 +68,24 @@ type QuizEntity {
   timeLimit: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
-  lecture: LectureEntity!
+  lesson: LessonEntity!
   quizAttempts: QuizAttemptEntity!
 }
 
 type ProgressEntity {
   progressId: ID!
-  lectureId: ID!
-  userId: ID!
+  lessonId: ID!
+  accountId: ID!
   isCompleted: Boolean!
-  user: UserEntity!
-  lecture: LectureEntity!
+  account: AccountEntity!
+  lesson: LessonEntity!
 }
 
-type LectureEntity {
-  lectureId: ID!
+type LessonEntity {
+  lessonId: ID!
   title: String!
   thumbnailId: ID
-  lectureVideoId: ID
+  lessonVideoId: ID
   sectionId: ID!
   processStatus: String!
   videoType: String!
@@ -106,7 +106,7 @@ type SectionEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   course: CourseEntity!
-  lectures: [LectureEntity!]!
+  lessons: [LessonEntity!]!
 }
 
 type CourseTargetEntity {
@@ -182,13 +182,13 @@ type CourseTopicEntity {
 type CourseReviewEntity {
   courseReviewId: ID!
   courseId: ID!
-  userId: ID!
+  accountId: ID!
   content: String
   rating: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
   course: CourseEntity!
-  user: UserEntity!
+  account: AccountEntity!
 }
 
 type CartEntity {
@@ -197,7 +197,7 @@ type CartEntity {
   isDeleted: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
-  user: UserEntity!
+  account: AccountEntity!
 }
 
 type CartCourseEntity {
@@ -213,17 +213,17 @@ type CartCourseEntity {
 type CertificateEntity {
   certificateId: ID!
   courseId: ID!
-  userId: ID!
+  accountId: ID!
   createdAt: DateTime!
   achievedDate: DateTime
   expireDate: DateTime
-  user: UserEntity!
+  account: AccountEntity!
   course: CourseEntity
 }
 
 type OrderEntity {
   orderId: ID!
-  userId: ID!
+  accountId: ID!
   orderStatus: String!
   orderCourses: [OrderCourseEntity!]
   createdAt: DateTime!
@@ -231,7 +231,7 @@ type OrderEntity {
   updatedAt: DateTime!
   paymentDue: DateTime
   isDeleted: Boolean!
-  user: UserEntity!
+  account: AccountEntity!
 }
 
 type OrderCourseEntity {
@@ -256,11 +256,12 @@ type CourseEntity {
   discountPrice: Float!
   enableDiscount: Boolean!
   verifyStatus: String!
-  creator: UserEntity!
+  creator: AccountEntity!
   isDeleted: Boolean!
   receivedWalletAddress: String
   previewVideoId: ID
   includes: String
+  approveStatus: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   courseTopics: [CourseTopicEntity!]!
@@ -281,12 +282,12 @@ type CourseEntity {
 
 type PostLikeEntity {
   postLikeId: ID!
-  userId: String!
+  accountId: String!
   postId: String!
   liked: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
-  user: UserEntity!
+  account: AccountEntity!
   post: PostEntity!
 }
 
@@ -304,10 +305,11 @@ type PostEntity {
   title: String!
   creatorId: ID!
   courseId: ID!
+  allowComments: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   html: String!
-  creator: UserEntity!
+  creator: AccountEntity!
   postMedias: [PostMediaEntity!]!
   postComments: [PostCommentEntity!]!
   postReacts: [PostLikeEntity!]!
@@ -333,7 +335,7 @@ type PostCommentReplyEntity {
   updatedAt: DateTime!
   content: String!
   postComment: PostEntity!
-  creator: UserEntity!
+  creator: AccountEntity!
 }
 
 type PostCommentEntity {
@@ -344,7 +346,7 @@ type PostCommentEntity {
   updatedAt: DateTime!
   html: String!
   post: PostEntity!
-  creator: UserEntity!
+  creator: AccountEntity!
   postCommentMedias: [PostCommentMediaEntity!]!
   numberOfLikes: Int
   numberOfReplies: Int
@@ -358,8 +360,8 @@ type FollowEntity {
   followed: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
-  follower: UserEntity!
-  followedUser: UserEntity!
+  follower: AccountEntity!
+  followedUser: AccountEntity!
 }
 
 type CryptoWalletEntity {
@@ -367,12 +369,12 @@ type CryptoWalletEntity {
   address: String!
   createdAt: DateTime!
   updatedAt: DateTime!
-  userId: ID!
-  user: UserEntity!
+  accountId: ID!
+  account: AccountEntity!
 }
 
-type UserEntity {
-  userId: ID!
+type AccountEntity {
+  accountId: ID!
   email: String!
   password: String
   avatarId: ID
@@ -381,7 +383,7 @@ type UserEntity {
   phoneNumber: String
   username: String
   balance: Float
-  userRole: String!
+  accountRole: String!
   walletId: ID
   firstName: String
   lastName: String
@@ -433,13 +435,13 @@ type FindOneCourseAuthOutput {
   tokens: AuthTokens
 }
 
-type FindOneLectureOutput {
-  data: LectureEntity!
+type FindOneLessonOutput {
+  data: LessonEntity!
   tokens: AuthTokens
 }
 
-type FindManyLecturesOutput {
-  data: [LectureEntity!]!
+type FindManyLessonsOutput {
+  data: [LessonEntity!]!
   tokens: AuthTokens
 }
 
@@ -460,6 +462,15 @@ type FindManyCourseReviewsOutputMetadata {
 type FindManyCourseReviewsOutputData {
   results: [CourseReviewEntity!]!
   metadata: FindManyCourseReviewsOutputMetadata
+}
+
+type FindManyCoursesTopicOutputMetadata {
+  count: Int
+}
+
+type FindManyCoursesTopicOutputData {
+  results: [CourseEntity!]!
+  metadata: FindManyCoursesTopicOutputMetadata
 }
 
 type FindOnePostOutput {
@@ -515,7 +526,7 @@ type FindManyUsersOutputMetadata {
 }
 
 type FindManyUsersOutputData {
-  results: [UserEntity!]!
+  results: [AccountEntity!]!
   metadata: FindManyUsersOutputMetadata
 }
 
@@ -553,17 +564,17 @@ type FindManyEnrolledCoursesOutput {
 }
 
 type InitOutput {
-  data: UserEntity!
+  data: AccountEntity!
   tokens: AuthTokens
 }
 
 type SignInOutput {
-  data: UserEntity!
+  data: AccountEntity!
   tokens: AuthTokens
 }
 
 type VerifyGoogleAccessTokenOutput {
-  data: UserEntity!
+  data: AccountEntity!
   tokens: AuthTokens
 }
 
@@ -607,20 +618,21 @@ type Query {
   findOneCourse(data: FindOneCourseInputData!): CourseEntity!
   findOneCourseAuth(data: FindOneCourseAuthInputData!): FindOneCourseAuthOutput!
   findManyCourses(data: FindManyCoursesInputData!): FindManyCoursesOutputData!
-  findOneLecture(data: FindOneLectureInputData!): FindOneLectureOutput!
-  findManyLectures(data: FindManyLecturesInputData!): FindManyLecturesOutput!
+  findOneLesson(data: FindOneLessonInputData!): FindOneLessonOutput!
+  findManyLessons(data: FindManyLessonsInputData!): FindManyLessonsOutput!
   findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findManyCategories: [CategoryEntity!]!
   findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
   findManyCourseReviews(data: FindManyCourseReviewsInputData!): FindManyCourseReviewsOutputData!
+  findManyCoursesTopic(data: FindManyCoursesTopicInputData!): FindManyCoursesTopicOutputData!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
   findManyPostComments(data: FindManyPostCommentsInputData!): FindManyPostCommentsOutput!
   findManyPostCommentReplies(data: FindManyPostCommentRepliesInputData!): FindManyPostCommentRepliesOutput!
-  findOneUser(data: FindOneUserInputData!): UserEntity!
-  findManyFollowers(data: FindManyFollowersInputData!): [UserEntity!]!
+  findOneUser(data: FindOneUserInputData!): AccountEntity!
+  findManyFollowers(data: FindManyFollowersInputData!): [AccountEntity!]!
   findManyCreatedCourses(data: FindManyCreatedCoursesInputData!): [CourseEntity!]!
   findManyUsers(data: FindManyUsersInputData!): FindManyUsersOutput!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
@@ -654,7 +666,7 @@ input FindOneCourseInputData {
 
 input FindOneCourseInputParams {
   courseId: ID!
-  userId: ID
+  accountId: ID
 }
 
 input FindOneCourseAuthInputData {
@@ -675,24 +687,24 @@ input FindManyCoursesInputOptions {
   searchValue: String
 }
 
-input FindOneLectureInputData {
-  params: FindOneLectureInputParams!
-  options: FindOneLectureInputOptions
+input FindOneLessonInputData {
+  params: FindOneLessonInputParams!
+  options: FindOneLessonInputOptions
 }
 
-input FindOneLectureInputParams {
-  lectureId: ID!
+input FindOneLessonInputParams {
+  lessonId: ID!
 }
 
-input FindOneLectureInputOptions {
+input FindOneLessonInputOptions {
   followerId: ID
 }
 
-input FindManyLecturesInputData {
-  params: FindManyLecturesInputParams!
+input FindManyLessonsInputData {
+  params: FindManyLessonsInputParams!
 }
 
-input FindManyLecturesInputParams {
+input FindManyLessonsInputParams {
   sectionId: ID!
 }
 
@@ -701,7 +713,7 @@ input FindManyResourcesInputData {
 }
 
 input FindManyResourcesInputParams {
-  lectureId: ID!
+  lessonId: ID!
 }
 
 input FindManyCourseTargetsInputData {
@@ -730,6 +742,20 @@ input FindManyCourseReviewsInputParams {
 }
 
 input FindManyCourseReviewsInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManyCoursesTopicInputData {
+  params: FindManyCoursesTopicInputParams!
+  options: FindManyCoursesTopicInputOptions
+}
+
+input FindManyCoursesTopicInputParams {
+  topicId: ID!
+}
+
+input FindManyCoursesTopicInputOptions {
   take: Int
   skip: Int
 }
@@ -798,7 +824,7 @@ input FindOneUserInputData {
 }
 
 input FindOneUserInputParams {
-  userId: ID!
+  accountId: ID!
 }
 
 input FindOneUserInputOptions {
@@ -810,7 +836,7 @@ input FindManyFollowersInputData {
 }
 
 input FindManyFollowersInputParams {
-  userId: ID!
+  accountId: ID!
 }
 
 input FindManyCreatedCoursesInputData {
@@ -819,7 +845,7 @@ input FindManyCreatedCoursesInputData {
 }
 
 input FindManyCreatedCoursesInputParams {
-  userId: String!
+  accountId: String!
 }
 
 input FindManyCreatedCoursesInputOptions {

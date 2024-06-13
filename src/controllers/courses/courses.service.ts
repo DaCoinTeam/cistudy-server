@@ -7,7 +7,7 @@ import {
     CourseSubcategoryMySqlEntity,
     CourseTargetMySqlEntity,
     CourseTopicMySqlEntity,
-    LectureMySqlEntity,
+    LessonMySqlEntity,
     QuizQuestionAnswerMySqlEntity,
     QuizMySqlEntity,
     ResourceMySqlEntity,
@@ -18,6 +18,7 @@ import {
     QuizQuestionMediaMySqlEntity,
     ProgressMySqlEntity,
     QuizAttemptMySqlEntity,
+    AccountMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, In } from "typeorm"
@@ -25,14 +26,14 @@ import { StorageService } from "@global"
 import {
     CreateCourseInput,
     CreateSectionInput,
-    CreateLectureInput,
+    CreateLessonInput,
     UpdateCourseInput,
     CreateCourseTargetInput,
     UpdateCourseTargetInput,
     DeleteCourseTargetInput,
     CreateResourcesInput,
-    UpdateLectureInput,
-    DeleteLectureInput,
+    UpdateLessonInput,
+    DeleteLessonInput,
     DeleteSectionInput,
     UpdateSectionInput,
     DeleteResourceInput,
@@ -48,9 +49,10 @@ import {
     CreateQuizInput,
 
     UpdateQuizInput,
-    MarkLectureAsCompletedInput,
+    MarkLessonAsCompletedInput,
     CreateQuizAttemptInput,
     FinishQuizAttemptInput,
+    GiveAwayCourseInput,
 
 
 
@@ -58,7 +60,7 @@ import {
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import { ProcessStatus, QuizAttemptStatus, VideoType, existKeyNotUndefined } from "@common"
-import { CreateCategoryOutput, CreateCertificateOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateQuizAttemptOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteQuizOutput, DeleteTopicOutputData, EnrollCourseOutput, FinishQuizAttemptOutput, MarkLectureAsCompletedOutput, UpdateCourseOutput, UpdateCourseReviewOutput, UpdateQuizOutput } from "./courses.output"
+import { CreateCategoryOutput, CreateCertificateOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateQuizAttemptOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteQuizOutput, DeleteTopicOutputData, EnrollCourseOutput, FinishQuizAttemptOutput, MarkLessonAsCompletedOutput, UpdateCourseOutput, UpdateCourseReviewOutput, UpdateQuizOutput } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
 import { QuizQuestionEntity } from "src/database/mysql/quiz-question.entity"
 
@@ -69,8 +71,8 @@ export class CoursesService {
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
         @InjectRepository(SectionMySqlEntity)
         private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
-        @InjectRepository(LectureMySqlEntity)
-        private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
+        @InjectRepository(LessonMySqlEntity)
+        private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
         @InjectRepository(CourseTargetMySqlEntity)
         private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
         @InjectRepository(ResourceMySqlEntity)
@@ -103,6 +105,8 @@ export class CoursesService {
         private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
         @InjectRepository(QuizAttemptMySqlEntity)
         private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
+        @InjectRepository(AccountMySqlEntity)
+        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
         // @InjectModel(TransactionMongoEntity.name) private readonly transactionMongoModel: Model<TransactionMongoEntity>,
         // @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         private readonly storageService: StorageService,
@@ -111,7 +115,7 @@ export class CoursesService {
     ) { }
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
-        const { data, userId } = input
+        const { data, accountId } = input
         const { courseId } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -121,7 +125,7 @@ export class CoursesService {
         try {
             const found = await this.enrolledInfoMySqlRepository.findOne({
                 where: {
-                    userId, courseId
+                    accountId, courseId
                 }
             }
             )
@@ -161,7 +165,7 @@ export class CoursesService {
             const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
                 enrolledInfoId: found?.enrolledInfoId,
                 courseId,
-                userId,
+                accountId,
                 enrolled: true,
                 priceAtEnrolled: price
             })
@@ -171,23 +175,23 @@ export class CoursesService {
                 },
                 relations: {
                     sections: {
-                        lectures: true
+                        lessons: true
                     }
                 }
             });
 
-            const userProgressData = course.sections.reduce((acc, section) => {
-                section.lectures.forEach(lecture => {
+            const progresses = course.sections.reduce((acc, section) => {
+                section.lessons.forEach(lesson => {
                     acc.push({
-                        userId,
-                        lectureId: lecture.lectureId,
+                        accountId,
+                        lessonId: lesson.lessonId,
                         isCompleted: false // Giả sử bạn muốn khởi tạo với `isCompleted` là false
                     });
                 });
                 return acc;
             }, []);
 
-            await this.progressMySqlRepository.save(userProgressData);
+            await this.progressMySqlRepository.save(progresses);
 
             await queryRunner.commitTransaction()
 
@@ -205,9 +209,9 @@ export class CoursesService {
     }
 
     async createCourse(input: CreateCourseInput): Promise<CreateCourseOutput> {
-        const { userId } = input
+        const { accountId } = input
         const created = await this.courseMySqlRepository.save({
-            creatorId: userId,
+            creatorId: accountId,
         })
 
         if (created)
@@ -318,11 +322,11 @@ export class CoursesService {
     }
 
     async createCourseReview(input: CreateCourseReviewInput): Promise<CreateCourseReviewOutput> {
-        const { data, userId } = input;
+        const { data, accountId } = input;
         const { courseId, content, rating } = data;
 
         const reviewed = await this.courseReviewMySqlRepository.findOne({
-            where: { userId, courseId }
+            where: { accountId, courseId }
         });
 
         if (reviewed) {
@@ -332,7 +336,7 @@ export class CoursesService {
         try {
             const result = await this.courseReviewMySqlRepository.save({
                 courseId,
-                userId,
+                accountId,
                 content,
                 rating,
             });
@@ -346,10 +350,10 @@ export class CoursesService {
     }
 
     async updateCourseReview(input: UpdateCourseReviewInput): Promise<UpdateCourseReviewOutput> {
-        const { data, userId } = input;
+        const { data, accountId } = input;
         const { content, rating, courseReviewId } = data;
 
-        const reviewed = await this.courseReviewMySqlRepository.findOne({ where: { courseReviewId, userId } });
+        const reviewed = await this.courseReviewMySqlRepository.findOne({ where: { courseReviewId, accountId } });
         if (!reviewed) {
             throw new NotFoundException("This review is not found or not owned by sender.")
         }
@@ -366,13 +370,13 @@ export class CoursesService {
     }
 
     async deleteCourseReview(input: DeleteCourseReviewInput): Promise<DeleteCourseReviewOutput> {
-        const { data, userId } = input;
+        const { data, accountId } = input;
         const { courseReviewId } = data;
 
         const reviewed = await this.courseReviewMySqlRepository.findOne({
             where: {
                 courseReviewId,
-                userId
+                accountId
             }
         });
 
@@ -382,6 +386,7 @@ export class CoursesService {
         }
 
         await this.courseReviewMySqlRepository.delete({ courseReviewId });
+
         return { message: "Review deleted successfully" }
     }
 
@@ -400,52 +405,52 @@ export class CoursesService {
             return `A section with id ${created.sectionId} has been created successfully.`
     }
 
-    async createLecture(input: CreateLectureInput): Promise<string> {
+    async createLesson(input: CreateLessonInput): Promise<string> {
         const { title, sectionId } = input.data
 
-        const created = await this.lectureMySqlRepository.save({
+        const created = await this.lessonMySqlRepository.save({
             title,
             sectionId,
         })
 
         if (created)
-            return `A lecture with id ${created.lectureId} has been creeated successfully.`
+            return `A lesson with id ${created.lessonId} has been creeated successfully.`
     }
 
-    async updateLecture(input: UpdateLectureInput): Promise<string> {
+    async updateLesson(input: UpdateLessonInput): Promise<string> {
         const { data, files } = input
-        const { lectureId, title, description, lectureVideoIndex, thumbnailIndex } = data
+        const { lessonId, title, description, lessonVideoIndex, thumbnailIndex } = data
 
-        const { thumbnailId, lectureVideoId } =
-            await this.lectureMySqlRepository.findOneBy({ lectureId })
+        const { thumbnailId, lessonVideoId } =
+            await this.lessonMySqlRepository.findOneBy({ lessonId })
 
         const promises: Array<Promise<void>> = []
 
-        const lecture: DeepPartial<LectureMySqlEntity> = { title, description }
+        const lesson: DeepPartial<LessonMySqlEntity> = { title, description }
 
-        if (Number.isInteger(lectureVideoIndex)) {
+        if (Number.isInteger(lessonVideoIndex)) {
             const promise = async () => {
-                const file = files.at(lectureVideoIndex)
+                const file = files.at(lessonVideoIndex)
 
-                await this.lectureMySqlRepository.update(
-                    { lectureId },
+                await this.lessonMySqlRepository.update(
+                    { lessonId },
                     {
                         processStatus: ProcessStatus.Pending,
                     },
                 )
 
-                const queryAtStart = this.lectureMySqlRepository
+                const queryAtStart = this.lessonMySqlRepository
                     .createQueryBuilder()
                     .update()
                     .set({
                         processStatus: ProcessStatus.Processing,
                     })
                     .where({
-                        lectureId,
+                        lessonId,
                     })
                     .getQueryAndParameters()
 
-                const queryAtEnd = this.lectureMySqlRepository
+                const queryAtEnd = this.lessonMySqlRepository
                     .createQueryBuilder()
                     .update()
                     .set({
@@ -453,21 +458,21 @@ export class CoursesService {
                         videoType: VideoType.DASH
                     })
                     .andWhere({
-                        lectureId,
+                        lessonId,
                     })
                     .getQueryAndParameters()
 
                 let assetId: string
-                if (lectureVideoId) {
-                    await this.storageService.update(lectureVideoId, {
+                if (lessonVideoId) {
+                    await this.storageService.update(lessonVideoId, {
                         rootFile: file,
                     })
-                    assetId = lectureVideoId
+                    assetId = lessonVideoId
                 } else {
                     const { assetId: createdAssetId } = await this.storageService.upload({
                         rootFile: file,
                     })
-                    lecture.lectureVideoId = createdAssetId
+                    lesson.lessonVideoId = createdAssetId
                     assetId = createdAssetId
                 }
 
@@ -494,23 +499,23 @@ export class CoursesService {
                     const { assetId } = await this.storageService.upload({
                         rootFile: file,
                     })
-                    lecture.thumbnailId = assetId
+                    lesson.thumbnailId = assetId
                 }
             }
             promises.push(promise())
         }
         await Promise.all(promises)
 
-        if (existKeyNotUndefined(lecture))
-            await this.lectureMySqlRepository.update(lectureId, lecture)
-        return `A lecture with id ${lectureId} has been updated successfully.`
+        if (existKeyNotUndefined(lesson))
+            await this.lessonMySqlRepository.update(lessonId, lesson)
+        return `A lesson with id ${lessonId} has been updated successfully.`
     }
 
-    async deleteLecture(input: DeleteLectureInput): Promise<string> {
+    async deleteLesson(input: DeleteLessonInput): Promise<string> {
         const { data } = input
-        const { lectureId } = data
-        await this.lectureMySqlRepository.delete({ lectureId })
-        return `A lecture with id ${lectureId} has been deleted successfully.`
+        const { lessonId } = data
+        await this.lessonMySqlRepository.delete({ lessonId })
+        return `A lesson with id ${lessonId} has been deleted successfully.`
     }
 
     async createCourseTarget(input: CreateCourseTargetInput): Promise<string> {
@@ -547,7 +552,7 @@ export class CoursesService {
 
     async createResources(input: CreateResourcesInput): Promise<string> {
         const { files, data } = input
-        const { lectureId } = data
+        const { lessonId } = data
 
         const promises: Array<Promise<void>> = []
         const resources: Array<DeepPartial<ResourceMySqlEntity>> = []
@@ -560,7 +565,7 @@ export class CoursesService {
                 resources.push({
                     name: file.originalname,
                     fileId: assetId,
-                    lectureId,
+                    lessonId,
                 })
             }
             promises.push(promise())
@@ -671,12 +676,12 @@ export class CoursesService {
     }
 
     async createCourseCertificate(input: CreateCertificateInput): Promise<CreateCertificateOutput> {
-        const { userId, data } = input
+        const { accountId, data } = input
         const { courseId } = data
 
         const found = await this.courseCertificateMySqlEntity.findOne({
             where: {
-                userId,
+                accountId,
                 courseId
             }
         })
@@ -691,7 +696,7 @@ export class CoursesService {
         expireDate.setDate(expireDate.getDate() + 90)
 
         const { certificateId } = await this.courseCertificateMySqlEntity.save({
-            userId,
+            accountId,
             courseId,
             achievedDate,
             expireDate
@@ -707,12 +712,12 @@ export class CoursesService {
 
     async createQuiz(input: CreateQuizInput): Promise<string> {
         const { data, files } = input;
-        const { lectureId, quizQuestions, timeLimit } = data;
+        const { lessonId, quizQuestions, timeLimit } = data;
         //Tìm quiz trong db, nếu chưa có thì tạo mới, nếu có thì chỉ thêm question và answer
-        let availableQuiz = await this.quizMySqlRepository.findOneBy({ quizId: lectureId })
+        let availableQuiz = await this.quizMySqlRepository.findOneBy({ quizId: lessonId })
 
         if (!availableQuiz) {
-            availableQuiz = await this.quizMySqlRepository.save({ quizId: lectureId, timeLimit })
+            availableQuiz = await this.quizMySqlRepository.save({ quizId: lessonId, timeLimit })
         }
 
         if (!quizQuestions || quizQuestions.length === 0) {
@@ -730,7 +735,7 @@ export class CoursesService {
                 const { questionMedias, answers, question } = questions
 
                 const quizQuestion: DeepPartial<QuizQuestionMySqlEntity> = {
-                    quizId: lectureId,
+                    quizId: lessonId,
                     question,
                     questionMedias: [],
                 }
@@ -1001,15 +1006,15 @@ export class CoursesService {
 
     }
 
-    async markLectureAsCompleted(input: MarkLectureAsCompletedInput): Promise<MarkLectureAsCompletedOutput> {
-        const { data, userId } = input
-        const { lectureId } = data
-        await this.progressMySqlRepository.update({ userId, lectureId }, { isCompleted: true })
-        return { message: "User had completed this lecture" }
+    async markLessonAsCompleted(input: MarkLessonAsCompletedInput): Promise<MarkLessonAsCompletedOutput> {
+        const { data, accountId } = input
+        const { lessonId } = data
+        await this.progressMySqlRepository.update({ accountId, lessonId }, { isCompleted: true })
+        return { message: "User had completed this lesson" }
     }
 
     async createQuizAttempt(input: CreateQuizAttemptInput): Promise<CreateQuizAttemptOutput> {
-        const { data, userId } = input
+        const { data, accountId } = input
         const { quizId } = data
 
         const queryRunner = this.dataSource.createQueryRunner();
@@ -1020,7 +1025,7 @@ export class CoursesService {
             const doing = await this.quizAttemptMySqlRepository.findOne({
                 where: {
                     quizId,
-                    userId,
+                    accountId,
                     attemptStatus: QuizAttemptStatus.Started
                 }
             })
@@ -1031,9 +1036,9 @@ export class CoursesService {
 
             // await queryRunner.manager.save(QuizAttemptMySqlEntity, {
             //     quizId,
-            //     userId,
+            //     accountId,
             // })
-            const { quizAttemptId } = await this.quizAttemptMySqlRepository.save({ userId, quizId })
+            const { quizAttemptId } = await this.quizAttemptMySqlRepository.save({ accountId, quizId })
             return {
                 message: "Attempt Started Successfully!",
                 others: {
@@ -1081,6 +1086,104 @@ export class CoursesService {
         } finally {
             await queryRunner.release()
         }
+    }
+
+    async giveAwayCourse(input: GiveAwayCourseInput): Promise<string> {
+        const { accountId, data } = input
+        const { courseId, receiveUserEmail, code } = data
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+        try {
+            const receiveUser = await this.accountMySqlRepository.findOneBy({ email: receiveUserEmail })
+
+            if (!receiveUser) {
+                throw new NotFoundException("Receive user not found or they aren't a CiStudy member")
+            }
+
+            const enrolled = await this.enrolledInfoMySqlRepository.findOne({
+                where: {
+                    accountId: receiveUser.accountId,
+                    courseId
+                }
+            })
+
+            if (enrolled) {
+                throw new ConflictException("This user is already enrolled to this course")
+            }
+
+            // const cachedTransaction = (await this.cacheManager.get(code)) as CodeValue
+            // if (!cachedTransaction) throw new NotFoundException("The code either expired or never existed.")
+
+            // const { transactionHash } = cachedTransaction
+            // const transaction = await this.transactionMongoModel.findOne({
+            //     transactionHash
+            // })
+            // if (!transaction) {
+            //     throw new NotFoundException("Transaction not found.")
+            // }
+
+            // const { _id, isValidated, value } = transaction
+
+            // if (isValidated) throw new ConflictException("This transaction is validated.")
+
+            const { enableDiscount, discountPrice, price: coursePrice, title } = await this.courseMySqlRepository.findOne({
+                where: {
+                    courseId
+                }
+            }
+            )
+
+            const price = enableDiscount ? discountPrice : coursePrice
+            // if (BigInt(value) < computeRaw(price)) throw new ConflictException("Value is not enough.")
+
+            // await this.transactionMongoModel.findOneAndUpdate({ _id }, {
+            //     isValidated: true
+            // },
+            // )
+
+            const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
+                enrolledInfoId: enrolled?.enrolledInfoId,
+                courseId,
+                accountId: receiveUser.accountId,
+                enrolled: true,
+                priceAtEnrolled: price
+            })
+
+            const course = await this.courseMySqlRepository.findOne({
+                where: {
+                    courseId
+                },
+                relations: {
+                    sections: {
+                        lessons: true
+                    }
+                }
+            });
+
+            const progresses = course.sections.reduce((acc, section) => {
+                section.lessons.forEach(lesson => {
+                    acc.push({
+                        accountId: receiveUser.accountId,
+                        lessonId: lesson.lessonId,
+                        isCompleted: false // Giả sử bạn muốn khởi tạo với `isCompleted` là false
+                    });
+                });
+                return acc;
+            }, []);
+
+            await this.progressMySqlRepository.save(progresses);
+
+            await queryRunner.commitTransaction()
+            return `User with email ${receiveUserEmail} have received and enrolled to course ${course.title}`
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
+
     }
 }
 

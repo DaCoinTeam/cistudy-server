@@ -7,7 +7,7 @@ import { IsOptional, IsUUID } from "class-validator"
 export class FindOneUserInputParams {
     @Field(() => ID)
     @IsUUID()
-        userId: string
+        accountId: string
 }
 
 @InputType()
@@ -35,7 +35,7 @@ export class FindOneUserInput implements Input<FindOneUserInputData> {
 export class FindManyFollowersInputParams {
     @Field(() => ID)
     @IsUUID()
-        userId: string
+        accountId: string
 }
 
 @InputType()
@@ -52,7 +52,7 @@ export class FindManyFollowersInput implements Input<FindManyFollowersInputData>
 export class FindManyCreatedCoursesInputParams {
     @Field(() => String)
     @IsUUID()
-        userId: string
+        accountId: string
 }
 
 @InputType()
@@ -96,7 +96,7 @@ export class FindManyUsersInputData implements OptionsOnly<FindManyUsersInputOpt
 export class FindManyUsersInput
 implements AuthInput<FindManyUsersInputData>
 {
-    userId: string
+    accountId: string
     data: FindManyUsersInputData
 }
 

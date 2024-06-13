@@ -7,7 +7,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn
 } from "typeorm"
-import { UserEntity } from "./user.entity"
+import { AccountEntity } from "./account.entity"
 import { CourseEntity } from "./course.entity"
 import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
 
@@ -20,7 +20,7 @@ export class EnrolledInfoEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        userId: string
+        accountId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
@@ -52,8 +52,8 @@ export class EnrolledInfoEntity {
     @JoinColumn({ name: "courseId" })
         course: CourseEntity
 
-    @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (user) => user.enrolledInfos)
-    @JoinColumn({ name: "userId" })
-        user: UserEntity
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (account) => account.enrolledInfos)
+    @JoinColumn({ name: "accountId" })
+        account: AccountEntity
 }

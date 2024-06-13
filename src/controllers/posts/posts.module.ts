@@ -3,12 +3,12 @@ import { PostsController } from "./posts.controller"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     SessionMySqlEntity,
-    UserMySqlEntity,
+    AccountMySqlEntity,
     PostMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     SectionMySqlEntity,
-    LectureMySqlEntity,
+    LessonMySqlEntity,
     ResourceMySqlEntity,
     PostCommentMySqlEntity,
     PostLikeMySqlEntity,
@@ -23,12 +23,12 @@ import { PostsService } from "./posts.service"
     imports: [
         TypeOrmModule.forFeature([
             SessionMySqlEntity,
-            UserMySqlEntity,
+            AccountMySqlEntity,
             PostMySqlEntity,
             CourseMySqlEntity,
             EnrolledInfoMySqlEntity,
             SectionMySqlEntity,
-            LectureMySqlEntity,
+            LessonMySqlEntity,
             ResourceMySqlEntity,
             PostCommentMySqlEntity,
             PostLikeMySqlEntity,

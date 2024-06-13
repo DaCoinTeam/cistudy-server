@@ -7,7 +7,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
 } from "typeorm"
-import { UserEntity } from "./user.entity"
+import { AccountEntity } from "./account.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
@@ -40,13 +40,13 @@ export class FollowEntity {
     @UpdateDateColumn()
         updatedAt: Date
 
-    @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (user) => user.followerRelations)
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (account) => account.followerRelations)
     @JoinColumn({ name: "followerId" })
-        follower: UserEntity
+        follower: AccountEntity
 
-    @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (post) => post.followedUserRelations)
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (post) => post.followedUserRelations)
     @JoinColumn({ name: "followedUserId" })
-        followedUser: UserEntity
+        followedUser: AccountEntity
 }

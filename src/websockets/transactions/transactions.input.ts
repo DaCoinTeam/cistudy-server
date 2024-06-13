@@ -7,6 +7,6 @@ export class VerifyTransactionInputData {
 
 export class VerifyTransactionInput implements WsAuthInput<VerifyTransactionInputData> {
     client: Socket
-    userId: string
+    accountId: string
     data: VerifyTransactionInputData
 } 

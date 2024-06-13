@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn } from "typeorm"
-import { UserEntity } from "./user.entity"
+import { AccountEntity } from "./account.entity"
 import { PostCommentEntity } from "./post-comment.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { PostEntity } from "./post.entity"
@@ -13,7 +13,7 @@ export class PostCommentLikeEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        userId: string
+        accountId: string
 
     @Field(() => Date)
     @CreateDateColumn()
@@ -34,10 +34,10 @@ export class PostCommentLikeEntity {
     @Column({ type: "uuid", length: 36 })
         postCommentId: string
 
-    @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (user) => user.postReacts)
-    @JoinColumn({ name: "userId" })
-        user: UserEntity
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (account) => account.postReacts)
+    @JoinColumn({ name: "accountId" })
+        account: AccountEntity
 
     @Field(() => PostEntity)
     @ManyToOne(() => PostCommentEntity, (postComment) => postComment.postCommentLikes, {

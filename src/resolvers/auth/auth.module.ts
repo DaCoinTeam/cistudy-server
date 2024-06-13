@@ -3,14 +3,14 @@ import { AuthResolver } from "./auth.resolver"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     CartMySqlEntity,
-    UserMySqlEntity,
+    AccountMySqlEntity,
 } from "@database"
 import { AuthService } from "./auth.service"
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
-            UserMySqlEntity,
+            AccountMySqlEntity,
             CartMySqlEntity
         ]),
     ],

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToOne, JoinColumn, Generated } from "typeorm"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
-import { UserKind, UserRole } from "@common"
+import { AccountKind, AccountRole } from "@common"
 import { SessionEntity } from "./session.entity"
 import { PostCommentEntity } from "./post-comment.entity"
 import { PostLikeEntity } from "./post-like.entity"
@@ -18,11 +18,11 @@ import { QuizAttemptEntity } from "./quiz-attempt.entity"
 
 
 @ObjectType()
-@Entity("user")
-export class UserEntity {
+@Entity("account")
+export class AccountEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    userId: string
+    accountId: string
 
     @Field(() => String)
     @Column({ type: "varchar", length: 50, default: null })
@@ -64,10 +64,10 @@ export class UserEntity {
     @Field(() => String)
     @Column({
         type: "enum",
-        enum: UserRole,
-        default: UserRole.User,
+        enum: AccountRole,
+        default: AccountRole.User,
     })
-    userRole: UserRole
+    accountRole: AccountRole
 
     @Field(() => ID, { nullable: true })
     @Column({
@@ -95,10 +95,10 @@ export class UserEntity {
     @Field(() => String)
     @Column({
         type: "enum",
-        enum: UserKind,
-        default: UserKind.Local,
+        enum: AccountKind,
+        default: AccountKind.Local,
     })
-    kind: UserKind
+    kind: AccountKind
 
     @Field(() => Date)
     @CreateDateColumn()
@@ -112,20 +112,20 @@ export class UserEntity {
     @Column({ type: "varchar", length: 128, default: null })
     externalId: string
 
-    @OneToMany(() => SessionEntity, (session) => session.user)
+    @OneToMany(() => SessionEntity, (session) => session.account)
     sessions: Array<SessionEntity>
 
     @OneToMany(() => PostCommentEntity, (postComment) => postComment.creator)
     postComments: Array<PostCommentEntity>
 
-    @OneToMany(() => PostLikeEntity, (postReact) => postReact.user)
+    @OneToMany(() => PostLikeEntity, (postReact) => postReact.account)
     postReacts: Array<PostLikeEntity>
 
-    @OneToMany(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.user)
+    @OneToMany(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.account)
     enrolledInfos: Array<EnrolledInfoEntity>
 
     @Field(() => [CryptoWalletEntity])
-    @OneToMany(() => CryptoWalletEntity, (cryptoWallet) => cryptoWallet.user)
+    @OneToMany(() => CryptoWalletEntity, (cryptoWallet) => cryptoWallet.account)
     cryptoWallets: Array<CourseEntity>
 
     @Field(() => [PostEntity])
@@ -137,15 +137,15 @@ export class UserEntity {
     courses: Array<CourseEntity>
 
     @Field(() => [FollowEntity])
-    @OneToMany(() => FollowEntity, (user) => user.follower)
+    @OneToMany(() => FollowEntity, (account) => account.follower)
     followerRelations: Array<FollowEntity>
 
     @Field(() => [FollowEntity])
-    @OneToMany(() => FollowEntity, (user) => user.followedUser)
+    @OneToMany(() => FollowEntity, (account) => account.followedUser)
     followedUserRelations: Array<FollowEntity>
 
     @Field(() => CourseReviewEntity)
-    @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.user, { nullable: true })
+    @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.account, { nullable: true })
     courseReview: CourseReviewEntity
 
     @Field(() => CartEntity)
@@ -154,19 +154,19 @@ export class UserEntity {
     cart: CartEntity;
 
     @Field(() => OrderEntity)
-    @OneToMany(() => OrderEntity, (orders) => orders.user)
+    @OneToMany(() => OrderEntity, (orders) => orders.account)
     orders: OrderEntity
 
     @Field(() => CertificateEntity)
-    @OneToMany(() => CertificateEntity, (certificates) => certificates.user, { nullable: true })
+    @OneToMany(() => CertificateEntity, (certificates) => certificates.account, { nullable: true })
     certificates?: Array<CertificateEntity>
 
     @Field(() => ProgressEntity)
-    @OneToMany(() => ProgressEntity, (progress) => progress.user, {nullable: true })
+    @OneToMany(() => ProgressEntity, (progress) => progress.account, {nullable: true })
     courseProgresses? : Array<ProgressEntity>
 
     @Field(() => QuizAttemptEntity)
-    @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.user, {nullable : true})
+    @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.account, {nullable : true})
     quizAttempts? : Array<QuizAttemptEntity>
 
     //graphql

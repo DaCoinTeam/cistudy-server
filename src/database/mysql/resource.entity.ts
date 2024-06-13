@@ -7,7 +7,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn
 } from "typeorm"
-import { LectureEntity } from "./lecture.entity"
+import { LessonEntity } from "./lesson.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
@@ -26,8 +26,8 @@ export class ResourceEntity {
       fileId: string
 
   @Field(() => ID)
-  @Column({ name: "lectureId", type: "uuid", length: 36 })
-      lectureId: string
+  @Column({ name: "lessonId", type: "uuid", length: 36 })
+      lessonId: string
 
   @Field(() => Date)
   @CreateDateColumn()
@@ -37,8 +37,8 @@ export class ResourceEntity {
   @UpdateDateColumn()
       updatedAt: Date
 
-  @Field(() => LectureEntity)
-  @ManyToOne(() => LectureEntity, (lecture) => lecture.resources, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "lectureId" })
-      lecture: LectureEntity
+  @Field(() => LessonEntity)
+  @ManyToOne(() => LessonEntity, (lesson) => lesson.resources, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "lessonId" })
+      lesson: LessonEntity
 }

@@ -1,4 +1,4 @@
-import { CartMySqlEntity, CartCourseMySqlEntity, CourseMySqlEntity, OrderMySqlEntity, OrderCourseMySqlEntity, UserMySqlEntity } from "@database";
+import { CartMySqlEntity, CartCourseMySqlEntity, CourseMySqlEntity, OrderMySqlEntity, OrderCourseMySqlEntity, AccountMySqlEntity } from "@database";
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, In, Repository } from "typeorm";
@@ -16,8 +16,8 @@ export class CartService {
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
         @InjectRepository(OrderMySqlEntity)
         private readonly orderMySqlRepository: Repository<OrderMySqlEntity>,
-        @InjectRepository(UserMySqlEntity)
-        private readonly userMySqlRepository: Repository<UserMySqlEntity>,
+        @InjectRepository(AccountMySqlEntity)
+        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
         @InjectRepository(OrderCourseMySqlEntity)
         private readonly orderCoursesMySqlRepository: Repository<OrderCourseMySqlEntity>,
         private readonly dataSource: DataSource,
@@ -25,14 +25,14 @@ export class CartService {
 
 
     async addToCart(input: AddToCartInput): Promise<AddToCartOutput> {
-        const { data, userId } = input;
+        const { data, accountId } = input;
         const { courseId } = data
 
-        let usercart = await this.cartMySqlRepository.findOne({ where: { cartId: userId } })
+        let usercart = await this.cartMySqlRepository.findOne({ where: { cartId: accountId } })
 
         if (!usercart) {
-            usercart = await this.cartMySqlRepository.save({ cartId: userId })
-            await this.userMySqlRepository.update(userId, { cart: usercart })
+            usercart = await this.cartMySqlRepository.save({ cartId: accountId })
+            await this.accountMySqlRepository.update(accountId, { cart: usercart })
         }
 
         const exist = await this.cartCourseMySqlRepository.findOne({ where: { cartId : usercart.cartId ,courseId } })
@@ -55,12 +55,12 @@ export class CartService {
     }
 
     async deleteFromCart(input: DeleteFromCartInput): Promise<DeleteFromCartOutput> {
-        const { userId, data } = input;
+        const { accountId, data } = input;
         const { cartCourseIds } = data
 
         const usercart = await this.cartMySqlRepository.findOne({
             where: {
-                cartId: userId
+                cartId: accountId
             },
         })
 
@@ -74,7 +74,7 @@ export class CartService {
     }
 
     async checkOut(input: CheckOutInput): Promise<CheckOutOutput> {
-        const { data, userId } = input
+        const { data, accountId } = input
         const { cartCourseIds } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -87,7 +87,7 @@ export class CartService {
             paymentDue.setDate(paymentDue.getDate() + 1);
 
             const order = await queryRunner.manager.save(OrderMySqlEntity, {
-                userId,
+                accountId,
                 paymentDue
             })
 

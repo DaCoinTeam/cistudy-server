@@ -4,7 +4,7 @@ import { IsInt, IsNumber, IsOptional, IsUUID, Length, Max, Min, max, min } from 
 
 export class CreateCourseInput implements AuthEmptyDataInput {
     @IsUUID("4")
-    userId: string
+    accountId: string
 }
 
 export class EnrollCourseInputData {
@@ -18,7 +18,7 @@ export class EnrollCourseInputData {
 export class EnrollCourseInput implements AuthInput<EnrollCourseInputData> {
     data: EnrollCourseInputData
     @IsUUID("4")
-    userId: string
+    accountId: string
 }
 
 export class CreateCourseTargetInputData {
@@ -32,7 +32,7 @@ export class CreateCourseTargetInputData {
 export class CreateCourseTargetInput
     implements AuthInput<CreateCourseTargetInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: CreateCourseTargetInputData
 }
 
@@ -49,7 +49,7 @@ export class UpdateCourseTargetInputData {
 export class UpdateCourseTargetInput
     implements AuthInput<UpdateCourseTargetInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: UpdateCourseTargetInputData
 }
 
@@ -98,7 +98,7 @@ export class UpdateCourseInputData {
 
 export class UpdateCourseInput implements AuthInput<UpdateCourseInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: UpdateCourseInputData
     files: Array<Express.Multer.File>
 }
@@ -112,12 +112,12 @@ export class DeleteCourseTargetInputData {
 export class DeleteCourseTargetInput
     implements AuthInput<DeleteCourseTargetInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     @ApiProperty()
     data: DeleteCourseTargetInputData
 }
 
-export class CreateLectureInputData {
+export class CreateLessonInputData {
     @IsUUID("4")
     @ApiProperty()
     sectionId: string
@@ -125,24 +125,24 @@ export class CreateLectureInputData {
     title: string
 }
 
-export class CreateLectureInput implements AuthInput<CreateLectureInputData> {
+export class CreateLessonInput implements AuthInput<CreateLessonInputData> {
     @IsUUID("4")
-    userId: string
-    data: CreateLectureInputData
+    accountId: string
+    data: CreateLessonInputData
 }
 
-export class DeleteLectureInputData {
+export class DeleteLessonInputData {
     @IsUUID()
     @ApiProperty()
-    lectureId: string
+    lessonId: string
 }
 
-export class DeleteLectureInput
-    implements AuthInput<DeleteLectureInputData> {
+export class DeleteLessonInput
+    implements AuthInput<DeleteLessonInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     @ApiProperty()
-    data: DeleteLectureInputData
+    data: DeleteLessonInputData
 }
 
 
@@ -157,26 +157,26 @@ export class CreateSectionInputData {
 
 export class CreateSectionInput implements AuthInput<CreateSectionInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: CreateSectionInputData
 }
 
 export class CreateResourcesInputData {
     @IsUUID("4")
     @ApiProperty()
-    lectureId: string
+    lessonId: string
 }
 export class CreateResourcesInput implements AuthInput<CreateResourcesInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: CreateResourcesInputData
     files: Express.Multer.File[]
 }
 
-export class UpdateLectureInputData {
+export class UpdateLessonInputData {
     @IsUUID("4")
     @ApiProperty()
-    lectureId: string
+    lessonId: string
     @ApiProperty({ nullable: true })
     title?: string
     @ApiProperty({ nullable: true })
@@ -184,13 +184,13 @@ export class UpdateLectureInputData {
     @ApiProperty({ nullable: true })
     thumbnailIndex?: number
     @ApiProperty({ nullable: true })
-    lectureVideoIndex?: number
+    lessonVideoIndex?: number
 }
 
-export class UpdateLectureInput implements AuthInput<UpdateLectureInputData> {
+export class UpdateLessonInput implements AuthInput<UpdateLessonInputData> {
     @IsUUID("4")
-    userId: string
-    data: UpdateLectureInputData
+    accountId: string
+    data: UpdateLessonInputData
     files: Express.Multer.File[]
 }
 
@@ -203,7 +203,7 @@ export class DeleteSectionInputData {
 export class DeleteSectionInput
     implements AuthInput<DeleteSectionInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     @ApiProperty()
     data: DeleteSectionInputData
 }
@@ -218,7 +218,7 @@ export class UpdateSectionInputData {
 
 export class UpdateSectionInput implements AuthInput<UpdateSectionInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: UpdateSectionInputData
 }
 
@@ -231,7 +231,7 @@ export class DeleteResourceInputData {
 export class DeleteResourceInput
     implements AuthInput<DeleteResourceInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     @ApiProperty()
     data: DeleteResourceInputData
 }
@@ -244,7 +244,7 @@ export class CreateCategoryInputData {
 
 export class CreateCategoryInput implements AuthInput<CreateCategoryInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: CreateCategoryInputData
 }
 
@@ -257,7 +257,7 @@ export class CreateSubcategoryInputData {
 
 export class CreateSubcategoryInput implements AuthInput<CreateSubcategoryInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: CreateSubcategoryInputData
 }
 
@@ -270,7 +270,7 @@ export class CreateTopicInputData {
 
 export class CreateTopicInput implements AuthInput<CreateTopicInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: CreateTopicInputData
     files: Array<Express.Multer.File>
 }
@@ -283,7 +283,7 @@ export class DeleteTopicInputData {
 
 export class DeleteTopicInput implements AuthInput<DeleteTopicInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: DeleteTopicInputData
 }
 
@@ -301,7 +301,7 @@ export class CreateCourseReviewInputData {
 }
 export class CreateCourseReviewInput implements AuthInput<CreateCourseReviewInputData> {
     @IsUUID("4")
-    userId: string;
+    accountId: string;
     data: CreateCourseReviewInputData;
 }
 
@@ -324,7 +324,7 @@ export class UpdateCourseReviewInputData {
 
 export class UpdateCourseReviewInput implements AuthInput<UpdateCourseReviewInputData> {
     @IsUUID("4")
-    userId: string;
+    accountId: string;
     data: UpdateCourseReviewInputData
 }
 
@@ -335,7 +335,7 @@ export class DeleteCourseReviewInputData {
 }
 export class DeleteCourseReviewInput implements AuthInput<DeleteCourseReviewInputData> {
     @IsUUID("4")
-    userId: string;
+    accountId: string;
     data: DeleteCourseReviewInputData;
 }
 
@@ -347,7 +347,7 @@ export class CreateCertificateInputData {
 
 export class CreateCertificateInput implements AuthInput<CreateCertificateInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: CreateCertificateInputData
 }
 
@@ -383,7 +383,7 @@ export class QuizQuestionInputData {
 export class CreateQuizInputData {
     @IsUUID("4")
     @ApiProperty()
-    lectureId: string
+    lessonId: string
 
     @ApiProperty()
     quizQuestions: Array<QuizQuestionInputData>
@@ -395,7 +395,7 @@ export class CreateQuizInputData {
 
 export class CreateQuizInput implements AuthInput<CreateQuizInputData> {
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: CreateQuizInputData
     files?: Array<Express.Multer.File>
 }
@@ -457,7 +457,7 @@ export class UpdateQuizInputData {
 export class UpdateQuizInput implements AuthInput<UpdateQuizInputData> {
     @IsUUID("4")
     @ApiProperty()
-    userId: string
+    accountId: string
     data: UpdateQuizInputData
     files?: Array<Express.Multer.File>
 }
@@ -472,33 +472,33 @@ export class DeleteQuizInput
     implements AuthInput<DeleteQuizInputData> {
     @IsUUID("4")
     @ApiProperty()
-    userId: string
+    accountId: string
     data: DeleteQuizInputData
 }
 
 export class CeateUserProgressInputData {
     @ApiProperty()
-    lectureId: string
+    lessonId: string
 }
 
 export class CeateUserProgressInput implements AuthInput<CeateUserProgressInputData> {
     @IsUUID("4")
     @ApiProperty()
-    userId: string
+    accountId: string
     data: CeateUserProgressInputData
 }
 
-export class MarkLectureAsCompletedInputData{
+export class MarkLessonAsCompletedInputData{
     @IsUUID("4")
     @ApiProperty()
-    lectureId: string
+    lessonId: string
 }
 
-export class MarkLectureAsCompletedInput implements AuthInput<MarkLectureAsCompletedInputData>{
+export class MarkLessonAsCompletedInput implements AuthInput<MarkLessonAsCompletedInputData>{
     @IsUUID("4")
     @ApiProperty()
-    userId: string
-    data: MarkLectureAsCompletedInputData
+    accountId: string
+    data: MarkLessonAsCompletedInputData
 }
 
 export class CreateQuizAttemptInputData {
@@ -508,7 +508,7 @@ export class CreateQuizAttemptInputData {
 }
 
 export class CreateQuizAttemptInput implements AuthInput<CreateQuizAttemptInputData> {
-    userId: string
+    accountId: string
     data: CreateQuizAttemptInputData
 }
 
@@ -522,6 +522,22 @@ export class FinishQuizAttemptInputData {
 }
 
 export class FinishQuizAttemptInput implements AuthInput<FinishQuizAttemptInputData>{
-    userId: string
+    accountId: string
     data: FinishQuizAttemptInputData
+}
+
+export class GiveAwayCourseInputData {
+    @ApiProperty()
+    courseId: string
+
+    @ApiProperty()
+    receiveUserEmail : string
+
+    @ApiProperty()
+    code : string
+}
+
+export class GiveAwayCourseInput implements AuthInput<GiveAwayCourseInputData>{
+    accountId: string
+    data: GiveAwayCourseInputData
 }

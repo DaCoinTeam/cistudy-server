@@ -8,7 +8,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn
 } from "typeorm"
-import { LectureEntity } from "./lecture.entity"
+import { LessonEntity } from "./lesson.entity"
 import { CourseEntity } from "./course.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 
@@ -40,8 +40,8 @@ export class SectionEntity {
     @JoinColumn({ name: "courseId" })
     course: CourseEntity
 
-    @Field(() => [LectureEntity])
-    @OneToMany(() => LectureEntity, (video) => video.section, { cascade: true })
-    lectures: Array<LectureEntity>
+    @Field(() => [LessonEntity])
+    @OneToMany(() => LessonEntity, (video) => video.section, { cascade: true })
+    lessons: Array<LessonEntity>
 
 }

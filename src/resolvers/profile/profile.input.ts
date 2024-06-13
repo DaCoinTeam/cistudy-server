@@ -19,12 +19,12 @@ export class FindManySelfCreatedCoursesInputData implements OptionsOnly<FindMany
 export class FindManySelfCreatedCoursesInput
 implements AuthInput<FindManySelfCreatedCoursesInputData>
 {
-    userId: string
+    accountId: string
     data: FindManySelfCreatedCoursesInputData
 }
 
 export class FindManySelfCreatedCoursesMetadataInput implements AuthEmptyDataInput {
-    userId: string
+    accountId: string
 }
 
 
@@ -45,6 +45,6 @@ export class FindManyEnrolledCoursesInputData implements OptionsOnly<FindManyEnr
 export class FindManyEnrolledCoursesInput
 implements AuthInput<FindManyEnrolledCoursesInputData>
 {   
-    userId: string
+    accountId: string
     data: FindManyEnrolledCoursesInputData
 }

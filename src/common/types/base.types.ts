@@ -12,20 +12,20 @@ export interface WsOutput<T> {
 }
 
 export interface AuthInput<T> {
-    userId: string,
+    accountId: string,
     data: T,
     files?: Array<Express.Multer.File>
 }
 
 export interface WsAuthInput<T> {
-    userId: string,
+    accountId: string,
     client: Socket,
     data: T,
     files?: Array<Express.Multer.File>
 }
 
 export interface WsAuthEmptyInput {
-    userId: string,
+    accountId: string,
     client: Socket,
     files?: Array<Express.Multer.File>
 }
@@ -41,7 +41,7 @@ export interface Output<T = undefined> {
 }
 
 export interface AuthEmptyDataInput {
-    userId: string,
+    accountId: string,
     files?: Array<Express.Multer.File>
 }
 

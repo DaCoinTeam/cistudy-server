@@ -17,7 +17,7 @@ export enum ContentType {
     Application = "Application"
 }
 
-export enum UserRole {
+export enum AccountRole {
     User = "User",
     Moderator = "Moderator",
     Administrator = "Administrator"
@@ -65,14 +65,14 @@ export interface PostContentModel {
     postId: string;
 }
 
-export interface UserModel {
-    userId: string;
+export interface AccountModel {
+    accountId: string;
     email: string;
     password?: Nullable<string>;
     avatarUrl?: Nullable<string>;
     phoneNumber?: Nullable<string>;
     balance?: Nullable<number>;
-    userRole: UserRole;
+    accountRole: AccountRole;
     walletId?: Nullable<string>;
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;
@@ -90,7 +90,7 @@ export interface CourseModel {
     price: number;
     verifyStatus?: Nullable<VerifyStatus>;
     isDraft: boolean;
-    creator: UserModel;
+    creator: AccountModel;
     isDeleted: boolean;
     previewVideoId?: Nullable<string>;
     targets?: Nullable<string>;
@@ -102,7 +102,7 @@ export interface PostModel {
     title: string;
     course: CourseModel;
     postContents: PostContentModel[];
-    creator: UserModel;
+    creator: AccountModel;
 }
 
 export interface IQuery {

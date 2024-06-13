@@ -1,5 +1,5 @@
 import { AuthTokens, AuthOutput, ResultsWithMetadata } from "@common"
-import { LectureMySqlEntity, ResourceMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity } from "@database"
+import { LessonMySqlEntity, ResourceMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 import { CategoryEntity } from "src/database/mysql/category.entity"
 import { CourseTargetEntity } from "src/database/mysql/course-target.entity"
@@ -47,22 +47,22 @@ implements AuthOutput<CourseMySqlEntity>
 
 
 @ObjectType()
-export class FindOneLectureOutput
-implements AuthOutput<LectureMySqlEntity>
+export class FindOneLessonOutput
+implements AuthOutput<LessonMySqlEntity>
 {
-    @Field(() => LectureMySqlEntity)
-        data: LectureMySqlEntity
+    @Field(() => LessonMySqlEntity)
+        data: LessonMySqlEntity
     @Field(() => AuthTokens, { nullable: true })
         tokens: AuthTokens
 }
 
 
 @ObjectType()
-export class FindManyLecturesOutput
-implements AuthOutput<Array<LectureMySqlEntity>>
+export class FindManyLessonsOutput
+implements AuthOutput<Array<LessonMySqlEntity>>
 {
-    @Field(() => [LectureMySqlEntity])
-        data: Array<LectureMySqlEntity>
+    @Field(() => [LessonMySqlEntity])
+        data: Array<LessonMySqlEntity>
     @Field(() => AuthTokens, { nullable: true })
         tokens: AuthTokens
 }
@@ -108,6 +108,30 @@ implements ResultsWithMetadata<CourseReviewMySqlEntity, FindManyCourseReviewsOut
 export class FindManyCourseReviewsOutput implements AuthOutput<FindManyCourseReviewsOutputData> {
     @Field(() => FindManyCourseReviewsOutputData)
         data: FindManyCourseReviewsOutputData
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
+}
+//
+@ObjectType()
+export class FindManyCoursesTopicOutputMetadata {
+    @Field(() => Int, { nullable: true })
+        count?: number
+}
+
+@ObjectType()
+export class FindManyCoursesTopicOutputData
+implements ResultsWithMetadata<CourseMySqlEntity, FindManyCoursesTopicOutputMetadata>
+{
+    @Field(() => [CourseMySqlEntity])
+        results: Array<CourseMySqlEntity>
+    @Field(() => FindManyCoursesTopicOutputMetadata, { nullable: true })
+        metadata: FindManyCoursesTopicOutputMetadata
+}
+
+@ObjectType()
+export class FindManyCoursesTopicOutput implements AuthOutput<FindManyCoursesTopicOutputData> {
+    @Field(() => FindManyCoursesTopicOutputData)
+        data: FindManyCoursesTopicOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }

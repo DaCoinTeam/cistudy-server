@@ -1,6 +1,6 @@
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { UserEntity } from "./user.entity";
+import { AccountEntity } from "./account.entity";
 import { QuizEntity } from "./quiz.entity";
 import { QuizAttemptStatus } from "@common";
 
@@ -18,7 +18,7 @@ export class QuizAttemptEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    userId: string
+    accountId: string
 
     @Field(() => Float, { nullable: true })
     @Column({ type: "float", default: 0, nullable: true })
@@ -36,10 +36,10 @@ export class QuizAttemptEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (user) => user.quizAttempts, {onDelete: "CASCADE"})
-    @JoinColumn({ name: "userId" })
-    user: UserEntity
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (account) => account.quizAttempts, {onDelete: "CASCADE"})
+    @JoinColumn({ name: "accountId" })
+    account: AccountEntity
 
     @Field(() => QuizEntity)
     @ManyToOne(() => QuizEntity, (quiz) => quiz.quizAttempts, {onDelete: "CASCADE"})

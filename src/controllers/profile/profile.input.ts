@@ -14,7 +14,7 @@ export class UpdateProfileData {
 }
 export class UpdateProfileInput implements AuthInput<UpdateProfileData> {
     @IsUUID("4")
-    	userId: string
+    	accountId: string
     data: UpdateProfileData
     files: Array<Express.Multer.File>
 }

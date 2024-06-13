@@ -1,5 +1,5 @@
 import { AuthTokens, AuthOutput, ResultsWithMetadata } from "@common"
-import { UserMySqlEntity } from "@database"
+import { AccountMySqlEntity } from "@database"
 import { ObjectType, Int, Field } from "@nestjs/graphql"
 
 @ObjectType()
@@ -10,10 +10,10 @@ export class FindManyUsersOutputMetadata {
 
 @ObjectType()
 export class FindManyUsersOutputData
-implements ResultsWithMetadata<UserMySqlEntity, FindManyUsersOutputMetadata>
+implements ResultsWithMetadata<AccountMySqlEntity, FindManyUsersOutputMetadata>
 {
-    @Field(() => [UserMySqlEntity])
-        results: Array<UserMySqlEntity>
+    @Field(() => [AccountMySqlEntity])
+        results: Array<AccountMySqlEntity>
     @Field(() => FindManyUsersOutputMetadata, { nullable: true })
         metadata: FindManyUsersOutputMetadata
 }

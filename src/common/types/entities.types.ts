@@ -1,23 +1,23 @@
 import { registerEnumType } from "@nestjs/graphql"
 
-export enum UserKind {
+export enum AccountKind {
   Local = "local",
   Google = "google",
   Facebook = "facebook",
 }
 
-registerEnumType(UserKind, {
-    name: "UserKind",
+registerEnumType(AccountKind, {
+    name: "AccountKind",
 })
 
-export enum UserRole {
+export enum AccountRole {
   User = "user",
   Moderator = "moderator",
   Administrator = "administrator",
 }
 
-registerEnumType(UserRole, {
-    name: "UserRole",
+registerEnumType(AccountRole, {
+    name: "AccountRole",
 })
 
 export enum VerifyStatus {
@@ -76,4 +76,14 @@ export enum QuizAttemptStatus {
 
 registerEnumType(QuizAttemptStatus, {
   name: "QuizAttemptStatus",
+})
+
+export enum CourseApproveStatus {
+  Pending = "pending",
+  Approved = "approved",
+  Rejected = "rejected"
+}
+
+registerEnumType(CourseApproveStatus, {
+  name: "CourseApproveStatus",
 })

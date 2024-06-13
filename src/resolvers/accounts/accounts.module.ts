@@ -1,17 +1,17 @@
 import { Module } from "@nestjs/common"
-import { UsersResolver } from "./users.resolver"
+import { UsersResolver } from "./accounts.resolver"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     CourseMySqlEntity,
     FollowMySqlEnitity,
-    UserMySqlEntity,
+    AccountMySqlEntity,
 } from "@database"
-import { UsersService } from "./users.service"
+import { UsersService } from "./accounts.service"
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
-            UserMySqlEntity,
+            AccountMySqlEntity,
             FollowMySqlEnitity,
             CourseMySqlEntity
         ]),

@@ -3,7 +3,7 @@ import { JwtService } from "@nestjs/jwt"
 import {
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
-    LectureMySqlEntity,
+    LessonMySqlEntity,
     PostCommentLikeMySqlEntity,
     PostCommentMySqlEntity,
     PostLikeMySqlEntity,
@@ -11,7 +11,7 @@ import {
     ResourceMySqlEntity,
     SectionMySqlEntity,
     SessionMySqlEntity,
-    UserMySqlEntity
+    AccountMySqlEntity
 } from "@database"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
@@ -31,13 +31,13 @@ import { JwtStrategy } from "./strategies"
     imports: [
         TypeOrmModule.forFeature([
             SessionMySqlEntity,
-            UserMySqlEntity,
+            AccountMySqlEntity,
             PostCommentMySqlEntity,
             PostMySqlEntity,
             CourseMySqlEntity,
             EnrolledInfoMySqlEntity,
             SectionMySqlEntity,
-            LectureMySqlEntity,
+            LessonMySqlEntity,
             ResourceMySqlEntity,
             PostLikeMySqlEntity,
             PostCommentMySqlEntity,

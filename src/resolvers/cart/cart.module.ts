@@ -5,7 +5,7 @@ import {
     CartCourseMySqlEntity,
     CourseMySqlEntity,
     OrderMySqlEntity,
-    UserMySqlEntity,
+    AccountMySqlEntity,
 } from "@database"
 
 import { CartResolver } from "./cart.resolver"
@@ -14,7 +14,7 @@ import { CartService } from "./cart.service"
 @Module({
     imports: [
         TypeOrmModule.forFeature([
-            UserMySqlEntity,
+            AccountMySqlEntity,
             CartMySqlEntity,
             CartCourseMySqlEntity,
             CourseMySqlEntity,

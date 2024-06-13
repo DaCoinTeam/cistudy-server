@@ -11,9 +11,9 @@ import {
 import { CourseEntity } from "./course.entity"
 import { PostCommentEntity } from "./post-comment.entity"
 import { PostLikeEntity } from "./post-like.entity"
-import { UserEntity } from "./user.entity"
+import { AccountEntity } from "./account.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
-import { UserMySqlEntity } from "."
+import { AccountMySqlEntity } from "."
 import { PostMediaEntity } from "./post-media.entity"
 
 @ObjectType()
@@ -21,60 +21,64 @@ import { PostMediaEntity } from "./post-media.entity"
 export class PostEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-        postId: string
+    postId: string
 
     @Field(() => String)
     @Column({ type: "varchar", length: 500 })
-        title: string
+    title: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        creatorId: string
+    creatorId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        courseId: string
+    courseId: string
+
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: true })
+    allowComments: boolean
 
     @Field(() => Date)
     @CreateDateColumn()
-        createdAt: Date
+    createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-        updatedAt: Date
+    updatedAt: Date
 
     @Field(() => String)
     @Column({ type: "longtext" })
-        html: string
+    html: string
 
     @ManyToOne(() => CourseEntity, (course) => course.posts)
     @JoinColumn({ name: "courseId" })
-        course: CourseEntity
+    course: CourseEntity
 
-    @Field(() => UserMySqlEntity)
-    @ManyToOne(() => UserEntity, (user) => user.posts)
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (account) => account.posts)
     @JoinColumn({ name: "creatorId" })
-        creator: UserEntity
+    creator: AccountEntity
 
     @Field(() => [PostMediaEntity])
     @OneToMany(() => PostMediaEntity, (postMedia) => postMedia.post, {
         cascade: true,
     })
-        postMedias: Array<PostMediaEntity>
+    postMedias: Array<PostMediaEntity>
 
     @Field(() => [PostCommentEntity])
     @OneToMany(() => PostCommentEntity, (postComment) => postComment.post)
-        postComments: Array<PostCommentEntity>
+    postComments: Array<PostCommentEntity>
 
     @Field(() => [PostLikeEntity])
     @OneToMany(() => PostLikeEntity, (postReact) => postReact.post)
-        postReacts: Array<PostLikeEntity>
+    postReacts: Array<PostLikeEntity>
 
     //graphql
     @Field(() => Int, { nullable: true })
-        numberOfLikes?: number
+    numberOfLikes?: number
     @Field(() => Int, { nullable: true })
-        numberOfComments?: number
+    numberOfComments?: number
     @Field(() => Boolean, { nullable: true })
-        liked?: boolean
+    liked?: boolean
 }

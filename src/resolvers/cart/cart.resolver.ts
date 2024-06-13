@@ -3,7 +3,7 @@ import { CartService } from "./cart.service";
 import { CartMySqlEntity, OrderMySqlEntity } from "@database";
 import { FindManyUserOrdersInputData, FindOneOrderInputData } from "./cart.input";
 import { UseGuards, UseInterceptors } from "@nestjs/common";
-import { JwtAuthGuard, AuthInterceptor, UserId } from "../shared";
+import { JwtAuthGuard, AuthInterceptor, AccountId } from "../shared";
 import { FindManyUserOrdersOutput, FindOneCartOutput, FindOneOrderOutput } from "./cart.output";
 
 @Resolver()
@@ -16,28 +16,28 @@ export class CartResolver {
     @UseInterceptors(AuthInterceptor)
     @Query(() => FindOneCartOutput)
     async findOneCart(
-        @UserId() userId: string,
+        @AccountId() accountId: string,
     ) {
-        return await this.cartService.findOneCart({ userId })
+        return await this.cartService.findOneCart({ accountId })
     }
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     @Query(() => FindOneOrderOutput)
     async findOneOrder(
-        @UserId() userId: string,
+        @AccountId() accountId: string,
         @Args("data") data: FindOneOrderInputData
     ) {
-        return await this.cartService.findOneOrder({ userId, data })
+        return await this.cartService.findOneOrder({ accountId, data })
     }
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     @Query(() => FindManyUserOrdersOutput)
     async findManyUserOrders(
-        @UserId() userId : string,
+        @AccountId() accountId : string,
         @Args("data") data: FindManyUserOrdersInputData) {
-        return await this.cartService.findManyUserOrders({ userId, data })
+        return await this.cartService.findManyUserOrders({ accountId, data })
     }
 
     

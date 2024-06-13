@@ -1,4 +1,4 @@
-import { CartMySqlEntity, UserMySqlEntity } from "@database"
+import { CartMySqlEntity, AccountMySqlEntity } from "@database"
 import {
     Injectable,
     NotFoundException,
@@ -12,22 +12,22 @@ import {
     VerifyGoogleAccessTokenInput,
 } from "./auth.input"
 import { FirebaseService, Sha256Service } from "@global"
-import { UserKind } from "@common"
+import { AccountKind } from "@common"
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly sha256Service: Sha256Service,
-        @InjectRepository(UserMySqlEntity)
-        private readonly userMySqlRepository: Repository<UserMySqlEntity>,
+        @InjectRepository(AccountMySqlEntity)
+        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
         @InjectRepository(CartMySqlEntity)
         private readonly firebaseService: FirebaseService,
     ) { }
 
-    async init(input: InitInput): Promise<UserMySqlEntity> {
-        const user = await this.userMySqlRepository.findOne({
+    async init(input: InitInput): Promise<AccountMySqlEntity> {
+        const user = await this.accountMySqlRepository.findOne({
             where: {
-                userId: input.userId,
+                accountId: input.accountId,
             },
             relations: {
                 cart: {
@@ -41,12 +41,12 @@ export class AuthService {
         return user
     }
 
-    async signIn(input: SignInInput): Promise<UserMySqlEntity> {
+    async signIn(input: SignInInput): Promise<AccountMySqlEntity> {
         const { data } = input
         const { params } = data
         const { email, password } = params
 
-        const found = await this.userMySqlRepository.findOneBy({
+        const found = await this.accountMySqlRepository.findOneBy({
             email,
         })
         if (!found) throw new NotFoundException("User not found.")
@@ -57,7 +57,7 @@ export class AuthService {
 
     async verifyGoogleAccessToken(
         input: VerifyGoogleAccessTokenInput,
-    ): Promise<UserMySqlEntity> {
+    ): Promise<AccountMySqlEntity> {
         const { data } = input
         const { params } = data
         const { token } = params
@@ -65,16 +65,16 @@ export class AuthService {
         const decoded = await this.firebaseService.verifyGoogleAccessToken(token)
         if (!decoded)
             throw new UnauthorizedException("Invalid Google access token.")
-        let found = await this.userMySqlRepository.findOneBy({
+        let found = await this.accountMySqlRepository.findOneBy({
             externalId: decoded.uid,
         })
         if (!found) {
-            found = await this.userMySqlRepository.save({
+            found = await this.accountMySqlRepository.save({
                 externalId: decoded.uid,
                 email: decoded.email,
                 phoneNumber: decoded.phone_number,
                 avatarUrl: decoded.picture,
-                kind: UserKind.Google,
+                kind: AccountKind.Google,
             })
         }
         return found

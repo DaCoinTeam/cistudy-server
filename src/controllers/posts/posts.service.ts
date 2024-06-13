@@ -1,5 +1,5 @@
 import { StorageService } from "@global"
-import { Injectable } from "@nestjs/common"
+import { Injectable, NotFoundException } from "@nestjs/common"
 import {
     CreatePostCommentInput,
     CreatePostInput,
@@ -12,6 +12,7 @@ import {
     DeletePostCommentInput,
     UpdatePostInput,
     DeletePostInput,
+    TogglePostCommentInput,
 } from "./posts.input"
 import {
     PostMySqlEntity,
@@ -23,7 +24,7 @@ import {
     PostCommentReplyMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
-    UserMySqlEntity,
+    AccountMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DeepPartial, DataSource } from "typeorm"
@@ -48,8 +49,8 @@ export class PostsService {
         private readonly postMySqlRepository: Repository<PostMySqlEntity>,
         @InjectRepository(PostMediaMySqlEntity)
         private readonly postMediaMySqlRepository: Repository<PostMediaMySqlEntity>,
-        @InjectRepository(UserMySqlEntity)
-        private readonly userMySqlRepository: Repository<UserMySqlEntity>,
+        @InjectRepository(AccountMySqlEntity)
+        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
         @InjectRepository(CourseMySqlEntity)
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
         @InjectRepository(EnrolledInfoMySqlEntity)
@@ -70,13 +71,13 @@ export class PostsService {
 
     async createPost(input: CreatePostInput): Promise<string> {
         console.log(input)
-        const { data, files, userId } = input
+        const { data, files, accountId } = input
 
         const { postMedias, title, courseId, html } = data
         const post: DeepPartial<PostMySqlEntity> = {
             title,
             courseId,
-            creatorId: userId,
+            creatorId: accountId,
             html,
             postMedias: [],
         }
@@ -110,13 +111,13 @@ export class PostsService {
     }
 
     async updatePost(input: UpdatePostInput): Promise<UpdatePostOutput> {
-        const { data, files, userId } = input
+        const { data, files, accountId } = input
 
         const { postMedias, title, postId, html } = data
         const post: DeepPartial<PostMySqlEntity> = {
             postId,
             title,
-            creatorId: userId,
+            creatorId: accountId,
             html,
             postMedias: [],
         }
@@ -162,7 +163,7 @@ export class PostsService {
             )
             await this.storageService.delete(...mediaIds)
 
-            return {message : "Post Updated Successfully"}
+            return { message: "Post Updated Successfully" }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {
@@ -190,7 +191,7 @@ export class PostsService {
             )
             await this.storageService.delete(...mediaIds)
 
-            return {message: "Post Deleted Successfully"}
+            return { message: "Post Deleted Successfully" }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {
@@ -202,7 +203,7 @@ export class PostsService {
     async toggleLikePost(
         input: ToggleLikePostInput,
     ): Promise<ToggleLikePostOutputData> {
-        const { userId, data } = input
+        const { accountId, data } = input
         const { postId } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -212,14 +213,14 @@ export class PostsService {
             let earnAmount: number
             let found = await this.postLikeMySqlRepository.findOne({
                 where: {
-                    userId,
+                    accountId,
                     postId,
                 },
             })
 
             if (found === null) {
                 found = await this.postLikeMySqlRepository.save({
-                    userId,
+                    accountId,
                     postId,
                 })
 
@@ -228,12 +229,12 @@ export class PostsService {
                 })
 
                 const { priceAtEnrolled } = await this.enrolledInfoMySqlEntity.findOneBy({
-                    userId,
+                    accountId,
                     courseId
                 })
 
                 earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient
-                await this.userMySqlRepository.increment({ userId }, "balance", earnAmount)
+                await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
             } else {
                 const { postLikeId, liked } = found
                 await this.postLikeMySqlRepository.update(postLikeId, {
@@ -244,8 +245,8 @@ export class PostsService {
             const { postLikeId } = found
             return {
                 message: "",
-                others:{
-                    postLikeId :postLikeId,
+                others: {
+                    postLikeId: postLikeId,
                     earnAmount: earnAmount
                 }
             }
@@ -259,11 +260,11 @@ export class PostsService {
     async createPostComment(
         input: CreatePostCommentInput,
     ): Promise<CreatePostCommentOutput> {
-        const { data, files, userId } = input
+        const { data, files, accountId } = input
         const { postCommentMedias, postId, html } = data
         const postComment: DeepPartial<PostCommentMySqlEntity> = {
             postId,
-            creatorId: userId,
+            creatorId: accountId,
             html,
             postCommentMedias: [],
         }
@@ -297,7 +298,7 @@ export class PostsService {
 
         try {
             const { postCommentId } =
-            await this.postCommentMySqlRepository.save(postComment)
+                await this.postCommentMySqlRepository.save(postComment)
 
             const { post } = await this.postCommentMySqlRepository.findOne({
                 where: {
@@ -311,20 +312,20 @@ export class PostsService {
             })
 
             const { priceAtEnrolled } = await this.enrolledInfoMySqlEntity.findOneBy({
-                userId,
+                accountId,
                 courseId: post.courseId
             })
 
             const earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient
-            await this.userMySqlRepository.increment({ userId }, "balance", earnAmount)
+            await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
 
             return {
                 message: "Comment Posted Successfully",
-                others:{
+                others: {
                     postCommentId,
                     earnAmount
                 }
-                
+
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -384,7 +385,7 @@ export class PostsService {
             )
             await this.storageService.delete(...mediaIds)
 
-            return {message :"Comment updated successfully"}
+            return { message: "Comment updated successfully" }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {
@@ -413,7 +414,7 @@ export class PostsService {
             )
             await this.storageService.delete(...mediaIds)
 
-            return {message: "Comment deleted successfully"}
+            return { message: "Comment deleted successfully" }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {
@@ -421,8 +422,8 @@ export class PostsService {
         }
     }
 
-    async toggleLikePostComment(input: ToggleLikePostCommentInput) : Promise<ToggleCommentLikePostOutputData> {
-        const { userId, data } = input
+    async toggleLikePostComment(input: ToggleLikePostCommentInput): Promise<ToggleCommentLikePostOutputData> {
+        const { accountId, data } = input
         const { postCommentId } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -432,14 +433,14 @@ export class PostsService {
             let earnAmount: number
             let found = await this.postCommentLikeMySqlRepository.findOne({
                 where: {
-                    userId,
+                    accountId,
                     postCommentId,
                 },
             })
 
             if (found === null) {
                 found = await this.postCommentLikeMySqlRepository.save({
-                    userId,
+                    accountId,
                     postCommentId,
                 })
 
@@ -455,12 +456,12 @@ export class PostsService {
                 })
 
                 const { priceAtEnrolled } = await this.enrolledInfoMySqlEntity.findOneBy({
-                    userId,
+                    accountId,
                     courseId: post.courseId
                 })
 
                 earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostCommentEarnCoefficient
-                await this.userMySqlRepository.increment({ userId }, "balance", earnAmount)
+                await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
             } else {
                 const { postCommentLikeId, liked } = found
                 await this.postCommentLikeMySqlRepository.update(postCommentLikeId, {
@@ -469,12 +470,12 @@ export class PostsService {
             }
             const { postCommentLikeId } = found
             return {
-                message:"",
-                others:{
+                message: "",
+                others: {
                     postCommentLikeId,
                     earnAmount
                 }
-                
+
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -486,7 +487,7 @@ export class PostsService {
     async createPostCommentReply(
         input: CreatePostCommentReplyInput,
     ): Promise<CreatePostCommentReplyOutput> {
-        const { data, userId } = input
+        const { data, accountId } = input
         const { content, postCommentId } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -496,13 +497,13 @@ export class PostsService {
         try {
             const { postCommentReplyId } = await this.postCommentReplyMySqlRepository.save({
                 content,
-                creatorId: userId,
+                creatorId: accountId,
                 postCommentId,
             })
 
             return {
-                message:"Reply created successfully",
-                others: {postCommentReplyId}
+                message: "Reply created successfully",
+                others: { postCommentReplyId }
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -521,7 +522,7 @@ export class PostsService {
             content,
         })
 
-        return {message : "Reply Updated Successfully"}
+        return { message: "Reply Updated Successfully" }
     }
 
     async deletePostCommentReply(
@@ -532,6 +533,26 @@ export class PostsService {
 
         await this.postCommentReplyMySqlRepository.delete(postCommentReplyId)
 
-        return {message : "Reply deleted successfully"}
+        return { message: "Reply deleted successfully" }
+    }
+
+    async togglePostComment(input: TogglePostCommentInput): Promise<string> {
+        const { data, accountId } = input
+        const { postId } = data
+
+        const found = await this.postMySqlRepository.findOne({
+            where: {
+                postId,
+                creatorId: accountId
+            }
+        })
+
+        if (!found) {
+            throw new NotFoundException("Post not found or not owned by user")
+        }
+
+        const { allowComments } = await this.postMySqlRepository.save({ postId, allowComments: !found.allowComments })
+
+        return (allowComments) ? "Post's comment allowed" : "Post's comment closed"
     }
 }

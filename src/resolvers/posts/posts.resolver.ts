@@ -7,7 +7,7 @@ import {
     FindOnePostInputData,
 } from "./posts.input"
 import { PostsService } from "./posts.service"
-import { AuthInterceptor, JwtAuthGuard, UserId } from "../shared"
+import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import {
     FindManyPostCommentRepliesOutput,
@@ -26,49 +26,49 @@ export class PostsResolver {
   @UseInterceptors(AuthInterceptor)
   @Query(() => FindOnePostOutput)
     async findOnePost(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @Args("data") data: FindOnePostInputData,
     ) {
-        return (await this.postsService.findOnePost({ userId, data })).data
+        return (await this.postsService.findOnePost({ accountId, data })).data
     }
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   @Query(() => FindManyPostsOutput)
   async findManyPosts(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @Args("data") data: FindManyPostsInputData,
   ) {
-      return this.postsService.findManyPosts({ userId, data })
+      return this.postsService.findManyPosts({ accountId, data })
   }
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   @Query(() => FindOnePostCommentOutput)
   async findOnePostComment(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @Args("data") data: FindOnePostCommentInputData,
   ) {
-      return this.postsService.findOnePostComment({ userId, data })
+      return this.postsService.findOnePostComment({ accountId, data })
   }
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   @Query(() => FindManyPostCommentsOutput)
   async findManyPostComments(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @Args("data") data: FindManyPostCommentsInputData,
   ) {
-      return this.postsService.findManyPostComments({ userId, data })
+      return this.postsService.findManyPostComments({ accountId, data })
   }
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   @Query(() => FindManyPostCommentRepliesOutput)
   async findManyPostCommentReplies(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @Args("data") data: FindManyPostCommentRepliesInputData,
   ) {
-      return this.postsService.findManyPostCommentReplies({ userId, data })
+      return this.postsService.findManyPostCommentReplies({ accountId, data })
   }
 }

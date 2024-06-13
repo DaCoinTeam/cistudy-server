@@ -10,7 +10,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm"
-import { UserEntity } from "./user.entity"
+import { AccountEntity } from "./account.entity"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { CartCourseEntity } from "./cart-course.enity"
 import { OrderEntity } from "./order.entity"
@@ -39,8 +39,8 @@ export class CartEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @Field(() => UserEntity)
-    @OneToOne(() => UserEntity, (user) => user.cart)
+    @Field(() => AccountEntity)
+    @OneToOne(() => AccountEntity, (account) => account.cart)
     @JoinColumn({ name: "cartId" })
-    user: UserEntity
+    account: AccountEntity
 }

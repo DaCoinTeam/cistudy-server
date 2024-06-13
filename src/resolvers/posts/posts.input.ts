@@ -15,7 +15,7 @@ export class FindOnePostInputData implements ParamsOnly<FindOnePostInputParams> 
 }
 
 export class FindOnePostInput implements AuthInput<FindOnePostInputData> {
-    userId: string
+    accountId: string
     data: FindOnePostInputData
 }
 
@@ -34,7 +34,7 @@ export class FindOnePostCommentInputData implements ParamsOnly<FindOnePostCommen
 export class FindOnePostCommentInput
 implements AuthInput<FindOnePostCommentInputData>
 {
-    userId: string
+    accountId: string
     data: FindOnePostCommentInputData
 }
 
@@ -66,7 +66,7 @@ implements
 }
 
 export class FindManyPostsInput implements AuthInput<FindManyPostsInputData> {
-    userId: string
+    accountId: string
     data: FindManyPostsInputData
 }
 
@@ -103,7 +103,7 @@ implements
 export class FindManyPostCommentsInput
 implements AuthInput<FindManyPostCommentsInputData>
 {
-    userId: string
+    accountId: string
     data: FindManyPostCommentsInputData
 }
 
@@ -140,6 +140,6 @@ implements
 export class FindManyPostCommentRepliesInput
 implements AuthInput<FindManyPostCommentRepliesInputData>
 {
-    userId: string
+    accountId: string
     data: FindManyPostCommentRepliesInputData
 }

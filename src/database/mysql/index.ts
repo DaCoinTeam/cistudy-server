@@ -1,12 +1,12 @@
 import { SessionEntity as SessionMySqlEntity } from "./session.entity"
 import { CourseEntity as CourseMySqlEntity } from "./course.entity"
-import { UserEntity as UserMySqlEntity } from "./user.entity"
+import { AccountEntity as AccountMySqlEntity } from "./account.entity"
 import { PostEntity as PostMySqlEntity } from "./post.entity"
 import { PostCommentEntity as PostCommentMySqlEntity } from "./post-comment.entity"
 import { PostCommentLikeEntity as PostCommentLikeMySqlEntity } from "./post-comment-like.entity"
 import { EnrolledInfoEntity as EnrolledInfoMySqlEntity } from "./enrolled-info.entity"
 import { SectionEntity as SectionMySqlEntity } from "./section.entity"
-import { LectureEntity as LectureMySqlEntity } from "./lecture.entity"
+import { LessonEntity as LessonMySqlEntity } from "./lesson.entity"
 import { ResourceEntity as ResourceMySqlEntity } from "./resource.entity"
 import { CourseTargetEntity as CourseTargetMySqlEntity } from "./course-target.entity"
 import { PostMediaEntity as PostMediaMySqlEntity } from "./post-media.entity"
@@ -34,7 +34,7 @@ import { QuizQuestionMediaEntity as QuizQuestionMediaMySqlEntity } from "./quiz-
 import { ProgressEntity as ProgressMySqlEntity } from "./progress.entity"
 import { QuizAttemptEntity as QuizAttemptMySqlEntity} from "./quiz-attempt.entity"
 export {
-    UserMySqlEntity,
+    AccountMySqlEntity,
     PostMySqlEntity,
     PostCommentMySqlEntity,
     PostCommentLikeMySqlEntity,
@@ -44,7 +44,7 @@ export {
     CourseMySqlEntity,
     SessionMySqlEntity,
     SectionMySqlEntity,
-    LectureMySqlEntity,
+    LessonMySqlEntity,
     ResourceMySqlEntity,
     CourseTargetMySqlEntity,
     FollowMySqlEnitity,

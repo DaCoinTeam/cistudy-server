@@ -16,10 +16,10 @@ export class MailerService {
         },
     })
 
-    private mailOptions = (userId: string, email: string) => {
+    private mailOptions = (accountId: string, email: string) => {
         const appUrl = appConfig().url
         const token = this.jwtService.sign(
-            { userId, type: TokenType.Verify },
+            { accountId, type: TokenType.Verify },
             { secret: jwtConfig().secret },
         )
         return {
@@ -37,8 +37,8 @@ export class MailerService {
         }
     }
 
-    async sendMail(userId: string, email: string) {
-        return await this.transporter.sendMail(this.mailOptions(userId, email))
+    async sendMail(accountId: string, email: string) {
+        return await this.transporter.sendMail(this.mailOptions(accountId, email))
     }
 }
   

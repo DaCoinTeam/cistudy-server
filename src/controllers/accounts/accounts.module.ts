@@ -1,14 +1,14 @@
 import { Module } from "@nestjs/common"
-import { UsersController } from "./users.controller"
+import { UsersController } from "./accounts.controller"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     SessionMySqlEntity,
-    UserMySqlEntity,
+    AccountMySqlEntity,
     PostMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     SectionMySqlEntity,
-    LectureMySqlEntity,
+    LessonMySqlEntity,
     ResourceMySqlEntity,
     PostCommentMySqlEntity,
     PostLikeMySqlEntity,
@@ -19,18 +19,18 @@ import {
     QuizAttemptMySqlEntity,
 
 } from "@database"
-import { UsersService } from "./users.service"
+import { UsersService } from "./accounts.service"
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
             SessionMySqlEntity,
-            UserMySqlEntity,
+            AccountMySqlEntity,
             PostMySqlEntity,
             CourseMySqlEntity,
             EnrolledInfoMySqlEntity,
             SectionMySqlEntity,
-            LectureMySqlEntity,
+            LessonMySqlEntity,
             ResourceMySqlEntity,
             PostCommentMySqlEntity,
             PostLikeMySqlEntity,

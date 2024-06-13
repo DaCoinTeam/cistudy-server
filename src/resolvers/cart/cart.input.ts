@@ -5,7 +5,7 @@ import { IsOptional } from "class-validator";
 
 
 export class FindOneCartInput implements AuthEmptyDataInput {
-    userId: string;
+    accountId: string;
 }
 
 @InputType()
@@ -21,7 +21,7 @@ export class FindOneOrderInputData implements ParamsOnly<FindOneOrderInputParams
 }
 
 export class FindOneOrderInput implements AuthInput<FindOneOrderInputData> {
-    userId: string;
+    accountId: string;
     data: FindOneOrderInputData
 }
 
@@ -45,7 +45,7 @@ export class FindManyUserOrdersInputData
 }
 
 export class FindManyUserOrdersInput implements AuthInput<FindManyUserOrdersInputData> {
-    userId: string;
+    accountId: string;
     data: FindManyUserOrdersInputData
 }
 

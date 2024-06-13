@@ -8,7 +8,7 @@ import {
     UpdateDateColumn
 } from "typeorm"
 
-import { UserEntity } from "./user.entity"
+import { AccountEntity } from "./account.entity"
 
 @Entity("session")
 export class SessionEntity {
@@ -16,7 +16,7 @@ export class SessionEntity {
       sessionId: string
 
   @Column({ type: "uuid", length: "36" })
-      userId: string
+      accountId: string
 
   @CreateDateColumn()
       createdAt: Date
@@ -35,7 +35,7 @@ export class SessionEntity {
   })
       clientId: string
 
-  @ManyToOne(() => UserEntity, (user) => user.sessions)
-  @JoinColumn({ name: "userId" })
-      user: UserEntity
+  @ManyToOne(() => AccountEntity, (account) => account.sessions)
+  @JoinColumn({ name: "accountId" })
+      account: AccountEntity
 }

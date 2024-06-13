@@ -10,7 +10,7 @@ import {
 } from "typeorm"
 import { Field, Float, ID, ObjectType, Int } from "@nestjs/graphql"
 import { CourseEntity } from "./course.entity"
-import { UserEntity } from "./user.entity"
+import { AccountEntity } from "./account.entity"
 
 @ObjectType()
 @Entity("course-review")
@@ -25,7 +25,7 @@ export class CourseReviewEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        userId: string
+        accountId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 200, nullable: true })
@@ -48,8 +48,8 @@ export class CourseReviewEntity {
     @JoinColumn({ name: "courseId" })
     course: CourseEntity
 
-    @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity,(user) => user.courseReview ,{ nullable: true })
-    @JoinColumn({ name: "userId" })
-    user: UserEntity
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity,(account) => account.courseReview ,{ nullable: true })
+    @JoinColumn({ name: "accountId" })
+    account: AccountEntity
 }

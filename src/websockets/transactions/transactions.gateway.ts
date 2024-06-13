@@ -16,7 +16,7 @@ import {
 } from "@nestjs/websockets"
 import { Server, Socket } from "socket.io"
 import { AuthInterceptor, JwtAuthGuard } from "../shared"
-import { UserId } from "../shared"
+import { AccountId } from "../shared"
 import { TRANSACTION_VERIFIED, VERIFY_TRANSACTION } from "./transaction.events"
 import { VerifyTransactionOutputData } from "./transactions.output"
 import { RedisClientType, createClient } from "redis"
@@ -144,7 +144,7 @@ export class TransactionsGateway implements OnModuleInit {
         async handleVerifyTransaction(
             @ConnectedSocket() client: Socket,
             @MessageBody() data: VerifyTransactionInputData,
-            @UserId() userId: string,
+            @AccountId() accountId: string,
         ): Promise < WsResponse < VerifyTransactionOutputData >> {
             console.log("C")
             const { transactionHash } = data
@@ -152,7 +152,7 @@ export class TransactionsGateway implements OnModuleInit {
             const message: TransactionsServiceMessage = {
                 transactionHash,
                 clientId: client.id,
-                userId,
+                accountId,
             }
 
             await this.redisPubClient.publish(
@@ -167,5 +167,5 @@ export class TransactionsGateway implements OnModuleInit {
 export interface TransactionsServiceMessage {
     transactionHash: string;
     clientId: string;
-    userId: string;
+    accountId: string;
 }

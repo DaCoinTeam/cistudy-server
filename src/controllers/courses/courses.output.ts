@@ -88,7 +88,7 @@ export class UpdateQuizOutput implements Output {
     message: string;
 }
 
-export class MarkLectureAsCompletedOutput implements Output {
+export class MarkLessonAsCompletedOutput implements Output {
     message: string
 }
 

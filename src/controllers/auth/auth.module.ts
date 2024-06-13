@@ -3,12 +3,12 @@ import { AuthController } from "./auth.controller"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     SessionMySqlEntity,
-    UserMySqlEntity,
+    AccountMySqlEntity,
     PostMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     SectionMySqlEntity,
-    LectureMySqlEntity,
+    LessonMySqlEntity,
     ResourceMySqlEntity,
     PostCommentMySqlEntity,
     PostLikeMySqlEntity,
@@ -21,12 +21,12 @@ import { AuthService } from "./auth.service"
     imports: [
         TypeOrmModule.forFeature([
             SessionMySqlEntity,
-            UserMySqlEntity,
+            AccountMySqlEntity,
             PostMySqlEntity,
             CourseMySqlEntity,
             EnrolledInfoMySqlEntity,
             SectionMySqlEntity,
-            LectureMySqlEntity,
+            LessonMySqlEntity,
             ResourceMySqlEntity,
             PostCommentMySqlEntity,
             PostLikeMySqlEntity,

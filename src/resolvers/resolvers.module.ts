@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common"
 import { CoursesModule } from "./courses"
 import { PostsModule } from "./posts"
-import { UsersModule } from "./users"
+import { UsersModule } from "./accounts"
 import { AuthModule } from "./auth"
 import { ProfileModule } from "./profile"
 import { TransactionsModule } from "./transactions"

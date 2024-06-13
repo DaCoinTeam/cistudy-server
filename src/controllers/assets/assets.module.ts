@@ -3,12 +3,12 @@ import { AssetsController } from "./assets.controller"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     SessionMySqlEntity,
-    UserMySqlEntity,
+    AccountMySqlEntity,
     PostMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     SectionMySqlEntity,
-    LectureMySqlEntity,
+    LessonMySqlEntity,
     ResourceMySqlEntity,
     PostCommentMySqlEntity,
     PostLikeMySqlEntity,
@@ -20,12 +20,12 @@ import { AssetsService } from "./assets.service"
     imports: [
         TypeOrmModule.forFeature([
             SessionMySqlEntity,
-            UserMySqlEntity,
+            AccountMySqlEntity,
             PostMySqlEntity,
             CourseMySqlEntity,
             EnrolledInfoMySqlEntity,
             SectionMySqlEntity,
-            LectureMySqlEntity,
+            LessonMySqlEntity,
             ResourceMySqlEntity,
             PostCommentMySqlEntity,
             PostLikeMySqlEntity,

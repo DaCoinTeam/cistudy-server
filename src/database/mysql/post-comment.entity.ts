@@ -9,7 +9,7 @@ import {
     UpdateDateColumn
 } from "typeorm"
 import { PostEntity } from "./post.entity"
-import { UserEntity } from "./user.entity"
+import { AccountEntity } from "./account.entity"
 import { PostCommentLikeEntity } from "./post-comment-like.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { PostCommentMediaEntity } from "./post-comment-media.entity"
@@ -47,10 +47,10 @@ export class PostCommentEntity {
     @JoinColumn({ name: "postId" })
         post: PostEntity
 
-    @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (user) => user.postComments)
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (account) => account.postComments)
     @JoinColumn({ name: "creatorId" })
-        creator: UserEntity
+        creator: AccountEntity
 
     @Field(() => [PostCommentMediaEntity])
     @OneToMany(

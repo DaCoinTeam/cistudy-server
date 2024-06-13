@@ -25,8 +25,8 @@ implements NestInterceptor<T, AuthOutput<T>>
             mergeMap(async (data) => {
                 return await this.authManagerService.generateOutput<T>(
                     {
-                        userId: data.userId,
-                        userRole: data.userRole,
+                        accountId: data.accountId,
+                        accountRole: data.accountRole,
                         type: AuthTokenType.Refresh,
                     },
                     data,

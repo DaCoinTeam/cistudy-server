@@ -9,7 +9,7 @@ import { Observable, mergeMap } from "rxjs"
 import { AuthTokenType, Payload, AuthOutput, getClientId } from "@common"
 import { GqlExecutionContext } from "@nestjs/graphql"
 import { InjectRepository } from "@nestjs/typeorm"
-import { UserMySqlEntity } from "@database"
+import { AccountMySqlEntity } from "@database"
 import { Repository} from "typeorm"
 
 @Injectable()
@@ -18,8 +18,8 @@ implements NestInterceptor<T, AuthOutput<T>>
 {
     constructor(
         private readonly authManagerService: AuthManagerService,
-        @InjectRepository(UserMySqlEntity)
-        private readonly userMySqlRepository: Repository<UserMySqlEntity>
+        @InjectRepository(AccountMySqlEntity)
+        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>
     ) {}
 
     async intercept(
@@ -29,22 +29,22 @@ implements NestInterceptor<T, AuthOutput<T>>
         const gqlContext = GqlExecutionContext.create(context).getContext()
         const request = gqlContext.req
 
-        const { userId, type } = request.user as Payload
-        let { userRole } = request.user as Payload
+        const { accountId, type } = request.user as Payload
+        let { accountRole } = request.user as Payload
 
         const clientId = getClientId(request.headers)
         const refresh = type === AuthTokenType.Refresh
 
         if (refresh) {
-            await this.authManagerService.validateSession(userId, clientId)
-            const user = await this.userMySqlRepository.findOneBy({userId})
-            userRole = user.userRole
+            await this.authManagerService.validateSession(accountId, clientId)
+            const user = await this.accountMySqlRepository.findOneBy({accountId})
+            accountRole = user.accountRole
         }
 
         return next.handle().pipe(
             mergeMap(async (data) => {
                 return await this.authManagerService.generateOutput<T>(
-                    { userId, userRole, type },
+                    { accountId, accountRole, type },
                     data,
                     refresh,
                     clientId,

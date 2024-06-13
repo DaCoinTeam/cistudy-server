@@ -6,7 +6,7 @@ import {
     PrimaryGeneratedColumn} from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { CourseEntity } from "./course.entity"
-import { UserEntity } from "./user.entity"
+import { AccountEntity } from "./account.entity"
 
 
 @ObjectType()
@@ -23,7 +23,7 @@ export class CertificateEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    userId: string
+    accountId: string
 
     @Field(() => Date)
     @CreateDateColumn()
@@ -38,10 +38,10 @@ export class CertificateEntity {
     expireDate: Date
     //relations
 
-    @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (user) => user.certificates)
-    @JoinColumn({ name: "userId" })
-    user: UserEntity
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (account) => account.certificates)
+    @JoinColumn({ name: "accountId" })
+    account: AccountEntity
 
     @Field(() => CourseEntity, { nullable: true })
     @ManyToOne(() => CourseEntity, (course) => course.certificate)

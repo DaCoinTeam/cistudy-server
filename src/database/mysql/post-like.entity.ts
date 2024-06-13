@@ -7,7 +7,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
 } from "typeorm"
-import { UserEntity } from "./user.entity"
+import { AccountEntity } from "./account.entity"
 import { PostEntity } from "./post.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 
@@ -20,7 +20,7 @@ export class PostLikeEntity {
 
   @Field(() => String)
   @Column({ type: "uuid", length: 36 })
-      userId: string
+      accountId: string
 
   @Field(() => String)
   @Column({ type: "uuid", length: 36 })
@@ -41,10 +41,10 @@ export class PostLikeEntity {
   @UpdateDateColumn()
       updatedAt: Date
 
-  @Field(() => UserEntity)
-  @ManyToOne(() => UserEntity, (user) => user.postReacts)
-  @JoinColumn({ name: "userId" })
-      user: UserEntity
+  @Field(() => AccountEntity)
+  @ManyToOne(() => AccountEntity, (account) => account.postReacts)
+  @JoinColumn({ name: "accountId" })
+      account: AccountEntity
 
   @Field(() => PostEntity)
   @ManyToOne(() => PostEntity, (post) => post.postReacts, {

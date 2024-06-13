@@ -5,7 +5,7 @@ import { CoursesModule } from "./courses"
 import { AssetsModule } from "./assets"
 import { PostsModule } from "./posts"
 import { ProfileModule } from "./profile"
-import { UsersModule } from "./users"
+import { UsersModule } from "./accounts"
 import { CartModule } from "./cart"
 
 

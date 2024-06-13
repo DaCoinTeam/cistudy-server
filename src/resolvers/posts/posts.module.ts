@@ -7,14 +7,14 @@ import {
     PostCommentMySqlEntity,
     PostCommentLikeMySqlEntity,
     PostCommentReplyMySqlEntity,
-    UserMySqlEntity
+    AccountMySqlEntity
 } from "@database"
 import { PostsService } from "./posts.service"
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
-            UserMySqlEntity,
+            AccountMySqlEntity,
             PostMySqlEntity,
             PostLikeMySqlEntity,
             PostCommentMySqlEntity,

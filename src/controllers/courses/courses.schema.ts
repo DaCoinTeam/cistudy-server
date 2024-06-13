@@ -38,7 +38,7 @@ export const updateCourseSchema: SchemaObject = {
     }
 }
 
-export const createLectureSchema: SchemaObject = {
+export const createLessonSchema: SchemaObject = {
     type: "object",
     properties: {
         data: {
@@ -68,7 +68,7 @@ export const createResourcesSchema: SchemaObject = {
         data: {
             type: "object",
             properties: {
-                lectureId: {
+                lessonId: {
                     type: "string",
                 },
             },
@@ -116,7 +116,7 @@ export const createQuizSchema: SchemaObject = {
         data: {
             type: "object",
             properties: {
-                lectureId: {
+                lessonId: {
                     type: "string",
                 },
                 timeLimit: {

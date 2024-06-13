@@ -11,7 +11,7 @@ export class AddToCartInputData {
 
 export class AddToCartInput implements AuthInput<AddToCartInputData>{
     @IsUUID("4")
-    userId: string
+    accountId: string
     @ApiProperty()
     data: AddToCartInputData
 }
@@ -23,7 +23,7 @@ export class DeleteFromCartInputData {
 
 export class DeleteFromCartInput implements AuthInput<DeleteFromCartInputData>{
     @IsUUID("4")
-    userId: string;
+    accountId: string;
     data: DeleteFromCartInputData;
 }
 
@@ -35,6 +35,6 @@ export class CheckOutInputData {
 
 export class CheckOutInput implements AuthInput<CheckOutInputData>{
     @IsUUID("4")
-    userId: string
+    accountId: string
     data: CheckOutInputData;
 }

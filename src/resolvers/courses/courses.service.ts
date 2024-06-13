@@ -5,7 +5,7 @@ import {
     CourseTargetMySqlEntity,
     EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
-    LectureMySqlEntity,
+    LessonMySqlEntity,
     ResourceMySqlEntity,
     TopicMySqlEntity
 } from "@database"
@@ -15,15 +15,16 @@ import { Repository, DataSource, Like } from "typeorm"
 import {
     FindOneCourseInput,
     FindManyCoursesInput,
-    FindManyLecturesInput,
+    FindManyLessonsInput,
     FindManyResourcesInput,
-    FindOneLectureInput,
+    FindOneLessonInput,
     FindManyCourseTargetsInput,
     FindOneCourseAuthInput,
     FindOneCourseReviewInput,
     FindManyCourseReviewsInput,
+    FindManyCoursesTopicInput,
 } from "./courses.input"
-import { FindManyCourseReviewsOutputData, FindManyCoursesOutputData } from "./courses.output"
+import { FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData } from "./courses.output"
 import { SubcategoryEntity } from "src/database/mysql/subcategory.entity"
 
 @Injectable()
@@ -31,8 +32,8 @@ export class CoursesService {
     constructor(
         @InjectRepository(CourseMySqlEntity)
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-        @InjectRepository(LectureMySqlEntity)
-        private readonly lectureMySqlRepository: Repository<LectureMySqlEntity>,
+        @InjectRepository(LessonMySqlEntity)
+        private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
         @InjectRepository(ResourceMySqlEntity)
         private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
         @InjectRepository(CourseTargetMySqlEntity)
@@ -67,7 +68,7 @@ export class CoursesService {
                 where: { courseId },
                 relations: {
                     course: true,
-                    user: true,
+                    account: true,
                 },
                 skip,
                 take,
@@ -99,7 +100,7 @@ export class CoursesService {
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
         const { data } = input
         const { params } = data
-        const { courseId, userId } = params
+        const { courseId, accountId } = params
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -110,7 +111,7 @@ export class CoursesService {
                 where: { courseId },
                 relations: {
                     sections: {
-                        lectures: {
+                        lessons: {
                             resources: true,
                         },
                     },
@@ -135,17 +136,17 @@ export class CoursesService {
                 },
             })
 
-            const enrolledInfo = userId
+            const enrolledInfo = accountId
                 ? await this.enrolledInfoMySqlRepository.findOneBy({
                     courseId,
-                    userId
+                    accountId
                 }) : undefined
 
             const numberOfFollowersResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(FollowMySqlEnitity, "follow")
-                .where("followedUserId = :userId", { userId: course.creator.userId })
+                .where("followedUserId = :accountId", { accountId: course.creator.accountId })
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 
@@ -173,10 +174,10 @@ export class CoursesService {
     }
 
     async findOneCourseAuth(input: FindOneCourseAuthInput): Promise<CourseMySqlEntity> {
-        const { data, userId } = input
+        const { data, accountId } = input
         const { params } = data
         const { courseId } = params
-        //console.log(data, userId)
+        //console.log(data, accountId)
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
@@ -186,7 +187,7 @@ export class CoursesService {
                 where: { courseId },
                 relations: {
                     sections: {
-                        lectures: {
+                        lessons: {
                             resources: true,
                         },
                     },
@@ -211,17 +212,17 @@ export class CoursesService {
                 },
             })
 
-            const enrolledInfo = userId
+            const enrolledInfo = accountId
                 ? await this.enrolledInfoMySqlRepository.findOneBy({
                     courseId,
-                    userId
+                    accountId
                 }) : undefined
 
             const numberOfFollowersResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(FollowMySqlEnitity, "follow")
-                .where("followedUserId = :userId", { userId: course.creator.userId })
+                .where("followedUserId = :accountId", { accountId: course.creator.accountId })
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 
@@ -321,27 +322,27 @@ export class CoursesService {
         }
     }
 
-    async findOneLecture(
-        input: FindOneLectureInput,
-    ): Promise<LectureMySqlEntity> {
-        const { data, userId } = input
+    async findOneLesson(
+        input: FindOneLessonInput,
+    ): Promise<LessonMySqlEntity> {
+        const { data, accountId } = input
         const { params } = data
-        const { lectureId } = params
+        const { lessonId } = params
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
 
         try {
-            const lecture = await this.lectureMySqlRepository.findOne({
-                where: { lectureId },
+            const lesson = await this.lessonMySqlRepository.findOne({
+                where: { lessonId },
                 relations: {
                     resources: true,
                     section: {
                         course: {
                             creator: true,
                             sections: {
-                                lectures: true
+                                lessons: true
                             }
                         }
                     }
@@ -352,8 +353,8 @@ export class CoursesService {
                 FollowMySqlEnitity,
                 {
                     where: {
-                        followerId: userId,
-                        followedUserId: lecture.section.course.creator.userId,
+                        followerId: accountId,
+                        followedUserId: lesson.section.course.creator.accountId,
                         followed: true,
                     }
                 }
@@ -363,16 +364,16 @@ export class CoursesService {
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(FollowMySqlEnitity, "follow")
-                .where("followedUserId = :userId", { userId: lecture.section.course.creator.userId })
+                .where("followedUserId = :accountId", { accountId: lesson.section.course.creator.accountId })
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 
             await queryRunner.commitTransaction()
 
-            lecture.section.course.creator.numberOfFollowers = numberOfFollowers.count
-            lecture.section.course.creator.followed = follow ? follow.followed : false
+            lesson.section.course.creator.numberOfFollowers = numberOfFollowers.count
+            lesson.section.course.creator.followed = follow ? follow.followed : false
 
-            return lecture
+            return lesson
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {
@@ -380,14 +381,14 @@ export class CoursesService {
         }
     }
 
-    async findManyLectures(
-        input: FindManyLecturesInput,
-    ): Promise<Array<LectureMySqlEntity>> {
+    async findManyLessons(
+        input: FindManyLessonsInput,
+    ): Promise<Array<LessonMySqlEntity>> {
         const { data } = input
         const { params } = data
         const { sectionId } = params
 
-        return await this.lectureMySqlRepository.find({
+        return await this.lessonMySqlRepository.find({
             where: {
                 sectionId
             },
@@ -412,11 +413,11 @@ export class CoursesService {
     ): Promise<Array<ResourceMySqlEntity>> {
         const { data } = input
         const { params } = data
-        const { lectureId } = params
+        const { lessonId } = params
 
         return await this.resourceMySqlRepository.find({
             where: {
-                lectureId
+                lessonId
             },
         })
     }
@@ -462,7 +463,7 @@ export class CoursesService {
             relations: {
                 creator: true,
                 sections: {
-                    lectures: {
+                    lessons: {
                         resources: true
                     }
                 },
@@ -472,4 +473,47 @@ export class CoursesService {
             }
         })
     }
+
+    async findManyCoursesTopic(input: FindManyCoursesTopicInput): Promise<FindManyCoursesTopicOutputData> {
+        const { data } = input;
+        const { params, options } = data;
+        const { topicId } = params;
+        const { take, skip } = { ...options };
+
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const results = await queryRunner.manager
+                .createQueryBuilder(CourseMySqlEntity, "course")
+                .innerJoinAndSelect("course.courseTopics", "course_topic")
+                .where("course_topic.topicId = :topicId", { topicId })
+                .skip(skip)
+                .take(take)
+                .getMany();
+
+            const numberOfCoursesTopicResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(course.courseId)", "count")
+                .from(CourseMySqlEntity, "course")
+                .innerJoin("course.courseTopics", "course_topic")
+                .where("course_topic.topicId = :topicId", { topicId })
+                .getRawOne();
+
+            await queryRunner.commitTransaction();
+
+            return {
+                results,
+                metadata: {
+                    count: numberOfCoursesTopicResult.count,
+                }
+            };
+        } catch (ex) {
+            await queryRunner.rollbackTransaction();
+            throw ex;
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
 }

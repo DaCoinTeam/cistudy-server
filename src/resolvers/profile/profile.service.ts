@@ -1,4 +1,4 @@
-import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, LectureMySqlEntity, ProgressMySqlEntity, SectionMySqlEntity, UserMySqlEntity } from "@database"
+import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, LessonMySqlEntity, ProgressMySqlEntity, SectionMySqlEntity, AccountMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { Repository, DataSource } from "typeorm"
 import {
@@ -19,7 +19,7 @@ export class ProfileService {
     async findManySelfCreatedCourses(
         input: FindManySelfCreatedCoursesInput,
     ): Promise<FindManySelfCreatedCoursesOutputData> {
-        const { data, userId } = input
+        const { data, accountId } = input
         const { options } = data
         const { take, skip } = { ...options }
         
@@ -30,7 +30,7 @@ export class ProfileService {
         try {
             const courses =  await this.courseMySqlRepository.find({
                 where: {
-                    creatorId: userId,
+                    creatorId: accountId,
                 },
                 take,
                 skip,
@@ -40,7 +40,7 @@ export class ProfileService {
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(CourseMySqlEntity, "course")
-                .where("creatorId = :creatorId", { creatorId: userId })
+                .where("creatorId = :creatorId", { creatorId: accountId })
                 .getRawOne()
 
             await queryRunner.commitTransaction()
@@ -59,7 +59,7 @@ export class ProfileService {
     }
     
     async findManyEnrolledCourses(input: FindManyEnrolledCoursesInput): Promise<FindManyEnrolledCoursesOutputData> {
-        const { data, userId } = input;
+        const { data, accountId } = input;
         const { options } = data;
         const { take, skip } = { ...options };
     
@@ -74,14 +74,14 @@ export class ProfileService {
                     creator: true,
                     enrolledInfos: true,
                     sections: {
-                        lectures: true
+                        lessons: true
                     }
                 },
                 take,
                 skip,
                 where: {
                     enrolledInfos: {
-                        userId,
+                        accountId,
                         enrolled: true
                     }
                 }
@@ -93,8 +93,8 @@ export class ProfileService {
                 .select("COUNT(follow.followerId)", "count")
                 .addSelect("course.courseId", "courseId")
                 .from(CourseMySqlEntity, "course")
-                .innerJoin(UserMySqlEntity, "user", "course.creatorId = user.userId")
-                .innerJoin(FollowMySqlEnitity, "follow", "user.userId = follow.followerId")
+                .innerJoin(AccountMySqlEntity, "account", "course.creatorId = account.accountId")
+                .innerJoin(FollowMySqlEnitity, "follow", "account.accountId = follow.followerId")
                 .where("followed = :followed", { followed: true })
                 .groupBy("course.courseId")
                 .getRawMany();
@@ -105,7 +105,7 @@ export class ProfileService {
                 .select("COUNT(*)", "count")
                 .from(CourseMySqlEntity, "course")
                 .innerJoin(EnrolledInfoMySqlEntity, "enrolledInfo", "course.courseId = enrolledInfo.courseId")
-                .where("enrolledInfo.userId = :userId", { userId })
+                .where("enrolledInfo.accountId = :accountId", { accountId })
                 .andWhere("enrolledInfo.enrolled = :enrolled", { enrolled: true })
                 .getRawOne();
     
@@ -113,13 +113,13 @@ export class ProfileService {
             const progressResults = await queryRunner.manager
                 .createQueryBuilder()
                 .select("course.courseId", "courseId")
-                .addSelect("COUNT(progress.lectureId)", "completedLectures")
-                .addSelect("COUNT(DISTINCT lecture.lectureId)", "totalLectures")
+                .addSelect("COUNT(progress.lessonId)", "completedLessons")
+                .addSelect("COUNT(DISTINCT lesson.lessonId)", "totalLessons")
                 .from(ProgressMySqlEntity, "progress")
-                .innerJoin(LectureMySqlEntity, "lecture", "progress.lectureId = lecture.lectureId")
-                .innerJoin(SectionMySqlEntity, "section", "lecture.sectionId = section.sectionId")
+                .innerJoin(LessonMySqlEntity, "lesson", "progress.lessonId = lesson.lessonId")
+                .innerJoin(SectionMySqlEntity, "section", "lesson.sectionId = section.sectionId")
                 .innerJoin(CourseMySqlEntity, "course", "section.courseId = course.courseId")
-                .where("progress.userId = :userId", { userId })
+                .where("progress.accountId = :accountId", { accountId })
                 .andWhere("progress.isCompleted = :isCompleted", { isCompleted: true })
                 .groupBy("course.courseId")
                 .getRawMany();
@@ -135,9 +135,9 @@ export class ProfileService {
                         result => result.courseId === course.courseId
                     );
     
-                    const totalLectures = course.sections.reduce((acc, section) => acc + section.lectures.length, 0);
-                    const completedLectures = courseProgress?.completedLectures ?? 0;
-                    const progress = totalLectures > 0 ? (completedLectures / totalLectures) * 100 : 0;
+                    const totalLessons = course.sections.reduce((acc, section) => acc + section.lessons.length, 0);
+                    const completedLessons = courseProgress?.completedLessons ?? 0;
+                    const progress = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
     
                     course.creator.numberOfFollowers = numberOfFollowers;
                     course.courseProgress = progress;

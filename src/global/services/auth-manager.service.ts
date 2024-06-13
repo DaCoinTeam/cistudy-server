@@ -1,17 +1,17 @@
 import { jwtConfig } from "@config"
-import { SessionMySqlEntity, UserMySqlEntity } from "@database"
+import { SessionMySqlEntity, AccountMySqlEntity } from "@database"
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
 import { JsonWebTokenError, JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Payload, AuthTokens, AuthTokenType, AuthOutput, UserRole } from "@common"
+import { Payload, AuthTokens, AuthTokenType, AuthOutput, AccountRole } from "@common"
 import { Repository } from "typeorm"
 
 @Injectable()
 export class AuthManagerService {
     constructor(
         private readonly jwtService: JwtService,
-        @InjectRepository(UserMySqlEntity)
-        private readonly userMySqlRepository: Repository<UserMySqlEntity>,
+        @InjectRepository(AccountMySqlEntity)
+        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
         @InjectRepository(SessionMySqlEntity)
         private readonly sessionMySqlRepository: Repository<SessionMySqlEntity>,
     ) { }
@@ -26,10 +26,10 @@ export class AuthManagerService {
         }
     }
 
-    async validateSession(userId: string, clientId: string): Promise<void> {
+    async validateSession(accountId: string, clientId: string): Promise<void> {
         if (!clientId) throw new NotFoundException("Client id not found.")
         const session = await this.sessionMySqlRepository.findOneBy({
-            userId,
+            accountId,
             clientId,
         })
         if (session === null) throw new UnauthorizedException("Session not found.")
@@ -47,11 +47,11 @@ export class AuthManagerService {
         }
         const expiresIn = typeToExpiresIn[type]
 
-        console.log(data.userRole)
+        console.log(data.accountRole)
 
         const payload: PayloadLike = {
-            userId: data.userId,
-            userRole: type === AuthTokenType.Access ? data.userRole : undefined,
+            accountId: data.accountId,
+            accountRole: type === AuthTokenType.Access ? data.accountRole : undefined,
             type,
         }
 
@@ -70,12 +70,12 @@ export class AuthManagerService {
         if (clientId) {
             let found = await this.sessionMySqlRepository.findOneBy({
                 clientId,
-                userId: data.userId,
+                accountId: data.accountId,
             })
             if (!found) {
                 found = await this.sessionMySqlRepository.save({
                     clientId,
-                    userId: data.userId,
+                    accountId: data.accountId,
                 })
             } else {
                 const { sessionId, numberOfUpdates } = found
@@ -98,16 +98,16 @@ export class AuthManagerService {
         authTokensRequested: boolean = false,
         clientId?: string,
     ): Promise<AuthOutput<T>> {
-        const { userId } = payload
-        let { userRole } = payload
+        const { accountId } = payload
+        let { accountRole } = payload
 
         if (authTokensRequested) {
-            const user = await this.userMySqlRepository.findOneBy({ userId })
-            userRole = user.userRole
+            const user = await this.accountMySqlRepository.findOneBy({ accountId })
+            accountRole = user.accountRole
         }
 
         const tokens = authTokensRequested
-            ? await this.generateAuthTokens({ userId, userRole }, clientId)
+            ? await this.generateAuthTokens({ accountId, accountRole }, clientId)
             : undefined
 
         return {
@@ -118,7 +118,7 @@ export class AuthManagerService {
 }
 
 export interface PayloadLike {
-    userId: string,
-    userRole: UserRole,
+    accountId: string,
+    accountRole: AccountRole,
     type?: AuthTokenType
 }

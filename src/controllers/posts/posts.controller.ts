@@ -19,13 +19,14 @@ import {
 } from "@nestjs/swagger"
 import { PostsService } from "./posts.service"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
-import { JwtAuthGuard, AuthInterceptor, UserId, DataFromBody } from "../shared"
+import { JwtAuthGuard, AuthInterceptor, AccountId, DataFromBody } from "../shared"
 import {
     CreatePostCommentInputData,
     CreatePostCommentReplyInputData,
     CreatePostInputData,
     ToggleLikePostCommentInputData,
     ToggleLikePostInputData,
+    TogglePostCommentInputData,
     UpdatePostCommentInputData,
     UpdatePostCommentReplyInputData,
     UpdatePostInputData,
@@ -57,11 +58,11 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
     async createPost(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @DataFromBody() data: CreatePostInputData,
     @UploadedFiles() { files }: Files,
     ) {
-        return await this.postsService.createPost({ userId, data, files })
+        return await this.postsService.createPost({ accountId, data, files })
     }
 
   @ApiBearerAuth()
@@ -71,19 +72,19 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
   async updatePost(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @DataFromBody() data: UpdatePostInputData,
     @UploadedFiles() { files }: Files,
   ) {
-      return await this.postsService.updatePost({ userId, data, files })
+      return await this.postsService.updatePost({ accountId, data, files })
   }
 
   @ApiBearerAuth()
   @Delete("delete-post/:postId")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
-  async deletePost(@UserId() userId: string, @Param("postId") postId: string) {
-      return await this.postsService.deletePost({ userId, data: {
+  async deletePost(@AccountId() accountId: string, @Param("postId") postId: string) {
+      return await this.postsService.deletePost({ accountId, data: {
           postId
       } })
   }
@@ -93,11 +94,11 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   async toggleLikePost(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @Body() body: ToggleLikePostInputData,
   ) {
       return this.postsService.toggleLikePost({
-          userId,
+          accountId,
           data: body,
       })
   }
@@ -109,11 +110,11 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
   async createPostComment(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @DataFromBody() data: CreatePostCommentInputData,
     @UploadedFiles() { files }: Files,
   ) {
-      return await this.postsService.createPostComment({ userId, data, files })
+      return await this.postsService.createPostComment({ accountId, data, files })
   }
 
 
@@ -124,11 +125,11 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
   async updatePostComment(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @DataFromBody() data: UpdatePostCommentInputData,
     @UploadedFiles() { files }: Files,
   ) {
-      return await this.postsService.updatePostComment({ userId, data, files })
+      return await this.postsService.updatePostComment({ accountId, data, files })
   }
 
   @ApiBearerAuth()
@@ -136,11 +137,11 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   async deletePostComment(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @Param("postCommentId") postCommentId: string,
   ) {
       return await this.postsService.deletePostComment({
-          userId, data: {
+          accountId, data: {
               postCommentId
           }
       })
@@ -151,11 +152,11 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   async toggleLikePostComment(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @Body() body: ToggleLikePostCommentInputData,
   ) {
       return await this.postsService.toggleLikePostComment({
-          userId,
+          accountId,
           data: body,
       })
   }
@@ -165,11 +166,11 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   async createPostCommentReply(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @Body() body: CreatePostCommentReplyInputData,
   ): Promise<CreatePostCommentReplyOutput> {
       return await this.postsService.createPostCommentReply({
-          userId,
+          accountId,
           data: body,
       })
   }
@@ -179,11 +180,11 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   async updatePostCommentReply(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @Body() body: UpdatePostCommentReplyInputData,
   ): Promise<UpdatePostCommentReplyOutput> {
       return await this.postsService.updatePostCommentReply({
-          userId,
+          accountId,
           data: body,
       })
   }
@@ -193,14 +194,28 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   async deletePostCommentReply(
-    @UserId() userId: string,
+    @AccountId() accountId: string,
     @Param("postCommentReply") postCommentReplyId: string,
   ): Promise<DeletePostCommentReplyOutput> {
       return await this.postsService.deletePostCommentReply({
-          userId,
+          accountId,
           data: {
               postCommentReplyId
           },
+      })
+  }
+
+  @ApiBearerAuth()
+  @Patch("toggle-post-comment")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async togglePostComment(
+    @AccountId() accountId: string,
+    @Body() body: TogglePostCommentInputData,
+  ) {
+      return this.postsService.togglePostComment({
+          accountId,
+          data: body,
       })
   }
 }

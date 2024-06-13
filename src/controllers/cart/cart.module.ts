@@ -8,7 +8,7 @@ import {
     TransactionMongoEntitySchema,
     OrderMySqlEntity,
     OrderCourseMySqlEntity,
-    UserMySqlEntity,
+    AccountMySqlEntity,
 } from "@database"
 
 import { MongooseModule } from "@nestjs/mongoose"
@@ -24,7 +24,7 @@ import { CartService } from "./cart.service"
             CourseMySqlEntity,
             OrderMySqlEntity,
             OrderCourseMySqlEntity,
-            UserMySqlEntity
+            AccountMySqlEntity
         ]),
     ],
     controllers: [CartController],

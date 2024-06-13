@@ -10,11 +10,11 @@ import {
     OneToOne,
 } from "typeorm"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
-import { VerifyStatus } from "@common"
+import { CourseApproveStatus, VerifyStatus } from "@common"
 import { PostEntity } from "./post.entity"
 import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { SectionEntity } from "./section.entity"
-import { UserEntity } from "./user.entity"
+import { AccountEntity } from "./account.entity"
 import { CourseTargetEntity } from "./course-target.entity"
 import { CourseTopicEntity } from "./course-topic.entity"
 import { CourseSubcategoryEntity } from "./course-subcategory.entity"
@@ -72,10 +72,10 @@ export class CourseEntity {
     @Column({ type: "enum", enum: VerifyStatus, default: VerifyStatus.Pending })
     verifyStatus: VerifyStatus
 
-    @Field(() => UserEntity)
-    @ManyToOne(() => UserEntity, (user) => user.courses)
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (account) => account.courses)
     @JoinColumn({ name: "creatorId" })
-    creator: UserEntity
+    creator: AccountEntity
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ default: false })
@@ -92,6 +92,10 @@ export class CourseEntity {
     @Field(() => String, { nullable: true })
     @Column({ type: "json", default: null })
     includes: CourseIncludes
+
+    @Field(() => String)
+    @Column({ type: "enum", enum: CourseApproveStatus, default: CourseApproveStatus.Pending })
+    approveStatus: CourseApproveStatus
 
     @Field(() => Date)
     @CreateDateColumn()

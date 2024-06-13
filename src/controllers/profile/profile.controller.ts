@@ -6,7 +6,7 @@ import {
     Put,
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
-import { UserId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
+import { AccountId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import { Files } from "@common"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { ProfileService } from "./profile.service"
@@ -32,14 +32,14 @@ export class ProfileController{
         FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
     )
     async updateProfile(
-        @UserId() userId: string,
+        @AccountId() accountId: string,
         @DataFromBody() data: UpdateProfileData,
         @UploadedFiles() { files }: Files,
     ) {     
-        console.log(userId)
+        console.log(accountId)
         console.log(data)
     	return this.profileService.updateProfile({
-    		userId,
+    		accountId,
             data,
     		files
     	}) 

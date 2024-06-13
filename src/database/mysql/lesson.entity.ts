@@ -17,11 +17,11 @@ import { QuizEntity } from "./quiz.entity"
 import { ProgressEntity } from "./progress.entity"
 
 @ObjectType()
-@Entity("lecture")
-export class LectureEntity {
+@Entity("lesson")
+export class LessonEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    lectureId: string
+    lessonId: string
 
     @Field(() => String)
     @Column({ type: "varchar", length: 150 })
@@ -33,7 +33,7 @@ export class LectureEntity {
 
     @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36, nullable: true })
-    lectureVideoId?: string
+    lessonVideoId?: string
 
     @Field(() => ID)
     @Column({ name: "sectionId", type: "uuid", length: 36 })
@@ -64,14 +64,14 @@ export class LectureEntity {
     updatedAt: Date
 
     @Field(() => SectionEntity)
-    @ManyToOne(() => SectionEntity, (section) => section.lectures, {
+    @ManyToOne(() => SectionEntity, (section) => section.lessons, {
         onDelete: "CASCADE",
     })
     @JoinColumn({ name: "sectionId" })
     section: SectionEntity
 
     @Field(() => [ResourceEntity])
-    @OneToMany(() => ResourceEntity, (resource) => resource.lecture)
+    @OneToMany(() => ResourceEntity, (resource) => resource.lesson)
     resources: Array<ResourceEntity>
 
     @Field(() => [QuizEntity], { nullable: true })
@@ -79,6 +79,6 @@ export class LectureEntity {
     quiz?: QuizEntity
 
     @Field(() => ProgressEntity)
-    @OneToMany(() => ProgressEntity, (userProgress) => userProgress.lecture)
+    @OneToMany(() => ProgressEntity, (userProgress) => userProgress.lesson)
     userProgresses? : ProgressEntity
 }

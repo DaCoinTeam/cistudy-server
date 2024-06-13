@@ -20,11 +20,11 @@ export class CartService {
     ) { }
 
     async findOneCart(input: FindOneCartInput): Promise<CartMySqlEntity> {
-        const { userId } = input
+        const { accountId } = input
 
         const cart = await this.cartMySqlRepository.findOne({
             where: {
-                cartId: userId,
+                cartId: accountId,
             },
             relations: {
                 cartCourses: {
@@ -58,7 +58,7 @@ export class CartService {
     }
 
     async findManyUserOrders(input: FindManyUserOrdersInput): Promise<FindManyUserOrdersOutputData> {
-        const { userId, data } = input
+        const { accountId, data } = input
         const { options } = data
         const { skip, take, orderStatus } = { ...options }
 
@@ -70,7 +70,7 @@ export class CartService {
             const results = await this.orderMySqlEntity.find(
                 {
                     where: {
-                        userId,
+                        accountId,
                         orderStatus
                     },
                     skip,

@@ -7,7 +7,7 @@ import {
 import { AuthManagerService } from "@global"
 import { Observable, mergeMap } from "rxjs"
 import { AuthTokenType, Payload, getClientId, WsOutput } from "@common"
-import { UserMySqlEntity } from "@database"
+import { AccountMySqlEntity } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 
@@ -17,8 +17,8 @@ implements NestInterceptor<T, WsOutput<T>>
 {
     constructor(
         private readonly authManagerService: AuthManagerService,
-        @InjectRepository(UserMySqlEntity)
-        private readonly userMySqlRepository: Repository<UserMySqlEntity>,
+        @InjectRepository(AccountMySqlEntity)
+        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
     ) {}
 
     async intercept(
@@ -27,22 +27,22 @@ implements NestInterceptor<T, WsOutput<T>>
     ): Promise<Observable<WsOutput<T>>> {
         const client = context.switchToWs().getClient()
 
-        const { userId, type } = client.user as Payload
-        let { userRole } = client.user
+        const { accountId, type } = client.user as Payload
+        let { accountRole } = client.user
 
         const headers = client.handshake?.headers
         const clientId = getClientId(headers)
 
         const refresh = type === AuthTokenType.Refresh
         if (refresh) {
-            await this.authManagerService.validateSession(userId, clientId)
-            const user = await this.userMySqlRepository.findOneBy({userId})
-            userRole = user.userRole
+            await this.authManagerService.validateSession(accountId, clientId)
+            const user = await this.accountMySqlRepository.findOneBy({accountId})
+            accountRole = user.accountRole
         }
         return next.handle().pipe(
             mergeMap(async ({event, data}) => {
                 data = await this.authManagerService.generateOutput<T>(
-                    { userId, userRole, type },
+                    { accountId, accountRole, type },
                     data,
                     refresh,
                     clientId,

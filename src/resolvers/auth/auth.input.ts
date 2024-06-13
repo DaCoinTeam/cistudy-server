@@ -6,7 +6,7 @@ import { IsEmail, IsJWT, Length } from "class-validator"
 @InputType()
 export class InitInput implements AuthEmptyDataInput {
     @Field(() => ID)
-        userId: string
+        accountId: string
 }
 
 @InputType()

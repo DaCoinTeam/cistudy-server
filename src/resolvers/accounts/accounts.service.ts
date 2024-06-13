@@ -1,14 +1,14 @@
-import { CourseMySqlEntity, FollowMySqlEnitity, UserMySqlEntity } from "@database"
+import { CourseMySqlEntity, FollowMySqlEnitity, AccountMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { DataSource, Repository } from "typeorm"
-import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindManyUsersInput, FindOneUserInput } from "./users.input"
+import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindManyUsersInput, FindOneUserInput } from "./accounts.input"
 import { InjectRepository } from "@nestjs/typeorm"
-import { FindManyUsersOutputData } from "./user.output"
+import { FindManyUsersOutputData } from "./accounts.output"
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectRepository(UserMySqlEntity)
-        private readonly userMySqlRepository: Repository<UserMySqlEntity>,
+        @InjectRepository(AccountMySqlEntity)
+        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
         @InjectRepository(FollowMySqlEnitity)
         private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
         @InjectRepository(CourseMySqlEntity)
@@ -16,10 +16,10 @@ export class UsersService {
         private readonly dataSource: DataSource,
     ) { }
 
-    async findOneUser(input: FindOneUserInput): Promise<UserMySqlEntity> {
+    async findOneUser(input: FindOneUserInput): Promise<AccountMySqlEntity> {
         const { data } = input
         const { params, options } = data
-        const { userId} = params
+        const { accountId} = params
         const { followerId } = options
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -27,8 +27,8 @@ export class UsersService {
         await queryRunner.startTransaction()
 
         try {
-            const user = await queryRunner.manager.findOne(UserMySqlEntity, {
-                where: { userId },
+            const user = await queryRunner.manager.findOne(AccountMySqlEntity, {
+                where: { accountId },
                 relations: {
                     //cart: true
                 }
@@ -39,7 +39,7 @@ export class UsersService {
                 {
                     where: {
                         followerId,
-                        followedUserId: userId,
+                        followedUserId: accountId,
                         followed: true
                     }
                 }
@@ -49,7 +49,7 @@ export class UsersService {
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(FollowMySqlEnitity, "follow")
-                .where("followedUserId = :userId", { userId })
+                .where("followedUserId = :accountId", { accountId })
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 
@@ -67,15 +67,15 @@ export class UsersService {
         }
     }
 
-    async findManyFollowers(input: FindManyFollowersInput): Promise<Array<UserMySqlEntity>> {
+    async findManyFollowers(input: FindManyFollowersInput): Promise<Array<AccountMySqlEntity>> {
         const { data } = input
         const { params } = data
-        const { userId } = params
+        const { accountId } = params
 
         const followRelations = await this.followMySqlRepository.find(
             {
                 where: {
-                    followedUserId: userId,
+                    followedUserId: accountId,
                     followed: true
                 },
                 relations: {
@@ -89,13 +89,13 @@ export class UsersService {
     async findManyCreatedCourses(input: FindManyCreatedCoursesInput): Promise<Array<CourseMySqlEntity>> {
         const { data } = input
         const { params, options } = data
-        const { userId } = params
+        const { accountId } = params
         const { take, skip } = { ...options }
 
         return await this.courseMySqlRepository.find(
             {
                 where: {
-                    creatorId: userId,
+                    creatorId: accountId,
                 },
                 take,
                 skip
@@ -112,13 +112,13 @@ export class UsersService {
         await queryRunner.connect()
         await queryRunner.startTransaction()
         try {
-            const results = await this.userMySqlRepository.find(
+            const results = await this.accountMySqlRepository.find(
                 {
                     skip,
                     take,
                 })
 
-            const count = await this.userMySqlRepository.count()
+            const count = await this.accountMySqlRepository.count()
 
             await queryRunner.commitTransaction()
 

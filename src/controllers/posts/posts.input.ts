@@ -29,7 +29,7 @@ export class CreatePostInputData {
 export class CreatePostInput implements AuthInput<CreatePostInputData> {
   @IsUUID("4")
   @ApiProperty()
-      userId: string
+      accountId: string
   data: CreatePostInputData
   files: Array<Express.Multer.File>
 }
@@ -60,7 +60,7 @@ implements AuthInput<CreatePostCommentInputData>
 {
   @IsUUID("4")
   @ApiProperty()
-      userId: string
+      accountId: string
   data: CreatePostCommentInputData
   files: Array<Express.Multer.File>
 }
@@ -74,7 +74,7 @@ export class ToggleLikePostInputData {
 export class ToggleLikePostInput implements AuthInput<ToggleLikePostInputData> {
   @IsUUID("4")
   @ApiProperty()
-      userId: string
+      accountId: string
   data: ToggleLikePostInputData
 }
 
@@ -89,7 +89,7 @@ implements AuthInput<ToggleLikePostCommentInputData>
 {
   @IsUUID("4")
   @ApiProperty()
-      userId: string
+      accountId: string
   data: ToggleLikePostCommentInputData
 }
 
@@ -114,7 +114,7 @@ implements AuthInput<DeletePostCommentInputData>
 {
   @IsUUID("4")
   @ApiProperty()
-      userId: string
+      accountId: string
   data: DeletePostCommentInputData
 }
 
@@ -123,7 +123,7 @@ implements AuthInput<UpdatePostCommentInputData>
 {
   @IsUUID("4")
   @ApiProperty()
-      userId: string
+      accountId: string
   data: UpdatePostCommentInputData
   files: Array<Express.Multer.File>
 }
@@ -146,7 +146,7 @@ export class UpdatePostInputData {
 export class UpdatePostInput implements AuthInput<UpdatePostInputData> {
   @IsUUID("4")
   @ApiProperty()
-      userId: string
+      accountId: string
   data: UpdatePostInputData
   files: Array<Express.Multer.File>
 }
@@ -162,7 +162,7 @@ implements AuthInput<DeletePostInputData>
 {
     @IsUUID("4")
     @ApiProperty()
-        userId: string
+        accountId: string
     data: DeletePostInputData
 }
   
@@ -180,7 +180,7 @@ implements AuthInput<CreatePostCommentReplyInputData>
 {
   @IsUUID("4")
   @ApiProperty()
-      userId: string
+      accountId: string
   data: CreatePostCommentReplyInputData
 }
 
@@ -198,7 +198,7 @@ implements AuthInput<UpdatePostCommentReplyInputData>
 {
   @IsUUID("4")
   @ApiProperty()
-      userId: string
+      accountId: string
   data: UpdatePostCommentReplyInputData
 }
 
@@ -213,6 +213,17 @@ implements AuthInput<DeletePostCommentReplyInputData>
 {
   @IsUUID("4")
   @ApiProperty()
-      userId: string
+      accountId: string
   data: DeletePostCommentReplyInputData
+}
+
+export class TogglePostCommentInputData {
+    @ApiProperty()
+    postId: string
+}
+
+export class TogglePostCommentInput implements AuthInput<TogglePostCommentInputData>{
+    @IsUUID("4")
+    accountId: string
+    data: TogglePostCommentInputData
 }

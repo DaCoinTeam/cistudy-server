@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common"
 import { InitializationGateway } from "./initialization.gateway"
-import { UserMySqlEntity } from "@database"
+import { AccountMySqlEntity } from "@database"
 import { TypeOrmModule } from "@nestjs/typeorm"
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
-            UserMySqlEntity
+            AccountMySqlEntity
         ]),
     ],
     providers: [ InitializationGateway ],

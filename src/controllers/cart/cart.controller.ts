@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Post, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard, AuthInterceptor, UserId } from "../shared";
+import { JwtAuthGuard, AuthInterceptor, AccountId } from "../shared";
 import { CartService } from "./cart.service";
 import { AddToCartInputData, CheckOutInputData, DeleteFromCartInputData } from "./cart.input";
 
@@ -18,11 +18,11 @@ export class CartController {
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     async addtoCart(
-        @UserId() userId: string,
+        @AccountId() accountId: string,
         @Body() body: AddToCartInputData,
     ) {
         return await this.cartService.addToCart({
-            userId,
+            accountId,
             data: body
         })
     }
@@ -32,11 +32,11 @@ export class CartController {
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     async deleteCartCourse(
-        @UserId() userId: string,
+        @AccountId() accountId: string,
         @Body() body: DeleteFromCartInputData,
     ) {
         return this.cartService.deleteFromCart({
-            userId,
+            accountId,
             data: body
         })
     }
@@ -46,11 +46,11 @@ export class CartController {
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     async checkOut(
-        @UserId() userId: string,
+        @AccountId() accountId: string,
         @Body() body: CheckOutInputData
     ) {
         return this.cartService.checkOut({
-            userId,
+            accountId,
             data: body
         })
     }

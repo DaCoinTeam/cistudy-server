@@ -3,12 +3,11 @@ import { CoursesController } from "./courses.controller"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     SessionMySqlEntity,
-    UserMySqlEntity,
     PostMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     SectionMySqlEntity,
-    LectureMySqlEntity,
+    LessonMySqlEntity,
     ResourceMySqlEntity,
     PostCommentMySqlEntity,
     PostLikeMySqlEntity,
@@ -30,7 +29,8 @@ import {
     QuizQuestionMySqlEntity,
     QuizQuestionAnswerMySqlEntity,
     ProgressMySqlEntity,
-    QuizAttemptMySqlEntity
+    QuizAttemptMySqlEntity,
+    AccountMySqlEntity
 } from "@database"
 import { CoursesService } from "./courses.service"
 import { MongooseModule } from "@nestjs/mongoose"
@@ -40,12 +40,12 @@ import { MongooseModule } from "@nestjs/mongoose"
         MongooseModule.forFeature([{ name: TransactionMongoEntity.name, schema: TransactionMongoEntitySchema }]),
         TypeOrmModule.forFeature([
             SessionMySqlEntity,
-            UserMySqlEntity,
+            AccountMySqlEntity,
             PostMySqlEntity,
             CourseMySqlEntity,
             EnrolledInfoMySqlEntity,
             SectionMySqlEntity,
-            LectureMySqlEntity,
+            LessonMySqlEntity,
             ResourceMySqlEntity,
             PostCommentMySqlEntity,
             PostLikeMySqlEntity,

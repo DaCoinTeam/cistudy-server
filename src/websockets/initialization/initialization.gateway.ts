@@ -11,7 +11,7 @@ import {
 } from "@nestjs/websockets"
 import { Server, Socket } from "socket.io"
 import { JwtAuthGuard } from "../shared"
-import { UserId } from "../shared"
+import { AccountId } from "../shared"
 import { AuthInterceptor } from "../shared"
 import { INITIALIZE, INITIALIZED } from "./initialization.events"
 import { InitializeOutputData } from "./initialization.output"
@@ -45,8 +45,8 @@ export class InitializationGateway implements OnGatewayConnection, OnGatewayDisc
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     @SubscribeMessage(INITIALIZE)
-    async handleInitialize(@ConnectedSocket() client: Socket, @UserId() userId: string): Promise<WsResponse<InitializeOutputData>> {
-        await this.cacheManager.set(client.id, userId)
+    async handleInitialize(@ConnectedSocket() client: Socket, @AccountId() accountId: string): Promise<WsResponse<InitializeOutputData>> {
+        await this.cacheManager.set(client.id, accountId)
         return { event: INITIALIZED, data: {} }
     }
 }
