@@ -5,6 +5,7 @@ import {
     CourseMySqlEntity,
     FollowMySqlEnitity,
     AccountMySqlEntity,
+    UserReviewMySqlEntity,
 } from "@database"
 import { UsersService } from "./accounts.service"
 
@@ -13,7 +14,8 @@ import { UsersService } from "./accounts.service"
         TypeOrmModule.forFeature([
             AccountMySqlEntity,
             FollowMySqlEnitity,
-            CourseMySqlEntity
+            CourseMySqlEntity,
+            UserReviewMySqlEntity
         ]),
     ],
     providers: [UsersResolver, UsersService],

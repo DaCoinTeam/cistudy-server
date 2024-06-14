@@ -48,3 +48,7 @@ implements AuthInput<FindManyEnrolledCoursesInputData>
     accountId: string
     data: FindManyEnrolledCoursesInputData
 }
+
+export class GenerateReportInput implements AuthEmptyDataInput {
+    accountId: string  
+}

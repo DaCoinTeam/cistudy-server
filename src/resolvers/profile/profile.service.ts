@@ -4,6 +4,7 @@ import { Repository, DataSource } from "typeorm"
 import {
     FindManyEnrolledCoursesInput,
     FindManySelfCreatedCoursesInput,
+    GenerateReportInput,
 } from "./profile.input"
 import { InjectRepository } from "@nestjs/typeorm"
 import { FindManyEnrolledCoursesOutputData, FindManySelfCreatedCoursesOutputData } from "./profile.output"
@@ -156,5 +157,5 @@ export class ProfileService {
             await queryRunner.release();
         }
     }
-    
+
 }

@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException, InternalServerErrorException, ConsoleLogger } from "@nestjs/common"
+import { ConflictException, Injectable, NotFoundException, InternalServerErrorException } from "@nestjs/common"
 import {
     CategoryMySqlEntity,
     CertificateMySqlEntity,
@@ -52,7 +52,7 @@ import {
     MarkLessonAsCompletedInput,
     CreateQuizAttemptInput,
     FinishQuizAttemptInput,
-    GiveAwayCourseInput,
+    GiftCourseInput,
 
 
 
@@ -60,9 +60,8 @@ import {
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import { ProcessStatus, QuizAttemptStatus, VideoType, existKeyNotUndefined } from "@common"
-import { CreateCategoryOutput, CreateCertificateOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateQuizAttemptOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteQuizOutput, DeleteTopicOutputData, EnrollCourseOutput, FinishQuizAttemptOutput, MarkLessonAsCompletedOutput, UpdateCourseOutput, UpdateCourseReviewOutput, UpdateQuizOutput } from "./courses.output"
+import { CreateCategoryOutput, CreateCertificateOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateQuizAttemptOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteTopicOutputData, EnrollCourseOutput, FinishQuizAttemptOutput, MarkLessonAsCompletedOutput, UpdateCourseOutput, UpdateCourseReviewOutput, UpdateQuizOutput } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
-import { QuizQuestionEntity } from "src/database/mysql/quiz-question.entity"
 
 @Injectable()
 export class CoursesService {
@@ -324,6 +323,12 @@ export class CoursesService {
     async createCourseReview(input: CreateCourseReviewInput): Promise<CreateCourseReviewOutput> {
         const { data, accountId } = input;
         const { courseId, content, rating } = data;
+
+        const enrolled = await this.enrolledInfoMySqlRepository.findOneBy({ accountId })
+
+        if (!enrolled) {
+            throw new ConflictException("User must be enrolled to the course to post a review")
+        }
 
         const reviewed = await this.courseReviewMySqlRepository.findOne({
             where: { accountId, courseId }
@@ -1088,7 +1093,7 @@ export class CoursesService {
         }
     }
 
-    async giveAwayCourse(input: GiveAwayCourseInput): Promise<string> {
+    async giftCourse(input: GiftCourseInput): Promise<string> {
         const { accountId, data } = input
         const { courseId, receiveUserEmail, code } = data
 

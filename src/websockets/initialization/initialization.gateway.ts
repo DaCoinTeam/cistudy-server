@@ -2,6 +2,7 @@ import { Inject, Logger, UseGuards, UseInterceptors } from "@nestjs/common"
 
 import {
     ConnectedSocket,
+    MessageBody,
     OnGatewayConnection,
     OnGatewayDisconnect,
     SubscribeMessage,
@@ -47,6 +48,6 @@ export class InitializationGateway implements OnGatewayConnection, OnGatewayDisc
     @SubscribeMessage(INITIALIZE)
     async handleInitialize(@ConnectedSocket() client: Socket, @AccountId() accountId: string): Promise<WsResponse<InitializeOutputData>> {
         await this.cacheManager.set(client.id, accountId)
-        return { event: INITIALIZED, data: {} }
+        return { event: INITIALIZED, data: "sdadasdasdasdd" }
     }
 }

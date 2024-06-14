@@ -64,6 +64,5 @@ export class ProfileService {
 
         return `A profile with id ${accountId} has updated successfully.`
     }
-
     
 }

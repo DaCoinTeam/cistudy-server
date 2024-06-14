@@ -32,7 +32,7 @@ import {
     CreateTopicInputData,
     EnrollCourseInputData,
     FinishQuizAttemptInputData,
-    GiveAwayCourseInputData,
+    GiftCourseInputData,
     MarkLessonAsCompletedInputData,
     UpdateCourseInputData,
     UpdateCourseReviewInputData,
@@ -459,13 +459,13 @@ export class CoursesController {
     }
 
     @ApiBearerAuth()
-    @Post("giveaway-course")
+    @Post("gift-course")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    async giveawayCourse(
+    async giftCourse(
         @AccountId() accountId: string,
-        @Body() data: GiveAwayCourseInputData,
+        @Body() data: GiftCourseInputData,
     ) {
-        return await this.coursesService.giveAwayCourse({ accountId, data })
+        return await this.coursesService.giftCourse({ accountId, data })
     }
 }

@@ -15,6 +15,7 @@ import { OrderEntity } from "./order.entity"
 import { CertificateEntity } from "./certificate"
 import { ProgressEntity } from "./progress.entity"
 import { QuizAttemptEntity } from "./quiz-attempt.entity"
+import { UserReviewEntity } from "./user-review.entity"
 
 
 @ObjectType()
@@ -153,21 +154,29 @@ export class AccountEntity {
     @JoinColumn()
     cart: CartEntity;
 
-    @Field(() => OrderEntity)
+    @Field(() => [OrderEntity])
     @OneToMany(() => OrderEntity, (orders) => orders.account)
     orders: OrderEntity
 
-    @Field(() => CertificateEntity)
+    @Field(() => [CertificateEntity])
     @OneToMany(() => CertificateEntity, (certificates) => certificates.account, { nullable: true })
     certificates?: Array<CertificateEntity>
 
-    @Field(() => ProgressEntity)
-    @OneToMany(() => ProgressEntity, (progress) => progress.account, {nullable: true })
-    courseProgresses? : Array<ProgressEntity>
+    @Field(() => [ProgressEntity])
+    @OneToMany(() => ProgressEntity, (progress) => progress.account, { nullable: true })
+    courseProgresses?: Array<ProgressEntity>
 
-    @Field(() => QuizAttemptEntity)
-    @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.account, {nullable : true})
-    quizAttempts? : Array<QuizAttemptEntity>
+    @Field(() => [QuizAttemptEntity])
+    @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.account, { nullable: true })
+    quizAttempts?: Array<QuizAttemptEntity>
+
+    @Field(() => [UserReviewEntity])
+    @OneToMany(() => UserReviewEntity, (userReviews) => userReviews.account, {nullable: true})
+    userReviews?: Array<UserReviewEntity>
+
+    @Field(() => [UserReviewEntity])
+    @OneToMany(() => UserReviewEntity, (selfReviews) => selfReviews.user, {nullable: true})
+    selfReviews?: Array<UserReviewEntity>
 
     //graphql
     @Field(() => Boolean)

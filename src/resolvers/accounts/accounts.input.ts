@@ -100,3 +100,30 @@ implements AuthInput<FindManyUsersInputData>
     data: FindManyUsersInputData
 }
 
+@InputType()
+export class FindManyUserReviewsInputParams {
+    @Field(() => ID)
+    accountId: string
+}
+
+@InputType()
+export class FindManyUserReviewsInputOptions {
+    @Field(() => Int, { nullable: true })
+    take?: number
+    @Field(() => Int, { nullable: true })
+    skip?: number
+}
+
+@InputType()
+export class FindManyUserReviewsInputData implements ParamsWithOptions<FindManyUserReviewsInputParams, FindManyUserReviewsInputOptions> {
+    @Field(() => FindManyUserReviewsInputParams)
+    params: FindManyUserReviewsInputParams
+    @Field(() => FindManyUserReviewsInputOptions, { nullable: true })
+    @IsOptional()
+    options?: FindManyUserReviewsInputOptions
+}
+
+export class FindManyUserReviewsInput implements Input<FindManyUserReviewsInputData> {
+    data: FindManyUserReviewsInputData
+}
+

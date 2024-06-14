@@ -72,6 +72,7 @@ export class DeletePostCommentOutput implements Output{
 
 export class UpdatePostCommentReplyOutput implements Output{
     message: string;
+   // others?: undefined;
 }
 
 export class DeletePostCommentReplyOutput implements Output{

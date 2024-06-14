@@ -93,10 +93,6 @@ export class CourseEntity {
     @Column({ type: "json", default: null })
     includes: CourseIncludes
 
-    @Field(() => String)
-    @Column({ type: "enum", enum: CourseApproveStatus, default: CourseApproveStatus.Pending })
-    approveStatus: CourseApproveStatus
-
     @Field(() => Date)
     @CreateDateColumn()
     createdAt: Date

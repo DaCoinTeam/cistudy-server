@@ -1,11 +1,11 @@
 import {
     Body,
-    Controller, Patch, UseGuards, UseInterceptors,
+    Controller, Delete, Param, Patch, Post, UseGuards, UseInterceptors,
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { UsersService } from "./accounts.service"
 import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
-import { ToggleFollowInputData, UpdateCourseApprovalInputData } from "./accounts.input"
+import { CreateUserReviewInputData, DeleteCourseInputData, ToggleFollowInputData, UpdateUserReviewInputData, VerifyCourseInputData } from "./accounts.input"
 
 @ApiTags("Users")
 @ApiHeader({
@@ -28,13 +28,66 @@ export class UsersController{
     }
 
     @ApiBearerAuth()
-    @Patch("update-course-approval")
+    @Patch("verify-course")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    async updateCourseAprroval(@AccountId() accountId: string, @Body() body: UpdateCourseApprovalInputData) {
-        return this.accountsService.updateCourseApproval({
+    async updateCourseAprroval(@AccountId() accountId: string, @Body() body: VerifyCourseInputData) {
+        return this.accountsService.verifyCourse({
             accountId,
             data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("delete-courses")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async deleteCourses(@AccountId() accountId: string, @Body() body: DeleteCourseInputData) {
+        return this.accountsService.deleteCourses({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-user-review")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async createUserReview(
+        @AccountId() accountId: string,
+        @Body() body: CreateUserReviewInputData,
+    ) {
+        return this.accountsService.createUserReview({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("update-user-review")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async updateCourseReview(
+        @AccountId() accountId: string,
+        @Body() body: UpdateUserReviewInputData,
+    ) {
+        return this.accountsService.updateUserReview({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Delete("delete-user-review/:userReviewId")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async deleteUserReview(
+        @AccountId() accountId: string,
+        @Param("userReviewId") userReviewId: string,
+    ) {
+        return this.accountsService.deleteUserReview({
+            accountId,
+            data: { userReviewId }
         })
     }
 }

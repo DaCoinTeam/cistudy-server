@@ -1,8 +1,8 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
 import { UsersService } from "./accounts.service"
-import { FindManyCreatedCoursesInputData, FindManyFollowersInputData, FindManyUsersInputData, FindOneUserInputData } from "./accounts.input"
+import { FindManyCreatedCoursesInputData, FindManyFollowersInputData, FindManyUserReviewsInputData, FindManyUsersInputData, FindOneUserInputData } from "./accounts.input"
 import { CourseMySqlEntity, AccountMySqlEntity } from "@database"
-import { FindManyUsersOutput } from "./accounts.output"
+import { FindManyUserReviewsOutputData, FindManyUsersOutput } from "./accounts.output"
 import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 
@@ -31,5 +31,10 @@ export class UsersResolver {
   async findManyUsers(@AccountId() accountId: string, @Args("data") data: FindManyUsersInputData) {
       return this.accountsService.findManyUsers({ accountId, data })
   }
+
+  @Query(() => FindManyUserReviewsOutputData)
+    async findManyCourseReviews(@Args("data") data : FindManyUserReviewsInputData) {
+        return await this.accountsService.findManyUserReviews({data})
+    }
 }
 

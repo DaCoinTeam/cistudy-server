@@ -1,9 +1,9 @@
-import { CourseMySqlEntity, FollowMySqlEnitity, AccountMySqlEntity } from "@database"
+import { CourseMySqlEntity, FollowMySqlEnitity, AccountMySqlEntity, UserReviewMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { DataSource, Repository } from "typeorm"
-import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindManyUsersInput, FindOneUserInput } from "./accounts.input"
+import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindManyUserReviewsInput, FindManyUsersInput, FindOneUserInput } from "./accounts.input"
 import { InjectRepository } from "@nestjs/typeorm"
-import { FindManyUsersOutputData } from "./accounts.output"
+import { FindManyUserReviewsOutputData, FindManyUsersOutputData } from "./accounts.output"
 @Injectable()
 export class UsersService {
     constructor(
@@ -13,13 +13,15 @@ export class UsersService {
         private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
         @InjectRepository(CourseMySqlEntity)
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(UserReviewMySqlEntity)
+        private readonly userReviewMySqlRepository: Repository<UserReviewMySqlEntity>,
         private readonly dataSource: DataSource,
     ) { }
 
     async findOneUser(input: FindOneUserInput): Promise<AccountMySqlEntity> {
         const { data } = input
         const { params, options } = data
-        const { accountId} = params
+        const { accountId } = params
         const { followerId } = options
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -133,5 +135,91 @@ export class UsersService {
         } finally {
             await queryRunner.release()
         }
+    }
+
+    async findManyUserReviews(input: FindManyUserReviewsInput): Promise<FindManyUserReviewsOutputData> {
+        const { data } = input;
+        const { params, options } = data;
+        const { accountId } = params;
+        const { skip, take } = options
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const results = await this.userReviewMySqlRepository.find({
+                where: { accountId },
+                relations: {
+                    account: true,
+                    user: true
+                },
+                skip,
+                take,
+                order: { createdAt: 'DESC' }
+            });
+            const numberOfCourseReviewsResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(UserReviewMySqlEntity, "user-review")
+                .where("accountId = :accountId ", { accountId })
+                .getRawOne()
+
+            return {
+                results,
+                metadata: {
+                    count: numberOfCourseReviewsResult.count,
+                }
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
+
+        // async findManyCourseReviews(input: FindManyCourseReviewsInput): Promise<FindManyCourseReviewsOutputData> {
+        //     const { data } = input;
+        //     const { params, options } = data;
+        //     const { courseId } = params;
+        //     const { skip, take } = options
+
+        //     const queryRunner = this.dataSource.createQueryRunner()
+        //     await queryRunner.connect()
+        //     await queryRunner.startTransaction()
+
+        //     try {
+        //         console.log(courseId)
+        //         const results = await this.courseReviewMySqlRepository.find({
+        //             where: { courseId },
+        //             relations: {
+        //                 course: true,
+        //                 account: true,
+        //             },
+        //             skip,
+        //             take,
+        //             order: { createdAt: 'DESC' }
+        //         });
+        //         console.log(results.length)
+        //         const numberOfCourseReviewsResult = await queryRunner.manager
+        //             .createQueryBuilder()
+        //             .select("COUNT(*)", "count")
+        //             .from(CourseReviewMySqlEntity, "course-review")
+        //             .where("courseId = :courseId ", { courseId })
+        //             .getRawOne()
+
+        //         return {
+        //             results,
+        //             metadata: {
+        //                 count: numberOfCourseReviewsResult.count,
+        //             }
+        //         }
+        //     } catch (ex) {
+        //         await queryRunner.rollbackTransaction()
+        //         throw ex
+        //     } finally {
+        //         await queryRunner.release()
+        //     }
+        // }
     }
 }

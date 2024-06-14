@@ -261,7 +261,6 @@ type CourseEntity {
   receivedWalletAddress: String
   previewVideoId: ID
   includes: String
-  approveStatus: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   courseTopics: [CourseTopicEntity!]!
@@ -373,6 +372,18 @@ type CryptoWalletEntity {
   account: AccountEntity!
 }
 
+type UserReviewEntity {
+  userReviewId: ID!
+  accountId: ID!
+  userId: ID!
+  content: String
+  rating: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  account: AccountEntity!
+  user: AccountEntity!
+}
+
 type AccountEntity {
   accountId: ID!
   email: String!
@@ -400,10 +411,12 @@ type AccountEntity {
   followedUserRelations: [FollowEntity!]!
   courseReview: CourseReviewEntity!
   cart: CartEntity!
-  orders: OrderEntity!
-  certificates: CertificateEntity!
-  courseProgresses: ProgressEntity!
-  quizAttempts: QuizAttemptEntity!
+  orders: [OrderEntity!]!
+  certificates: [CertificateEntity!]!
+  courseProgresses: [ProgressEntity!]!
+  quizAttempts: [QuizAttemptEntity!]!
+  userReviews: [UserReviewEntity!]!
+  selfReviews: [UserReviewEntity!]!
   followed: Boolean!
   numberOfFollowers: Int!
 }
@@ -535,6 +548,15 @@ type FindManyUsersOutput {
   tokens: AuthTokens
 }
 
+type FindManyUserReviewsOutputMetadata {
+  count: Int
+}
+
+type FindManyUserReviewsOutputData {
+  results: [UserReviewEntity!]!
+  metadata: FindManyUserReviewsOutputMetadata
+}
+
 type FindManySelfCreatedCoursesOutputMetadata {
   count: Int
 }
@@ -624,7 +646,7 @@ type Query {
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findManyCategories: [CategoryEntity!]!
   findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
-  findManyCourseReviews(data: FindManyCourseReviewsInputData!): FindManyCourseReviewsOutputData!
+  findManyCourseReviews(data: FindManyUserReviewsInputData!): FindManyUserReviewsOutputData!
   findManyCoursesTopic(data: FindManyCoursesTopicInputData!): FindManyCoursesTopicOutputData!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
@@ -732,16 +754,16 @@ input FindOneCourseReviewInputParams {
   courseId: ID!
 }
 
-input FindManyCourseReviewsInputData {
-  params: FindManyCourseReviewsInputParams!
-  options: FindManyCourseReviewsInputOptions
+input FindManyUserReviewsInputData {
+  params: FindManyUserReviewsInputParams!
+  options: FindManyUserReviewsInputOptions
 }
 
-input FindManyCourseReviewsInputParams {
-  courseId: ID!
+input FindManyUserReviewsInputParams {
+  accountId: ID!
 }
 
-input FindManyCourseReviewsInputOptions {
+input FindManyUserReviewsInputOptions {
   take: Int
   skip: Int
 }

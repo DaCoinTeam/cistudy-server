@@ -55,7 +55,7 @@ export class PostsService {
                     postMedias: true,
                 },
             })
-            console.log(post ? "tim ra" : "ko thay")
+
             const numberOfLikes = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")

@@ -33,6 +33,8 @@ import { QuizQuestionAnswerEntity as QuizQuestionAnswerMySqlEntity } from "./qui
 import { QuizQuestionMediaEntity as QuizQuestionMediaMySqlEntity } from "./quiz-question-media.entity"
 import { ProgressEntity as ProgressMySqlEntity } from "./progress.entity"
 import { QuizAttemptEntity as QuizAttemptMySqlEntity} from "./quiz-attempt.entity"
+import { UserReviewEntity as UserReviewMySqlEntity } from "./user-review.entity"
+
 export {
     AccountMySqlEntity,
     PostMySqlEntity,
@@ -68,5 +70,6 @@ export {
     QuizQuestionAnswerMySqlEntity,
     QuizQuestionMediaMySqlEntity,
     QuizAttemptMySqlEntity,
-    ProgressMySqlEntity
+    ProgressMySqlEntity,
+    UserReviewMySqlEntity
 }

@@ -526,7 +526,7 @@ export class FinishQuizAttemptInput implements AuthInput<FinishQuizAttemptInputD
     data: FinishQuizAttemptInputData
 }
 
-export class GiveAwayCourseInputData {
+export class GiftCourseInputData {
     @ApiProperty()
     courseId: string
 
@@ -537,7 +537,7 @@ export class GiveAwayCourseInputData {
     code : string
 }
 
-export class GiveAwayCourseInput implements AuthInput<GiveAwayCourseInputData>{
+export class GiftCourseInput implements AuthInput<GiftCourseInputData>{
     accountId: string
-    data: GiveAwayCourseInputData
+    data: GiftCourseInputData
 }

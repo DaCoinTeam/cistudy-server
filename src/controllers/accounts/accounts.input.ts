@@ -1,32 +1,93 @@
-import { AuthInput, CourseApproveStatus } from "@common"
+import { AuthInput, CourseApproveStatus, VerifyStatus } from "@common"
 import { InputType } from "@nestjs/graphql"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsUUID } from "class-validator"
+import { IsUUID, Max, Min } from "class-validator"
+import { app } from "firebase-admin"
 
 export class ToggleFollowInputData {
     @IsUUID("4")
     @ApiProperty()
-        followedUserId: string
+    followedUserId: string
 }
 
 export class ToggleFollowInput implements AuthInput<ToggleFollowInputData> {
     @IsUUID("4")
     @ApiProperty()
-        accountId: string
+    accountId: string
     data: ToggleFollowInputData
 }
 
-@InputType()
-export class UpdateCourseApprovalInputData{
+export class VerifyCourseInputData {
     @IsUUID("4")
     @ApiProperty()
     courseId: string
 
     @ApiProperty()
-    approveStatus : CourseApproveStatus
+    verifyStatus: VerifyStatus
 }
 
-export class UpdateCourseApprovalInput implements AuthInput <UpdateCourseApprovalInputData>{
+export class VerifyCourseInput implements AuthInput<VerifyCourseInputData> {
     accountId: string
-    data: UpdateCourseApprovalInputData
+    data: VerifyCourseInputData
+}
+
+export class DeleteCourseInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    courseIds: Array<string>
+}
+
+export class DeleteCourseInput implements AuthInput<DeleteCourseInputData> {
+    accountId: string
+    data: DeleteCourseInputData
+}
+
+export class CreateUserReviewInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    userId: string
+
+    @ApiProperty()
+    content: string
+
+    @Min(1)
+    @Max(5)
+    @ApiProperty()
+    rating: number
+}
+
+export class CreateUserReviewInput implements AuthInput<CreateUserReviewInputData> {
+    accountId: string
+    data: CreateUserReviewInputData
+}
+
+export class UpdateUserReviewInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    userReviewId: string
+
+    @ApiProperty()
+    content?: string
+
+    @Min(1)
+    @Max(5)
+    @ApiProperty()
+    rating?: number
+}
+
+export class UpdateUserReviewInput implements AuthInput<UpdateUserReviewInputData> {
+    accountId: string
+    data: UpdateUserReviewInputData
+}
+
+export class DeleteUserReviewInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    userReviewId: string
+}
+
+export class DeleteUserReviewInput implements AuthInput<DeleteUserReviewInputData> {
+    accountId: string
+    data: DeleteUserReviewInputData
+
 }
