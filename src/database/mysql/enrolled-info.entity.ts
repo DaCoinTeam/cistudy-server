@@ -16,27 +16,31 @@ import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
 export class EnrolledInfoEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-        enrolledInfoId: string
+    enrolledInfoId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        accountId: string
+    accountId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        courseId: string
+    courseId: string
+
+    @Field(() => Date, { nullable: true })
+    @Column({ type: "datetime", nullable: true })
+    endDate: Date
 
     @Field(() => Date)
     @CreateDateColumn()
-        createdAt: Date
+    createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-        updatedAt: Date
+    updatedAt: Date
 
     @Field(() => Boolean)
     @Column({ type: "boolean", default: true })
-        enrolled: boolean
+    enrolled: boolean
 
     @Field(() => Float, { nullable: true })
     @Column({
@@ -45,15 +49,15 @@ export class EnrolledInfoEntity {
         scale: 5,
         default: 0,
     })
-        priceAtEnrolled: number
+    priceAtEnrolled: number
 
     @Field(() => CourseEntity)
     @ManyToOne(() => CourseEntity, (course) => course.enrolledInfos)
     @JoinColumn({ name: "courseId" })
-        course: CourseEntity
+    course: CourseEntity
 
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (account) => account.enrolledInfos)
     @JoinColumn({ name: "accountId" })
-        account: AccountEntity
+    account: AccountEntity
 }

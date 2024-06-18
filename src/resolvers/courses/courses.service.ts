@@ -314,7 +314,6 @@ export class CoursesService {
                 course.courseRate = reviews.length ? (totalRating / reviews.length) : 0;
             });
 
-            // Tìm khóa học có điểm đánh giá cao nhất
             const maxRate = Math.max(...results.map(course => course.courseRate));
             const highRateCourses = results.filter(course => course.courseRate === maxRate);
 

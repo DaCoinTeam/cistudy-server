@@ -72,7 +72,6 @@ export {
     QuizQuestionAnswerMySqlEntity,
     QuizQuestionMediaMySqlEntity,
     QuizAttemptMySqlEntity,
-    //QuizAttemptAnswerMySqlEntity,
     ProgressMySqlEntity,
     UserReviewMySqlEntity,
 

@@ -110,3 +110,7 @@ export class FinishQuizAttemptOutput implements Output<FinishQuizAttemptOutputOt
     message: string
     others?: FinishQuizAttemptOutputOther;
 }
+
+export class GiftCourseOutput implements Output {
+    message: string;
+}

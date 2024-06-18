@@ -60,7 +60,7 @@ import {
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import { ProcessStatus, QuizAttemptStatus, VideoType, existKeyNotUndefined } from "@common"
-import { CreateCategoryOutput, CreateCertificateOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateQuizAttemptOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteTopicOutputData, EnrollCourseOutput, FinishQuizAttemptOutput, MarkLessonAsCompletedOutput, UpdateCourseOutput, UpdateCourseReviewOutput, UpdateQuizOutput } from "./courses.output"
+import { CreateCategoryOutput, CreateCertificateOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateQuizAttemptOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteTopicOutputData, EnrollCourseOutput, FinishQuizAttemptOutput, GiftCourseOutput, MarkLessonAsCompletedOutput, UpdateCourseOutput, UpdateCourseReviewOutput, UpdateQuizOutput } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
 
 
@@ -147,9 +147,14 @@ export class CoursesService {
 
             // if (isValidated) throw new ConflictException("This transaction is validated.")
 
-            const { enableDiscount, discountPrice, price: coursePrice, title } = await this.courseMySqlRepository.findOne({
+            const { enableDiscount, discountPrice, price: coursePrice, title, duration, sections } = await this.courseMySqlRepository.findOne({
                 where: {
                     courseId
+                },
+                relations: {
+                    sections: {
+                        lessons: true
+                    }
                 }
             }
             )
@@ -161,31 +166,25 @@ export class CoursesService {
             //     isValidated: true
             // },
             // )
+            const enrollDate = new Date()
+            const endDate = new Date(enrollDate)
+            endDate.setMonth(endDate.getMonth() + duration)
 
             const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
                 enrolledInfoId: found?.enrolledInfoId,
                 courseId,
                 accountId,
                 enrolled: true,
-                priceAtEnrolled: price
+                priceAtEnrolled: price,
+                endDate
             })
-            const course = await this.courseMySqlRepository.findOne({
-                where: {
-                    courseId
-                },
-                relations: {
-                    sections: {
-                        lessons: true
-                    }
-                }
-            });
 
-            const progresses = course.sections.reduce((acc, section) => {
+            const progresses = sections.reduce((acc, section) => {
                 section.lessons.forEach(lesson => {
                     acc.push({
                         accountId,
                         lessonId: lesson.lessonId,
-                        isCompleted: false // Giả sử bạn muốn khởi tạo với `isCompleted` là false
+                        isCompleted: false
                     });
                 });
                 return acc;
@@ -1038,6 +1037,30 @@ export class CoursesService {
         await queryRunner.startTransaction();
 
         try {
+            const { section } = await this.lessonMySqlRepository.findOne({
+                where: {
+                    lessonId: quizId
+                },
+                relations: {
+                    section: {
+                        course: true
+                    }
+                }
+            })
+
+            const { endDate } = await this.enrolledInfoMySqlRepository.findOne({
+                where: {
+                    courseId: section.courseId
+                }
+            })
+
+            const now = new Date();
+            const endDateTime = new Date(endDate);
+
+            if (now > endDateTime) {
+                throw new ConflictException('Course has expired');
+            }
+
             const doing = await this.quizAttemptMySqlRepository.findOne({
                 where: {
                     quizId,
@@ -1072,25 +1095,25 @@ export class CoursesService {
     async finishQuizAttempt(input: FinishQuizAttemptInput): Promise<FinishQuizAttemptOutput> {
         const { data } = input;
         const { quizAttemptId, quizQuestionAnswerIds } = data;
-    
+
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
-    
+
         try {
             const attempt = await this.quizAttemptMySqlRepository.findOneBy({ quizAttemptId });
-    
+
             if (!attempt) {
                 throw new NotFoundException("Attempt not found");
             }
-    
+
             if (attempt.attemptStatus === QuizAttemptStatus.Ended) {
                 throw new NotFoundException("Attempt already ended");
             }
-    
+
             await this.quizAttemptMySqlRepository.update(quizAttemptId, { attemptStatus: QuizAttemptStatus.Ended });
             const { quizId } = await this.quizAttemptMySqlRepository.findOneBy({ quizAttemptId });
-    
+
             const quiz = await this.quizMySqlRepository.findOne({
                 where: {
                     quizId
@@ -1101,14 +1124,14 @@ export class CoursesService {
                     }
                 }
             });
-    
+
             if (!quiz) {
                 throw new NotFoundException("Quiz not found");
             }
 
             const questionAnswers = await this.quizQuestionAnswerMySqlRepository.find({
-                where:{
-                    quizQuestionAnswerId : In(quizQuestionAnswerIds)
+                where: {
+                    quizQuestionAnswerId: In(quizQuestionAnswerIds)
                 }
             })
 
@@ -1120,12 +1143,12 @@ export class CoursesService {
                     correctAnswers: correctAnswers
                 };
             });
-    
+
             let totalPoints = 0;
             let maxPoints = 0
-            
+
             const questionAnswerCountMap: { [key: string]: number } = {};
-    
+
             quizQuestionAnswerIds.forEach(answerId => {
                 questionsWithCorrectAnswers.forEach(question => {
                     if (question.correctAnswers.includes(answerId)) {
@@ -1136,8 +1159,8 @@ export class CoursesService {
                     }
                 });
             });
-    
-            
+
+
             questionsWithCorrectAnswers.forEach(question => {
                 const correctAnswerCount = question.correctAnswers.length;
                 const userAnswerCount = questionAnswerCountMap[question.quizQuestionId] || 0;
@@ -1147,7 +1170,7 @@ export class CoursesService {
                 }
             });
             const score = (totalPoints / maxPoints) * 10;
-            
+
             //await this.quizAttemptMySqlRepository.update(quizAttemptId, { score, questionAnswers });
             await this.quizAttemptMySqlRepository.save({
                 quizAttemptId,
@@ -1156,10 +1179,10 @@ export class CoursesService {
             })
 
             await queryRunner.commitTransaction();
-    
+
             return {
                 message: "Quiz ended successfully!",
-                others:{
+                others: {
                     score
                 }
             };
@@ -1170,9 +1193,9 @@ export class CoursesService {
             await queryRunner.release();
         }
     }
-    
 
-    async giftCourse(input: GiftCourseInput): Promise<string> {
+
+    async giftCourse(input: GiftCourseInput): Promise<GiftCourseOutput> {
         const { accountId, data } = input
         const { courseId, receiveUserEmail, code } = data
 
@@ -1260,7 +1283,9 @@ export class CoursesService {
             await this.progressMySqlRepository.save(progresses);
 
             await queryRunner.commitTransaction()
-            return `User with email ${receiveUserEmail} have received and enrolled to course ${course.title}`
+            return {
+                message: `User with email ${receiveUserEmail} have received and enrolled to course ${course.title}`
+            }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
             throw ex

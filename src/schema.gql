@@ -264,6 +264,7 @@ type CourseEntity {
   receivedWalletAddress: String
   previewVideoId: ID
   includes: String
+  duration: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
   courseTopics: [CourseTopicEntity!]!

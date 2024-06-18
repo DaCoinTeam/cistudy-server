@@ -24,6 +24,7 @@ export class VerifyCourseInputData {
 
     @ApiProperty()
     verifyStatus: VerifyStatus
+
 }
 
 export class VerifyCourseInput implements AuthInput<VerifyCourseInputData> {

@@ -93,6 +93,10 @@ export class CourseEntity {
     @Column({ type: "json", default: null })
     includes: CourseIncludes
 
+    @Field(() => Int, { defaultValue: 12 })
+    @Column({ type: "int", default: 12 })
+    duration: number
+
     @Field(() => Date)
     @CreateDateColumn()
     createdAt: Date

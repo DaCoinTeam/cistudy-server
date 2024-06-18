@@ -28,7 +28,7 @@ export class CartController {
     }
 
     @ApiBearerAuth()
-    @Delete("delete-from-cart")
+    @Post("delete-from-cart")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
     async deleteCartCourse(

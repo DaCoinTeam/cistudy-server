@@ -171,7 +171,7 @@ export class UsersService {
 
         try {
 
-            if(accountId === userId){
+            if (accountId === userId) {
                 throw new ConflictException("You can't post a review of yourself")
             }
 
@@ -191,7 +191,7 @@ export class UsersService {
                 .from(CourseMySqlEntity, "course")
                 .where("course.creatorId = :userId", { userId })
                 .getRawOne()
-            
+
             if (numberOfUserCreatedCourses.count < 1) {
                 throw new ConflictException("This user didn't have any course yet")
             }
