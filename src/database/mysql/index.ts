@@ -16,7 +16,7 @@ import { PostLikeEntity as PostLikeMySqlEntity } from "./post-like.entity"
 import { PostCommentReplyEntity as PostCommentReplyMySqlEntity } from "./post-comment-reply.entity"
 import { CryptoWalletEntity as CryptoWalletMySqlEntity } from "./crypto-wallet.entity"
 import { CategoryEntity as CategoryMySqlEntity } from "./category.entity"
-import { CategoryParentEntity as CategoryParentMySqlEntity } from "./category-parent.entity"
+import { CategoryRelationEntity as CategoryRelationMySqlEntity } from "./category-relation.entity"
 import { CourseReviewEntity as CourseReviewMySqlEntity } from "./course-review.entity"
 import { CartEntity as CartMySqlEntity } from "./cart.entity"
 import { CartCourseEntity as CartCourseMySqlEntity } from "./cart-course.enity"
@@ -30,8 +30,6 @@ import { QuizQuestionMediaEntity as QuizQuestionMediaMySqlEntity } from "./quiz-
 import { ProgressEntity as ProgressMySqlEntity } from "./progress.entity"
 import { QuizAttemptEntity as QuizAttemptMySqlEntity} from "./quiz-attempt.entity"
 import { UserReviewEntity as UserReviewMySqlEntity } from "./user-review.entity"
-//import { QuizAttemptAnswerEntity as QuizAttemptAnswerMySqlEntity } from "./quiz-attempt-answer.entity"
-
 
 export {
     AccountMySqlEntity,
@@ -52,7 +50,7 @@ export {
     PostCommentReplyMySqlEntity,
     CryptoWalletMySqlEntity,
     CategoryMySqlEntity,
-    CategoryParentMySqlEntity,
+    CategoryRelationMySqlEntity,
     CourseReviewMySqlEntity,
     CartMySqlEntity,
     CartCourseMySqlEntity,

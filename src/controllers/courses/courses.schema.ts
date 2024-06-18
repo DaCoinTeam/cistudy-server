@@ -62,6 +62,42 @@ export const createLessonSchema: SchemaObject = {
     }
 }
 
+export const createCategorySchema: SchemaObject = {
+    type: "object",
+    properties: {
+        data: {
+            type: "object",
+            properties: {
+                name: {
+                    type: "string",
+                },
+                imageIndex: {
+                    type: "number"
+                },
+                categoryIds: {
+                    type: "array",
+                    items: {
+                        type: "string",
+                    },
+                },
+                categoryParentIds: {
+                    type: "array",
+                    items: {
+                        type: "string",
+                    },
+                }
+            },
+        },
+        files: {
+            type: "array",
+            items: {
+                type: "string",
+                format: "binary"
+            },
+        },
+    }
+}
+
 export const createResourcesSchema: SchemaObject = {
     type: "object",
     properties: {

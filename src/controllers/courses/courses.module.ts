@@ -30,7 +30,7 @@ import {
 } from "@database"
 import { CoursesService } from "./courses.service"
 import { MongooseModule } from "@nestjs/mongoose"
-import { CategoryParentEntity } from "src/database/mysql/category-parent.entity"
+import { CategoryRelationEntity } from "src/database/mysql/category-relation.entity"
 import { CourseCategoryEntity } from "src/database/mysql/course-category.entity"
 
 @Module({
@@ -49,7 +49,7 @@ import { CourseCategoryEntity } from "src/database/mysql/course-category.entity"
             PostLikeMySqlEntity,
             PostCommentLikeMySqlEntity,
             CourseTargetMySqlEntity,
-            CategoryParentEntity,
+            CategoryRelationEntity,
             CourseCategoryEntity,
             CategoryMySqlEntity,
             CourseReviewMySqlEntity,
