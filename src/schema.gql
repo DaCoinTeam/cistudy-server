@@ -18,6 +18,19 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type QuizAttemptEntity {
+  quizAttemptId: ID!
+  quizId: ID!
+  accountId: ID!
+  score: Float
+  attemptStatus: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  account: AccountEntity!
+  quiz: QuizEntity!
+  questionAnswers: [QuizQuestionAnswerEntity!]!
+}
+
 type QuizQuestionAnswerEntity {
   quizQuestionAnswerId: ID!
   quizQuestionId: ID!
@@ -26,6 +39,7 @@ type QuizQuestionAnswerEntity {
   quizQuestion: [QuizQuestionEntity!]!
   createdAt: DateTime!
   updatedAt: DateTime!
+  attempt: QuizAttemptEntity!
 }
 
 type QuizQuestionMediaEntity {
@@ -42,6 +56,7 @@ type QuizQuestionMediaEntity {
 type QuizQuestionEntity {
   quizQuestionId: ID!
   quizId: ID!
+  point: Float
   question: String!
   questionMedias: [QuizQuestionMediaEntity!]
   answers: [QuizQuestionAnswerEntity!]!
@@ -50,22 +65,10 @@ type QuizQuestionEntity {
   quiz: QuizEntity!
 }
 
-type QuizAttemptEntity {
-  quizAttemptId: ID!
-  quizId: ID!
-  accountId: ID!
-  score: Float
-  attemptStatus: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  account: AccountEntity!
-  quiz: QuizEntity!
-}
-
 type QuizEntity {
   quizId: ID!
-  questions: QuizQuestionEntity!
-  timeLimit: Int!
+  questions: [QuizQuestionEntity!]!
+  timeLimit: Int
   createdAt: DateTime!
   updatedAt: DateTime!
   lesson: LessonEntity!
@@ -277,6 +280,7 @@ type CourseEntity {
   numberOfEnrollments: Int
   enrolled: Boolean
   courseProgress: Float
+  courseRate: Float
 }
 
 type PostLikeEntity {
@@ -410,7 +414,7 @@ type AccountEntity {
   followerRelations: [FollowEntity!]!
   followedUserRelations: [FollowEntity!]!
   courseReview: CourseReviewEntity!
-  cart: CartEntity!
+  cart: CartEntity
   orders: [OrderEntity!]!
   certificates: [CertificateEntity!]!
   courseProgresses: [ProgressEntity!]!
@@ -436,6 +440,7 @@ type FindManyCoursesOutputMetadata {
   categories: [CategoryEntity!]
   subcategories: [SubcategoryEntity!]
   topics: [TopicEntity!]
+  highRateCourses: [CourseEntity!]
 }
 
 type FindManyCoursesOutputData {
@@ -486,6 +491,11 @@ type FindManyCoursesTopicOutputData {
   metadata: FindManyCoursesTopicOutputMetadata
 }
 
+type FindOneQuizAttemptOutput {
+  data: QuizAttemptEntity!
+  tokens: AuthTokens
+}
+
 type FindOnePostOutput {
   data: PostEntity!
   tokens: AuthTokens
@@ -534,17 +544,17 @@ type FindManyPostCommentRepliesOutput {
   tokens: AuthTokens
 }
 
-type FindManyUsersOutputMetadata {
+type FindManyAccountsOutputMetadata {
   count: Int
 }
 
-type FindManyUsersOutputData {
+type FindManyAccountsOutputData {
   results: [AccountEntity!]!
-  metadata: FindManyUsersOutputMetadata
+  metadata: FindManyAccountsOutputMetadata
 }
 
-type FindManyUsersOutput {
-  data: FindManyUsersOutputData!
+type FindManyAccountsOutput {
+  data: FindManyAccountsOutputData!
   tokens: AuthTokens
 }
 
@@ -648,15 +658,16 @@ type Query {
   findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
   findManyCourseReviews(data: FindManyUserReviewsInputData!): FindManyUserReviewsOutputData!
   findManyCoursesTopic(data: FindManyCoursesTopicInputData!): FindManyCoursesTopicOutputData!
+  findOneQuizAttempt(data: FindOneQuizAttemptInputData!): FindOneQuizAttemptOutput!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
   findManyPostComments(data: FindManyPostCommentsInputData!): FindManyPostCommentsOutput!
   findManyPostCommentReplies(data: FindManyPostCommentRepliesInputData!): FindManyPostCommentRepliesOutput!
-  findOneUser(data: FindOneUserInputData!): AccountEntity!
+  findOneAccount(data: FindOneAccountInputData!): AccountEntity!
   findManyFollowers(data: FindManyFollowersInputData!): [AccountEntity!]!
   findManyCreatedCourses(data: FindManyCreatedCoursesInputData!): [CourseEntity!]!
-  findManyUsers(data: FindManyUsersInputData!): FindManyUsersOutput!
+  findManyUsers(data: FindManyAccountsInputData!): FindManyAccountsOutput!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
@@ -782,6 +793,10 @@ input FindManyCoursesTopicInputOptions {
   skip: Int
 }
 
+input FindOneQuizAttemptInputData {
+  quizAttemptId: String!
+}
+
 input FindOnePostInputData {
   params: FindOnePostInputParams!
 }
@@ -840,16 +855,16 @@ input FindManyPostsCommentRepliesInputOptions {
   skip: Int
 }
 
-input FindOneUserInputData {
-  params: FindOneUserInputParams!
-  options: FindOneUserInputOptions
+input FindOneAccountInputData {
+  params: FindOneAccountInputParams!
+  options: FindOneAccountInputOptions
 }
 
-input FindOneUserInputParams {
+input FindOneAccountInputParams {
   accountId: ID!
 }
 
-input FindOneUserInputOptions {
+input FindOneAccountInputOptions {
   followerId: ID
 }
 
@@ -875,11 +890,11 @@ input FindManyCreatedCoursesInputOptions {
   skip: Int
 }
 
-input FindManyUsersInputData {
-  options: FindManyUsersInputOptions
+input FindManyAccountsInputData {
+  options: FindManyAccountsInputOptions
 }
 
-input FindManyUsersInputOptions {
+input FindManyAccountsInputOptions {
   take: Int
   skip: Int
   searchValue: String

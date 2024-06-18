@@ -3,25 +3,25 @@ import { AccountMySqlEntity, UserReviewMySqlEntity } from "@database"
 import { ObjectType, Int, Field } from "@nestjs/graphql"
 
 @ObjectType()
-export class FindManyUsersOutputMetadata {
+export class FindManyAccountsOutputMetadata {
     @Field(() => Int, { nullable: true })
         count?: number
 }
 
 @ObjectType()
-export class FindManyUsersOutputData
-implements ResultsWithMetadata<AccountMySqlEntity, FindManyUsersOutputMetadata>
+export class FindManyAccountsOutputData
+implements ResultsWithMetadata<AccountMySqlEntity, FindManyAccountsOutputMetadata>
 {
     @Field(() => [AccountMySqlEntity])
         results: Array<AccountMySqlEntity>
-    @Field(() => FindManyUsersOutputMetadata, { nullable: true })
-        metadata: FindManyUsersOutputMetadata
+    @Field(() => FindManyAccountsOutputMetadata, { nullable: true })
+        metadata: FindManyAccountsOutputMetadata
 }
 
 @ObjectType()
-export class FindManyUsersOutput implements AuthOutput<FindManyUsersOutputData> {
-    @Field(() => FindManyUsersOutputData)
-        data: FindManyUsersOutputData
+export class FindManyAccountsOutput implements AuthOutput<FindManyAccountsOutputData> {
+    @Field(() => FindManyAccountsOutputData)
+        data: FindManyAccountsOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens: AuthTokens
 }

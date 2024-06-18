@@ -208,3 +208,14 @@ export class FindManyCoursesTopicInputData implements ParamsWithOptions<FindMany
 export class FindManyCoursesTopicInput implements Input<FindManyCoursesTopicInputData>{
     data: FindManyCoursesTopicInputData
 }
+
+@InputType()
+export class FindOneQuizAttemptInputData{ 
+    @Field(() => String)
+    quizAttemptId: string
+}
+
+export class FindOneQuizAttemptInput implements AuthInput<FindOneQuizAttemptInputData> {
+    accountId: string
+    data: FindOneQuizAttemptInputData
+}

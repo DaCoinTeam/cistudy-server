@@ -455,7 +455,7 @@ export class CoursesController {
         @AccountId() accountId: string,
         @Body() data: FinishQuizAttemptInputData,
     ) {
-        return await this.coursesService.finishQuizAttempt({ accountId, data })
+        return await this.coursesService.finishQuizAttempt({ accountId,data })
     }
 
     @ApiBearerAuth()

@@ -1,8 +1,8 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
 import { UsersService } from "./accounts.service"
-import { FindManyCreatedCoursesInputData, FindManyFollowersInputData, FindManyUserReviewsInputData, FindManyUsersInputData, FindOneUserInputData } from "./accounts.input"
+import { FindManyCreatedCoursesInputData, FindManyFollowersInputData, FindManyUserReviewsInputData, FindManyAccountsInputData, FindOneAccountInputData} from "./accounts.input"
 import { CourseMySqlEntity, AccountMySqlEntity } from "@database"
-import { FindManyUserReviewsOutputData, FindManyUsersOutput } from "./accounts.output"
+import { FindManyUserReviewsOutputData, FindManyAccountsOutput } from "./accounts.output"
 import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 
@@ -11,8 +11,8 @@ export class UsersResolver {
     constructor(private readonly accountsService: UsersService) { }
     
   @Query(() => AccountMySqlEntity)
-    async findOneUser(@Args("data") data: FindOneUserInputData) {
-        return this.accountsService.findOneUser({ data })
+    async findOneAccount(@Args("data") data: FindOneAccountInputData) {
+        return this.accountsService.findOneAccount({ data })
     }
 
   @Query(() => [AccountMySqlEntity])
@@ -27,8 +27,8 @@ export class UsersResolver {
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
-  @Query(() => FindManyUsersOutput)
-  async findManyUsers(@AccountId() accountId: string, @Args("data") data: FindManyUsersInputData) {
+  @Query(() => FindManyAccountsOutput)
+  async findManyUsers(@AccountId() accountId: string, @Args("data") data: FindManyAccountsInputData) {
       return this.accountsService.findManyUsers({ accountId, data })
   }
 

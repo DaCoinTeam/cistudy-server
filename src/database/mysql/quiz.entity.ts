@@ -12,11 +12,11 @@ export class QuizEntity {
     @PrimaryColumn("uuid")
     quizId: string
 
-    @Field(() => QuizQuestionEntity)
-    @OneToMany(() => QuizQuestionEntity, (quizQuestion) => quizQuestion.quiz, { onDelete: "CASCADE" , onUpdate: "CASCADE"})
+    @Field(() => [QuizQuestionEntity])
+    @OneToMany(() => QuizQuestionEntity, (quizQuestion) => quizQuestion.quiz, { onDelete: "CASCADE", onUpdate: "CASCADE" })
     questions: Array<QuizQuestionEntity>
 
-    @Field(() => Int)
+    @Field(() => Int, { nullable: true })
     @Column({ type: "int", nullable: true })
     timeLimit: Number;
 
@@ -29,7 +29,7 @@ export class QuizEntity {
     updatedAt: Date
 
     @Field(() => LessonEntity)
-    @OneToOne(() => LessonEntity, (lesson) => lesson.quiz, {onDelete : "CASCADE"})
+    @OneToOne(() => LessonEntity, (lesson) => lesson.quiz, { onDelete: "CASCADE" })
     @JoinColumn({ name: "quizId" })
     lesson: LessonEntity
 

@@ -1,8 +1,9 @@
-import { AuthTokens, AuthOutput, ResultsWithMetadata } from "@common"
-import { LessonMySqlEntity, ResourceMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity } from "@database"
+import { AuthTokens, AuthOutput, ResultsWithMetadata, Output } from "@common"
+import { LessonMySqlEntity, ResourceMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity, QuizAttemptMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 import { CategoryEntity } from "src/database/mysql/category.entity"
 import { CourseTargetEntity } from "src/database/mysql/course-target.entity"
+import { QuizAttemptEntity } from "src/database/mysql/quiz-attempt.entity"
 import { SubcategoryEntity } from "src/database/mysql/subcategory.entity"
 import { TopicEntity } from "src/database/mysql/topic.entity"
 @ObjectType()
@@ -15,6 +16,8 @@ export class FindManyCoursesOutputMetadata {
         subcategories?: Array<SubcategoryEntity>
     @Field(() => [TopicEntity], { nullable: true })
         topics?: Array<TopicEntity>
+    @Field(() => [CourseMySqlEntity], {nullable: true})
+        highRateCourses? : Array<CourseMySqlEntity>
 }
 
 @ObjectType()
@@ -134,4 +137,12 @@ export class FindManyCoursesTopicOutput implements AuthOutput<FindManyCoursesTop
         data: FindManyCoursesTopicOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
+}
+
+@ObjectType()
+export class FindOneQuizAttemptOutput implements AuthOutput<QuizAttemptMySqlEntity>{
+    @Field(() => QuizAttemptEntity)
+    data: QuizAttemptMySqlEntity
+    @Field(() => AuthTokens, {nullable: true})
+    tokens?: AuthTokens
 }

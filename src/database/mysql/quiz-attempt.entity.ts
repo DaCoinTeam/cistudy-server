@@ -3,6 +3,9 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, One
 import { AccountEntity } from "./account.entity";
 import { QuizEntity } from "./quiz.entity";
 import { QuizAttemptStatus } from "@common";
+import { QuizQuestionEntity } from "./quiz-question.entity";
+import { QuizQuestionAnswerEntity } from "./quiz-question-answer.entity";
+//import { QuizAttemptAnswerEntity } from "./quiz-attempt-answer.entity";
 
 @ObjectType()
 @Entity("quiz-attempt")
@@ -26,7 +29,7 @@ export class QuizAttemptEntity {
 
     @Field(() => String)
     @Column({ type: "enum", enum: QuizAttemptStatus, default: QuizAttemptStatus.Started })
-    attemptStatus : QuizAttemptStatus
+    attemptStatus: QuizAttemptStatus
 
     @Field(() => Date)
     @CreateDateColumn()
@@ -37,12 +40,16 @@ export class QuizAttemptEntity {
     updatedAt: Date
 
     @Field(() => AccountEntity)
-    @ManyToOne(() => AccountEntity, (account) => account.quizAttempts, {onDelete: "CASCADE"})
+    @ManyToOne(() => AccountEntity, (account) => account.quizAttempts, { onDelete: "CASCADE" })
     @JoinColumn({ name: "accountId" })
     account: AccountEntity
 
     @Field(() => QuizEntity)
-    @ManyToOne(() => QuizEntity, (quiz) => quiz.quizAttempts, {onDelete: "CASCADE"})
+    @ManyToOne(() => QuizEntity, (quiz) => quiz.quizAttempts, { onDelete: "CASCADE" })
     @JoinColumn({ name: "quizId" })
     quiz: QuizEntity
+
+    @Field(() => [QuizQuestionAnswerEntity])
+    @OneToMany(() => QuizQuestionAnswerEntity, (quizQuestionAnswer) => quizQuestionAnswer.attempt, { nullable: true })
+    questionAnswers: Array<QuizQuestionAnswerEntity>
 }

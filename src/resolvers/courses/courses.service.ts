@@ -6,12 +6,13 @@ import {
     EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
     LessonMySqlEntity,
+    QuizAttemptMySqlEntity,
     ResourceMySqlEntity,
     TopicMySqlEntity
 } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, DataSource, Like } from "typeorm"
+import { Repository, DataSource, Like, In } from "typeorm"
 import {
     FindOneCourseInput,
     FindManyCoursesInput,
@@ -23,6 +24,7 @@ import {
     FindOneCourseReviewInput,
     FindManyCourseReviewsInput,
     FindManyCoursesTopicInput,
+    FindOneQuizAttemptInput,
 } from "./courses.input"
 import { FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData } from "./courses.output"
 import { SubcategoryEntity } from "src/database/mysql/subcategory.entity"
@@ -48,6 +50,8 @@ export class CoursesService {
         private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
         @InjectRepository(EnrolledInfoMySqlEntity)
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
+        @InjectRepository(QuizAttemptMySqlEntity)
+        private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
 
         private readonly dataSource: DataSource
     ) { }
@@ -298,6 +302,22 @@ export class CoursesService {
                     },
                 })
 
+            const coursesReviews = await this.courseReviewMySqlRepository.find({
+                where: {
+                    courseId: In(results.map(course => course.courseId))
+                },
+            });
+
+            results.forEach(course => {
+                const reviews = coursesReviews.filter(review => review.courseId === course.courseId);
+                const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+                course.courseRate = reviews.length ? (totalRating / reviews.length) : 0;
+            });
+
+            // Tìm khóa học có điểm đánh giá cao nhất
+            const maxRate = Math.max(...results.map(course => course.courseRate));
+            const highRateCourses = results.filter(course => course.courseRate === maxRate);
+
             const numberOfCoursesResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
@@ -312,7 +332,8 @@ export class CoursesService {
                     count: numberOfCoursesResult.count,
                     categories,
                     subcategories,
-                    topics
+                    topics,
+                    highRateCourses
                 }
             }
         } catch (ex) {
@@ -516,4 +537,23 @@ export class CoursesService {
         }
     }
 
+    async findOneQuizAttempt(input: FindOneQuizAttemptInput): Promise<QuizAttemptMySqlEntity> {
+        const { accountId, data } = input
+        const { quizAttemptId } = data
+        const found = await this.quizAttemptMySqlRepository.findOne({
+            where: {
+                accountId, quizAttemptId
+            },
+            relations: {
+                questionAnswers: true,
+                quiz: {
+                    questions: {
+                        answers: true
+                    }
+                }
+            }
+        })
+        //console.log(found.quiz.questions)
+        return found
+    }
 }

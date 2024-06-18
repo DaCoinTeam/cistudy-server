@@ -1,4 +1,5 @@
 import { AuthEmptyDataInput, AuthInput, MediaType } from "@common"
+import { QuizQuestionAnswerMySqlEntity } from "@database"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsInt, IsNumber, IsOptional, IsUUID, Length, Max, Min, max, min } from "class-validator"
 
@@ -374,6 +375,10 @@ export class QuizQuestionInputData {
     question: string
 
     @ApiProperty()
+    @Min(10)
+    point : number
+
+    @ApiProperty()
     answers: Array<QuizQuestionAnswerInputData>
 
     @ApiProperty({ nullable: true })
@@ -389,7 +394,8 @@ export class CreateQuizInputData {
     quizQuestions: Array<QuizQuestionInputData>
 
     @ApiProperty()
-    timeLimit: number
+    @Min(5)
+    timeLimit?: number
 
 }
 
@@ -418,7 +424,11 @@ export class UpdateQuizQuestionInputData {
     quizQuestionId?: string
 
     @ApiProperty({ nullable: true })
-    question: string
+    question?: string
+
+    @ApiProperty({nullable: true })
+    @Min(10)
+    point? : number 
 
     @ApiProperty({ nullable: true })
     questionMedias?: Array<QuizQuestionMediaInputData>
@@ -433,7 +443,7 @@ export class UpdateQuizQuestionInputData {
     mediaIdsToDelete?: Array<string>
 
     @ApiProperty({ nullable: true })
-    newQuizQuestionAnswer: Array<QuizQuestionAnswerInputData>
+    newQuizQuestionAnswer?: Array<QuizQuestionAnswerInputData>
 }
 
 export class UpdateQuizInputData {
@@ -442,7 +452,8 @@ export class UpdateQuizInputData {
     quizId: string
 
     @ApiProperty()
-    timeLimit: number
+    @Min(5)
+    timeLimit?: number
 
     @ApiProperty({ nullable: true })
     newQuestions?: Array<QuizQuestionInputData>
@@ -512,13 +523,14 @@ export class CreateQuizAttemptInput implements AuthInput<CreateQuizAttemptInputD
     data: CreateQuizAttemptInputData
 }
 
+
 export class FinishQuizAttemptInputData {
     @IsUUID("4")
     @ApiProperty()
     quizAttemptId : string
 
     @ApiProperty()
-    score: number
+    quizQuestionAnswerIds: Array<string>
 }
 
 export class FinishQuizAttemptInput implements AuthInput<FinishQuizAttemptInputData>{

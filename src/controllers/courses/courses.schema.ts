@@ -120,7 +120,8 @@ export const createQuizSchema: SchemaObject = {
                     type: "string",
                 },
                 timeLimit: {
-                    type: "number"
+                    type: "number",
+                    minimum: 5
                 },
                 quizQuestions: {
                     type: "array",
@@ -129,6 +130,10 @@ export const createQuizSchema: SchemaObject = {
                         properties: {
                             question: {
                                 type: "string",
+                            },
+                            point:{
+                                type: "number",
+                                minimum: 10
                             },
                             answers: {
                                 type: "array",
@@ -181,7 +186,8 @@ export const updateQuizSchema: SchemaObject = {
                     type: "string"
                 },
                 timeLimit: {
-                    type: "number"
+                    type: "number",
+                    minimum: 5
                 },
                 newQuestions: {
                     type: "array",
@@ -190,6 +196,10 @@ export const updateQuizSchema: SchemaObject = {
                         properties: {
                             question: {
                                 type: "string",
+                            },
+                            point: {
+                                type: "number",
+                                minimum: 10,
                             },
                             answers: {
                                 type: "array",
@@ -229,6 +239,10 @@ export const updateQuizSchema: SchemaObject = {
                             },
                             question: {
                                 type: "string",
+                            },
+                            point:{
+                                type: "number",
+                                minimum: 10
                             },
                             questionMedias: {
                                 type: "array",

@@ -63,6 +63,7 @@ import { ProcessStatus, QuizAttemptStatus, VideoType, existKeyNotUndefined } fro
 import { CreateCategoryOutput, CreateCertificateOutput, CreateCourseOutput, CreateCourseReviewOutput, CreateQuizAttemptOutput, CreateSubcategoryOutput, CreateTopicOutput, DeleteCourseReviewOutput, DeleteTopicOutputData, EnrollCourseOutput, FinishQuizAttemptOutput, MarkLessonAsCompletedOutput, UpdateCourseOutput, UpdateCourseReviewOutput, UpdateQuizOutput } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
 
+
 @Injectable()
 export class CoursesService {
     constructor(
@@ -726,7 +727,7 @@ export class CoursesService {
         }
 
         if (!quizQuestions || quizQuestions.length === 0) {
-            throw new ConflictException("Please provide more than 1 question for the question");
+            throw new ConflictException("Please provide more than 1 question for the quiz");
         }
 
         const questionPromises: Array<Promise<void>> = []
@@ -737,11 +738,12 @@ export class CoursesService {
 
         try {
             for (const questions of quizQuestions) {
-                const { questionMedias, answers, question } = questions
+                const { questionMedias, answers, question, point } = questions
 
                 const quizQuestion: DeepPartial<QuizQuestionMySqlEntity> = {
                     quizId: lessonId,
                     question,
+                    point,
                     questionMedias: [],
                 }
                 if (files) {
@@ -767,12 +769,12 @@ export class CoursesService {
                     }
                     await Promise.all(mediaPromises);
                 }
+                const { quizQuestionId } = await this.quizQuestionMySqlRepository.save(quizQuestion)
 
                 if (!answers || answers.length < 2) {
                     throw new ConflictException("Question must have at least 2 answers");
                 }
 
-                const { quizQuestionId } = await this.quizQuestionMySqlRepository.save(quizQuestion)
                 const questionAnswers = answers.map(({ content, isCorrect }) => ({
                     quizQuestionId,
                     content,
@@ -786,6 +788,7 @@ export class CoursesService {
                 }
 
                 await this.quizQuestionAnswerMySqlRepository.save(questionAnswers)
+
                 questionPromises.push()
             }
             await Promise.all(questionPromises)
@@ -813,62 +816,55 @@ export class CoursesService {
             }
 
             if (newQuestions) {
-                const questionPromises: Array<Promise<void>> = []
                 for (const questions of newQuestions) {
-                    const { questionMedias, answers, question } = questions
+                    const { questionMedias, answers, question, point } = questions;
                     const quizQuestion: DeepPartial<QuizQuestionMySqlEntity> = {
                         quizId,
                         question,
+                        point,
                         questionMedias: [],
-                    }
+                    };
 
                     if (files) {
-                        const mediaPromises: Array<Promise<void>> = []
-                        let mediaPosition = 0
+                        let mediaPosition = 0;
                         for (const questionMedia of questionMedias) {
                             const { mediaIndex, mediaType } = questionMedia;
-
                             const position = mediaPosition;
-                            const promise = async () => {
-                                const file = files.at(mediaIndex);
-                                const { assetId } = await this.storageService.upload({
-                                    rootFile: file,
-                                });
-                                quizQuestion.questionMedias.push({
-                                    position,
-                                    mediaId: assetId,
-                                    mediaType,
-                                } as QuizQuestionMediaMySqlEntity);
-                            };
+
+                            const file = files.at(mediaIndex);
+                            const { assetId } = await this.storageService.upload({
+                                rootFile: file,
+                            });
+                            quizQuestion.questionMedias.push({
+                                position,
+                                mediaId: assetId,
+                                mediaType,
+                            } as QuizQuestionMediaMySqlEntity);
                             mediaPosition++;
-                            mediaPromises.push(promise());
                         }
-                        await Promise.all(mediaPromises);
                     }
 
-                    if (!answers || answers.length < 2) {
-                        throw new ConflictException("Question must have at least 2 answers");
-                    }
+                    const savedQuizQuestion = await queryRunner.manager.save(QuizQuestionMySqlEntity, quizQuestion);
+                    const { quizQuestionId } = savedQuizQuestion;
 
-                    const { quizQuestionId } = await this.quizQuestionMySqlRepository.save(quizQuestion)
                     const questionAnswers = answers.map(({ content, isCorrect }) => ({
                         quizQuestionId,
                         content,
                         isCorrect,
                     }));
 
-                    const hasCorrectAnswer = questionAnswers.some(answer => answer.isCorrect);
+                    if (!answers || answers.length < 2) {
+                        throw new ConflictException("Question must have at least 2 answers");
+                    }
 
+                    const hasCorrectAnswer = questionAnswers.some(answer => answer.isCorrect);
                     if (!hasCorrectAnswer) {
                         throw new ConflictException("Quiz must have at least 1 correct answer");
                     }
 
-                    await this.quizQuestionAnswerMySqlRepository.save(questionAnswers)
-                    questionPromises.push()
+                    await queryRunner.manager.save(QuizQuestionAnswerMySqlEntity, questionAnswers);
                 }
-                await Promise.all(questionPromises)
             }
-
             if (quizQuestionIdsToDelete) {
 
                 const numberOfQuizQuestions = await queryRunner.manager
@@ -899,6 +895,7 @@ export class CoursesService {
                     const {
                         quizQuestionId,
                         question,
+                        point,
                         questionMedias,
                         quizAnswerIdsToUpdate,
                         quizAnswerIdsToDelete,
@@ -906,9 +903,21 @@ export class CoursesService {
                         mediaIdsToDelete
                     } = updateQuestion
 
+                    const found = await this.quizQuestionMySqlRepository.findOne({
+                        where: {
+                            quizQuestionId,
+                            quizId
+                        }
+                    })
+
+                    if (!found) {
+                        throw new NotFoundException("Question not found or not belong to this quiz")
+                    }
+
                     const currentQuestion: DeepPartial<QuizQuestionMySqlEntity> = {
                         quizQuestionId,
                         question,
+                        point
                     }
 
                     if (files) {
@@ -970,6 +979,7 @@ export class CoursesService {
                     if (quizAnswerIdsToDelete) {
                         await queryRunner.manager.delete(QuizQuestionAnswerMySqlEntity, { quizQuestionAnswerId: In(quizAnswerIdsToDelete) })
                     }
+
                     const numberOfCorrectQuizQuestionAnswersResult = await queryRunner.manager
                         .createQueryBuilder()
                         .select("COUNT(*)", "count")
@@ -987,10 +997,11 @@ export class CoursesService {
                     if (numberOfQuizQuestionAnswersResult.count < 2) {
                         throw new ConflictException("Question must have at least 2 answers")
                     }
-                    console.log(numberOfCorrectQuizQuestionAnswersResult.count)
+
                     if (numberOfCorrectQuizQuestionAnswersResult.count < 1) {
                         throw new ConflictException("Quiz must have at least 1 correct answer")
                     }
+
 
                     if (mediaIdsToDelete) {
                         await this.storageService.delete(...mediaIdsToDelete)
@@ -1059,39 +1070,107 @@ export class CoursesService {
     }
 
     async finishQuizAttempt(input: FinishQuizAttemptInput): Promise<FinishQuizAttemptOutput> {
-        const { data } = input
-        const { quizAttemptId, score } = data
-
+        const { data } = input;
+        const { quizAttemptId, quizQuestionAnswerIds } = data;
+    
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
-
+    
         try {
-            const attempt = await this.quizAttemptMySqlRepository.findOneBy({ quizAttemptId })
-
+            const attempt = await this.quizAttemptMySqlRepository.findOneBy({ quizAttemptId });
+    
             if (!attempt) {
-                throw new NotFoundException("Attempt not found")
+                throw new NotFoundException("Attempt not found");
             }
-
+    
             if (attempt.attemptStatus === QuizAttemptStatus.Ended) {
-                throw new NotFoundException("Attempt already ended")
+                throw new NotFoundException("Attempt already ended");
+            }
+    
+            await this.quizAttemptMySqlRepository.update(quizAttemptId, { attemptStatus: QuizAttemptStatus.Ended });
+            const { quizId } = await this.quizAttemptMySqlRepository.findOneBy({ quizAttemptId });
+    
+            const quiz = await this.quizMySqlRepository.findOne({
+                where: {
+                    quizId
+                },
+                relations: {
+                    questions: {
+                        answers: true
+                    }
+                }
+            });
+    
+            if (!quiz) {
+                throw new NotFoundException("Quiz not found");
             }
 
-            await this.quizAttemptMySqlRepository.update(quizAttemptId, { score, attemptStatus: QuizAttemptStatus.Ended })
+            const questionAnswers = await this.quizQuestionAnswerMySqlRepository.find({
+                where:{
+                    quizQuestionAnswerId : In(quizQuestionAnswerIds)
+                }
+            })
 
+            const questionsWithCorrectAnswers = quiz.questions.map(question => {
+                const correctAnswers = question.answers.filter(answer => answer.isCorrect).map(answer => answer.quizQuestionAnswerId);
+                return {
+                    quizQuestionId: question.quizQuestionId,
+                    point: question.point,
+                    correctAnswers: correctAnswers
+                };
+            });
+    
+            let totalPoints = 0;
+            let maxPoints = 0
+            
+            const questionAnswerCountMap: { [key: string]: number } = {};
+    
+            quizQuestionAnswerIds.forEach(answerId => {
+                questionsWithCorrectAnswers.forEach(question => {
+                    if (question.correctAnswers.includes(answerId)) {
+                        if (!questionAnswerCountMap[question.quizQuestionId]) {
+                            questionAnswerCountMap[question.quizQuestionId] = 0;
+                        }
+                        questionAnswerCountMap[question.quizQuestionId]++;
+                    }
+                });
+            });
+    
+            
+            questionsWithCorrectAnswers.forEach(question => {
+                const correctAnswerCount = question.correctAnswers.length;
+                const userAnswerCount = questionAnswerCountMap[question.quizQuestionId] || 0;
+                maxPoints += Number(question.point);
+                if (userAnswerCount === correctAnswerCount) {
+                    totalPoints += Number(question.point)
+                }
+            });
+            const score = (totalPoints / maxPoints) * 10;
+            
+            //await this.quizAttemptMySqlRepository.update(quizAttemptId, { score, questionAnswers });
+            await this.quizAttemptMySqlRepository.save({
+                quizAttemptId,
+                score,
+                questionAnswers
+            })
+
+            await queryRunner.commitTransaction();
+    
             return {
                 message: "Quiz ended successfully!",
-                others: {
+                others:{
                     score
                 }
-            }
+            };
         } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
+            await queryRunner.rollbackTransaction();
+            throw ex;
         } finally {
-            await queryRunner.release()
+            await queryRunner.release();
         }
     }
+    
 
     async giftCourse(input: GiftCourseInput): Promise<string> {
         const { accountId, data } = input
@@ -1190,5 +1269,8 @@ export class CoursesService {
         }
 
     }
-}
 
+    // async gradeQuiz(input: GradeQuizInput): Promise<GradeQuizOutput> {
+    //     return
+    // }
+}

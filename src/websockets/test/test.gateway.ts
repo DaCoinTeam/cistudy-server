@@ -16,11 +16,11 @@ import { AccountId } from "../shared"
 import { AuthInterceptor } from "../shared"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { Cache } from "cache-manager"
-import { TEST_CALL, TEST_CALL2 } from "./test.events"
+import { REAL_TIME_CHAT, TEST_CALL, TEST_CALL2, TEST_NO_AUTH } from "./test.events"
 import { InjectRepository } from "@nestjs/typeorm"
 import { AccountMySqlEntity } from "@database"
 import { Repository } from "typeorm"
-import { TestOutput } from "./test.output"
+import { RealTimeChatOutput, TestNoAuth, TestOutput } from "./test.output"
 import { AccountEntity } from "src/database/mysql/account.entity"
 
 @WebSocketGateway({
@@ -49,44 +49,61 @@ export class TestGateway implements OnGatewayConnection, OnGatewayDisconnect {
         await this.cacheManager.del(client.id)
     }
 
+    @SubscribeMessage(TEST_NO_AUTH)
+    async testNoAuth(@MessageBody() body: string): Promise<TestNoAuth> {
 
-    @UseGuards(JwtAuthGuard)
-    @UseInterceptors(AuthInterceptor)
-    @SubscribeMessage(TEST_CALL)
-    async testCall(@MessageBody() body: string, @ConnectedSocket() client: Socket, @AccountId() accountId : string): Promise<TestOutput> {
-        // this.server.emit(TEST_CALL, {
-        //     msg : "new mess",
-        //     content : body
-        // })
-        console.log(body)
-        console.log(accountId)
-        const userData = await this.accountMySqlRepository.findOne({ where: { username: body } })
         return {
-            event: "testcall", data: {
+            event: TEST_NO_AUTH,
+            data: {
                 data: {
-                    userData,
-                    message:"User logged in : "+userData.username
+                    message: "Some body asked: " + body + " server response : Chac chan la neo r"
                 }
             }
         }
     }
 
-    // @UseGuards(JwtAuthGuard)
-    // //@UseInterceptors(AuthInterceptor)
-    // @SubscribeMessage(TEST_CALL2)
-    // async testCall2(@MessageBody() body: string, @ConnectedSocket() client: Socket): Promise<TestOutput> {
-    //     // this.server.emit(TEST_CALL, {
-    //     //     msg : "new mess",
-    //     //     content : body
-    //     // })
-    //     console.log(body)
-    //     const userData = await this.accountMySqlRepository.findOne({ where: { username: body } })
-    //     return {
-    //         event: "testcall", data: {
-    //             data: {
-    //                 userData
-    //             }
-    //         }
-    //     }
-    // }
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @SubscribeMessage(TEST_CALL)
+    async testCall(@MessageBody() body: string, @AccountId() accountId: string): Promise<TestOutput> {
+        console.log("dadas: "+ accountId)
+        const userData = await this.accountMySqlRepository.findOne({ where: { accountId } })
+        const time = new Date();
+
+        const hours = time.getHours().toString().padStart(2, '0');
+        const minutes = time.getMinutes().toString().padStart(2, '0');
+
+        const formattedTime = `${hours}:${minutes}`;
+        return {
+            event: "testcall", data: {
+                data: {
+                    userData,
+                    message: "[" + formattedTime + "] " + userData.username + " says: " + body
+                }
+            }
+        }
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @SubscribeMessage(REAL_TIME_CHAT)
+    async realTimeChat(@MessageBody() body: string, @AccountId() accountId : string) : Promise<RealTimeChatOutput>{
+        const userData = await this.accountMySqlRepository.findOne({ where: { accountId } })
+
+        const time = new Date();
+        const hours = time.getHours().toString().padStart(2, '0');
+        const minutes = time.getMinutes().toString().padStart(2, '0');
+
+        const formattedTime = `${hours}:${minutes}`;
+        this.server.emit(REAL_TIME_CHAT, "[" + formattedTime + "] " + userData.username + ": " + body)
+        
+        return{
+            event: REAL_TIME_CHAT,
+            data: {
+                data:{
+                    message:  userData.username + " sent a message"
+                }
+            }
+        }
+    }   
 }

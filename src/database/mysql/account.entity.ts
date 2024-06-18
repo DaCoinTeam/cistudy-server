@@ -149,8 +149,8 @@ export class AccountEntity {
     @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.account, { nullable: true })
     courseReview: CourseReviewEntity
 
-    @Field(() => CartEntity)
-    @OneToOne(() => CartEntity, (cart) => cart.cartId)
+    @Field(() => CartEntity, {nullable: true})
+    @OneToOne(() => CartEntity, (cart) => cart.cartId, {nullable: true})
     @JoinColumn()
     cart: CartEntity;
 

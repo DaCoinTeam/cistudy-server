@@ -165,4 +165,6 @@ export class CourseEntity {
     @Field(() => Float, {nullable: true})
     courseProgress? : number
 
+    @Field(() => Float, {nullable: true})
+    courseRate : number
 }

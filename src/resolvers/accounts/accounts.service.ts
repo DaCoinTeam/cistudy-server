@@ -1,9 +1,9 @@
 import { CourseMySqlEntity, FollowMySqlEnitity, AccountMySqlEntity, UserReviewMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { DataSource, Repository } from "typeorm"
-import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindManyUserReviewsInput, FindManyUsersInput, FindOneUserInput } from "./accounts.input"
+import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindManyUserReviewsInput, FindManyAccountsInput, FindOneAccountInput } from "./accounts.input"
 import { InjectRepository } from "@nestjs/typeorm"
-import { FindManyUserReviewsOutputData, FindManyUsersOutputData } from "./accounts.output"
+import { FindManyUserReviewsOutputData, FindManyAccountsOutputData } from "./accounts.output"
 @Injectable()
 export class UsersService {
     constructor(
@@ -18,7 +18,7 @@ export class UsersService {
         private readonly dataSource: DataSource,
     ) { }
 
-    async findOneUser(input: FindOneUserInput): Promise<AccountMySqlEntity> {
+    async findOneAccount(input: FindOneAccountInput): Promise<AccountMySqlEntity> {
         const { data } = input
         const { params, options } = data
         const { accountId } = params
@@ -105,7 +105,7 @@ export class UsersService {
         )
     }
 
-    async findManyUsers(input: FindManyUsersInput): Promise<FindManyUsersOutputData> {
+    async findManyUsers(input: FindManyAccountsInput): Promise<FindManyAccountsOutputData> {
         const { data } = input
         const { options } = data
         const { skip, take } = { ...options }

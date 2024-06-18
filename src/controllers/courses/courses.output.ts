@@ -104,11 +104,9 @@ export class CreateQuizAttemptOutput implements Output<CreateQuizAttemptOutputOt
 }
 
 export class FinishQuizAttemptOutputOther {
-    @ApiProperty()
-    score: number
+    score : number
 }
-
 export class FinishQuizAttemptOutput implements Output<FinishQuizAttemptOutputOther> {
-    message: string;
+    message: string
     others?: FinishQuizAttemptOutputOther;
 }

@@ -4,30 +4,30 @@ import { IsOptional, IsUUID } from "class-validator"
 
 
 @InputType()
-export class FindOneUserInputParams {
+export class FindOneAccountInputParams {
     @Field(() => ID)
     @IsUUID()
         accountId: string
 }
 
 @InputType()
-export class FindOneUserInputOptions {
+export class FindOneAccountInputOptions {
     @Field(() => ID, { nullable: true })
     @IsOptional()
         followerId?: string
 }
 
 @InputType()
-export class FindOneUserInputData implements ParamsWithOptions<FindOneUserInputParams, FindOneUserInputOptions> {
-    @Field(() => FindOneUserInputParams)
-        params: FindOneUserInputParams
-    @Field(() => FindOneUserInputOptions, { nullable: true })
+export class FindOneAccountInputData implements ParamsWithOptions<FindOneAccountInputParams, FindOneAccountInputOptions> {
+    @Field(() => FindOneAccountInputParams)
+        params: FindOneAccountInputParams
+    @Field(() => FindOneAccountInputOptions, { nullable: true })
     @IsOptional()
-        options?: FindOneUserInputOptions
+        options?: FindOneAccountInputOptions
 }
 
-export class FindOneUserInput implements Input<FindOneUserInputData> {
-    data: FindOneUserInputData
+export class FindOneAccountInput implements Input<FindOneAccountInputData> {
+    data: FindOneAccountInputData
 }
 
 
@@ -78,7 +78,7 @@ implements Input<FindManyCreatedCoursesInputData>
 }
 
 @InputType()
-export class FindManyUsersInputOptions {
+export class FindManyAccountsInputOptions {
     @Field(() => Int, { nullable: true })
         take?: number
     @Field(() => Int, { nullable: true })
@@ -88,16 +88,16 @@ export class FindManyUsersInputOptions {
 }
 
 @InputType()
-export class FindManyUsersInputData implements OptionsOnly<FindManyUsersInputOptions> {
-    @Field(() => FindManyUsersInputOptions, { nullable: true })
-        options: FindManyUsersInputOptions
+export class FindManyAccountsInputData implements OptionsOnly<FindManyAccountsInputOptions> {
+    @Field(() => FindManyAccountsInputOptions, { nullable: true })
+        options: FindManyAccountsInputOptions
 }
 
-export class FindManyUsersInput
-implements AuthInput<FindManyUsersInputData>
+export class FindManyAccountsInput
+implements AuthInput<FindManyAccountsInputData>
 {
     accountId: string
-    data: FindManyUsersInputData
+    data: FindManyAccountsInputData
 }
 
 @InputType()

@@ -16,6 +16,7 @@ import {
     SubcategoyTopicMySqlEntity,
     CourseSubcategoryMySqlEntity,
     CourseReviewMySqlEntity,
+    QuizAttemptMySqlEntity,
 } from "@database"
 import { CoursesResolver } from "./courses.resolver"
 import { TypeOrmModule } from "@nestjs/typeorm"
@@ -40,7 +41,8 @@ import { CoursesService } from "./courses.service"
             CourseTopicMySqlEntity,
             SubcategoyTopicMySqlEntity,
             CourseSubcategoryMySqlEntity,
-            CourseReviewMySqlEntity
+            CourseReviewMySqlEntity,
+            QuizAttemptMySqlEntity,
         ]),
     ],
     providers: [CoursesResolver, CoursesService],

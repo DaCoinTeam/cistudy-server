@@ -10,7 +10,7 @@ export class JwtAuthGuard implements CanActivate {
         const event = context.switchToWs().getPattern()
         const data = context.switchToWs().getData()
         const client = context.switchToWs().getClient()
-        
+        console.log(client)
         const token = client.handshake?.headers?.token
 
         if (!token) throw UnauthorizedWsException({event, data})
