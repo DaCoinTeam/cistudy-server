@@ -1,39 +1,53 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    CreateDateColumn,
-    UpdateDateColumn,
-    OneToMany
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  JoinColumn,
+  ManyToOne,
 } from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
-import { SubcategoryEntity } from "./subcategory.entity"
-import { CourseEntity } from "./course.entity"
+import { CourseCategoryEntity } from "./course-category.entity"
+import { CategoryParentEntity } from "./category-parent.entity"
 
 @ObjectType()
 @Entity("category")
 export class CategoryEntity {
-    @Field(() => ID)
-    @PrimaryGeneratedColumn("uuid")
-        categoryId: string
+  @Field(() => ID)
+  @PrimaryGeneratedColumn("uuid")
+  categoryId: string
 
-    @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", length: 1000, nullable: true })
-        name: string
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", length: 1000, nullable: true })
+  name: string
 
-    @Field(() => Date)
-    @CreateDateColumn()
-        createdAt: Date
+  @Field(() => Date)
+  @CreateDateColumn()
+  createdAt: Date
 
-    @Field(() => Date)
-    @UpdateDateColumn()
-        updatedAt: Date
+  @Field(() => Date)
+  @UpdateDateColumn()
+  updatedAt: Date
 
-    @Field(() => [SubcategoryEntity])
-    @OneToMany(() => SubcategoryEntity, (subcategory) => subcategory.category)
-        subcategories: Array<SubcategoryEntity>
+  @Field(() => [CourseCategoryEntity])
+  @OneToMany(
+    () => CourseCategoryEntity,
+    (courseCategory) => courseCategory.category,
+  )
+  courseCategories: Array<CourseCategoryEntity>
 
-    @Field(() => [CourseEntity])
-    @OneToMany(() => CourseEntity, (course) => course.category)
-        courses: Array<CourseEntity>
+  @Field(() => ID)
+  @Column({ type: "uuid"})
+  categoryParentId: string
+
+  @Field(() => CategoryParentEntity)
+    @ManyToOne(() => CategoryParentEntity, (categoryParent) => categoryParent.categories)
+    @JoinColumn({ name: "categoryParentId" })
+    categoryParent: CategoryParentEntity
+
+    @Field(() => [CategoryParentEntity])
+    @OneToMany(() => CategoryParentEntity, (categoryParent) => categoryParent.baseCategory)
+    baseCategoryParents: Array<CategoryParentEntity>
 }

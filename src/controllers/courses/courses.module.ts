@@ -13,10 +13,6 @@ import {
     PostLikeMySqlEntity,
     PostCommentLikeMySqlEntity,
     CourseTargetMySqlEntity,
-    CourseSubcategoryMySqlEntity,
-    CourseTopicMySqlEntity,
-    TopicMySqlEntity,
-    SubcategoyMySqlEntity,
     CategoryMySqlEntity,
     TransactionMongoEntity,
     TransactionMongoEntitySchema,
@@ -34,6 +30,8 @@ import {
 } from "@database"
 import { CoursesService } from "./courses.service"
 import { MongooseModule } from "@nestjs/mongoose"
+import { CategoryParentEntity } from "src/database/mysql/category-parent.entity"
+import { CourseCategoryEntity } from "src/database/mysql/course-category.entity"
 
 @Module({
     imports: [
@@ -51,10 +49,8 @@ import { MongooseModule } from "@nestjs/mongoose"
             PostLikeMySqlEntity,
             PostCommentLikeMySqlEntity,
             CourseTargetMySqlEntity,
-            CourseSubcategoryMySqlEntity,
-            CourseTopicMySqlEntity,
-            TopicMySqlEntity,
-            SubcategoyMySqlEntity,
+            CategoryParentEntity,
+            CourseCategoryEntity,
             CategoryMySqlEntity,
             CourseReviewMySqlEntity,
             CartMySqlEntity,

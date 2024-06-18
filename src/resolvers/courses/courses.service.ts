@@ -7,8 +7,7 @@ import {
     FollowMySqlEnitity,
     LessonMySqlEntity,
     QuizAttemptMySqlEntity,
-    ResourceMySqlEntity,
-    TopicMySqlEntity
+    ResourceMySqlEntity
 } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
@@ -27,7 +26,6 @@ import {
     FindOneQuizAttemptInput,
 } from "./courses.input"
 import { FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData } from "./courses.output"
-import { SubcategoryEntity } from "src/database/mysql/subcategory.entity"
 
 @Injectable()
 export class CoursesService {
@@ -42,10 +40,6 @@ export class CoursesService {
         private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
         @InjectRepository(CategoryMySqlEntity)
         private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
-        @InjectRepository(SubcategoryEntity)
-        private readonly subcategoryMySqlRepository: Repository<SubcategoryEntity>,
-        @InjectRepository(TopicMySqlEntity)
-        private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
         @InjectRepository(CourseReviewMySqlEntity)
         private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
         @InjectRepository(EnrolledInfoMySqlEntity)
@@ -121,17 +115,6 @@ export class CoursesService {
                     },
                     courseTargets: true,
                     creator: true,
-                    courseSubcategories: {
-                        subcategory: {
-                            subcategoryTopics: {
-                                topic: true
-                            }
-                        }
-                    },
-                    category: true,
-                    courseTopics: {
-                        topic: true
-                    }
                 },
                 order: {
                     courseTargets: {
@@ -197,17 +180,6 @@ export class CoursesService {
                     },
                     courseTargets: true,
                     creator: true,
-                    courseSubcategories: {
-                        subcategory: {
-                            subcategoryTopics: {
-                                topic: true
-                            }
-                        }
-                    },
-                    category: true,
-                    courseTopics: {
-                        topic: true
-                    }
                 },
                 order: {
                     courseTargets: {
@@ -265,31 +237,6 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            const categories = await this.categoryMySqlRepository.find(
-                {
-                    where: {
-                        name: searchValue ? Like(`%${searchValue}%`) : undefined
-                    }
-                })
-
-            const subcategories = await this.subcategoryMySqlRepository.find(
-                {
-                    where: {
-                        name: searchValue ? Like(`%${searchValue}%`) : undefined
-                    }
-                })
-
-            const topics = await this.topicMySqlRepository.find(
-                {
-                    where: {
-                        name: searchValue ? Like(`%${searchValue}%`) : undefined
-                    },
-                    relations: {
-                        courseTopics: true
-                    }
-                })
-
-
             const results = await this.courseMySqlRepository.find(
                 {
                     where: {
@@ -329,9 +276,6 @@ export class CoursesService {
                 results,
                 metadata: {
                     count: numberOfCoursesResult.count,
-                    categories,
-                    subcategories,
-                    topics,
                     highRateCourses
                 }
             }
@@ -460,11 +404,6 @@ export class CoursesService {
     ): Promise<Array<CategoryMySqlEntity>> {
         return await this.categoryMySqlRepository.find({
             relations: {
-                subcategories: {
-                    subcategoryTopics: {
-                        topic: true
-                    }
-                }
             },
         })
     }
