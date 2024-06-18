@@ -4,16 +4,12 @@ import {
     CertificateMySqlEntity,
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
-    CourseSubcategoryMySqlEntity,
     CourseTargetMySqlEntity,
-    CourseTopicMySqlEntity,
     LessonMySqlEntity,
     QuizQuestionAnswerMySqlEntity,
     QuizMySqlEntity,
     ResourceMySqlEntity,
     SectionMySqlEntity,
-    SubcategoyMySqlEntity,
-    TopicMySqlEntity,
     QuizQuestionMySqlEntity,
     QuizQuestionMediaMySqlEntity,
     ProgressMySqlEntity,
@@ -79,16 +75,8 @@ export class CoursesService {
         private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
         @InjectRepository(EnrolledInfoEntity)
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoEntity>,
-        @InjectRepository(CourseSubcategoryMySqlEntity)
-        private readonly courseSubcategoryMySqlRepository: Repository<CourseSubcategoryMySqlEntity>,
-        @InjectRepository(CourseTopicMySqlEntity)
-        private readonly courseTopicMySqlRepository: Repository<CourseTopicMySqlEntity>,
         @InjectRepository(CategoryMySqlEntity)
         private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
-        @InjectRepository(SubcategoyMySqlEntity)
-        private readonly subcategoryMySqlRepository: Repository<SubcategoyMySqlEntity>,
-        @InjectRepository(TopicMySqlEntity)
-        private readonly topicMySqlRepository: Repository<TopicMySqlEntity>,
         @InjectRepository(CourseReviewMySqlEntity)
         private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
         @InjectRepository(CertificateMySqlEntity)
@@ -107,8 +95,6 @@ export class CoursesService {
         private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
         @InjectRepository(AccountMySqlEntity)
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
-        // @InjectModel(TransactionMongoEntity.name) private readonly transactionMongoModel: Model<TransactionMongoEntity>,
-        // @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
         private readonly storageService: StorageService,
         private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
         private readonly dataSource: DataSource
@@ -231,7 +217,6 @@ export class CoursesService {
             discountPrice,
             enableDiscount,
             title,
-            categoryId,
             subcategoryIds,
             topicIds,
             receivedWalletAddress
@@ -245,14 +230,6 @@ export class CoursesService {
             discountPrice,
             enableDiscount,
             receivedWalletAddress,
-            categoryId,
-            courseSubcategories: subcategoryIds?.map(subcategoryId => ({
-                subcategoryId,
-                courseId
-            })),
-            courseTopics: topicIds?.map(topicId => ({
-                topicId
-            })),
         }
 
         const promises: Array<Promise<void>> = []
@@ -300,12 +277,6 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            if (subcategoryIds?.length)
-                await this.courseSubcategoryMySqlRepository.delete({ courseId })
-
-            if (topicIds?.length)
-                await this.courseTopicMySqlRepository.delete({ courseId })
-
             if (existKeyNotUndefined(course))
                 await this.courseMySqlRepository.save(course)
 
@@ -623,14 +594,9 @@ export class CoursesService {
         const { data } = input
         const { name, categoryId } = data
 
-        const { subcategoryId } = await this.subcategoryMySqlRepository.save({
-            name,
-            categoryId
-        })
-
         return {
             message: "Subcategory Created Successfully",
-            others: { subcategoryId }
+            others: { subcategoryId: "" }
         }
     }
 
@@ -645,17 +611,9 @@ export class CoursesService {
             rootFile: file,
         })
 
-        const { topicId } = await this.topicMySqlRepository.save({
-            svgId: assetId,
-            name,
-            subcategoryTopics: subcategoryIds.map(subcategoryId => ({
-                subcategoryId
-            }))
-        })
-
         return {
             message: "Topic Created Successfully",
-            others: { topicId }
+            others: { topicId: "" }
         }
     }
 
@@ -668,9 +626,6 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            const { svgId } = await this.topicMySqlRepository.findOneBy({ topicId })
-            await this.storageService.delete(svgId)
-            await this.topicMySqlRepository.delete({ topicId })
             return { message: "Topic Deleted Successfully" }
         } catch (ex) {
             await queryRunner.rollbackTransaction()

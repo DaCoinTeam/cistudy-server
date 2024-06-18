@@ -4,18 +4,12 @@ import { Field, Int, ObjectType } from "@nestjs/graphql"
 import { CategoryEntity } from "src/database/mysql/category.entity"
 import { CourseTargetEntity } from "src/database/mysql/course-target.entity"
 import { QuizAttemptEntity } from "src/database/mysql/quiz-attempt.entity"
-import { SubcategoryEntity } from "src/database/mysql/subcategory.entity"
-import { TopicEntity } from "src/database/mysql/topic.entity"
 @ObjectType()
 export class FindManyCoursesOutputMetadata {
     @Field(() => Int, { nullable: true })
         count?: number
     @Field(() => [CategoryEntity], { nullable: true })
         categories?: Array<CategoryEntity>
-    @Field(() => [SubcategoryEntity], { nullable: true })
-        subcategories?: Array<SubcategoryEntity>
-    @Field(() => [TopicEntity], { nullable: true })
-        topics?: Array<TopicEntity>
     @Field(() => [CourseMySqlEntity], {nullable: true})
         highRateCourses? : Array<CourseMySqlEntity>
 }

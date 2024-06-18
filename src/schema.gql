@@ -122,66 +122,6 @@ type CourseTargetEntity {
   course: CourseEntity!
 }
 
-type CategoryEntity {
-  categoryId: ID!
-  name: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  subcategories: [SubcategoryEntity!]!
-  courses: [CourseEntity!]!
-}
-
-type CourseSubcategoryEntity {
-  courseSubcategoryId: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  courseId: ID!
-  subcategoryId: ID!
-  course: CourseEntity!
-  subcategory: SubcategoryEntity!
-}
-
-type SubcategoryEntity {
-  subcategoryId: ID!
-  name: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  categoryId: ID!
-  category: CategoryEntity!
-  subcategoryTopics: [SubcategoryTopicEntity!]!
-  courseSubcategories: [CourseSubcategoryEntity!]!
-}
-
-type SubcategoryTopicEntity {
-  subcategoryTopicId: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  subcategoryId: ID!
-  topicId: ID!
-  subcategory: SubcategoryEntity!
-  topic: TopicEntity!
-}
-
-type TopicEntity {
-  topicId: ID!
-  name: String
-  svgId: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  courseTopics: [CourseTopicEntity!]!
-  subcategoryTopics: [SubcategoryTopicEntity!]!
-}
-
-type CourseTopicEntity {
-  courseTopicId: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  courseId: ID!
-  topicId: ID!
-  course: CourseEntity!
-  topic: TopicEntity!
-}
-
 type CourseReviewEntity {
   courseReviewId: ID!
   courseId: ID!
@@ -249,6 +189,34 @@ type OrderCourseEntity {
   course: CourseEntity!
 }
 
+type CategoryParentEntity {
+  categoryParentId: ID!
+  categoryId: ID!
+  baseCategory: [CategoryEntity!]!
+  categories: [CategoryEntity!]!
+}
+
+type CategoryEntity {
+  categoryId: ID!
+  name: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  courseCategories: [CourseCategoryEntity!]!
+  categoryParentId: ID!
+  categoryParent: CategoryParentEntity!
+  baseCategoryParents: [CategoryParentEntity!]!
+}
+
+type CourseCategoryEntity {
+  courseCategoryId: ID!
+  courseId: ID!
+  categoryId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  course: CourseEntity!
+  category: CategoryEntity!
+}
+
 type CourseEntity {
   courseId: ID!
   title: String
@@ -267,10 +235,7 @@ type CourseEntity {
   duration: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
-  courseTopics: [CourseTopicEntity!]!
-  categoryId: ID
-  category: CategoryEntity
-  courseSubcategories: [CourseSubcategoryEntity!]
+  courseCategories: [CourseCategoryEntity!]!
   courseTargets: [CourseTargetEntity!]
   posts: [PostEntity!]!
   sections: [SectionEntity!]!
@@ -439,8 +404,6 @@ type TransactionMongoEntity {
 type FindManyCoursesOutputMetadata {
   count: Int
   categories: [CategoryEntity!]
-  subcategories: [SubcategoryEntity!]
-  topics: [TopicEntity!]
   highRateCourses: [CourseEntity!]
 }
 

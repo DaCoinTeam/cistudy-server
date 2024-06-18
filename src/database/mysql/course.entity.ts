@@ -10,19 +10,17 @@ import {
     OneToOne,
 } from "typeorm"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
-import { CourseApproveStatus, VerifyStatus } from "@common"
+import { VerifyStatus } from "@common"
 import { PostEntity } from "./post.entity"
 import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { SectionEntity } from "./section.entity"
 import { AccountEntity } from "./account.entity"
 import { CourseTargetEntity } from "./course-target.entity"
-import { CourseTopicEntity } from "./course-topic.entity"
-import { CourseSubcategoryEntity } from "./course-subcategory.entity"
-import { CategoryEntity } from "./category.entity"
 import { CourseReviewEntity } from "./course-review.entity"
 import { CartCourseEntity } from "./cart-course.enity"
 import { CertificateEntity } from "./certificate"
 import { OrderCourseEntity } from "./order-course.entity"
+import { CourseCategoryEntity } from "./course-category.entity"
 
 
 interface CourseIncludes {
@@ -105,26 +103,9 @@ export class CourseEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @Field(() => [CourseTopicEntity])
-    @OneToMany(() => CourseTopicEntity, (courseTopic) => courseTopic.course, {
-        cascade: true,
-    })
-    courseTopics: Array<CourseTopicEntity>
-
-    @Field(() => ID, { nullable: true })
-    @Column({ type: "uuid", length: 36, nullable: true })
-    categoryId: string
-
-    @Field(() => CategoryEntity, { nullable: true })
-    @ManyToOne(() => CategoryEntity, (category) => category.courses)
-    @JoinColumn({ name: "categoryId" })
-    category: CategoryEntity
-
-    @Field(() => [CourseSubcategoryEntity], { nullable: true })
-    @OneToMany(() => CourseSubcategoryEntity, (courseSubcategory) => courseSubcategory.course, {
-        cascade: true,
-    })
-    courseSubcategories: Array<CourseSubcategoryEntity>
+    @Field(() => [CourseCategoryEntity])
+    @OneToMany(() => CourseCategoryEntity, (courseCategory) => courseCategory.course)
+    courseCategories: Array<CourseCategoryEntity>
 
     @Field(() => [CourseTargetEntity], { nullable: true })
     @OneToMany(() => CourseTargetEntity, (courseTarget) => courseTarget.course)
