@@ -99,7 +99,7 @@ type LessonEntity {
   section: SectionEntity!
   resources: [ResourceEntity!]!
   quiz: [QuizEntity!]
-  userProgresses: ProgressEntity!
+  accountProgresses: ProgressEntity!
 }
 
 type SectionEntity {
@@ -360,12 +360,12 @@ type PostCommentEntity {
 type FollowEntity {
   followId: ID!
   followerId: String!
-  followedUserId: String!
+  followedAccountId: String!
   followed: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   follower: AccountEntity!
-  followedUser: AccountEntity!
+  followedAccount: AccountEntity!
 }
 
 type CryptoWalletEntity {
@@ -377,16 +377,16 @@ type CryptoWalletEntity {
   account: AccountEntity!
 }
 
-type UserReviewEntity {
-  userReviewId: ID!
+type AccountReviewEntity {
+  accountReviewId: ID!
   accountId: ID!
-  userId: ID!
+  reviewedAccountId: ID!
   content: String
   rating: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
   account: AccountEntity!
-  user: AccountEntity!
+  reviewedAccount: AccountEntity!
 }
 
 type AccountEntity {
@@ -413,15 +413,15 @@ type AccountEntity {
   posts: [PostEntity!]!
   courses: [CourseEntity!]!
   followerRelations: [FollowEntity!]!
-  followedUserRelations: [FollowEntity!]!
+  followedAccountRelations: [FollowEntity!]!
   courseReview: CourseReviewEntity!
   cart: CartEntity
   orders: [OrderEntity!]!
   certificates: [CertificateEntity!]!
   courseProgresses: [ProgressEntity!]!
   quizAttempts: [QuizAttemptEntity!]!
-  userReviews: [UserReviewEntity!]!
-  selfReviews: [UserReviewEntity!]!
+  accountReviews: [AccountReviewEntity!]!
+  selfReviews: [AccountReviewEntity!]!
   followed: Boolean!
   numberOfFollowers: Int!
 }
@@ -559,13 +559,13 @@ type FindManyAccountsOutput {
   tokens: AuthTokens
 }
 
-type FindManyUserReviewsOutputMetadata {
+type FindManyAccountReviewsOutputMetadata {
   count: Int
 }
 
-type FindManyUserReviewsOutputData {
-  results: [UserReviewEntity!]!
-  metadata: FindManyUserReviewsOutputMetadata
+type FindManyAccountReviewsOutputData {
+  results: [AccountReviewEntity!]!
+  metadata: FindManyAccountReviewsOutputMetadata
 }
 
 type FindManySelfCreatedCoursesOutputMetadata {
@@ -630,17 +630,17 @@ type FindOneOrderOutput {
   tokens: AuthTokens
 }
 
-type FindManyUserOrdersOutputMetadata {
+type FindManyAccountOrdersOutputMetadata {
   count: Int
 }
 
-type FindManyUserOrdersOutputData {
+type FindManyAccountOrdersOutputData {
   results: [OrderEntity!]!
-  metadata: FindManyUserOrdersOutputMetadata
+  metadata: FindManyAccountOrdersOutputMetadata
 }
 
-type FindManyUserOrdersOutput {
-  data: FindManyUserOrdersOutputData!
+type FindManyAccountOrdersOutput {
+  data: FindManyAccountOrdersOutputData!
   tokens: AuthTokens
 }
 
@@ -657,7 +657,7 @@ type Query {
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findManyCategories: [CategoryEntity!]!
   findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
-  findManyCourseReviews(data: FindManyUserReviewsInputData!): FindManyUserReviewsOutputData!
+  findManyCourseReviews(data: FindManyCourseReviewsInputData!): FindManyCourseReviewsOutputData!
   findManyCoursesTopic(data: FindManyCoursesTopicInputData!): FindManyCoursesTopicOutputData!
   findOneQuizAttempt(data: FindOneQuizAttemptInputData!): FindOneQuizAttemptOutput!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
@@ -668,13 +668,14 @@ type Query {
   findOneAccount(data: FindOneAccountInputData!): AccountEntity!
   findManyFollowers(data: FindManyFollowersInputData!): [AccountEntity!]!
   findManyCreatedCourses(data: FindManyCreatedCoursesInputData!): [CourseEntity!]!
-  findManyUsers(data: FindManyAccountsInputData!): FindManyAccountsOutput!
+  findManyAccounts(data: FindManyAccountsInputData!): FindManyAccountsOutput!
+  findManyAccountReviews(data: FindManyAccountReviewsInputData!): FindManyAccountReviewsOutputData!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
   findOneCart: FindOneCartOutput!
   findOneOrder(data: FindOneOrderInputData!): FindOneOrderOutput!
-  findManyUserOrders(data: FindManyUserOrdersInputData!): FindManyUserOrdersOutput!
+  findManyAccountOrders(data: FindManyAccountOrdersInputData!): FindManyAccountOrdersOutput!
 }
 
 input SignInInputData {
@@ -766,16 +767,16 @@ input FindOneCourseReviewInputParams {
   courseId: ID!
 }
 
-input FindManyUserReviewsInputData {
-  params: FindManyUserReviewsInputParams!
-  options: FindManyUserReviewsInputOptions
+input FindManyCourseReviewsInputData {
+  params: FindManyCourseReviewsInputParams!
+  options: FindManyCourseReviewsInputOptions
 }
 
-input FindManyUserReviewsInputParams {
-  accountId: ID!
+input FindManyCourseReviewsInputParams {
+  courseId: ID!
 }
 
-input FindManyUserReviewsInputOptions {
+input FindManyCourseReviewsInputOptions {
   take: Int
   skip: Int
 }
@@ -901,6 +902,20 @@ input FindManyAccountsInputOptions {
   searchValue: String
 }
 
+input FindManyAccountReviewsInputData {
+  params: FindManyAccountReviewsInputParams!
+  options: FindManyAccountReviewsInputOptions
+}
+
+input FindManyAccountReviewsInputParams {
+  accountId: ID!
+}
+
+input FindManyAccountReviewsInputOptions {
+  take: Int
+  skip: Int
+}
+
 input FindManySelfCreatedCoursesInputData {
   options: FindManySelfCreatedCoursesInputOptions
 }
@@ -936,11 +951,11 @@ input FindOneOrderInputParams {
   orderId: ID!
 }
 
-input FindManyUserOrdersInputData {
-  options: FindManyUserOrdersInputOptions
+input FindManyAccountOrdersInputData {
+  options: FindManyAccountOrdersInputOptions
 }
 
-input FindManyUserOrdersInputOptions {
+input FindManyAccountOrdersInputOptions {
   take: Int
   skip: Int
   orderStatus: String!

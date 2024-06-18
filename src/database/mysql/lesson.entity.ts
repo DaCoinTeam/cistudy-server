@@ -79,6 +79,6 @@ export class LessonEntity {
     quiz?: QuizEntity
 
     @Field(() => ProgressEntity)
-    @OneToMany(() => ProgressEntity, (userProgress) => userProgress.lesson)
-    userProgresses? : ProgressEntity
+    @OneToMany(() => ProgressEntity, (accountProgress) => accountProgress.lesson)
+    accountProgresses? : ProgressEntity
 }

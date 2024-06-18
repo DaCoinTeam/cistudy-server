@@ -23,7 +23,7 @@ export class FollowEntity {
 
     @Field(() => String)
     @Column({ type: "uuid", length: 36 })
-        followedUserId: string
+        followedAccountId: string
 
     @Field(() => Boolean)
     @Column({
@@ -46,7 +46,7 @@ export class FollowEntity {
         follower: AccountEntity
 
     @Field(() => AccountEntity)
-    @ManyToOne(() => AccountEntity, (post) => post.followedUserRelations)
-    @JoinColumn({ name: "followedUserId" })
-        followedUser: AccountEntity
+    @ManyToOne(() => AccountEntity, (post) => post.followedAccountRelations)
+    @JoinColumn({ name: "followedAccountId" })
+        followedAccount: AccountEntity
 }

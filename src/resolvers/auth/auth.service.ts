@@ -25,7 +25,7 @@ export class AuthService {
     ) { }
 
     async init(input: InitInput): Promise<AccountMySqlEntity> {
-        const user = await this.accountMySqlRepository.findOne({
+        const account = await this.accountMySqlRepository.findOne({
             where: {
                 accountId: input.accountId,
             },
@@ -37,8 +37,8 @@ export class AuthService {
                 }
             }
         })
-        console.log(user)
-        return user
+        console.log(account)
+        return account
     }
 
     async signIn(input: SignInInput): Promise<AccountMySqlEntity> {
@@ -49,7 +49,7 @@ export class AuthService {
         const found = await this.accountMySqlRepository.findOneBy({
             email,
         })
-        if (!found) throw new NotFoundException("User not found.")
+        if (!found) throw new NotFoundException("Account not found.")
         if (!this.sha256Service.verifyHash(password, found.password))
             throw new UnauthorizedException("Invalid credentials.")
         return found

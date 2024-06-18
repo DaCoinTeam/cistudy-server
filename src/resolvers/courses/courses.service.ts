@@ -150,7 +150,7 @@ export class CoursesService {
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(FollowMySqlEnitity, "follow")
-                .where("followedUserId = :accountId", { accountId: course.creator.accountId })
+                .where("followedAccountId = :accountId", { accountId: course.creator.accountId })
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 
@@ -226,7 +226,7 @@ export class CoursesService {
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(FollowMySqlEnitity, "follow")
-                .where("followedUserId = :accountId", { accountId: course.creator.accountId })
+                .where("followedAccountId = :accountId", { accountId: course.creator.accountId })
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 
@@ -374,7 +374,7 @@ export class CoursesService {
                 {
                     where: {
                         followerId: accountId,
-                        followedUserId: lesson.section.course.creator.accountId,
+                        followedAccountId: lesson.section.course.creator.accountId,
                         followed: true,
                     }
                 }
@@ -384,7 +384,7 @@ export class CoursesService {
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(FollowMySqlEnitity, "follow")
-                .where("followedUserId = :accountId", { accountId: lesson.section.course.creator.accountId })
+                .where("followedAccountId = :accountId", { accountId: lesson.section.course.creator.accountId })
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 

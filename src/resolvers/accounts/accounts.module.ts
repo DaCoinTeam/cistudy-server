@@ -1,13 +1,13 @@
 import { Module } from "@nestjs/common"
-import { UsersResolver } from "./accounts.resolver"
+import { AccountsResolver } from "./accounts.resolver"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     CourseMySqlEntity,
     FollowMySqlEnitity,
     AccountMySqlEntity,
-    UserReviewMySqlEntity,
+    AccountReviewMySqlEntity,
 } from "@database"
-import { UsersService } from "./accounts.service"
+import { AccountsService } from "./accounts.service"
 
 @Module({
     imports: [
@@ -15,9 +15,9 @@ import { UsersService } from "./accounts.service"
             AccountMySqlEntity,
             FollowMySqlEnitity,
             CourseMySqlEntity,
-            UserReviewMySqlEntity
+            AccountReviewMySqlEntity
         ]),
     ],
-    providers: [UsersResolver, UsersService],
+    providers: [AccountsResolver, AccountsService],
 })
-export class UsersModule {}
+export class AccountsModule {}

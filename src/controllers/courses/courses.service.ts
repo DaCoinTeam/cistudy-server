@@ -327,7 +327,7 @@ export class CoursesService {
         const enrolled = await this.enrolledInfoMySqlRepository.findOneBy({ accountId })
 
         if (!enrolled) {
-            throw new ConflictException("User must be enrolled to the course to post a review")
+            throw new ConflictException("You must have been enrolled to the course to post a review")
         }
 
         const reviewed = await this.courseReviewMySqlRepository.findOne({
@@ -335,7 +335,7 @@ export class CoursesService {
         });
 
         if (reviewed) {
-            throw new ConflictException("This user already has a review on this course");
+            throw new ConflictException("You have already has a review on this course");
         }
 
         try {
@@ -692,7 +692,7 @@ export class CoursesService {
         })
 
         if (found) {
-            throw new ConflictException("This user already get certificate of this course")
+            throw new ConflictException("You have already get certificate of this course")
         }
 
 
@@ -1070,7 +1070,7 @@ export class CoursesService {
             })
 
             if (doing) {
-                throw new ConflictException("User havent completed the last attempt.")
+                throw new ConflictException("You havent completed the last attempt.")
             }
 
             // await queryRunner.manager.save(QuizAttemptMySqlEntity, {
@@ -1163,9 +1163,9 @@ export class CoursesService {
 
             questionsWithCorrectAnswers.forEach(question => {
                 const correctAnswerCount = question.correctAnswers.length;
-                const userAnswerCount = questionAnswerCountMap[question.quizQuestionId] || 0;
+                const accountAnswerCount = questionAnswerCountMap[question.quizQuestionId] || 0;
                 maxPoints += Number(question.point);
-                if (userAnswerCount === correctAnswerCount) {
+                if (accountAnswerCount === correctAnswerCount) {
                     totalPoints += Number(question.point)
                 }
             });
@@ -1197,27 +1197,27 @@ export class CoursesService {
 
     async giftCourse(input: GiftCourseInput): Promise<GiftCourseOutput> {
         const { accountId, data } = input
-        const { courseId, receiveUserEmail, code } = data
+        const { courseId, receiveAccountEmail, code } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
         try {
-            const receiveUser = await this.accountMySqlRepository.findOneBy({ email: receiveUserEmail })
+            const receiveAccount = await this.accountMySqlRepository.findOneBy({ email: receiveAccountEmail })
 
-            if (!receiveUser) {
-                throw new NotFoundException("Receive user not found or they aren't a CiStudy member")
+            if (!receiveAccount) {
+                throw new NotFoundException("Receive account not found or they aren't a CiStudy member")
             }
 
             const enrolled = await this.enrolledInfoMySqlRepository.findOne({
                 where: {
-                    accountId: receiveUser.accountId,
+                    accountId: receiveAccount.accountId,
                     courseId
                 }
             })
 
             if (enrolled) {
-                throw new ConflictException("This user is already enrolled to this course")
+                throw new ConflictException("This account has already enrolled to this course")
             }
 
             // const cachedTransaction = (await this.cacheManager.get(code)) as CodeValue
@@ -1253,7 +1253,7 @@ export class CoursesService {
             const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
                 enrolledInfoId: enrolled?.enrolledInfoId,
                 courseId,
-                accountId: receiveUser.accountId,
+                accountId: receiveAccount.accountId,
                 enrolled: true,
                 priceAtEnrolled: price
             })
@@ -1272,7 +1272,7 @@ export class CoursesService {
             const progresses = course.sections.reduce((acc, section) => {
                 section.lessons.forEach(lesson => {
                     acc.push({
-                        accountId: receiveUser.accountId,
+                        accountId: receiveAccount.accountId,
                         lessonId: lesson.lessonId,
                         isCompleted: false // Giả sử bạn muốn khởi tạo với `isCompleted` là false
                     });
@@ -1284,7 +1284,7 @@ export class CoursesService {
 
             await queryRunner.commitTransaction()
             return {
-                message: `User with email ${receiveUserEmail} have received and enrolled to course ${course.title}`
+                message: `Account with email ${receiveAccountEmail} have received and enrolled to course ${course.title}`
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()

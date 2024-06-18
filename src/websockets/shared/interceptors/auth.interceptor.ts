@@ -36,8 +36,8 @@ implements NestInterceptor<T, WsOutput<T>>
         const refresh = type === AuthTokenType.Refresh
         if (refresh) {
             await this.authManagerService.validateSession(accountId, clientId)
-            const user = await this.accountMySqlRepository.findOneBy({accountId})
-            accountRole = user.accountRole
+            const account = await this.accountMySqlRepository.findOneBy({accountId})
+            accountRole = account.accountRole
         }
         return next.handle().pipe(
             mergeMap(async ({event, data}) => {

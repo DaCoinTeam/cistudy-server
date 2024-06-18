@@ -7,7 +7,7 @@ import { app } from "firebase-admin"
 export class ToggleFollowInputData {
     @IsUUID("4")
     @ApiProperty()
-    followedUserId: string
+    followedAccountId: string
 }
 
 export class ToggleFollowInput implements AuthInput<ToggleFollowInputData> {
@@ -43,10 +43,10 @@ export class DeleteCourseInput implements AuthInput<DeleteCourseInputData> {
     data: DeleteCourseInputData
 }
 
-export class CreateUserReviewInputData {
+export class CreateAccountReviewInputData {
     @IsUUID("4")
     @ApiProperty()
-    userId: string
+    reviewedAccountId: string
 
     @ApiProperty()
     content: string
@@ -57,15 +57,15 @@ export class CreateUserReviewInputData {
     rating: number
 }
 
-export class CreateUserReviewInput implements AuthInput<CreateUserReviewInputData> {
+export class CreateAccountReviewInput implements AuthInput<CreateAccountReviewInputData> {
     accountId: string
-    data: CreateUserReviewInputData
+    data: CreateAccountReviewInputData
 }
 
-export class UpdateUserReviewInputData {
+export class UpdateAccountReviewInputData {
     @IsUUID("4")
     @ApiProperty()
-    userReviewId: string
+    accountReviewId: string
 
     @ApiProperty()
     content?: string
@@ -76,19 +76,19 @@ export class UpdateUserReviewInputData {
     rating?: number
 }
 
-export class UpdateUserReviewInput implements AuthInput<UpdateUserReviewInputData> {
+export class UpdateAccountReviewInput implements AuthInput<UpdateAccountReviewInputData> {
     accountId: string
-    data: UpdateUserReviewInputData
+    data: UpdateAccountReviewInputData
 }
 
-export class DeleteUserReviewInputData {
+export class DeleteAccountReviewInputData {
     @IsUUID("4")
     @ApiProperty()
-    userReviewId: string
+    accountReviewId: string
 }
 
-export class DeleteUserReviewInput implements AuthInput<DeleteUserReviewInputData> {
+export class DeleteAccountReviewInput implements AuthInput<DeleteAccountReviewInputData> {
     accountId: string
-    data: DeleteUserReviewInputData
+    data: DeleteAccountReviewInputData
 
 }

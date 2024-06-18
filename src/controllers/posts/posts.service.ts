@@ -548,7 +548,7 @@ export class PostsService {
         })
 
         if (!found) {
-            throw new NotFoundException("Post not found or not owned by user")
+            throw new NotFoundException("Post not found or not owned by this account")
         }
 
         const { allowComments } = await this.postMySqlRepository.save({ postId, allowComments: !found.allowComments })

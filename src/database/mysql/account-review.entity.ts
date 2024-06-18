@@ -13,11 +13,11 @@ import { CourseEntity } from "./course.entity"
 import { AccountEntity } from "./account.entity"
 
 @ObjectType()
-@Entity("user-review")
-export class UserReviewEntity {
+@Entity("account-review")
+export class AccountReviewEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-        userReviewId: string
+        accountReviewId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
@@ -25,7 +25,7 @@ export class UserReviewEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        userId: string
+        reviewedAccountId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 200, nullable: true })
@@ -44,12 +44,12 @@ export class UserReviewEntity {
     updatedAt: Date
 
     @Field(() => AccountEntity)
-    @ManyToOne(() => AccountEntity,(course) => course.courseReview ,{ nullable: true })
+    @ManyToOne(() => AccountEntity, (course) => course.courseReview ,{ nullable: true })
     @JoinColumn({ name: "accountId" })
     account: AccountEntity
 
     @Field(() => AccountEntity)
-    @ManyToOne(() => AccountEntity,(account) => account.courseReview ,{ nullable: true })
-    @JoinColumn({ name: "userId" })
-    user: AccountEntity
+    @ManyToOne(() => AccountEntity, (account) => account.courseReview ,{ nullable: true })
+    @JoinColumn({ name: "reviewedAccountId" })
+    reviewedAccount: AccountEntity
 }

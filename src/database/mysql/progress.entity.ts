@@ -37,7 +37,7 @@ export class ProgressEntity {
     account: AccountEntity;
 
     @Field(() => LessonEntity)
-    @ManyToOne(() => LessonEntity, (lesson) => lesson.userProgresses, {onDelete: "CASCADE"} )
+    @ManyToOne(() => LessonEntity, (lesson) => lesson.accountProgresses, {onDelete: "CASCADE"} )
     @JoinColumn({ name: "lessonId" })
     lesson: LessonEntity;
 

@@ -37,8 +37,8 @@ implements NestInterceptor<T, AuthOutput<T>>
 
         if (refresh) {
             await this.authManagerService.validateSession(accountId, clientId)
-            const user = await this.accountMySqlRepository.findOneBy({accountId})
-            accountRole = user.accountRole
+            const account = await this.accountMySqlRepository.findOneBy({accountId})
+            accountRole = account.accountRole
         }
 
         return next.handle().pipe(

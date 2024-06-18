@@ -10,12 +10,12 @@ export class VerifyCourseOuput implements Output<VerifyCourseOuputOther>{
     others : VerifyCourseOuputOther
 }
 
-export class CreateUserReviewOutputOthers {
+export class CreateAccountReviewOutputOthers {
     @IsUUID("4")
-    userReviewId : string
+    accountReviewId : string
 }
 
-export class CreateUserReviewOutput implements Output<CreateUserReviewOutputOthers>{
+export class CreateAccountReviewOutput implements Output<CreateAccountReviewOutputOthers>{
     message: string;
-    others?: CreateUserReviewOutputOthers;
+    others?: CreateAccountReviewOutputOthers;
 }

@@ -487,16 +487,16 @@ export class DeleteQuizInput
     data: DeleteQuizInputData
 }
 
-export class CeateUserProgressInputData {
+export class CeateAccountProgressInputData {
     @ApiProperty()
     lessonId: string
 }
 
-export class CeateUserProgressInput implements AuthInput<CeateUserProgressInputData> {
+export class CeateAccountProgressInput implements AuthInput<CeateAccountProgressInputData> {
     @IsUUID("4")
     @ApiProperty()
     accountId: string
-    data: CeateUserProgressInputData
+    data: CeateAccountProgressInputData
 }
 
 export class MarkLessonAsCompletedInputData{
@@ -543,7 +543,7 @@ export class GiftCourseInputData {
     courseId: string
 
     @ApiProperty()
-    receiveUserEmail : string
+    receiveAccountEmail : string
 
     @ApiProperty()
     code : string

@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common"
-import { UsersController } from "./accounts.controller"
+import { AccountsController } from "./accounts.controller"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     SessionMySqlEntity,
@@ -17,10 +17,10 @@ import {
     CartMySqlEntity,
     CertificateMySqlEntity,
     QuizAttemptMySqlEntity,
-    UserReviewMySqlEntity,
+    AccountReviewMySqlEntity,
 
 } from "@database"
-import { UsersService } from "./accounts.service"
+import { AccountsService } from "./accounts.service"
 
 @Module({
     imports: [
@@ -40,10 +40,10 @@ import { UsersService } from "./accounts.service"
             CartMySqlEntity,
             CertificateMySqlEntity,
             QuizAttemptMySqlEntity,
-            UserReviewMySqlEntity
+            AccountReviewMySqlEntity
         ]),
     ],
-    controllers: [UsersController],
-    providers: [UsersService],
+    controllers: [AccountsController],
+    providers: [AccountsService],
 })
-export class UsersModule {}
+export class AccountsModule {}

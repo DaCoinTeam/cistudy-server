@@ -5,7 +5,7 @@ import { CoursesModule } from "./courses"
 import { AssetsModule } from "./assets"
 import { PostsModule } from "./posts"
 import { ProfileModule } from "./profile"
-import { UsersModule } from "./accounts"
+import { AccountsModule } from "./accounts"
 import { CartModule } from "./cart"
 
 
@@ -17,7 +17,7 @@ import { CartModule } from "./cart"
         CoursesModule,
         PostsModule,
         ProfileModule,
-        UsersModule,
+        AccountsModule,
         CartModule
     ],
     providers: []

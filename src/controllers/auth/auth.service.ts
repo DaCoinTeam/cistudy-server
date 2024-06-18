@@ -21,7 +21,7 @@ export class AuthService {
         const found = await this.accountMySqlRepository.findOneBy({
             email: data.email,
         })
-        if (!found) throw new NotFoundException("User not found.")
+        if (!found) throw new NotFoundException("Account not found.")
 
         if (!this.sha256Service.verifyHash(data.password, found.password))
             throw new UnauthorizedException("Invalid credentials.")
@@ -37,13 +37,13 @@ export class AuthService {
   	})
   	if (found) {
   		throw new ConflictException(
-  			`User with email ${data.email} has existed.`,
+  			`Account with email ${data.email} has existed.`,
   		)
   	}
   	data.password = this.sha256Service.createHash(data.password)
   	const created = await this.accountMySqlRepository.save(data)
 	//create cart here
   	await this.mailerService.sendMail(created.accountId, data.email)
-  	return `An user with id ${created.accountId} has been created`
+  	return `An account with id ${created.accountId} has been created`
     }
 }

@@ -1,11 +1,11 @@
-import { CourseMySqlEntity, FollowMySqlEnitity, AccountMySqlEntity, UserReviewMySqlEntity } from "@database"
+import { CourseMySqlEntity, FollowMySqlEnitity, AccountMySqlEntity, AccountReviewMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { DataSource, Repository } from "typeorm"
-import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindManyUserReviewsInput, FindManyAccountsInput, FindOneAccountInput } from "./accounts.input"
+import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindOneAccountInput } from "./accounts.input"
 import { InjectRepository } from "@nestjs/typeorm"
-import { FindManyUserReviewsOutputData, FindManyAccountsOutputData } from "./accounts.output"
+import { FindManyAccountReviewsOutputData, FindManyAccountsOutputData } from "./accounts.output"
 @Injectable()
-export class UsersService {
+export class AccountsService {
     constructor(
         @InjectRepository(AccountMySqlEntity)
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
@@ -13,8 +13,8 @@ export class UsersService {
         private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
         @InjectRepository(CourseMySqlEntity)
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-        @InjectRepository(UserReviewMySqlEntity)
-        private readonly userReviewMySqlRepository: Repository<UserReviewMySqlEntity>,
+        @InjectRepository(AccountReviewMySqlEntity)
+        private readonly accountReviewMySqlRepository: Repository<AccountReviewMySqlEntity>,
         private readonly dataSource: DataSource,
     ) { }
 
@@ -29,7 +29,7 @@ export class UsersService {
         await queryRunner.startTransaction()
 
         try {
-            const user = await queryRunner.manager.findOne(AccountMySqlEntity, {
+            const account = await queryRunner.manager.findOne(AccountMySqlEntity, {
                 where: { accountId },
                 relations: {
                     //cart: true
@@ -41,7 +41,7 @@ export class UsersService {
                 {
                     where: {
                         followerId,
-                        followedUserId: accountId,
+                        followedAccountId: accountId,
                         followed: true
                     }
                 }
@@ -51,17 +51,17 @@ export class UsersService {
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(FollowMySqlEnitity, "follow")
-                .where("followedUserId = :accountId", { accountId })
+                .where("followedAccountId = :accountId", { accountId })
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 
             await queryRunner.commitTransaction()
 
-            user.numberOfFollowers = numberOfFollowersResult.count
+            account.numberOfFollowers = numberOfFollowersResult.count
             const followed = follow?.followed
-            user.followed = followed ?? false
+            account.followed = followed ?? false
 
-            return user
+            return account
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {
@@ -77,7 +77,7 @@ export class UsersService {
         const followRelations = await this.followMySqlRepository.find(
             {
                 where: {
-                    followedUserId: accountId,
+                    followedAccountId: accountId,
                     followed: true
                 },
                 relations: {
@@ -105,7 +105,7 @@ export class UsersService {
         )
     }
 
-    async findManyUsers(input: FindManyAccountsInput): Promise<FindManyAccountsOutputData> {
+    async findManyAccounts(input: FindManyAccountsInput): Promise<FindManyAccountsOutputData> {
         const { data } = input
         const { options } = data
         const { skip, take } = { ...options }
@@ -137,7 +137,7 @@ export class UsersService {
         }
     }
 
-    async findManyUserReviews(input: FindManyUserReviewsInput): Promise<FindManyUserReviewsOutputData> {
+    async findManyAccountReviews(input: FindManyAccountReviewsInput): Promise<FindManyAccountReviewsOutputData> {
         const { data } = input;
         const { params, options } = data;
         const { accountId } = params;
@@ -148,27 +148,27 @@ export class UsersService {
         await queryRunner.startTransaction()
 
         try {
-            const results = await this.userReviewMySqlRepository.find({
+            const results = await this.accountReviewMySqlRepository.find({
                 where: { accountId },
                 relations: {
                     account: true,
-                    user: true
+                    reviewedAccount: true
                 },
                 skip,
                 take,
                 order: { createdAt: 'DESC' }
             });
-            const numberOfCourseReviewsResult = await queryRunner.manager
+            const numberOfAccountReviewsResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
-                .from(UserReviewMySqlEntity, "user-review")
+                .from(AccountReviewMySqlEntity, "account-review")
                 .where("accountId = :accountId ", { accountId })
                 .getRawOne()
 
             return {
                 results,
                 metadata: {
-                    count: numberOfCourseReviewsResult.count,
+                    count: numberOfAccountReviewsResult.count,
                 }
             }
         } catch (ex) {
@@ -178,48 +178,6 @@ export class UsersService {
             await queryRunner.release()
         }
 
-        // async findManyCourseReviews(input: FindManyCourseReviewsInput): Promise<FindManyCourseReviewsOutputData> {
-        //     const { data } = input;
-        //     const { params, options } = data;
-        //     const { courseId } = params;
-        //     const { skip, take } = options
-
-        //     const queryRunner = this.dataSource.createQueryRunner()
-        //     await queryRunner.connect()
-        //     await queryRunner.startTransaction()
-
-        //     try {
-        //         console.log(courseId)
-        //         const results = await this.courseReviewMySqlRepository.find({
-        //             where: { courseId },
-        //             relations: {
-        //                 course: true,
-        //                 account: true,
-        //             },
-        //             skip,
-        //             take,
-        //             order: { createdAt: 'DESC' }
-        //         });
-        //         console.log(results.length)
-        //         const numberOfCourseReviewsResult = await queryRunner.manager
-        //             .createQueryBuilder()
-        //             .select("COUNT(*)", "count")
-        //             .from(CourseReviewMySqlEntity, "course-review")
-        //             .where("courseId = :courseId ", { courseId })
-        //             .getRawOne()
-
-        //         return {
-        //             results,
-        //             metadata: {
-        //                 count: numberOfCourseReviewsResult.count,
-        //             }
-        //         }
-        //     } catch (ex) {
-        //         await queryRunner.rollbackTransaction()
-        //         throw ex
-        //     } finally {
-        //         await queryRunner.release()
-        //     }
-        // }
+        
     }
 }

@@ -22,25 +22,25 @@ export class FindOneOrderOutput implements AuthOutput<OrderMySqlEntity> {
 }
 
 @ObjectType()
-export class FindManyUserOrdersOutputMetadata {
+export class FindManyAccountOrdersOutputMetadata {
     @Field(() => Int, { nullable: true })
         count?: number
 }
 
 @ObjectType()
-export class FindManyUserOrdersOutputData
-implements ResultsWithMetadata<OrderMySqlEntity, FindManyUserOrdersOutputMetadata>
+export class FindManyAccountOrdersOutputData
+implements ResultsWithMetadata<OrderMySqlEntity, FindManyAccountOrdersOutputMetadata>
 {
     @Field(() => [OrderMySqlEntity])
         results: Array<OrderMySqlEntity>
-    @Field(() => FindManyUserOrdersOutputMetadata, { nullable: true })
-        metadata: FindManyUserOrdersOutputMetadata
+    @Field(() => FindManyAccountOrdersOutputMetadata, { nullable: true })
+        metadata: FindManyAccountOrdersOutputMetadata
 }
 
 @ObjectType()
-export class FindManyUserOrdersOutput implements AuthOutput<FindManyUserOrdersOutputData> {
-    @Field(() => FindManyUserOrdersOutputData)
-        data: FindManyUserOrdersOutputData
+export class FindManyAccountOrdersOutput implements AuthOutput<FindManyAccountOrdersOutputData> {
+    @Field(() => FindManyAccountOrdersOutputData)
+        data: FindManyAccountOrdersOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }

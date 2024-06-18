@@ -101,13 +101,13 @@ implements AuthInput<FindManyAccountsInputData>
 }
 
 @InputType()
-export class FindManyUserReviewsInputParams {
+export class FindManyAccountReviewsInputParams {
     @Field(() => ID)
     accountId: string
 }
 
 @InputType()
-export class FindManyUserReviewsInputOptions {
+export class FindManyAccountReviewsInputOptions {
     @Field(() => Int, { nullable: true })
     take?: number
     @Field(() => Int, { nullable: true })
@@ -115,15 +115,15 @@ export class FindManyUserReviewsInputOptions {
 }
 
 @InputType()
-export class FindManyUserReviewsInputData implements ParamsWithOptions<FindManyUserReviewsInputParams, FindManyUserReviewsInputOptions> {
-    @Field(() => FindManyUserReviewsInputParams)
-    params: FindManyUserReviewsInputParams
-    @Field(() => FindManyUserReviewsInputOptions, { nullable: true })
+export class FindManyAccountReviewsInputData implements ParamsWithOptions<FindManyAccountReviewsInputParams, FindManyAccountReviewsInputOptions> {
+    @Field(() => FindManyAccountReviewsInputParams)
+    params: FindManyAccountReviewsInputParams
+    @Field(() => FindManyAccountReviewsInputOptions, { nullable: true })
     @IsOptional()
-    options?: FindManyUserReviewsInputOptions
+    options?: FindManyAccountReviewsInputOptions
 }
 
-export class FindManyUserReviewsInput implements Input<FindManyUserReviewsInputData> {
-    data: FindManyUserReviewsInputData
+export class FindManyAccountReviewsInput implements Input<FindManyAccountReviewsInputData> {
+    data: FindManyAccountReviewsInputData
 }
 

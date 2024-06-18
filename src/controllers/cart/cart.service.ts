@@ -28,21 +28,21 @@ export class CartService {
         const { data, accountId } = input;
         const { courseId } = data
 
-        let usercart = await this.cartMySqlRepository.findOne({ where: { cartId: accountId } })
+        let accountCart = await this.cartMySqlRepository.findOne({ where: { cartId: accountId } })
 
-        if (!usercart) {
-            usercart = await this.cartMySqlRepository.save({ cartId: accountId })
-            await this.accountMySqlRepository.update(accountId, { cart: usercart })
+        if (!accountCart) {
+            accountCart = await this.cartMySqlRepository.save({ cartId: accountId })
+            await this.accountMySqlRepository.update(accountId, { cart: accountCart })
         }
 
-        const exist = await this.cartCourseMySqlRepository.findOne({ where: { cartId : usercart.cartId ,courseId } })
+        const exist = await this.cartCourseMySqlRepository.findOne({ where: { cartId : accountCart.cartId ,courseId } })
 
         if (exist) {
             throw new ConflictException("This course already exist in cart")
         }
 
         const { cartCourseId } = await this.cartCourseMySqlRepository.save({
-            cartId: usercart.cartId,
+            cartId: accountCart.cartId,
             courseId
         })
 
@@ -58,19 +58,19 @@ export class CartService {
         const { accountId, data } = input;
         const { cartCourseIds } = data
 
-        const usercart = await this.cartMySqlRepository.findOne({
+        const accountCart = await this.cartMySqlRepository.findOne({
             where: {
                 cartId: accountId
             },
         })
 
-        if (!usercart) {
+        if (!accountCart) {
             throw new NotFoundException("Cart is not exist")
         }
 
         await this.cartCourseMySqlRepository.delete({ cartCourseId: In(cartCourseIds) })
 
-        return { message: "Course(s) have been removed from cart Successfully", others: { cartId: usercart.cartId } }
+        return { message: "Course(s) have been removed from cart Successfully", others: { cartId: accountCart.cartId } }
     }
 
     async checkOut(input: CheckOutInput): Promise<CheckOutOutput> {

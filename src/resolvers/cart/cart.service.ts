@@ -3,8 +3,8 @@ import { CartMySqlEntity, CartCourseMySqlEntity, OrderMySqlEntity } from "@datab
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
-import { FindManyUserOrdersInput, FindOneCartInput, FindOneOrderInput } from "./cart.input";
-import { FindManyUserOrdersOutputData } from "./cart.output";
+import { FindManyAccountOrdersInput, FindOneCartInput, FindOneOrderInput } from "./cart.input";
+import { FindManyAccountOrdersOutputData } from "./cart.output";
 
 
 @Injectable()
@@ -57,7 +57,7 @@ export class CartService {
         return order
     }
 
-    async findManyUserOrders(input: FindManyUserOrdersInput): Promise<FindManyUserOrdersOutputData> {
+    async findManyAccountOrders(input: FindManyAccountOrdersInput): Promise<FindManyAccountOrdersOutputData> {
         const { accountId, data } = input
         const { options } = data
         const { skip, take, orderStatus } = { ...options }
@@ -81,7 +81,7 @@ export class CartService {
                         }
                     },
                 })
-            const numberOfUserOrdersResult = await queryRunner.manager
+            const numberOfAccountOrdersResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(OrderMySqlEntity, "order")
@@ -90,7 +90,7 @@ export class CartService {
             return {
                 results,
                 metadata: {
-                    count: numberOfUserOrdersResult.count,
+                    count: numberOfAccountOrdersResult.count,
                 }
             }
         } catch (ex) {

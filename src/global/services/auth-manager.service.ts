@@ -102,8 +102,8 @@ export class AuthManagerService {
         let { accountRole } = payload
 
         if (authTokensRequested) {
-            const user = await this.accountMySqlRepository.findOneBy({ accountId })
-            accountRole = user.accountRole
+            const account = await this.accountMySqlRepository.findOneBy({ accountId })
+            accountRole = account.accountRole
         }
 
         const tokens = authTokensRequested

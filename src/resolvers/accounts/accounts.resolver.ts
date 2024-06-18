@@ -1,14 +1,14 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
-import { UsersService } from "./accounts.service"
-import { FindManyCreatedCoursesInputData, FindManyFollowersInputData, FindManyUserReviewsInputData, FindManyAccountsInputData, FindOneAccountInputData} from "./accounts.input"
+import { AccountsService } from "./accounts.service"
+import { FindManyCreatedCoursesInputData, FindManyFollowersInputData, FindManyAccountReviewsInputData, FindManyAccountsInputData, FindOneAccountInputData} from "./accounts.input"
 import { CourseMySqlEntity, AccountMySqlEntity } from "@database"
-import { FindManyUserReviewsOutputData, FindManyAccountsOutput } from "./accounts.output"
+import { FindManyAccountReviewsOutputData, FindManyAccountsOutput } from "./accounts.output"
 import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 
 @Resolver()
-export class UsersResolver {
-    constructor(private readonly accountsService: UsersService) { }
+export class AccountsResolver {
+    constructor(private readonly accountsService: AccountsService) { }
     
   @Query(() => AccountMySqlEntity)
     async findOneAccount(@Args("data") data: FindOneAccountInputData) {
@@ -28,13 +28,13 @@ export class UsersResolver {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   @Query(() => FindManyAccountsOutput)
-  async findManyUsers(@AccountId() accountId: string, @Args("data") data: FindManyAccountsInputData) {
-      return this.accountsService.findManyUsers({ accountId, data })
+  async findManyAccounts(@AccountId() accountId: string, @Args("data") data: FindManyAccountsInputData) {
+      return this.accountsService.findManyAccounts({ accountId, data })
   }
 
-  @Query(() => FindManyUserReviewsOutputData)
-    async findManyCourseReviews(@Args("data") data : FindManyUserReviewsInputData) {
-        return await this.accountsService.findManyUserReviews({data})
+  @Query(() => FindManyAccountReviewsOutputData)
+    async findManyAccountReviews(@Args("data") data : FindManyAccountReviewsInputData) {
+        return await this.accountsService.findManyAccountReviews({data})
     }
 }
 

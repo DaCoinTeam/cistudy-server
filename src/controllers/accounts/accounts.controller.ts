@@ -3,18 +3,18 @@ import {
     Controller, Delete, Param, Patch, Post, UseGuards, UseInterceptors,
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger"
-import { UsersService } from "./accounts.service"
+import { AccountsService } from "./accounts.service"
 import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
-import { CreateUserReviewInputData, DeleteCourseInputData, ToggleFollowInputData, UpdateUserReviewInputData, VerifyCourseInputData } from "./accounts.input"
+import { CreateAccountReviewInputData, DeleteCourseInputData, ToggleFollowInputData, UpdateAccountReviewInputData, VerifyCourseInputData } from "./accounts.input"
 
-@ApiTags("Users")
+@ApiTags("Accounts")
 @ApiHeader({
     name: "Client-Id",
     description: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
 })
 @Controller("api/accounts")
-export class UsersController{
-    constructor(private readonly accountsService: UsersService) { }
+export class AccountsController{
+    constructor(private readonly accountsService: AccountsService) { }
 
     @ApiBearerAuth()
     @Patch("toggle-follow")
@@ -50,44 +50,44 @@ export class UsersController{
     }
 
     @ApiBearerAuth()
-    @Post("create-user-review")
+    @Post("create-account-review")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    async createUserReview(
+    async createAccountReview(
         @AccountId() accountId: string,
-        @Body() body: CreateUserReviewInputData,
+        @Body() body: CreateAccountReviewInputData,
     ) {
-        return this.accountsService.createUserReview({
+        return this.accountsService.createAccountReview({
             accountId,
             data: body,
         })
     }
 
     @ApiBearerAuth()
-    @Patch("update-user-review")
+    @Patch("update-account-review")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    async updateCourseReview(
+    async updateAccountReview(
         @AccountId() accountId: string,
-        @Body() body: UpdateUserReviewInputData,
+        @Body() body: UpdateAccountReviewInputData,
     ) {
-        return this.accountsService.updateUserReview({
+        return this.accountsService.updateAccountReview({
             accountId,
             data: body,
         })
     }
 
     @ApiBearerAuth()
-    @Delete("delete-user-review/:userReviewId")
+    @Delete("delete-account-review/:accountReviewId")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    async deleteUserReview(
+    async deleteAccountReview(
         @AccountId() accountId: string,
-        @Param("userReviewId") userReviewId: string,
+        @Param("accountReviewId") accountReviewId: string,
     ) {
-        return this.accountsService.deleteUserReview({
+        return this.accountsService.deleteAccountReview({
             accountId,
-            data: { userReviewId }
+            data: { accountReviewId }
         })
     }
 }

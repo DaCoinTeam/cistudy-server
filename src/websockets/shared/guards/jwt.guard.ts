@@ -16,11 +16,11 @@ export class JwtAuthGuard implements CanActivate {
         if (!token) throw UnauthorizedWsException({event, data})
         
         try{
-            const user = await this.jwtService.verifyAsync(token, {
+            const account = await this.jwtService.verifyAsync(token, {
                 ignoreExpiration: false,
                 secret: jwtConfig().secret,
             })
-            context.switchToWs().getClient().user = user
+            context.switchToWs().getClient().user = account
             return true
         } catch (ex) {
             throw UnauthorizedWsException({event, data})
