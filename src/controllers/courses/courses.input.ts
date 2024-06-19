@@ -192,7 +192,7 @@ export class UpdateLessonInput implements AuthInput<UpdateLessonInputData> {
     @IsUUID("4")
     accountId: string
     data: UpdateLessonInputData
-    files: Express.Multer.File[]
+    files: Array<Express.Multer.File>
 }
 
 export class DeleteSectionInputData {
@@ -241,51 +241,31 @@ export class DeleteResourceInput
 export class CreateCategoryInputData {
     @ApiProperty()
     name: string
+    @ApiProperty({nullable: true})
+    imageIndex?: number
+    @ApiProperty({nullable: true})
+    categoryIds: Array<string>
+    @ApiProperty({nullable: true})
+    categoryParentIds: Array<string>
 }
 
 export class CreateCategoryInput implements AuthInput<CreateCategoryInputData> {
     @IsUUID("4")
     accountId: string
     data: CreateCategoryInputData
+    files: Array<Express.Multer.File>
 }
 
-export class CreateSubcategoryInputData {
-    @ApiProperty()
-    name: string
+//dev only apis
+export class DeleteCategoryInputData {
     @ApiProperty()
     categoryId: string
 }
 
-export class CreateSubcategoryInput implements AuthInput<CreateSubcategoryInputData> {
+export class DeleteCategoryInput implements AuthInput<DeleteCategoryInputData> {
     @IsUUID("4")
     accountId: string
-    data: CreateSubcategoryInputData
-}
-
-export class CreateTopicInputData {
-    @ApiProperty()
-    name: string
-    @ApiProperty()
-    subcategoryIds: Array<string>
-}
-
-export class CreateTopicInput implements AuthInput<CreateTopicInputData> {
-    @IsUUID("4")
-    accountId: string
-    data: CreateTopicInputData
-    files: Array<Express.Multer.File>
-}
-
-
-export class DeleteTopicInputData {
-    @ApiProperty()
-    topicId: string
-}
-
-export class DeleteTopicInput implements AuthInput<DeleteTopicInputData> {
-    @IsUUID("4")
-    accountId: string
-    data: DeleteTopicInputData
+    data: DeleteCategoryInputData
 }
 
 export class CreateCourseReviewInputData {

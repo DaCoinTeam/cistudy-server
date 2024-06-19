@@ -4,6 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { MailerService, Sha256Service } from "@global"
 import { SignInInput, SignUpInput } from "./auth.input"
+import { EmptyObject } from "@common"
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
     private readonly mailerService: MailerService,
     ) {}
 
-    async signIn(input: SignInInput): Promise<AccountMySqlEntity> {
+    async signIn(input: SignInInput): Promise<EmptyObject> {
         const { data } = input
         const found = await this.accountMySqlRepository.findOneBy({
             email: data.email,
@@ -25,7 +26,7 @@ export class AuthService {
 
         if (!this.sha256Service.verifyHash(data.password, found.password))
             throw new UnauthorizedException("Invalid credentials.")
-        return found
+        return {}
     }
 
     async signUp(input: SignUpInput): Promise<string> {

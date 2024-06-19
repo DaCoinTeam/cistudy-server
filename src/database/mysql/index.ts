@@ -16,7 +16,7 @@ import { PostLikeEntity as PostLikeMySqlEntity } from "./post-like.entity"
 import { PostCommentReplyEntity as PostCommentReplyMySqlEntity } from "./post-comment-reply.entity"
 import { CryptoWalletEntity as CryptoWalletMySqlEntity } from "./crypto-wallet.entity"
 import { CategoryEntity as CategoryMySqlEntity } from "./category.entity"
-import { CategoryParentEntity as CategoryParentMySqlEntity } from "./category-parent.entity"
+import { CategoryRelationEntity as CategoryRelationMySqlEntity } from "./category-relation.entity"
 import { CourseReviewEntity as CourseReviewMySqlEntity } from "./course-review.entity"
 import { CartEntity as CartMySqlEntity } from "./cart.entity"
 import { CartCourseEntity as CartCourseMySqlEntity } from "./cart-course.enity"
@@ -53,7 +53,7 @@ export {
     PostCommentReplyMySqlEntity,
     CryptoWalletMySqlEntity,
     CategoryMySqlEntity,
-    CategoryParentMySqlEntity,
+    CategoryRelationMySqlEntity,
     CourseReviewMySqlEntity,
     CartMySqlEntity,
     CartCourseMySqlEntity,

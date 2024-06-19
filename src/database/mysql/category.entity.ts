@@ -10,7 +10,7 @@ import {
 } from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { CourseCategoryEntity } from "./course-category.entity"
-import { CategoryParentEntity } from "./category-parent.entity"
+import { CategoryRelationEntity } from "./category-relation.entity"
 
 @ObjectType()
 @Entity("category")
@@ -22,6 +22,10 @@ export class CategoryEntity {
   @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 1000, nullable: true })
   name: string
+
+  @Field(() => ID, { nullable: true })
+  @Column({ type: "uuid", length: 36, nullable: true })
+  imageId?: string
 
   @Field(() => Date)
   @CreateDateColumn()
@@ -38,16 +42,19 @@ export class CategoryEntity {
   )
   courseCategories: Array<CourseCategoryEntity>
 
-  @Field(() => ID)
-  @Column({ type: "uuid"})
-  categoryParentId: string
+  @Field(() => [CategoryRelationEntity])
+  @OneToMany(
+    () => CategoryRelationEntity,
+    (categoryParentRelation) => categoryParentRelation.categoryParent,
+    { cascade: true }
+  )
+  categoryParentRelations: Array<CategoryRelationEntity>
 
-  @Field(() => CategoryParentEntity)
-    @ManyToOne(() => CategoryParentEntity, (categoryParent) => categoryParent.categories)
-    @JoinColumn({ name: "categoryParentId" })
-    categoryParent: CategoryParentEntity
-
-    @Field(() => [CategoryParentEntity])
-    @OneToMany(() => CategoryParentEntity, (categoryParent) => categoryParent.baseCategory)
-    baseCategoryParents: Array<CategoryParentEntity>
+  @Field(() => [CategoryRelationEntity])
+  @OneToMany(
+    () => CategoryRelationEntity,
+    (categoryRelation) => categoryRelation.category,
+    { cascade: true }
+  )
+  categoryRelations: Array<CategoryRelationEntity>
 }

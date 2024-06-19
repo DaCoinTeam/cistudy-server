@@ -189,22 +189,25 @@ type OrderCourseEntity {
   course: CourseEntity!
 }
 
-type CategoryParentEntity {
-  categoryParentId: ID!
+type CategoryRelationEntity {
+  categoryRelationId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   categoryId: ID!
-  baseCategory: [CategoryEntity!]!
-  categories: [CategoryEntity!]!
+  categoryParentId: ID!
+  category: [CategoryEntity!]!
+  categoryParent: [CategoryEntity!]!
 }
 
 type CategoryEntity {
   categoryId: ID!
   name: String
+  imageId: ID
   createdAt: DateTime!
   updatedAt: DateTime!
   courseCategories: [CourseCategoryEntity!]!
-  categoryParentId: ID!
-  categoryParent: CategoryParentEntity!
-  baseCategoryParents: [CategoryParentEntity!]!
+  categoryParentRelations: [CategoryRelationEntity!]!
+  categoryRelations: [CategoryRelationEntity!]!
 }
 
 type CourseCategoryEntity {

@@ -34,6 +34,10 @@ export class CreateCategoryOutput implements Output<CreateCategoryOutputOthers> 
     others: CreateCategoryOutputOthers
 }
 
+export class DeleteCategoryOutput implements Output {
+    message: string
+}
+
 export class CreateSubcategoryOutputOthers {
     @ApiProperty()
     subcategoryId: string
