@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany, Column, ManyToOne, JoinColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, OneToMany, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { CategoryEntity } from "./category.entity"
 
@@ -15,10 +15,18 @@ export class CategoryParentEntity {
 
   @Field(() => [CategoryEntity])
   @ManyToOne(() => CategoryEntity, (category) => category.baseCategoryParents)
-  @JoinColumn({name: "categoryParentId"})
+  @JoinColumn({ name: "categoryParentId" })
   baseCategory: CategoryEntity
-    
+
   @Field(() => [CategoryEntity])
   @OneToMany(() => CategoryEntity, (category) => category.categoryParent)
   categories: Array<CategoryEntity>
+
+  @Field(() => Date)
+  @CreateDateColumn()
+  createdAt: Date
+
+  @Field(() => Date)
+  @UpdateDateColumn()
+  updatedAt: Date
 }
