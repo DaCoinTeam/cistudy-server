@@ -47,8 +47,6 @@ export class AuthManagerService {
         }
         const expiresIn = typeToExpiresIn[type]
 
-        console.log(data.accountRole)
-
         const payload: PayloadLike = {
             accountId: data.accountId,
             accountRole: type === AuthTokenType.Access ? data.accountRole : undefined,
@@ -115,6 +113,13 @@ export class AuthManagerService {
             tokens,
         }
     }
+
+    // async generateSignInOutput<T extends object>(
+    //     authTokensRequested: boolean = false,
+    //     clientId?: string,
+    // ): Promise<AuthOutput>{
+
+    // }
 }
 
 export interface PayloadLike {

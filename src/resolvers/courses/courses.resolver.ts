@@ -1,8 +1,8 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
-import { FindOneCourseInputData, FindManyCoursesInputData, FindManyLessonsInputData, FindManyResourcesInputData, FindOneLessonInputData, FindManyCourseTargetsInputData, FindOneCourseAuthInputData, FindOneCourseReviewInputData, FindManyCourseReviewsInputData, FindManyCoursesTopicInputData, FindOneQuizAttemptInputData } from "./courses.input"
+import { FindOneCourseInputData, FindManyCoursesInputData, FindManyLessonsInputData, FindManyResourcesInputData, FindOneLessonInputData, FindManyCourseTargetsInputData, FindOneCourseAuthInputData, FindOneCourseReviewInputData, FindManyCourseReviewsInputData, FindManyCoursesTopicInputData, FindOneQuizAttemptInputData, FindOneCategoryInputData } from "./courses.input"
 import { CoursesService } from "./courses.service"
 import { CategoryMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity, QuizAttemptMySqlEntity } from "@database"
-import { FindManyCourseReviewsOutputData, FindManyCourseTargetsOutput, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindManyLessonsOutput, FindManyResourcesOutput, FindOneCourseAuthOutput, FindOneLessonOutput, FindOneQuizAttemptOutput } from "./courses.output"
+import { FindManyCourseReviewsOutputData, FindManyCourseTargetsOutput, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindManyLessonsOutput, FindManyResourcesOutput, FindOneCategoryOutput, FindOneCourseAuthOutput, FindOneLessonOutput, FindOneQuizAttemptOutput } from "./courses.output"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { JwtAuthGuard, AuthInterceptor, AccountId } from "../shared"
 
@@ -87,5 +87,11 @@ export class CoursesResolver {
     @Query(() => FindOneQuizAttemptOutput)
     async findOneQuizAttempt(@AccountId() accountId: string, @Args("data") data: FindOneQuizAttemptInputData) {
         return await this.coursesService.findOneQuizAttempt({ accountId, data })
+    }
+
+
+    @Query(() => CategoryMySqlEntity)
+    async findOneCategory(@Args("data") data: FindOneCategoryInputData) {
+        return await this.coursesService.findOneCategory({ data })
     }
 }

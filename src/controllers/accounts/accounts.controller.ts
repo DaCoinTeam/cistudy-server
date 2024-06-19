@@ -4,8 +4,10 @@ import {
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { AccountsService } from "./accounts.service"
-import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
+import { AuthInterceptor, JwtAuthGuard, AccountId, Roles } from "../shared"
 import { CreateAccountReviewInputData, DeleteCourseInputData, ToggleFollowInputData, UpdateAccountReviewInputData, VerifyCourseInputData } from "./accounts.input"
+import { RolesGuard } from "../shared/guards/role.guard"
+import { AccountRole } from "@common"
 
 @ApiTags("Accounts")
 @ApiHeader({
@@ -29,9 +31,10 @@ export class AccountsController{
 
     @ApiBearerAuth()
     @Patch("verify-course")
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(AccountRole.Moderator, AccountRole.Administrator)
     @UseInterceptors(AuthInterceptor)
-    async updateCourseAprroval(@AccountId() accountId: string, @Body() body: VerifyCourseInputData) {
+    async verifyCourse(@AccountId() accountId: string, @Body() body: VerifyCourseInputData) {
         return this.accountsService.verifyCourse({
             accountId,
             data: body,
@@ -40,7 +43,8 @@ export class AccountsController{
 
     @ApiBearerAuth()
     @Post("delete-courses")
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(AccountRole.Administrator)
     @UseInterceptors(AuthInterceptor)
     async deleteCourses(@AccountId() accountId: string, @Body() body: DeleteCourseInputData) {
         return this.accountsService.deleteCourses({

@@ -195,8 +195,8 @@ type CategoryRelationEntity {
   updatedAt: DateTime!
   categoryId: ID!
   categoryParentId: ID!
-  category: [CategoryEntity!]!
-  categoryParent: [CategoryEntity!]!
+  category: CategoryEntity
+  categoryParent: CategoryEntity
 }
 
 type CategoryEntity {
@@ -205,9 +205,9 @@ type CategoryEntity {
   imageId: ID
   createdAt: DateTime!
   updatedAt: DateTime!
-  courseCategories: [CourseCategoryEntity!]!
-  categoryParentRelations: [CategoryRelationEntity!]!
-  categoryRelations: [CategoryRelationEntity!]!
+  courseCategories: [CourseCategoryEntity!]
+  categoryParentRelations: [CategoryRelationEntity!]
+  categoryRelations: [CategoryRelationEntity!]
 }
 
 type CourseCategoryEntity {
@@ -626,6 +626,7 @@ type Query {
   findManyCourseReviews(data: FindManyCourseReviewsInputData!): FindManyCourseReviewsOutputData!
   findManyCoursesTopic(data: FindManyCoursesTopicInputData!): FindManyCoursesTopicOutputData!
   findOneQuizAttempt(data: FindOneQuizAttemptInputData!): FindOneQuizAttemptOutput!
+  findOneCategory(data: FindOneCategoryInputData!): CategoryEntity!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
@@ -763,6 +764,10 @@ input FindManyCoursesTopicInputOptions {
 
 input FindOneQuizAttemptInputData {
   quizAttemptId: String!
+}
+
+input FindOneCategoryInputData {
+  categoryId: String!
 }
 
 input FindOnePostInputData {

@@ -17,7 +17,7 @@ export class AuthService {
     private readonly mailerService: MailerService,
     ) {}
 
-    async signIn(input: SignInInput): Promise<EmptyObject> {
+    async signIn(input: SignInInput): Promise<AccountMySqlEntity> {
         const { data } = input
         const found = await this.accountMySqlRepository.findOneBy({
             email: data.email,
@@ -26,7 +26,7 @@ export class AuthService {
 
         if (!this.sha256Service.verifyHash(data.password, found.password))
             throw new UnauthorizedException("Invalid credentials.")
-        return {}
+        return found
     }
 
     async signUp(input: SignUpInput): Promise<string> {

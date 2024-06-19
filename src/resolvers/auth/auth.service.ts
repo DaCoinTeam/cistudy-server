@@ -37,7 +37,7 @@ export class AuthService {
                 }
             }
         })
-        console.log(account)
+        //console.log(account)
         return account
     }
 

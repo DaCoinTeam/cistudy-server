@@ -35,14 +35,14 @@ export class CategoryEntity {
   @UpdateDateColumn()
   updatedAt: Date
 
-  @Field(() => [CourseCategoryEntity])
+  @Field(() => [CourseCategoryEntity], {nullable: true})
   @OneToMany(
     () => CourseCategoryEntity,
     (courseCategory) => courseCategory.category,
   )
   courseCategories: Array<CourseCategoryEntity>
 
-  @Field(() => [CategoryRelationEntity])
+  @Field(() => [CategoryRelationEntity], {nullable: true})
   @OneToMany(
     () => CategoryRelationEntity,
     (categoryParentRelation) => categoryParentRelation.categoryParent,
@@ -50,7 +50,7 @@ export class CategoryEntity {
   )
   categoryParentRelations: Array<CategoryRelationEntity>
 
-  @Field(() => [CategoryRelationEntity])
+  @Field(() => [CategoryRelationEntity], {nullable: true})
   @OneToMany(
     () => CategoryRelationEntity,
     (categoryRelation) => categoryRelation.category,

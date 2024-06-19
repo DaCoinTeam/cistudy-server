@@ -24,8 +24,9 @@ import {
     FindManyCourseReviewsInput,
     FindManyCoursesTopicInput,
     FindOneQuizAttemptInput,
+    FindOneCategoryInput,
 } from "./courses.input"
-import { FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData } from "./courses.output"
+import { FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindOneCategoryOutput } from "./courses.output"
 
 @Injectable()
 export class CoursesService {
@@ -404,10 +405,74 @@ export class CoursesService {
     ): Promise<Array<CategoryMySqlEntity>> {
         return await this.categoryMySqlRepository.find({
             relations: {
-            },
+                categoryRelations:{
+                    category:{
+                        categoryRelations:{
+                            category:{
+                                categoryRelations:true,
+                                categoryParentRelations:true                       
+                            }
+                        },
+                        categoryParentRelations:{
+                            category:{
+                                categoryRelations:true,
+                                categoryParentRelations: true                 
+                            }
+                        },                       
+                    }
+                },
+                categoryParentRelations:{
+                    category:{
+                        categoryRelations:{
+                            category:{
+                                categoryRelations:true,
+                                categoryParentRelations:true                      
+                            }
+                        },
+                        categoryParentRelations:{
+                            category:{
+                                categoryRelations:true,
+                                categoryParentRelations:true                       
+                            }
+                        }
+                    }
+                }
+            }
         })
     }
 
+    async findOneCategory(
+        input : FindOneCategoryInput
+    ): Promise<CategoryMySqlEntity>{
+        const {data} = input
+        const  {categoryId} = data
+        return await this.categoryMySqlRepository.findOne({
+            where:{
+                categoryId
+            },
+            relations:{
+                categoryParentRelations: {
+                    category: {
+                        categoryParentRelations: {
+                            category: true,
+                        },
+                        categoryRelations:{
+                            category: {
+                                categoryParentRelations:{
+                                    category: true
+                                },
+                                categoryRelations:{
+                                    category:true
+                                }
+                            },
+                        }
+                    }
+                }
+            }
+        })
+
+        
+    }
     async findOneCourseReview(
         input: FindOneCourseReviewInput,
     ) {

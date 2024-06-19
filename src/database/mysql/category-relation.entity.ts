@@ -34,14 +34,14 @@ export class CategoryRelationEntity {
   @Column({ type: "uuid", length: 36 })
   categoryParentId: string
 
-  @Field(() => [CategoryEntity])
+  @Field(() => CategoryEntity, {nullable: true})
   @ManyToOne(() => CategoryEntity, (category) => category.categoryRelations, {
     onDelete: "CASCADE",
   })
   @JoinColumn({ name: "categoryId" })
   category: CategoryEntity
 
-  @Field(() => [CategoryEntity])
+  @Field(() => CategoryEntity, {nullable : true})
   @ManyToOne(
     () => CategoryEntity,
     (category) => category.categoryParentRelations,

@@ -1,5 +1,5 @@
 import { AuthTokens, AuthOutput, ResultsWithMetadata, Output } from "@common"
-import { LessonMySqlEntity, ResourceMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity, QuizAttemptMySqlEntity } from "@database"
+import { LessonMySqlEntity, ResourceMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity, QuizAttemptMySqlEntity, CategoryMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 import { CategoryEntity } from "src/database/mysql/category.entity"
 import { CourseTargetEntity } from "src/database/mysql/course-target.entity"
@@ -138,5 +138,12 @@ export class FindOneQuizAttemptOutput implements AuthOutput<QuizAttemptMySqlEnti
     @Field(() => QuizAttemptEntity)
     data: QuizAttemptMySqlEntity
     @Field(() => AuthTokens, {nullable: true})
+    tokens?: AuthTokens
+}
+
+@ObjectType()
+export class FindOneCategoryOutput implements AuthOutput<CategoryMySqlEntity>{
+    @Field(() => CategoryMySqlEntity)
+    data: CategoryMySqlEntity
     tokens?: AuthTokens
 }

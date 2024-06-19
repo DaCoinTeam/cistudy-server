@@ -2,7 +2,7 @@ import { Socket } from "socket.io"
 import { AuthTokens } from "./auth.types"
 
 export interface AuthOutput<T> {
-    data: T,
+    data?: T,
     tokens?: AuthTokens
 }
 

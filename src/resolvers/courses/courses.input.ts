@@ -219,3 +219,13 @@ export class FindOneQuizAttemptInput implements AuthInput<FindOneQuizAttemptInpu
     accountId: string
     data: FindOneQuizAttemptInputData
 }
+
+@InputType()
+export class FindOneCategoryInputData {
+    @Field(() => String)
+    categoryId: string
+}
+
+export class FindOneCategoryInput implements Input<FindOneCategoryInputData> {
+    data: FindOneCategoryInputData
+}
