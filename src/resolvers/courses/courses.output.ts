@@ -50,7 +50,7 @@ implements AuthOutput<LessonMySqlEntity>
     @Field(() => LessonMySqlEntity)
         data: LessonMySqlEntity
     @Field(() => AuthTokens, { nullable: true })
-        tokens: AuthTokens
+        tokens?: AuthTokens
 }
 
 

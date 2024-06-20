@@ -6,8 +6,8 @@ import { AddToCartInputData, CheckOutInputData, DeleteFromCartInputData } from "
 
 @ApiTags("Cart")
 @ApiHeader({
-    name: "refreshToken",
-    description: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1NzQ1YTg1OC02MmIyLTQ3Y2UtYWRhYi01ZmFhMzY0NTBhMDMiLCJ1c2VyUm9sZSI6InVzZXIiLCJ0eXBlIjoiQWNjZXNzIiwiaWF0IjoxNzE3ODE5NjY4LCJleHAiOjE3MTc4MjMyNjh9.nUyS-hqmn0UMLJsRdhP_Efu3iZTXna7SY51CgLLLcNw",
+    name: "Client-Id",
+    description: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
 })
 @Controller("api/cart")
 export class CartController {

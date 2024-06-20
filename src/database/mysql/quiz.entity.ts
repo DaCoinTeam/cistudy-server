@@ -34,6 +34,6 @@ export class QuizEntity {
     lesson: LessonEntity
 
     @Field(() => QuizAttemptEntity)
-    @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.quiz)
+    @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.quiz, { onDelete: "CASCADE" })
     quizAttempts?: Array<QuizAttemptEntity>
 }

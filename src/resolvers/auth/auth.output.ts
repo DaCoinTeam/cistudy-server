@@ -16,8 +16,8 @@ implements AuthOutput<AccountMySqlEntity>
 export class SignInOutput
 implements AuthOutput<AccountMySqlEntity>
 {
-  @Field(() => AccountMySqlEntity)
-      data: AccountMySqlEntity
+//   @Field(() => AccountMySqlEntity)
+//       data: AccountMySqlEntity
   @Field(() => AuthTokens, { nullable: true })
       tokens: AuthTokens
 }

@@ -74,11 +74,12 @@ export class LessonEntity {
     @OneToMany(() => ResourceEntity, (resource) => resource.lesson)
     resources: Array<ResourceEntity>
 
-    @Field(() => [QuizEntity], { nullable: true })
+    @Field(() => QuizEntity, { nullable: true })
     @OneToOne(() => QuizEntity, (quiz) => quiz.quizId, { nullable: true })
+    @JoinColumn()
     quiz?: QuizEntity
 
-    @Field(() => ProgressEntity)
+    @Field(() => [ProgressEntity])
     @OneToMany(() => ProgressEntity, (accountProgress) => accountProgress.lesson)
-    accountProgresses? : ProgressEntity
+    accountProgresses? : Array<ProgressEntity>
 }

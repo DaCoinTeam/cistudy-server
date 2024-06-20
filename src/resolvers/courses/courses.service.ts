@@ -26,7 +26,7 @@ import {
     FindOneQuizAttemptInput,
     FindOneCategoryInput,
 } from "./courses.input"
-import { FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindOneCategoryOutput } from "./courses.output"
+import { FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindOneCategoryOutput, FindOneLessonOutput } from "./courses.output"
 
 @Injectable()
 export class CoursesService {
@@ -309,6 +309,13 @@ export class CoursesService {
                             sections: {
                                 lessons: true
                             }
+                        },
+                        
+                    },
+                    quiz: {
+                        questions: {
+                            questionMedias: true,
+                            answers: true
                         }
                     }
                 }

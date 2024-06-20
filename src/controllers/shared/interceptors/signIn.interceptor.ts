@@ -10,9 +10,8 @@ import { AuthTokenType, AuthOutput, getClientId } from "@common"
 
 @Injectable()
 export class SignInInterceptor<T extends object>
-implements NestInterceptor<T, AuthOutput<T>>
-{
-    constructor(private readonly authManagerService: AuthManagerService) {}
+    implements NestInterceptor<T, AuthOutput<T>> {
+    constructor(private readonly authManagerService: AuthManagerService) { }
 
     async intercept(
         context: ExecutionContext,
@@ -23,7 +22,7 @@ implements NestInterceptor<T, AuthOutput<T>>
 
         return next.handle().pipe(
             mergeMap(async (data) => {
-                const output = await this.authManagerService.generateOutput<T>(
+                const { tokens } = await this.authManagerService.generateOutput<T>(
                     {
                         accountId: data.accountId,
                         accountRole: data.accountRole,
@@ -34,7 +33,7 @@ implements NestInterceptor<T, AuthOutput<T>>
                     clientId,
                 )
                 return {
-                    tokens: output.tokens
+                    tokens
                 } as AuthOutput<T>
             }),
         )

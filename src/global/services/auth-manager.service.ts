@@ -38,8 +38,8 @@ export class AuthManagerService {
     }
 
     async generateToken<T extends PayloadLike>(
-        data: T,d,
-        type: AuthTokenType = AuthTokenType.Access,
+        data: T,
+        type: AuthTokenType,
     ) {
         const typeToExpiresIn: Record<AuthTokenType, string> = {
             [AuthTokenType.Access]: jwtConfig().accessTokenExpiryTime,
@@ -49,10 +49,10 @@ export class AuthManagerService {
 
         const payload: PayloadLike = {
             accountId: data.accountId,
-            accountRole: type === AuthTokenType.Access ? data.accountRole : undefined,
+            accountRole: (type === AuthTokenType.Access) ? data.accountRole : undefined,
             type,
         }
-
+        
         return await this.jwtService.signAsync(payload, {
             expiresIn,
             secret: jwtConfig().secret,
@@ -64,6 +64,12 @@ export class AuthManagerService {
         clientId?: string,
     ): Promise<AuthTokens> {
         const accessToken = await this.generateToken(data, AuthTokenType.Access)
+        
+        // const refreshData : PayloadLike = {
+        //     accountId: data.accountId,
+        //     accountRole: undefined,
+        //     type: AuthTokenType.Refresh,
+        // }
         const refreshToken = await this.generateToken(data, AuthTokenType.Refresh)
         if (clientId) {
             let found = await this.sessionMySqlRepository.findOneBy({

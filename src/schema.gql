@@ -98,8 +98,8 @@ type LessonEntity {
   updatedAt: DateTime!
   section: SectionEntity!
   resources: [ResourceEntity!]!
-  quiz: [QuizEntity!]
-  accountProgresses: ProgressEntity!
+  quiz: QuizEntity
+  accountProgresses: [ProgressEntity!]!
 }
 
 type SectionEntity {
@@ -382,7 +382,7 @@ type AccountEntity {
   courses: [CourseEntity!]!
   followerRelations: [FollowEntity!]!
   followedAccountRelations: [FollowEntity!]!
-  courseReview: CourseReviewEntity!
+  courseReview: [CourseReviewEntity!]!
   cart: CartEntity
   orders: [OrderEntity!]!
   certificates: [CertificateEntity!]!
@@ -568,7 +568,6 @@ type InitOutput {
 }
 
 type SignInOutput {
-  data: AccountEntity!
   tokens: AuthTokens
 }
 

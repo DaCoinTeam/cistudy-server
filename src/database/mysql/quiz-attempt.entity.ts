@@ -45,11 +45,11 @@ export class QuizAttemptEntity {
     account: AccountEntity
 
     @Field(() => QuizEntity)
-    @ManyToOne(() => QuizEntity, (quiz) => quiz.quizAttempts, { onDelete: "CASCADE" })
+    @ManyToOne(() => QuizEntity, (quiz) => quiz.quizAttempts, { onDelete : "CASCADE" })
     @JoinColumn({ name: "quizId" })
     quiz: QuizEntity
 
     @Field(() => [QuizQuestionAnswerEntity])
-    @OneToMany(() => QuizQuestionAnswerEntity, (quizQuestionAnswer) => quizQuestionAnswer.attempt, { nullable: true })
+    @OneToMany(() => QuizQuestionAnswerEntity, (quizQuestionAnswer) => quizQuestionAnswer.attempt, { onDelete: "CASCADE" ,nullable: true })
     questionAnswers: Array<QuizQuestionAnswerEntity>
 }

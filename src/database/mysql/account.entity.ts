@@ -145,18 +145,18 @@ export class AccountEntity {
     @OneToMany(() => FollowEntity, (account) => account.followedAccount)
     followedAccountRelations: Array<FollowEntity>
 
-    @Field(() => CourseReviewEntity)
+    @Field(() => [CourseReviewEntity])
     @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.account, { nullable: true })
-    courseReview: CourseReviewEntity
+    courseReview: Array<CourseReviewEntity>
 
-    @Field(() => CartEntity, {nullable: true})
-    @OneToOne(() => CartEntity, (cart) => cart.cartId, {nullable: true})
-    @JoinColumn()
+    @Field(() => CartEntity, { nullable: true })
+    @OneToOne(() => CartEntity, (cart) => cart.cartId, { nullable: true })
+    @JoinColumn({ name: "cartId" })
     cart: CartEntity;
 
     @Field(() => [OrderEntity])
     @OneToMany(() => OrderEntity, (orders) => orders.account)
-    orders: OrderEntity
+    orders: Array<OrderEntity>
 
     @Field(() => [CertificateEntity])
     @OneToMany(() => CertificateEntity, (certificates) => certificates.account, { nullable: true })
@@ -171,11 +171,11 @@ export class AccountEntity {
     quizAttempts?: Array<QuizAttemptEntity>
 
     @Field(() => [AccountReviewEntity])
-    @OneToMany(() => AccountReviewEntity, (accountReviews) => accountReviews.account, {nullable: true})
+    @OneToMany(() => AccountReviewEntity, (accountReviews) => accountReviews.account, { nullable: true })
     accountReviews?: Array<AccountReviewEntity>
 
     @Field(() => [AccountReviewEntity])
-    @OneToMany(() => AccountReviewEntity, (selfReviews) => selfReviews.reviewedAccount, {nullable: true})
+    @OneToMany(() => AccountReviewEntity, (selfReviews) => selfReviews.reviewedAccount, { nullable: true })
     selfReviews?: Array<AccountReviewEntity>
 
     //graphql
