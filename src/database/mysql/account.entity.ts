@@ -145,7 +145,7 @@ export class AccountEntity {
     @OneToMany(() => FollowEntity, (account) => account.followedAccount)
     followedAccountRelations: Array<FollowEntity>
 
-    @Field(() => [CourseReviewEntity])
+    @Field(() => [CourseReviewEntity], {nullable: true})
     @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.account, { nullable: true })
     courseReview: Array<CourseReviewEntity>
 
@@ -161,10 +161,6 @@ export class AccountEntity {
     @Field(() => [CertificateEntity])
     @OneToMany(() => CertificateEntity, (certificates) => certificates.account, { nullable: true })
     certificates?: Array<CertificateEntity>
-
-    @Field(() => [ProgressEntity])
-    @OneToMany(() => ProgressEntity, (progress) => progress.account, { nullable: true })
-    courseProgresses?: Array<ProgressEntity>
 
     @Field(() => [QuizAttemptEntity])
     @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.account, { nullable: true })

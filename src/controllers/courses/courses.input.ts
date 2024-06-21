@@ -268,6 +268,32 @@ export class DeleteCategoryInput implements AuthInput<DeleteCategoryInputData> {
     data: DeleteCategoryInputData
 }
 
+export class CreateCourseCategoriesInputData {
+    @ApiProperty()
+    courseId: string
+
+    @ApiProperty()
+    categoryIds: Array<string>
+}
+
+export class CreateCourseCategoriesInput implements AuthInput<CreateCourseCategoriesInputData>{
+    accountId: string
+    data: CreateCourseCategoriesInputData
+}
+
+export class DeleteCourseCategoryInputData {
+    @ApiProperty()
+    courseId: string
+
+    @ApiProperty()
+    categoryId: string
+}
+
+export class DeleteCourseCategoryInput implements AuthInput<DeleteCourseCategoryInputData>{
+    accountId: string
+    data: DeleteCourseCategoryInputData
+}
+
 export class CreateCourseReviewInputData {
     @IsUUID()
     @ApiProperty()

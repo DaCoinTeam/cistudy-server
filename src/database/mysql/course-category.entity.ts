@@ -17,7 +17,6 @@ export class CourseCategoryEntity {
     @Field(() => ID)
     @Column({ type: "uuid" })
         categoryId: string
-    
 
     @Field(() => Date)
     @CreateDateColumn()
@@ -28,12 +27,12 @@ export class CourseCategoryEntity {
         updatedAt: Date
 
     @Field(() => CourseEntity)
-    @ManyToOne(() => CourseEntity, (course) => course.courseCategories)
+    @ManyToOne(() => CourseEntity, (course) => course.courseCategories, {cascade: true})
     @JoinColumn({ name: "courseId" })
     course: CourseEntity
 
-    @Field(() => CategoryEntity)
-    @ManyToOne(() => CategoryEntity, (category) => category.courseCategories)
+    @Field(() => CategoryEntity, {nullable: true})
+    @ManyToOne(() => CategoryEntity, (category) => category.courseCategories, {cascade : true})
     @JoinColumn({ name: "categoryId" })
     category: CategoryEntity
 }

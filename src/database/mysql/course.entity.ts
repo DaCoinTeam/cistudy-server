@@ -103,7 +103,7 @@ export class CourseEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @Field(() => [CourseCategoryEntity])
+    @Field(() => [CourseCategoryEntity], {nullable: true})
     @OneToMany(() => CourseCategoryEntity, (courseCategory) => courseCategory.course)
     courseCategories: Array<CourseCategoryEntity>
 

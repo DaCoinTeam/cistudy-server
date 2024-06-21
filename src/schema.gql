@@ -3,6 +3,21 @@ type AuthTokens {
   refreshToken: String!
 }
 
+type SectionEntity {
+  sectionId: ID!
+  title: String!
+  courseId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  course: CourseEntity!
+  lessons: [LessonEntity!]!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type ResourceEntity {
   resourceId: ID!
   name: String!
@@ -12,11 +27,6 @@ type ResourceEntity {
   updatedAt: DateTime!
   lesson: LessonEntity!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type QuizAttemptEntity {
   quizAttemptId: ID!
@@ -75,15 +85,6 @@ type QuizEntity {
   quizAttempts: QuizAttemptEntity!
 }
 
-type ProgressEntity {
-  progressId: ID!
-  lessonId: ID!
-  accountId: ID!
-  isCompleted: Boolean!
-  account: AccountEntity!
-  lesson: LessonEntity!
-}
-
 type LessonEntity {
   lessonId: ID!
   title: String!
@@ -102,14 +103,27 @@ type LessonEntity {
   accountProgresses: [ProgressEntity!]!
 }
 
-type SectionEntity {
-  sectionId: ID!
-  title: String!
+type ProgressEntity {
+  progressId: ID!
+  enrolledInfoId: ID!
+  lessonId: ID!
+  isCompleted: Boolean!
+  lesson: LessonEntity!
+  enrolledInfo: EnrolledInfoEntity!
+}
+
+type EnrolledInfoEntity {
+  enrolledInfoId: ID!
+  accountId: ID!
   courseId: ID!
+  endDate: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
+  enrolled: Boolean!
+  priceAtEnrolled: Float
   course: CourseEntity!
-  lessons: [LessonEntity!]!
+  account: AccountEntity!
+  courseProgress: [ProgressEntity!]!
 }
 
 type CourseTargetEntity {
@@ -131,7 +145,7 @@ type CourseReviewEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   course: CourseEntity!
-  account: AccountEntity!
+  account: AccountEntity
 }
 
 type CartEntity {
@@ -217,7 +231,7 @@ type CourseCategoryEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   course: CourseEntity!
-  category: CategoryEntity!
+  category: CategoryEntity
 }
 
 type CourseEntity {
@@ -238,7 +252,7 @@ type CourseEntity {
   duration: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
-  courseCategories: [CourseCategoryEntity!]!
+  courseCategories: [CourseCategoryEntity!]
   courseTargets: [CourseTargetEntity!]
   posts: [PostEntity!]!
   sections: [SectionEntity!]!
@@ -382,11 +396,10 @@ type AccountEntity {
   courses: [CourseEntity!]!
   followerRelations: [FollowEntity!]!
   followedAccountRelations: [FollowEntity!]!
-  courseReview: [CourseReviewEntity!]!
+  courseReview: [CourseReviewEntity!]
   cart: CartEntity
   orders: [OrderEntity!]!
   certificates: [CertificateEntity!]!
-  courseProgresses: [ProgressEntity!]!
   quizAttempts: [QuizAttemptEntity!]!
   accountReviews: [AccountReviewEntity!]!
   selfReviews: [AccountReviewEntity!]!

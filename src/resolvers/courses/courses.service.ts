@@ -73,7 +73,7 @@ export class CoursesService {
                 take,
                 order: { createdAt: 'DESC' }
             });
-            console.log(results.length)
+            console.log(results)
             const numberOfCourseReviewsResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
@@ -247,6 +247,9 @@ export class CoursesService {
                     take,
                     relations: {
                         creator: true,
+                        courseCategories: {
+                            category: true
+                        }
                     },
                 })
 

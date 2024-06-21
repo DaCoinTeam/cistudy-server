@@ -48,7 +48,7 @@ export class CourseReviewEntity {
     @JoinColumn({ name: "courseId" })
     course: CourseEntity
 
-    @Field(() => AccountEntity)
+    @Field(() => AccountEntity, {nullable: true})
     @ManyToOne(() => AccountEntity,(account) => account.courseReview ,{ nullable: true })
     @JoinColumn({ name: "accountId" })
     account: AccountEntity

@@ -21,6 +21,7 @@ import {
   QuizAttemptMySqlEntity,
   AccountMySqlEntity,
   CategoryRelationMySqlEntity,
+  CourseCategoryMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, In } from "typeorm"
@@ -52,6 +53,8 @@ import {
   FinishQuizAttemptInput,
   GiftCourseInput,
   DeleteCategoryInput,
+  CreateCourseCategoriesInput,
+  DeleteCourseCategoryInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -64,14 +67,13 @@ import {
 import {
   CreateCategoryOutput,
   CreateCertificateOutput,
+  CreateCourseCategoriesOutput,
   CreateCourseOutput,
   CreateCourseReviewOutput,
   CreateQuizAttemptOutput,
-  CreateSubcategoryOutput,
-  CreateTopicOutput,
   DeleteCategoryOutput,
+  DeleteCourseCategoryOutput,
   DeleteCourseReviewOutput,
-  DeleteTopicOutputData,
   EnrollCourseOutput,
   FinishQuizAttemptOutput,
   GiftCourseOutput,
@@ -101,6 +103,8 @@ export class CoursesService {
     private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
     @InjectRepository(CategoryRelationMySqlEntity)
     private readonly categoryRelationMySqlRepository: Repository<CategoryRelationMySqlEntity>,
+    @InjectRepository(CourseCategoryMySqlEntity)
+    private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
     @InjectRepository(CourseReviewMySqlEntity)
     private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
     @InjectRepository(CertificateMySqlEntity)
@@ -133,15 +137,20 @@ export class CoursesService {
     await queryRunner.startTransaction()
 
     try {
-      const found = await this.enrolledInfoMySqlRepository.findOne({
+      const enrollments = await this.enrolledInfoMySqlRepository.find({
         where: {
           accountId,
           courseId,
         },
-      })
+      });
 
-      if (found?.enrolled)
-        throw new ConflictException("You have enrolled to this course.")
+      const now = new Date();
+
+      const activeEnrollment = enrollments.some(enrollment => new Date(enrollment.endDate) > now);
+
+      if (activeEnrollment) {
+        throw new ConflictException("This user is already enrolled in that course.");
+      }
 
       // const cachedTransaction = (await this.cacheManager.get(code)) as CodeValue
       // if (!cachedTransaction) throw new NotFoundException("The code either expired or never existed.")
@@ -188,7 +197,6 @@ export class CoursesService {
       endDate.setMonth(endDate.getMonth() + duration)
 
       const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
-        enrolledInfoId: found?.enrolledInfoId,
         courseId,
         accountId,
         enrolled: true,
@@ -199,14 +207,14 @@ export class CoursesService {
       const progresses = sections.reduce((acc, section) => {
         section.lessons.forEach((lesson) => {
           acc.push({
-            accountId,
+            enrolledInfoId,
             lessonId: lesson.lessonId,
             isCompleted: false,
           })
         })
         return acc
       }, [])
-
+      console.log(progresses)
       await this.progressMySqlRepository.save(progresses)
 
       await queryRunner.commitTransaction()
@@ -696,23 +704,79 @@ export class CoursesService {
     }
   }
 
+  async createCourseCategories(input: CreateCourseCategoriesInput): Promise<CreateCourseCategoriesOutput> {
+    const { data } = input;
+    const { courseId, categoryIds } = data;
+  
+    const courseCategories = categoryIds.map(categoryId => ({
+      courseId,
+      categoryId,
+    }));
+  
+    await this.courseCategoryMySqlRepository.save(courseCategories);
+  
+    return {
+      message: "Course Category has been created successfully"
+    };
+  }
+
+  async deleteCourseCategory(
+    input: DeleteCourseCategoryInput,
+  ): Promise<DeleteCourseCategoryOutput> {
+    const { data } = input
+    const { categoryId, courseId } = data
+
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+
+    try {
+      await this.courseCategoryMySqlRepository.delete({
+        categoryId, courseId
+      })
+
+      await queryRunner.commitTransaction()
+      return {
+        message: `Course has been deleted from category successfully`,
+      }
+    } catch (ex) {
+      await queryRunner.rollbackTransaction()
+      throw ex
+    } finally {
+      await queryRunner.release()
+    }
+  }
+
   async createCourseCertificate(
     input: CreateCertificateInput,
   ): Promise<CreateCertificateOutput> {
     const { accountId, data } = input
     const { courseId } = data
 
-    const found = await this.courseCertificateMySqlEntity.findOne({
+    const enrollments = await this.enrolledInfoMySqlRepository.find({
       where: {
         accountId,
         courseId,
       },
-    })
+    });
 
-    if (found) {
-      throw new ConflictException("You have already get certificate of this course")
-    }
+    const now = new Date();
 
+    const activeEnrollment = enrollments.some(enrollment => new Date(enrollment.endDate) > now);
+
+    if (activeEnrollment) {
+      const found = await this.courseCertificateMySqlEntity.findOne({
+        where: {
+          accountId,
+          courseId,
+        },
+      })
+
+      if (found) {
+        throw new ConflictException("You have already get certificate of this course")
+      }
+    } else // Báo lỗi người dùng không có lượt đăng kí khóa học nào còn hạn sử dụng
+      throw new NotFoundException("You do not have any active enrollments in this course that remain valid. ")
 
     const achievedDate = new Date()
     const expireDate = new Date(achievedDate)
@@ -724,6 +788,7 @@ export class CoursesService {
       achievedDate,
       expireDate,
     })
+
 
     return {
       message: "Certificate Created Successfully",
@@ -1096,14 +1161,49 @@ export class CoursesService {
   async markLessonAsCompleted(
     input: MarkLessonAsCompletedInput,
   ): Promise<MarkLessonAsCompletedOutput> {
-    const { data, accountId } = input
-    const { lessonId } = data
-    await this.progressMySqlRepository.update(
-      { accountId, lessonId },
-      { isCompleted: true },
-    )
-    return { message: "User had completed this lesson" }
+    const { data, accountId } = input;
+    const { lessonId } = data;
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const progress = await this.progressMySqlRepository.findOne({
+        where: { lessonId },
+        relations: { enrolledInfo: true },
+      });
+
+      if (!progress) {
+        throw new NotFoundException("Lesson not found");
+      }
+
+      const { enrolledInfo } = progress;
+
+      if (!enrolledInfo || enrolledInfo.accountId !== accountId) {
+        throw new NotFoundException("You haven't enrolled to course that has this lesson");
+      }
+
+      const now = new Date();
+
+      if (now > enrolledInfo.endDate) throw new ConflictException("This Course has expired");
+
+      await this.progressMySqlRepository.update(
+        { lessonId },
+        { isCompleted: true },
+      );
+
+      await queryRunner.commitTransaction();
+
+      return { message: "You have completed this lesson" };
+    } catch (ex) {
+      await queryRunner.rollbackTransaction();
+      throw ex;
+    } finally {
+      await queryRunner.release();
+    }
   }
+
 
   async createQuizAttempt(
     input: CreateQuizAttemptInput,

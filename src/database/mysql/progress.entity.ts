@@ -8,8 +8,8 @@ import {
     UpdateDateColumn,
     JoinColumn
 } from 'typeorm';
-import { AccountEntity } from './account.entity';
 import { LessonEntity } from './lesson.entity';
+import { EnrolledInfoEntity } from './enrolled-info.entity';
 
 @ObjectType()
 @Entity("progress")
@@ -21,25 +21,25 @@ export class ProgressEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    lessonId: string
+    enrolledInfoId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    accountId: string
+    lessonId: string
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ type: "boolean", default: false })
     isCompleted: Boolean;
 
-    @Field(() => AccountEntity)
-    @ManyToOne(() => AccountEntity, (account) => account.courseProgresses, {onDelete: "CASCADE"})
-    @JoinColumn({ name: "accountId" })
-    account: AccountEntity;
-
     @Field(() => LessonEntity)
     @ManyToOne(() => LessonEntity, (lesson) => lesson.accountProgresses, {onDelete: "CASCADE"} )
     @JoinColumn({ name: "lessonId" })
     lesson: LessonEntity;
+
+    @Field(() => EnrolledInfoEntity)
+    @ManyToOne(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.courseProgress, {onDelete: "CASCADE"} )
+    @JoinColumn({ name: "enrolledInfoId" })
+    enrolledInfo: EnrolledInfoEntity;
 
     @CreateDateColumn()
     createdAt: Date;

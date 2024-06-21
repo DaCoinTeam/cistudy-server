@@ -26,6 +26,7 @@ import {
 import {
   CreateCategoryInputData,
   CreateCertificateInputData,
+  CreateCourseCategoriesInputData,
   CreateCourseReviewInputData,
   CreateCourseTargetInputData,
   CreateLessonInputData,
@@ -33,6 +34,7 @@ import {
   CreateQuizInputData,
   CreateResourcesInputData,
   CreateSectionInputData,
+  DeleteCourseCategoryInputData,
   EnrollCourseInputData,
   FinishQuizAttemptInputData,
   GiftCourseInputData,
@@ -50,7 +52,6 @@ import {
   createCategorySchema,
   createQuizSchema,
   createResourcesSchema,
-  createTopicSchema,
   updateCourseSchema,
   updateQuizSchema,
 } from "./courses.schema"
@@ -359,6 +360,34 @@ export class CoursesController {
       data: {
         categoryId,
       },
+    })
+  }
+
+  @ApiBearerAuth()
+  @Post("create-course-category")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async createCourseCategories(
+    @AccountId() accountId: string,
+    @Body() data: CreateCourseCategoriesInputData,
+  ) {
+    return this.coursesService.createCourseCategories({
+      accountId,
+      data
+    })
+  }
+
+  @ApiBearerAuth()
+  @Post("delete-course-category")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  async deleteCourseCategories(
+    @AccountId() accountId: string,
+    @Body() data: DeleteCourseCategoryInputData,
+  ) {
+    return this.coursesService.deleteCourseCategory({
+      accountId,
+      data
     })
   }
 

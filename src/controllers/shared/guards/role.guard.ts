@@ -1,34 +1,41 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { AccountRole, Payload } from '@common';
+import { AccountRole, AuthTokenType, Payload } from '@common';
 import { ROLES_KEY } from '../decorators';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AccountMySqlEntity } from '@database';
 
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(
+    private reflector: Reflector,
+    @InjectRepository(AccountMySqlEntity)
+    private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+  ) { }
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
 
     const requiredRoles = this.reflector.getAllAndOverride<AccountRole[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
 
-    if (!requiredRoles) {
-      return true;
-    }
+    if (requiredRoles) {
+      const request = context.switchToHttp().getRequest();
+      const { accountId, accountRole, type } = request.user as Payload;
+      let userRole = accountRole
+      const refresh = (type === AuthTokenType.Refresh)
 
-    console.log(requiredRoles)
+      if (refresh) {
+        const { accountRole } = await this.accountMySqlRepository.findOneBy({ accountId })
+        userRole = accountRole
+      }
 
-    const request = context.switchToHttp().getRequest();
-    const { accountRole } = request.user as Payload; 
-
-    console.log(request.user)
-    console.log("Role cua tao la : " + accountRole)
-    
-    if (!requiredRoles.some((role) => accountRole === role)) {
-      throw new ForbiddenException('You do not have the permission to perform this action');
+      if (!requiredRoles.some((role) => userRole === role)) {
+        throw new ForbiddenException('You do not have the permission to perform this action');
+      }
     }
 
     return true;

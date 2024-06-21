@@ -30,7 +30,7 @@ import { QuizQuestionMediaEntity as QuizQuestionMediaMySqlEntity } from "./quiz-
 import { ProgressEntity as ProgressMySqlEntity } from "./progress.entity"
 import { QuizAttemptEntity as QuizAttemptMySqlEntity} from "./quiz-attempt.entity"
 import { AccountReviewEntity as AccountReviewMySqlEntity } from "./account-review.entity"
-//import { QuizAttemptAnswerEntity as QuizAttemptAnswerMySqlEntity } from "./quiz-attempt-answer.entity"
+import { CourseCategoryEntity as CourseCategoryMySqlEntity} from "./course-category.entity"
 
 
 export {
@@ -54,6 +54,7 @@ export {
     CryptoWalletMySqlEntity,
     CategoryMySqlEntity,
     CategoryRelationMySqlEntity,
+    CourseCategoryMySqlEntity,
     CourseReviewMySqlEntity,
     CartMySqlEntity,
     CartCourseMySqlEntity,

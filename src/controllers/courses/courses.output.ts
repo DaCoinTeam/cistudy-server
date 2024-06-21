@@ -118,3 +118,11 @@ export class FinishQuizAttemptOutput implements Output<FinishQuizAttemptOutputOt
 export class GiftCourseOutput implements Output {
     message: string;
 }
+
+export class CreateCourseCategoriesOutput implements Output {
+    message: string;
+}
+
+export class DeleteCourseCategoryOutput implements Output {
+    message: string;
+}

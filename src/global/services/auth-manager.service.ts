@@ -63,13 +63,8 @@ export class AuthManagerService {
         data: T,
         clientId?: string,
     ): Promise<AuthTokens> {
-        const accessToken = await this.generateToken(data, AuthTokenType.Access)
         
-        // const refreshData : PayloadLike = {
-        //     accountId: data.accountId,
-        //     accountRole: undefined,
-        //     type: AuthTokenType.Refresh,
-        // }
+        const accessToken = await this.generateToken(data, AuthTokenType.Access)
         const refreshToken = await this.generateToken(data, AuthTokenType.Refresh)
         if (clientId) {
             let found = await this.sessionMySqlRepository.findOneBy({
