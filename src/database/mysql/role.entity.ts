@@ -9,10 +9,9 @@ import {
     UpdateDateColumn,
 
 } from "typeorm"
-import { CourseEntity } from "./course.entity"
-
 import { Field, ID, ObjectType } from "@nestjs/graphql"
-import { AccountRoleEntity } from "./account-role.entity"
+import { AccountEntity } from "./account.entity"
+import { SystemRoles } from "@common"
 
 
 @ObjectType()
@@ -25,7 +24,11 @@ export class RoleEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    name: string
+    accountId: string
+
+    @Field(() => String)
+    @Column({ type: "enum", enum: SystemRoles})
+    name: SystemRoles
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ type: "boolean", default: false })
@@ -40,11 +43,12 @@ export class RoleEntity {
     updatedAt: Date
 
     // Relations
-    @Field(() => [AccountRoleEntity])
-    @OneToMany(
-        () => AccountRoleEntity, 
-        (accountRole) => accountRole.role,
-        {cascade: true}
+    @Field(() => AccountEntity)
+    @ManyToOne(
+        () => AccountEntity,
+        (account) => account.roles,
+        { onDelete : "CASCADE" }
     )
-    accountRoles: Array<AccountRoleEntity>;
+    @JoinColumn({ name: "accountId" })
+    accountRoles: AccountEntity;
 }

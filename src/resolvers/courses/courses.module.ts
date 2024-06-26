@@ -14,6 +14,7 @@ import {
     QuizAttemptMySqlEntity,
     QuizMySqlEntity,
     QuizQuestionMySqlEntity,
+    RoleMySqlEntity,
 } from "@database"
 import { CoursesResolver } from "./courses.resolver"
 import { TypeOrmModule } from "@nestjs/typeorm"
@@ -35,7 +36,8 @@ import { CoursesService } from "./courses.service"
             CourseReviewMySqlEntity,
             QuizAttemptMySqlEntity,
             QuizMySqlEntity,
-            QuizQuestionMySqlEntity
+            QuizQuestionMySqlEntity,
+            RoleMySqlEntity
         ]),
     ],
     providers: [CoursesResolver, CoursesService],

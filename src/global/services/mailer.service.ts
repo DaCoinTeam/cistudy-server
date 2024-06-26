@@ -81,11 +81,9 @@ export class MailerService {
         <div class="content">
             <p>Hello <strong>${username ? username : email},</strong></p>
             <p>Thank you for registering on the CiStudy online learning platform. You have taken the first step towards expanding your knowledge and skills.</p>
-            <p>Here is your verification token: </p>
-            <p>${token}</p>
             <p>To complete your registration, please confirm your email by clicking the button below: </p>
             <p style="text-align: center;">
-                <a href="${appUrl}/api/auth/verify-registration-page" class="button">Confirm Email</a>
+                <a href="${appUrl}/api/auth/verify-registration-page?&token=${token}" class="button">Confirm Email</a>
             </p>
             
             <p>After confirming, you can access your account and start exploring exciting courses on CiStudy.</p>
