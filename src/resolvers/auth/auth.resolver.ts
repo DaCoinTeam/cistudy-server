@@ -4,7 +4,6 @@ import { AuthInterceptor, GenerateAuthTokensInterceptor, JwtAuthGuard, AccountId
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { InitOutput, SignInOutput, VerifyGoogleAccessTokenOutput } from "./auth.output"
 import { SignInInputData, VerifyGoogleAccessTokenData } from "./auth.input"
-import { SignInInterceptor } from "src/controllers/shared/interceptors/signIn.interceptor"
 
 @Resolver()
 export class AuthResolver {

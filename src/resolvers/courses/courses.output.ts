@@ -132,6 +132,7 @@ export class FindManyCoursesTopicOutput implements AuthOutput<FindManyCoursesTop
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }
+//
 
 @ObjectType()
 export class FindOneQuizAttemptOutput implements AuthOutput<QuizAttemptMySqlEntity>{
@@ -139,6 +140,8 @@ export class FindOneQuizAttemptOutput implements AuthOutput<QuizAttemptMySqlEnti
     data: QuizAttemptMySqlEntity
     @Field(() => AuthTokens, {nullable: true})
     tokens?: AuthTokens
+    @Field(() => Int, {nullable: true})
+    numberOfQuestions? : number
 }
 
 @ObjectType()

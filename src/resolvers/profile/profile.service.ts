@@ -69,7 +69,6 @@ export class ProfileService {
         await queryRunner.startTransaction();
     
         try {
-            
             const courses = await this.courseMySqlRepository.find({
                 relations: {
                     creator: true,
@@ -88,7 +87,6 @@ export class ProfileService {
                 }
             });
     
-          
             const numberOfFollowersResults = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(follow.followerId)", "count")
@@ -100,7 +98,6 @@ export class ProfileService {
                 .groupBy("course.courseId")
                 .getRawMany();
     
-            
             const numberOfEnrolledCoursesResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
@@ -110,7 +107,6 @@ export class ProfileService {
                 .andWhere("enrolledInfo.enrolled = :enrolled", { enrolled: true })
                 .getRawOne();
     
-            
             const progressResults = await queryRunner.manager
                 .createQueryBuilder()
                 .select("course.courseId", "courseId")
@@ -120,7 +116,8 @@ export class ProfileService {
                 .innerJoin(LessonMySqlEntity, "lesson", "progress.lessonId = lesson.lessonId")
                 .innerJoin(SectionMySqlEntity, "section", "lesson.sectionId = section.sectionId")
                 .innerJoin(CourseMySqlEntity, "course", "section.courseId = course.courseId")
-                .where("progress.accountId = :accountId", { accountId })
+                .innerJoin(EnrolledInfoMySqlEntity, "enrolledInfo", "progress.enrolledInfoId = enrolledInfo.enrolledInfoId")
+                .where("enrolledInfo.accountId = :accountId", { accountId })
                 .andWhere("progress.isCompleted = :isCompleted", { isCompleted: true })
                 .groupBy("course.courseId")
                 .getRawMany();
@@ -157,5 +154,6 @@ export class ProfileService {
             await queryRunner.release();
         }
     }
+    
 
 }

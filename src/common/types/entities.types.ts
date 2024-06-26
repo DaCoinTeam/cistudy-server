@@ -10,14 +10,14 @@ registerEnumType(AccountKind, {
     name: "AccountKind",
 })
 
-export enum AccountRole {
+export enum SystemRoles {
   User = "user",
   Moderator = "moderator",
   Administrator = "administrator",
 }
 
-registerEnumType(AccountRole, {
-    name: "AccountRole",
+registerEnumType(SystemRoles, {
+    name: "SystemRoles",
 })
 
 export enum VerifyStatus {

@@ -631,26 +631,80 @@ export class CoursesService {
   async createCategory(
     input: CreateCategoryInput,
   ): Promise<CreateCategoryOutput> {
-    const { data, files } = input
-    const { name, categoryParentIds, categoryIds, imageIndex } = data
+    const { data, files } = input;
+    const { name, categoryParentIds, categoryIds, imageIndex } = data;
 
-    const queryRunner = this.dataSource.createQueryRunner()
-    await queryRunner.connect()
-    await queryRunner.startTransaction()
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
-      let imageId: string | undefined
+      let imageId: string | undefined;
 
       if (Number.isInteger(imageIndex)) {
         const { assetId } = await this.storageService.upload({
           rootFile: files.at(imageIndex),
-        })
-        imageId = assetId
+        });
+        imageId = assetId;
       }
 
+      let level = 0;
+
+      let parentLevels: number[] = [];
+      if (categoryParentIds && categoryParentIds.length > 0) {
+        const parentCategories = await this.categoryMySqlRepository.find({
+          where:{
+            categoryId: In(categoryParentIds)
+          }
+        });
+        parentLevels = parentCategories.map(category => category.level);
+
+        if (new Set(parentLevels).size !== 1) {
+          throw new ConflictException('All parent categories must be at the same level');
+        }
+        level = parentLevels[0] + 1;
+      }
+
+      let childLevels: number[] = [];
+      if (categoryIds && categoryIds.length > 0) {
+        const childCategories = await this.categoryMySqlRepository.find({
+          where:{
+            categoryId: In(categoryIds)
+          }
+        });
+        childLevels = childCategories.map(category => category.level);
+
+        if (new Set(childLevels).size !== 1) {
+          throw new ConflictException('All child categories must be at the same level');
+        }
+
+        if (!categoryParentIds) {
+          if (childLevels[0] !== 1) {
+            throw new ConflictException('Child categories must be at level 1');
+          }
+          level = 0;
+        }
+      }
+
+      if (categoryParentIds && categoryIds) {
+        if (childLevels[0] - parentLevels[0] !== 2) {
+          throw new ConflictException('The level difference between child and parent categories must be 2');
+        }
+        const found = await this.categoryMySqlRepository.find({
+          where: {
+            level
+          }
+        })
+
+        if (found.some(categoryName => categoryName.name === name)) {
+          throw new ConflictException(`There's already existed category named ${name} at this level`);
+        }
+      }
+      
       const createdCategory = await this.categoryMySqlRepository.save({
         name,
         imageId,
+        level,
         categoryParentRelations: categoryIds
           ? categoryIds.map((categoryId) => ({
             categoryId,
@@ -661,21 +715,22 @@ export class CoursesService {
             categoryParentId,
           }))
           : [],
-      })
+      });
 
-      await queryRunner.commitTransaction()
+      await queryRunner.commitTransaction();
 
       return {
         message: `Category ${createdCategory.name} has been created successfully`,
         others: { categoryId: createdCategory.categoryId },
-      }
+      };
     } catch (ex) {
-      await queryRunner.rollbackTransaction()
-      throw ex
+      await queryRunner.rollbackTransaction();
+      throw ex;
     } finally {
-      await queryRunner.release()
+      await queryRunner.release();
     }
   }
+
 
   async deleteCategory(
     input: DeleteCategoryInput,
@@ -707,17 +762,30 @@ export class CoursesService {
   async createCourseCategories(input: CreateCourseCategoriesInput): Promise<CreateCourseCategoriesOutput> {
     const { data } = input;
     const { courseId, categoryIds } = data;
-  
-    const courseCategories = categoryIds.map(categoryId => ({
-      courseId,
-      categoryId,
-    }));
-  
-    await this.courseCategoryMySqlRepository.save(courseCategories);
-  
-    return {
-      message: "Course Category has been created successfully"
-    };
+
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+
+    try {
+      const courseCategories = categoryIds.map(categoryId => ({
+        courseId,
+        categoryId,
+      }));
+
+      //await this.courseCategoryMySqlRepository.save(courseCategories);
+      await queryRunner.manager.save(CourseCategoryMySqlEntity, courseCategories);
+
+      return {
+        message: "Course Category has been created successfully"
+      };
+    } catch (ex) {
+      await queryRunner.rollbackTransaction()
+      throw ex
+    } finally {
+      await queryRunner.release()
+    }
+
   }
 
   async deleteCourseCategory(
@@ -731,6 +799,15 @@ export class CoursesService {
     await queryRunner.startTransaction()
 
     try {
+      const found = await this.courseCategoryMySqlRepository.findOne({
+        where: {
+          courseId,
+          categoryId
+        }
+      })
+
+      if (!found) throw new NotFoundException("No specified course found in this category")
+
       await this.courseCategoryMySqlRepository.delete({
         categoryId, courseId
       })

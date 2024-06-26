@@ -19,3 +19,23 @@ export class CreateAccountReviewOutput implements Output<CreateAccountReviewOutp
     message: string;
     others?: CreateAccountReviewOutputOthers;
 }
+
+export class CreateRoleOutput implements Output{
+    message: string;
+}
+
+export class CreateAccountRoleOutput implements Output{
+    message: string;
+}
+
+export class ToggleRoleOutput implements Output{
+    message: string;
+}
+
+export class UpdateRoleOutput implements Output{
+    message: string;
+}
+
+export class UpdateAccountRoleOutput implements Output{
+    message: string;
+}

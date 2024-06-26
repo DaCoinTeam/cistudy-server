@@ -35,7 +35,7 @@ export class SessionEntity {
   })
       clientId: string
 
-  @ManyToOne(() => AccountEntity, (account) => account.sessions)
+  @ManyToOne(() => AccountEntity, (account) => account.sessions, {onDelete : "CASCADE"})
   @JoinColumn({ name: "accountId" })
       account: AccountEntity
 }

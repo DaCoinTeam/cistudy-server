@@ -14,6 +14,8 @@ import {
     PostLikeMySqlEntity,
     PostCommentLikeMySqlEntity,
     CartMySqlEntity,
+    AccountRoleMySqlEntity,
+    RoleMySqlEntity,
 } from "@database"
 import { AuthService } from "./auth.service"
 
@@ -22,6 +24,8 @@ import { AuthService } from "./auth.service"
         TypeOrmModule.forFeature([
             SessionMySqlEntity,
             AccountMySqlEntity,
+            AccountRoleMySqlEntity,
+            RoleMySqlEntity,
             PostMySqlEntity,
             CourseMySqlEntity,
             EnrolledInfoMySqlEntity,

@@ -215,6 +215,7 @@ type CategoryRelationEntity {
 
 type CategoryEntity {
   categoryId: ID!
+  level: Int!
   name: String
   imageId: ID
   createdAt: DateTime!
@@ -371,6 +372,25 @@ type AccountReviewEntity {
   reviewedAccount: AccountEntity!
 }
 
+type RoleEntity {
+  roleId: ID!
+  name: ID!
+  isDisabled: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  accountRoles: [AccountRoleEntity!]!
+}
+
+type AccountRoleEntity {
+  accountRoleId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  accountId: ID!
+  roleId: ID!
+  account: AccountEntity
+  role: RoleEntity
+}
+
 type AccountEntity {
   accountId: ID!
   email: String!
@@ -381,7 +401,6 @@ type AccountEntity {
   phoneNumber: String
   username: String
   balance: Float
-  accountRole: String!
   walletId: ID
   firstName: String
   lastName: String
@@ -391,6 +410,7 @@ type AccountEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   externalId: String
+  accountRoles: [AccountRoleEntity!]
   cryptoWallets: [CryptoWalletEntity!]!
   posts: [PostEntity!]!
   courses: [CourseEntity!]!
@@ -474,6 +494,7 @@ type FindManyCoursesTopicOutputData {
 type FindOneQuizAttemptOutput {
   data: QuizAttemptEntity!
   tokens: AuthTokens
+  numberOfQuestions: Int
 }
 
 type FindOnePostOutput {
@@ -633,12 +654,12 @@ type Query {
   findManyLessons(data: FindManyLessonsInputData!): FindManyLessonsOutput!
   findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
-  findManyCategories: [CategoryEntity!]!
   findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
   findManyCourseReviews(data: FindManyCourseReviewsInputData!): FindManyCourseReviewsOutputData!
   findManyCoursesTopic(data: FindManyCoursesTopicInputData!): FindManyCoursesTopicOutputData!
   findOneQuizAttempt(data: FindOneQuizAttemptInputData!): FindOneQuizAttemptOutput!
-  findOneCategory(data: FindOneCategoryInputData!): CategoryEntity!
+  findManyRootCategories: [CategoryEntity!]!
+  findManyLevelCategories(data: FindManyLevelCategoriesInputData!): [CategoryEntity!]!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
@@ -775,11 +796,21 @@ input FindManyCoursesTopicInputOptions {
 }
 
 input FindOneQuizAttemptInputData {
+  params: FindOneQuizAttemptInputParams!
+  options: FindOneQuizAttemptInputOptions!
+}
+
+input FindOneQuizAttemptInputParams {
   quizAttemptId: String!
 }
 
-input FindOneCategoryInputData {
-  categoryId: String!
+input FindOneQuizAttemptInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManyLevelCategoriesInputData {
+  categoryParentId: ID
 }
 
 input FindOnePostInputData {

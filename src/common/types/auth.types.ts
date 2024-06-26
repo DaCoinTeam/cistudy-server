@@ -1,6 +1,6 @@
 import { Field, ObjectType } from "@nestjs/graphql"
-import { AccountRole } from "./entities.types"
 import { IsJWT } from "class-validator"
+import { AccountRoleMySqlEntity } from "@database"
 
 @ObjectType()
 export class AuthTokens {
@@ -25,7 +25,7 @@ export enum AuthTokenType {
 
 export type Payload = {
   accountId: string;
-  accountRole?: AccountRole;
+  accountRoles?: Array<string>;
   type: AuthTokenType;
   iat: string;
   exp: string;

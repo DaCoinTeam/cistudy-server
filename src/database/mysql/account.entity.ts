@@ -1,6 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToOne, JoinColumn, Generated } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from "typeorm"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
-import { AccountKind, AccountRole } from "@common"
+import { AccountKind } from "@common"
 import { SessionEntity } from "./session.entity"
 import { PostCommentEntity } from "./post-comment.entity"
 import { PostLikeEntity } from "./post-like.entity"
@@ -13,9 +13,9 @@ import { CourseReviewEntity } from "./course-review.entity"
 import { CartEntity } from "./cart.entity"
 import { OrderEntity } from "./order.entity"
 import { CertificateEntity } from "./certificate"
-import { ProgressEntity } from "./progress.entity"
 import { QuizAttemptEntity } from "./quiz-attempt.entity"
 import { AccountReviewEntity } from "./account-review.entity"
+import { AccountRoleEntity } from "./account-role.entity"
 
 
 @ObjectType()
@@ -61,14 +61,6 @@ export class AccountEntity {
         default: 0,
     })
     balance: number
-
-    @Field(() => String)
-    @Column({
-        type: "enum",
-        enum: AccountRole,
-        default: AccountRole.User,
-    })
-    accountRole: AccountRole
 
     @Field(() => ID, { nullable: true })
     @Column({
@@ -125,6 +117,14 @@ export class AccountEntity {
     @OneToMany(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.account)
     enrolledInfos: Array<EnrolledInfoEntity>
 
+    @Field(() => [AccountRoleEntity], {nullable: true})
+    @OneToMany(
+        () => AccountRoleEntity, 
+        (accountRole) => accountRole.account, 
+        { cascade: true }
+    )
+    accountRoles: Array<AccountRoleEntity>
+
     @Field(() => [CryptoWalletEntity])
     @OneToMany(() => CryptoWalletEntity, (cryptoWallet) => cryptoWallet.account)
     cryptoWallets: Array<CourseEntity>
@@ -145,7 +145,7 @@ export class AccountEntity {
     @OneToMany(() => FollowEntity, (account) => account.followedAccount)
     followedAccountRelations: Array<FollowEntity>
 
-    @Field(() => [CourseReviewEntity], {nullable: true})
+    @Field(() => [CourseReviewEntity], { nullable: true })
     @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.account, { nullable: true })
     courseReview: Array<CourseReviewEntity>
 

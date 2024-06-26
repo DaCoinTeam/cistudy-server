@@ -28,23 +28,32 @@ implements NestInterceptor<T, AuthOutput<T>>
     ): Promise<Observable<AuthOutput<T>>> {
         const gqlContext = GqlExecutionContext.create(context).getContext()
         const request = gqlContext.req
-
+        
         const { accountId, type } = request.user as Payload
-        let { accountRole } = request.user as Payload
+        let { accountRoles } = request.user as Payload
 
         const clientId = getClientId(request.headers)
         const refresh = type === AuthTokenType.Refresh
 
         if (refresh) {
             await this.authManagerService.validateSession(accountId, clientId)
-            const account = await this.accountMySqlRepository.findOneBy({accountId})
-            accountRole = account.accountRole
+            const account = await this.accountMySqlRepository.findOne({
+                where: {
+                  accountId
+                },
+                relations: {
+                  accountRoles: {
+                    role: true
+                  }
+                }
+              })
+              accountRoles = account.accountRoles.map(accRoles => accRoles.role.name)
         }
 
         return next.handle().pipe(
             mergeMap(async (data) => {
                 return await this.authManagerService.generateOutput<T>(
-                    { accountId, accountRole, type },
+                    { accountId, accountRoles, type },
                     data,
                     refresh,
                     clientId,

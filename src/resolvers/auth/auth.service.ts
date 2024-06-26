@@ -20,7 +20,6 @@ export class AuthService {
         private readonly sha256Service: Sha256Service,
         @InjectRepository(AccountMySqlEntity)
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
-        @InjectRepository(CartMySqlEntity)
         private readonly firebaseService: FirebaseService,
     ) { }
 
@@ -34,6 +33,9 @@ export class AuthService {
                     cartCourses: {
                         course: true
                     }
+                },
+                accountRoles:{
+                    role: true
                 }
             }
         })
@@ -52,11 +54,14 @@ export class AuthService {
         if (!found) throw new NotFoundException("Account not found.")
         if (!this.sha256Service.verifyHash(password, found.password))
             throw new UnauthorizedException("Invalid credentials.")
+        if(found.verified === false){
+            throw new UnauthorizedException("Your account is not verified, please check the email again")
+        }
         return found
     }
 
     async verifyGoogleAccessToken(
-        input: VerifyGoogleAccessTokenInput,
+        input: VerifyGoogleAccessTokenInput
     ): Promise<AccountMySqlEntity> {
         const { data } = input
         const { params } = data
@@ -71,7 +76,7 @@ export class AuthService {
         if (!found) {
             found = await this.accountMySqlRepository.save({
                 externalId: decoded.uid,
-                email: decoded.email,
+                email: decoded.email,         
                 phoneNumber: decoded.phone_number,
                 avatarUrl: decoded.picture,
                 kind: AccountKind.Google,

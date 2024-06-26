@@ -1,4 +1,4 @@
-import { Input } from "@common"
+import { AuthInput, Input } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsDateString, IsEmail, IsNotEmpty, IsStrongPassword, Length } from "class-validator"
 
@@ -19,9 +19,14 @@ export class SignInInput implements Input<SignInInputData> {
 
 export class SignUpData {
     @IsEmail()
+    @IsNotEmpty()
     @ApiProperty({ example: "starci@gmail.com", description: "Email" })
         email: string
-  
+
+    @IsNotEmpty()
+    @ApiProperty({ example: "sample123", description: "Username" })
+        username: string
+
     @IsStrongPassword()
     @ApiProperty({ example: "Cuong123_A", description: "Password" })
         password: string
@@ -41,4 +46,14 @@ export class SignUpData {
   
 export class SignUpInput implements Input<SignUpData> {
     data: SignUpData
+}
+
+export class VerifyRegistrationInputData{
+    @ApiProperty()
+    token : string
+}
+
+export class VerifyRegistrationInput implements AuthInput<VerifyRegistrationInputData> {
+    accountId: string
+    data: VerifyRegistrationInputData
 }

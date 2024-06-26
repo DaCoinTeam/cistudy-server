@@ -22,12 +22,11 @@ implements NestInterceptor<T, AuthOutput<T>>
     ): Promise<Observable<AuthOutput<T>>> {
         // xử lý tiền request
         // check xem token là refresh hay là access, từ đó đưa ra những lựa chọn
-
+        
         const request = context.switchToHttp().getRequest()
-        const { type, accountId, accountRole } = request.user as Payload
+        const { type, accountId, accountRoles } = request.user as Payload
         const clientId = getClientId(request.headers)
-
-
+        
         const refresh = type === AuthTokenType.Refresh
         if (refresh) {
             await this.authManagerService.validateSession(accountId, clientId)
@@ -38,7 +37,7 @@ implements NestInterceptor<T, AuthOutput<T>>
             mergeMap(async (data) => {
                 // thêm cặp tokens vào response nếu yêu cầu gửi request
                 return await this.authManagerService.generateOutput<T>(
-                    { accountId, accountRole },
+                    { accountId, accountRoles },
                     data,
                     refresh,
                     clientId,

@@ -92,3 +92,68 @@ export class DeleteAccountReviewInput implements AuthInput<DeleteAccountReviewIn
     data: DeleteAccountReviewInputData
 
 }
+
+export class CreateRoleInputData {
+    @ApiProperty()
+    name: string
+}
+
+export class CreateRoleInput implements AuthInput<CreateRoleInputData> {
+    accountId: string
+    data: CreateRoleInputData
+}
+
+export class CreateAccountRoleInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    accountId: string
+
+    @IsUUID("4")
+    @ApiProperty()
+    roleId: string
+}
+
+export class CreateAccountRoleInput implements AuthInput<CreateAccountRoleInputData> {
+    accountId: string
+    data: CreateAccountRoleInputData
+}
+
+export class ToggleRoleInputData {
+    @ApiProperty()
+    roleId: string
+}
+
+export class ToggleRoleInput implements AuthInput<ToggleRoleInputData> {
+    accountId: string
+    data: ToggleRoleInputData
+}
+
+export class UpdateRoleInputData {
+    @ApiProperty()
+    roleId: string
+
+    @ApiProperty()
+    name: string
+}
+
+export class UpdateRoleInput implements AuthInput<UpdateRoleInputData> {
+    accountId: string
+    data: UpdateRoleInputData
+}
+
+export class UpdateAccountRoleInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    accountId: string
+
+    @ApiProperty()
+    roleIds: Array<string>
+
+    @ApiProperty()
+    deleteRoleIds : Array<string>
+}
+
+export class UpdateAccountRoleInput implements AuthInput<UpdateAccountRoleInputData> {
+    accountId: string
+    data: UpdateAccountRoleInputData
+}

@@ -28,7 +28,7 @@ implements NestInterceptor<T, WsOutput<T>>
         const client = context.switchToWs().getClient()
 
         const { accountId, type } = client.user as Payload
-        let { accountRole } = client.user
+        let { accountRoles } = client.user
 
         const headers = client.handshake?.headers
         const clientId = getClientId(headers)
@@ -37,12 +37,12 @@ implements NestInterceptor<T, WsOutput<T>>
         if (refresh) {
             await this.authManagerService.validateSession(accountId, clientId)
             const account = await this.accountMySqlRepository.findOneBy({accountId})
-            accountRole = account.accountRole
+           // accountRole = account.accountRole
         }
         return next.handle().pipe(
             mergeMap(async ({event, data}) => {
                 data = await this.authManagerService.generateOutput<T>(
-                    { accountId, accountRole, type },
+                    { accountId, accountRoles, type },
                     data,
                     refresh,
                     clientId,

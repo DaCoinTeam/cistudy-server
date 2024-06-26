@@ -23,16 +23,19 @@ implements NestInterceptor<T, AuthOutput<T>>
 
         return next.handle().pipe(
             mergeMap(async (data) => {
-                return await this.authManagerService.generateOutput<T>(
+                const { tokens } = await this.authManagerService.generateOutput<T>(
                     {
                         accountId: data.accountId,
-                        accountRole: data.accountRole,
+                        accountRoles: data.accountRoles,
                         type: AuthTokenType.Refresh,
                     },
                     data,
                     true,
                     clientId,
                 )
+                return {
+                    tokens
+                } as AuthOutput<T>
             }),
         )
     }

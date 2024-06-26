@@ -1,9 +1,9 @@
 import { jwtConfig } from "@config"
-import { SessionMySqlEntity, AccountMySqlEntity } from "@database"
+import { SessionMySqlEntity, AccountMySqlEntity, AccountRoleMySqlEntity } from "@database"
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
 import { JsonWebTokenError, JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Payload, AuthTokens, AuthTokenType, AuthOutput, AccountRole } from "@common"
+import { Payload, AuthTokens, AuthTokenType, AuthOutput } from "@common"
 import { Repository } from "typeorm"
 
 @Injectable()
@@ -12,6 +12,8 @@ export class AuthManagerService {
         private readonly jwtService: JwtService,
         @InjectRepository(AccountMySqlEntity)
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+        @InjectRepository(AccountRoleMySqlEntity)
+        private readonly accountRoleMySqlRepository: Repository<AccountRoleMySqlEntity>,
         @InjectRepository(SessionMySqlEntity)
         private readonly sessionMySqlRepository: Repository<SessionMySqlEntity>,
     ) { }
@@ -49,7 +51,7 @@ export class AuthManagerService {
 
         const payload: PayloadLike = {
             accountId: data.accountId,
-            accountRole: (type === AuthTokenType.Access) ? data.accountRole : undefined,
+            accountRoles: (type === AuthTokenType.Access) ? data.accountRoles : undefined,
             type,
         }
         
@@ -94,19 +96,29 @@ export class AuthManagerService {
     async generateOutput<T extends object>(
         payload: PayloadLike,
         data: T,
-        authTokensRequested: boolean = false,
+        authTokensRequested: boolean,
         clientId?: string,
     ): Promise<AuthOutput<T>> {
         const { accountId } = payload
-        let { accountRole } = payload
-
+        let { accountRoles } = payload
+        
         if (authTokensRequested) {
-            const account = await this.accountMySqlRepository.findOneBy({ accountId })
-            accountRole = account.accountRole
+            const roles = await this.accountRoleMySqlRepository.find({
+                where:{
+                    accountId
+                },
+                relations:{
+                    role : true
+                }
+            })
+            accountRoles = roles ? roles
+                .filter(accountRole => accountRole.role.isDisabled === false)
+                .map(accountRole => accountRole.role.name)
+                : undefined
         }
 
         const tokens = authTokensRequested
-            ? await this.generateAuthTokens({ accountId, accountRole }, clientId)
+            ? await this.generateAuthTokens({ accountId, accountRoles }, clientId)
             : undefined
 
         return {
@@ -125,6 +137,6 @@ export class AuthManagerService {
 
 export interface PayloadLike {
     accountId: string,
-    accountRole: AccountRole,
+    accountRoles: Array<string>,
     type?: AuthTokenType
 }

@@ -1,4 +1,3 @@
-import { AccountRole } from "@common";
 import { createParamDecorator, ExecutionContext, SetMetadata } from "@nestjs/common"
 
 export const Metadata = createParamDecorator((_, ctx: ExecutionContext) => {
@@ -7,4 +6,4 @@ export const Metadata = createParamDecorator((_, ctx: ExecutionContext) => {
 })
 
 export const ROLES_KEY = 'roles';
-export const Roles = (...roles: AccountRole[]) => SetMetadata(ROLES_KEY, roles);
+export const Roles = (...roles: String[]) => SetMetadata(ROLES_KEY, roles);

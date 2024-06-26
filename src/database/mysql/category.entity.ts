@@ -8,7 +8,7 @@ import {
   JoinColumn,
   ManyToOne,
 } from "typeorm"
-import { Field, ID, ObjectType } from "@nestjs/graphql"
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { CourseCategoryEntity } from "./course-category.entity"
 import { CategoryRelationEntity } from "./category-relation.entity"
 
@@ -18,6 +18,10 @@ export class CategoryEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn("uuid")
   categoryId: string
+
+  @Field(() => Int, { defaultValue: 0 })
+  @Column({ type: "int", default: 0 })
+  level: number
 
   @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 1000, nullable: true })
@@ -35,14 +39,14 @@ export class CategoryEntity {
   @UpdateDateColumn()
   updatedAt: Date
 
-  @Field(() => [CourseCategoryEntity], {nullable: true})
+  @Field(() => [CourseCategoryEntity], { nullable: true })
   @OneToMany(
     () => CourseCategoryEntity,
     (courseCategory) => courseCategory.category,
   )
   courseCategories: Array<CourseCategoryEntity>
 
-  @Field(() => [CategoryRelationEntity], {nullable: true})
+  @Field(() => [CategoryRelationEntity], { nullable: true })
   @OneToMany(
     () => CategoryRelationEntity,
     (categoryParentRelation) => categoryParentRelation.categoryParent,
@@ -50,11 +54,12 @@ export class CategoryEntity {
   )
   categoryParentRelations: Array<CategoryRelationEntity>
 
-  @Field(() => [CategoryRelationEntity], {nullable: true})
+  @Field(() => [CategoryRelationEntity], { nullable: true })
   @OneToMany(
     () => CategoryRelationEntity,
     (categoryRelation) => categoryRelation.category,
     { cascade: true }
   )
   categoryRelations: Array<CategoryRelationEntity>
+
 }

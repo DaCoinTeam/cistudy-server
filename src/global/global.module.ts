@@ -11,7 +11,9 @@ import {
     ResourceMySqlEntity,
     SectionMySqlEntity,
     SessionMySqlEntity,
-    AccountMySqlEntity
+    AccountMySqlEntity,
+    AccountRoleMySqlEntity,
+    RoleMySqlEntity
 } from "@database"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
@@ -41,7 +43,9 @@ import { JwtStrategy } from "./strategies"
             ResourceMySqlEntity,
             PostLikeMySqlEntity,
             PostCommentMySqlEntity,
-            PostCommentLikeMySqlEntity
+            PostCommentLikeMySqlEntity,
+            AccountRoleMySqlEntity,
+            RoleMySqlEntity
         ])
     ],
     exports: [

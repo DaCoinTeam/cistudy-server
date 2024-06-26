@@ -31,10 +31,13 @@ import { ProgressEntity as ProgressMySqlEntity } from "./progress.entity"
 import { QuizAttemptEntity as QuizAttemptMySqlEntity} from "./quiz-attempt.entity"
 import { AccountReviewEntity as AccountReviewMySqlEntity } from "./account-review.entity"
 import { CourseCategoryEntity as CourseCategoryMySqlEntity} from "./course-category.entity"
-
+import { RoleEntity as RoleMySqlEntity } from "./role.entity"
+import { AccountRoleEntity as AccountRoleMySqlEntity } from "./account-role.entity"
 
 export {
     AccountMySqlEntity,
+    RoleMySqlEntity,
+    AccountRoleMySqlEntity,
     AccountReviewMySqlEntity,
     PostMySqlEntity,
     PostCommentMySqlEntity,
@@ -67,6 +70,4 @@ export {
     QuizQuestionMediaMySqlEntity,
     QuizAttemptMySqlEntity,
     ProgressMySqlEntity
-
-
 }

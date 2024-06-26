@@ -5,9 +5,9 @@ import {
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { AccountsService } from "./accounts.service"
 import { AuthInterceptor, JwtAuthGuard, AccountId, Roles } from "../shared"
-import { CreateAccountReviewInputData, DeleteCourseInputData, ToggleFollowInputData, UpdateAccountReviewInputData, VerifyCourseInputData } from "./accounts.input"
+import { CreateAccountReviewInputData, CreateAccountRoleInputData, CreateRoleInputData, DeleteCourseInputData, ToggleFollowInputData, ToggleRoleInputData, UpdateAccountReviewInputData, UpdateAccountRoleInputData, UpdateRoleInputData, VerifyCourseInputData } from "./accounts.input"
 import { RolesGuard } from "../shared/guards/role.guard"
-import { AccountRole } from "@common"
+import { SystemRoles } from "@common"
 
 @ApiTags("Accounts")
 @ApiHeader({
@@ -15,12 +15,13 @@ import { AccountRole } from "@common"
     description: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
 })
 @Controller("api/accounts")
-export class AccountsController{
+export class AccountsController {
     constructor(private readonly accountsService: AccountsService) { }
 
     @ApiBearerAuth()
     @Patch("toggle-follow")
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async toggleFollow(@AccountId() accountId: string, @Body() body: ToggleFollowInputData) {
         return this.accountsService.toggleFollow({
@@ -32,7 +33,7 @@ export class AccountsController{
     @ApiBearerAuth()
     @Patch("verify-course")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(AccountRole.Moderator, AccountRole.Administrator)
+    @Roles(SystemRoles.User, SystemRoles.Moderator)
     @UseInterceptors(AuthInterceptor)
     async verifyCourse(@AccountId() accountId: string, @Body() body: VerifyCourseInputData) {
         return this.accountsService.verifyCourse({
@@ -44,7 +45,7 @@ export class AccountsController{
     @ApiBearerAuth()
     @Post("delete-courses")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(AccountRole.Administrator)
+    @Roles(SystemRoles.User, SystemRoles.Administrator)
     @UseInterceptors(AuthInterceptor)
     async deleteCourses(@AccountId() accountId: string, @Body() body: DeleteCourseInputData) {
         return this.accountsService.deleteCourses({
@@ -55,7 +56,8 @@ export class AccountsController{
 
     @ApiBearerAuth()
     @Post("create-account-review")
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async createAccountReview(
         @AccountId() accountId: string,
@@ -69,7 +71,8 @@ export class AccountsController{
 
     @ApiBearerAuth()
     @Patch("update-account-review")
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async updateAccountReview(
         @AccountId() accountId: string,
@@ -83,7 +86,8 @@ export class AccountsController{
 
     @ApiBearerAuth()
     @Delete("delete-account-review/:accountReviewId")
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async deleteAccountReview(
         @AccountId() accountId: string,
@@ -92,6 +96,81 @@ export class AccountsController{
         return this.accountsService.deleteAccountReview({
             accountId,
             data: { accountReviewId }
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-role")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Administrator)
+    @UseInterceptors(AuthInterceptor)
+    async createRole(
+        @AccountId() accountId: string,
+        @Body() body: CreateRoleInputData,
+    ) {
+        return this.accountsService.createRole({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-account-role")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Administrator)
+    @UseInterceptors(AuthInterceptor)
+    async createAccountRole(
+        @AccountId() accountId: string,
+        @Body() body: CreateAccountRoleInputData,
+    ) {
+        return this.accountsService.createAccountRole({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("toggle-role")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Administrator)
+    @UseInterceptors(AuthInterceptor)
+    async toggleRole(
+        @AccountId() accountId: string,
+        @Body() body: ToggleRoleInputData,
+    ) {
+        return this.accountsService.toggleRole({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("update-role")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Administrator)
+    @UseInterceptors(AuthInterceptor)
+    async updateRole(
+        @AccountId() accountId: string,
+        @Body() body: UpdateRoleInputData,
+    ) {
+        return this.accountsService.updateRole({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("update-account-role")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Administrator)
+    @UseInterceptors(AuthInterceptor)
+    async updateAccountRole(
+        @AccountId() accountId: string,
+        @Body() body: UpdateAccountRoleInputData,
+    ) {
+        return this.accountsService.updateAccountRole({
+            accountId,
+            data: body,
         })
     }
 }

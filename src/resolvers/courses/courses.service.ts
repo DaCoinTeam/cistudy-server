@@ -1,5 +1,6 @@
 import {
     CategoryMySqlEntity,
+    CategoryRelationMySqlEntity,
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
     CourseTargetMySqlEntity,
@@ -7,9 +8,11 @@ import {
     FollowMySqlEnitity,
     LessonMySqlEntity,
     QuizAttemptMySqlEntity,
+    QuizMySqlEntity,
+    QuizQuestionMySqlEntity,
     ResourceMySqlEntity
 } from "@database"
-import { Injectable } from "@nestjs/common"
+import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, Like, In } from "typeorm"
 import {
@@ -24,9 +27,9 @@ import {
     FindManyCourseReviewsInput,
     FindManyCoursesTopicInput,
     FindOneQuizAttemptInput,
-    FindOneCategoryInput,
+    FindManyLevelCategoriesInput,
 } from "./courses.input"
-import { FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindOneCategoryOutput, FindOneLessonOutput } from "./courses.output"
+import { FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindOneQuizAttemptOutput } from "./courses.output"
 
 @Injectable()
 export class CoursesService {
@@ -47,6 +50,10 @@ export class CoursesService {
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         @InjectRepository(QuizAttemptMySqlEntity)
         private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
+        @InjectRepository(QuizMySqlEntity)
+        private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+        @InjectRepository(QuizQuestionMySqlEntity)
+        private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
 
         private readonly dataSource: DataSource
     ) { }
@@ -313,7 +320,7 @@ export class CoursesService {
                                 lessons: true
                             }
                         },
-                        
+
                     },
                     quiz: {
                         questions: {
@@ -411,78 +418,61 @@ export class CoursesService {
         })
     }
 
-    async findManyCategories(
+    async findManyRootCategories(
     ): Promise<Array<CategoryMySqlEntity>> {
         return await this.categoryMySqlRepository.find({
-            relations: {
-                categoryRelations:{
-                    category:{
-                        categoryRelations:{
-                            category:{
-                                categoryRelations:true,
-                                categoryParentRelations:true                       
-                            }
-                        },
-                        categoryParentRelations:{
-                            category:{
-                                categoryRelations:true,
-                                categoryParentRelations: true                 
-                            }
-                        },                       
-                    }
-                },
-                categoryParentRelations:{
-                    category:{
-                        categoryRelations:{
-                            category:{
-                                categoryRelations:true,
-                                categoryParentRelations:true                      
-                            }
-                        },
-                        categoryParentRelations:{
-                            category:{
-                                categoryRelations:true,
-                                categoryParentRelations:true                       
-                            }
-                        }
-                    }
-                }
+            where: {
+                level: 0
             }
         })
     }
 
-    async findOneCategory(
-        input : FindOneCategoryInput
-    ): Promise<CategoryMySqlEntity>{
-        const {data} = input
-        const  {categoryId} = data
-        return await this.categoryMySqlRepository.findOne({
-            where:{
-                categoryId
-            },
-            relations:{
-                categoryParentRelations: {
-                    category: {
-                        categoryParentRelations: {
-                            category: true,
-                        },
-                        categoryRelations:{
-                            category: {
-                                categoryParentRelations:{
-                                    category: true
-                                },
-                                categoryRelations:{
-                                    category:true
-                                }
-                            },
-                        }
-                    }
-                }
-            }
-        })
+    async findManyLevelCategories(
+        input: FindManyLevelCategoriesInput,
+    ): Promise<Array<CategoryMySqlEntity>> {
+        const { data } = input
+        const { categoryParentId } = data
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
 
-        
+        try {
+            let childCategories = []
+
+            if (categoryParentId) {
+                const parentCategory = await this.categoryMySqlRepository.findOne({
+                    where: { categoryId: categoryParentId },
+                });
+
+                if (!parentCategory) {
+                    throw new NotFoundException('Parent category not found');
+                }
+
+                childCategories = await queryRunner.manager
+                    .createQueryBuilder()
+                    .select("category")
+                    .from(CategoryMySqlEntity, "category")
+                    .innerJoin(CategoryRelationMySqlEntity, "categoryRelation", "category.categoryId = categoryRelation.categoryId")
+                    .where("categoryRelation.categoryParentId = :categoryParentId", { categoryParentId })
+                    .getMany();
+            } else {
+                childCategories = await this.categoryMySqlRepository.find({
+                    where: {
+                        level: 0
+                    }
+                })
+            }
+
+            await queryRunner.commitTransaction()
+            return childCategories;
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex;
+        } finally {
+            await queryRunner.release()
+        }
     }
+
     async findOneCourseReview(
         input: FindOneCourseReviewInput,
     ) {
@@ -550,9 +540,12 @@ export class CoursesService {
         }
     }
 
-    async findOneQuizAttempt(input: FindOneQuizAttemptInput): Promise<QuizAttemptMySqlEntity> {
+    async findOneQuizAttempt(input: FindOneQuizAttemptInput): Promise<FindOneQuizAttemptOutput> {
         const { accountId, data } = input
-        const { quizAttemptId } = data
+        const { params, options } = data
+        const { quizAttemptId } = params
+        const { skip, take } = options
+
         const found = await this.quizAttemptMySqlRepository.findOne({
             where: {
                 accountId, quizAttemptId
@@ -566,7 +559,27 @@ export class CoursesService {
                 }
             }
         })
-        //console.log(found.quiz.questions)
-        return found
+        if (!found) {
+            throw new NotFoundException("Attempt not found or not started by user")
+        }
+        const { quizId } = found
+        const quizQuestions = await this.quizQuestionMySqlRepository.find({
+            where: {
+                quizId
+            },
+            skip,
+            take,
+            relations: {
+                answers: true
+            }
+        })
+
+        found.quiz.questions = quizQuestions
+
+        return {
+            data: found,
+            numberOfQuestions: quizQuestions.length
+        }
     }
+
 }

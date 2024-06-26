@@ -210,9 +210,25 @@ export class FindManyCoursesTopicInput implements Input<FindManyCoursesTopicInpu
 }
 
 @InputType()
-export class FindOneQuizAttemptInputData{ 
+export class FindOneQuizAttemptInputOptions{
+    @Field(() => Int, { nullable: true })
+    take?: number
+    @Field(() => Int, { nullable: true })
+    skip?: number
+}
+
+@InputType()
+export class FindOneQuizAttemptInputParams {
     @Field(() => String)
     quizAttemptId: string
+}
+
+@InputType()
+export class FindOneQuizAttemptInputData implements ParamsWithOptions<FindOneQuizAttemptInputParams, FindOneQuizAttemptInputOptions>{
+    @Field(() => FindOneQuizAttemptInputParams)
+    params: FindOneQuizAttemptInputParams
+    @Field(() => FindOneQuizAttemptInputOptions)
+    options?: FindOneQuizAttemptInputOptions  
 }
 
 export class FindOneQuizAttemptInput implements AuthInput<FindOneQuizAttemptInputData> {
@@ -221,11 +237,40 @@ export class FindOneQuizAttemptInput implements AuthInput<FindOneQuizAttemptInpu
 }
 
 @InputType()
-export class FindOneCategoryInputData {
-    @Field(() => String)
-    categoryId: string
+export class FindManyLevelCategoriesInputData{
+    @Field(() => ID, {nullable: true})
+    categoryParentId?: string
 }
 
-export class FindOneCategoryInput implements Input<FindOneCategoryInputData> {
-    data: FindOneCategoryInputData
+export class FindManyLevelCategoriesInput implements Input<FindManyLevelCategoriesInputData> {
+    data: FindManyLevelCategoriesInputData
 }
+
+// @InputType()
+// export class FindOneQuizInputOptions{
+//     @Field(() => Int, { nullable: true })
+//     take?: number
+//     @Field(() => Int, { nullable: true })
+//     skip?: number
+// }
+
+// @InputType()
+// export class FindOneQuizInputParams {
+//     @Field(() => ID)
+//     quizId: string
+// }
+
+// @InputType()
+// export class FindOneQuizInputData implements ParamsWithOptions<FindOneQuizInputParams, FindOneQuizInputOptions>{
+//     @Field(() => FindOneQuizInputParams)
+//     params: FindOneQuizInputParams;
+
+//     @Field(() => FindOneQuizInputOptions, { nullable: true })
+//     @IsOptional()
+//     options?: FindOneQuizInputOptions;
+// }
+
+// export class FindOneQuizInput implements AuthInput<FindOneQuizInputData>{
+//     accountId: string
+//     data: FindOneQuizInputData
+// }
