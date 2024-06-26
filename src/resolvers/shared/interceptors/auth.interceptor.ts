@@ -42,12 +42,12 @@ implements NestInterceptor<T, AuthOutput<T>>
                   accountId
                 },
                 relations: {
-                  accountRoles: {
-                    role: true
-                  }
+                //   accountRoles: {
+                //     role: true
+                //   }
                 }
               })
-              accountRoles = account.accountRoles.map(accRoles => accRoles.role.name)
+            //   accountRoles = account.accountRoles.map(accRoles => accRoles.role.name)
         }
 
         return next.handle().pipe(

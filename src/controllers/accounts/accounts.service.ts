@@ -1,9 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common"
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { DataSource, DeepPartial, In, Not, Repository } from "typeorm"
-import { CreateAccountReviewInput, DeleteCourseInput, DeleteAccountReviewInput, ToggleFollowInput, UpdateAccountReviewInput, VerifyCourseInput, CreateAccountRoleInput, CreateRoleInput, UpdateAccountRoleInput, UpdateRoleInput, ToggleRoleInput } from "./accounts.input"
-import { AccountMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, AccountReviewMySqlEntity, AccountRoleMySqlEntity, RoleMySqlEntity } from "@database"
-import { CreateAccountReviewOutput, CreateAccountRoleOutput, CreateRoleOutput, ToggleRoleOutput, UpdateAccountRoleOutput, UpdateRoleOutput, VerifyCourseOuput } from "./accounts.output"
+import { DataSource, DeepPartial, In, Repository } from "typeorm"
+import { CreateAccountReviewInput, DeleteCourseInput, DeleteAccountReviewInput, ToggleFollowInput, UpdateAccountReviewInput, VerifyCourseInput, ToggleRoleInput, CreateAccountRoleInput, UpdateAccountRoleInput } from "./accounts.input"
+import { AccountMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, AccountReviewMySqlEntity, RoleMySqlEntity } from "@database"
+import { CreateAccountReviewOutput, CreateAccountRoleOutput, ToggleRoleOutput, UpdateAccountRoleOutput, VerifyCourseOuput } from "./accounts.output"
 import { JwtService } from "@nestjs/jwt"
 import { SystemRoles } from "@common"
 
@@ -20,8 +20,6 @@ export class AccountsService {
         private readonly accountReviewMySqlRepository: Repository<AccountReviewMySqlEntity>,
         @InjectRepository(RoleMySqlEntity)
         private readonly roleMySqlRepository: Repository<RoleMySqlEntity>,
-        @InjectRepository(AccountRoleMySqlEntity)
-        private readonly accountRoleMySqlRepository: Repository<AccountRoleMySqlEntity>,
         private readonly dataSource: DataSource,
         private readonly jwtService: JwtService
     ) { }
@@ -251,79 +249,24 @@ export class AccountsService {
         }
     }
 
-    async createRole(input: CreateRoleInput): Promise<CreateRoleOutput> {
-        const { data } = input;
-        const { name } = data;
-
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-        try {
-            const trimmedName = name.trim();
-
-            const specialCharPattern = /[^a-zA-Z0-9]/;
-            if (specialCharPattern.test(trimmedName)) {
-                throw new BadRequestException("Role name contains special characters.");
-            }
-
-            const existingRole = await queryRunner.manager
-                .createQueryBuilder(RoleMySqlEntity, 'role')
-                .where('LOWER(role.name) = LOWER(:name)', { name })
-                .getOne();
-
-            if (existingRole) {
-                throw new ConflictException('Role already exists');
-            }
-
-
-            await queryRunner.manager.save(RoleMySqlEntity, { name: trimmedName.toLowerCase() });
-
-            await queryRunner.commitTransaction()
-
-            return {
-                message: `Role ${trimmedName} has been created successfully`,
-            };
-        } catch (ex) {
-            console.log(ex)
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
-        }
-    }
-
-
     async createAccountRole(input: CreateAccountRoleInput): Promise<CreateAccountRoleOutput> {
         const { data } = input;
-        const { accountId, roleId } = data
+        const { accountId, roleName } = data
 
 
-        const role = await this.roleMySqlRepository.findOneBy({ roleId })
+        const exist = await this.roleMySqlRepository.findOneBy({ accountId, name: roleName })
 
-        if (!role || role.isDisabled) {
-            throw new NotFoundException("Role Not Found or have been disabled");
+        if(exist){
+            throw new ConflictException("This user already have this role")
         }
 
-        const accountRoles = await this.accountRoleMySqlRepository.find({
-            where: {
-                accountId
-            }
+        const {name} = await this.roleMySqlRepository.save({
+            accountId,
+            name: roleName,
         })
 
-        const existingRole = accountRoles.some(accountRole => accountRole.roleId === roleId);
-
-        if (existingRole) {
-            throw new ConflictException("This account already have this role")
-        }
-
-        const added = await this.accountRoleMySqlRepository.save({
-            accountId, roleId
-        })
-
-        await this.accountMySqlRepository.save({accountId, accountRoles: [...accountRoles, added]})
-        
         return {
-            message: `Role have been added to account successfully`,
+            message: `Role "${name}" have been added to account successfully`,
         };
     }
 
@@ -336,10 +279,9 @@ export class AccountsService {
         if (!found) {
             throw new NotFoundException("Role Not Found");
         }
-        const restrictRoles = [SystemRoles.Administrator, SystemRoles.Moderator, SystemRoles.User].toString()
-        console.log(restrictRoles)
-        if(restrictRoles.includes(found.name)) {
-            throw new ConflictException("This role cannot be disabled")
+        
+        if(found.name === SystemRoles.User){
+            throw new ConflictException(`Cannot disable role ${SystemRoles.User} from this account`)
         }
 
         await this.roleMySqlRepository.update(roleId, { isDisabled: !found.isDisabled })
@@ -350,82 +292,63 @@ export class AccountsService {
         }
     }
 
-    async updateRole(input: UpdateRoleInput): Promise<UpdateRoleOutput> {
-        const { data } = input;
-        const { roleId, name } = data
-
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-        try {
-            const found = await this.roleMySqlRepository.findOneBy({ roleId })
-
-            if (!found) {
-                throw new NotFoundException("Role Not Found");
-            }
-
-            const trimmedName = name.trim();
-
-            const specialCharPattern = /[^a-zA-Z0-9]/;
-            if (specialCharPattern.test(trimmedName)) {
-                throw new BadRequestException("Role name contains special characters.");
-            }
-
-            const existingRole = await queryRunner.manager
-                .createQueryBuilder(RoleMySqlEntity, 'role')
-                .where('LOWER(role.name) = LOWER(:name)', { name })
-                .getOne();
-
-            if (existingRole) {
-                throw new ConflictException('Role already exists');
-            }
-
-            await this.roleMySqlRepository.update(roleId, {name: trimmedName})
-
-            return{
-                message: `Role ${found.name} has been changed to ${trimmedName} successfully.`
-            }
-        } catch (ex) {
-            console.log(ex)
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
-        }
-    }
-
     async updateAccountRole(input: UpdateAccountRoleInput): Promise<UpdateAccountRoleOutput> {
-        const {data} = input
-        const { accountId, roleIds, deleteRoleIds } = data;
+        const { data } = input;
+        const { accountId, roles, deleteRoleIds } = data;
 
-        const currentRoles = await this.accountRoleMySqlRepository.find({
-            where: { accountId }
-        });
-
-        if(!currentRoles || currentRoles.length === 0) {
-            throw new NotFoundException("This account don't have any roles")
+        const currentRoles = await this.roleMySqlRepository.find({ where: { accountId } });
+        if (!currentRoles || currentRoles.length === 0) {
+            throw new NotFoundException("This account doesn't have any roles.");
         }
 
-        
-        if (deleteRoleIds && deleteRoleIds.length > 0) {
-            await this.accountRoleMySqlRepository.delete({
-                accountId,
-                roleId: In(deleteRoleIds)
-            });
-        }
+        const queryRunner = this.roleMySqlRepository.manager.connection.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
 
-        if (roleIds && roleIds.length > 0) {
-            for (const role of roleIds) {
-                const newRole : DeepPartial<AccountRoleMySqlEntity> = {
-                    roleId: role,
-                    accountId
+        try {
+   
+            if (deleteRoleIds && deleteRoleIds.length > 0) {
+                
+                const userRoles = await this.roleMySqlRepository.find({
+                    where: { roleId: In(deleteRoleIds) },
+                });
+                const existUserRole = userRoles.some((role) => role.name === SystemRoles.User);
+                if (existUserRole) {
+                    throw new ConflictException(`Cannot delete role ${SystemRoles.User} from this account.`);
                 }
-                await this.accountRoleMySqlRepository.save(newRole);  
+                
+                await this.roleMySqlRepository.delete({ accountId, roleId: In(deleteRoleIds) });
             }
-        }
 
-        return {
-            message: 'Account role updated successfully.'
-        };
+            if (roles && roles.length > 0) {
+                const existingRoles = await this.roleMySqlRepository.find({
+                    where: { accountId, name: In(roles) },
+                });
+                const existingRolesSet = new Set(existingRoles.map((role) => role.name));
+
+                // Thêm role mới nếu chưa có, lọc ra role có rồi thì k thêm lại
+                const rolesToAdd = roles.filter((role) => !existingRolesSet.has(role));
+                for (const role of rolesToAdd) {
+                    const newRole: Partial<RoleMySqlEntity> = {
+                        accountId,
+                        name: role,
+                    };
+                    await this.roleMySqlRepository.save(newRole);
+                }
+            }
+            
+            await queryRunner.commitTransaction();
+
+            return {
+                message: 'Account roles updated successfully.',
+            };
+        } catch (error) {
+            // Rollback transaction on error
+            await queryRunner.rollbackTransaction();
+            throw error;
+        } finally {
+            // Release query runner
+            await queryRunner.release();
+        }
     }
 }

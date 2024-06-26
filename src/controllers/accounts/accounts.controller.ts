@@ -100,21 +100,6 @@ export class AccountsController {
     }
 
     @ApiBearerAuth()
-    @Post("create-role")
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User, SystemRoles.Administrator)
-    @UseInterceptors(AuthInterceptor)
-    async createRole(
-        @AccountId() accountId: string,
-        @Body() body: CreateRoleInputData,
-    ) {
-        return this.accountsService.createRole({
-            accountId,
-            data: body,
-        })
-    }
-
-    @ApiBearerAuth()
     @Post("create-account-role")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User, SystemRoles.Administrator)
@@ -139,21 +124,6 @@ export class AccountsController {
         @Body() body: ToggleRoleInputData,
     ) {
         return this.accountsService.toggleRole({
-            accountId,
-            data: body,
-        })
-    }
-
-    @ApiBearerAuth()
-    @Patch("update-role")
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User, SystemRoles.Administrator)
-    @UseInterceptors(AuthInterceptor)
-    async updateRole(
-        @AccountId() accountId: string,
-        @Body() body: UpdateRoleInputData,
-    ) {
-        return this.accountsService.updateRole({
             accountId,
             data: body,
         })

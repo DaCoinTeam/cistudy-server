@@ -1,13 +1,9 @@
 import { Output } from "@common";
-import { AccountMySqlEntity } from "@database";
 
-export class SignUpOutputOthers {
-    account : AccountMySqlEntity
-}
 
-export class SignUpOutput implements Output<SignUpOutputOthers>{
+
+export class SignUpOutput implements Output{
     message: string;
-    others: SignUpOutputOthers;
 }
 
 export class VerifyRegistrationOutput implements Output {

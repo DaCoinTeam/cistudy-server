@@ -12,7 +12,6 @@ import {
     SectionMySqlEntity,
     SessionMySqlEntity,
     AccountMySqlEntity,
-    AccountRoleMySqlEntity,
     RoleMySqlEntity
 } from "@database"
 import { TypeOrmModule } from "@nestjs/typeorm"
@@ -44,7 +43,6 @@ import { JwtStrategy } from "./strategies"
             PostLikeMySqlEntity,
             PostCommentMySqlEntity,
             PostCommentLikeMySqlEntity,
-            AccountRoleMySqlEntity,
             RoleMySqlEntity
         ])
     ],

@@ -29,7 +29,7 @@ implements NestInterceptor<T, AuthOutput<T>>
                 return await this.authManagerService.generateOutput<T>(
                     {
                         accountId: data.accountId,
-                        accountRoles: data.accountRoles,
+                        accountRoles: data.roles,
                         type: AuthTokenType.Refresh,
                     },
                     data,

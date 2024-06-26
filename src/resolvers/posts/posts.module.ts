@@ -7,7 +7,8 @@ import {
     PostCommentMySqlEntity,
     PostCommentLikeMySqlEntity,
     PostCommentReplyMySqlEntity,
-    AccountMySqlEntity
+    AccountMySqlEntity,
+    RoleMySqlEntity
 } from "@database"
 import { PostsService } from "./posts.service"
 
@@ -19,7 +20,8 @@ import { PostsService } from "./posts.service"
             PostLikeMySqlEntity,
             PostCommentMySqlEntity,
             PostCommentLikeMySqlEntity,
-            PostCommentReplyMySqlEntity
+            PostCommentReplyMySqlEntity,
+            RoleMySqlEntity
         ]),
     ],
     providers: [PostsResolver, PostsService],

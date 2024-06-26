@@ -1,4 +1,4 @@
-import { AuthInput, CourseApproveStatus, VerifyStatus } from "@common"
+import { AuthInput, CourseApproveStatus, SystemRoles, VerifyStatus } from "@common"
 import { InputType } from "@nestjs/graphql"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID, Max, Min } from "class-validator"
@@ -108,9 +108,8 @@ export class CreateAccountRoleInputData {
     @ApiProperty()
     accountId: string
 
-    @IsUUID("4")
     @ApiProperty()
-    roleId: string
+    roleName: SystemRoles
 }
 
 export class CreateAccountRoleInput implements AuthInput<CreateAccountRoleInputData> {
@@ -147,7 +146,7 @@ export class UpdateAccountRoleInputData {
     accountId: string
 
     @ApiProperty()
-    roleIds: Array<string>
+    roles: Array<SystemRoles>
 
     @ApiProperty()
     deleteRoleIds : Array<string>
