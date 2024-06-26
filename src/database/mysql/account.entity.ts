@@ -15,7 +15,7 @@ import { OrderEntity } from "./order.entity"
 import { CertificateEntity } from "./certificate"
 import { QuizAttemptEntity } from "./quiz-attempt.entity"
 import { AccountReviewEntity } from "./account-review.entity"
-import { AccountRoleEntity } from "./account-role.entity"
+import { RoleEntity } from "./role.entity"
 
 
 @ObjectType()
@@ -117,13 +117,12 @@ export class AccountEntity {
     @OneToMany(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.account)
     enrolledInfos: Array<EnrolledInfoEntity>
 
-    @Field(() => [AccountRoleEntity], {nullable: true})
+    @Field(() => [RoleEntity], {nullable: true})
     @OneToMany(
-        () => AccountRoleEntity, 
-        (accountRole) => accountRole.account, 
-        { cascade: true }
+        () => RoleEntity, 
+        (role) => role.accountRoles, 
     )
-    accountRoles: Array<AccountRoleEntity>
+    roles: Array<RoleEntity>
 
     @Field(() => [CryptoWalletEntity])
     @OneToMany(() => CryptoWalletEntity, (cryptoWallet) => cryptoWallet.account)

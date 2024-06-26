@@ -1,4 +1,4 @@
-import { CartMySqlEntity, AccountMySqlEntity } from "@database"
+import { CartMySqlEntity, AccountMySqlEntity, RoleMySqlEntity } from "@database"
 import {
     Injectable,
     NotFoundException,
@@ -12,7 +12,7 @@ import {
     VerifyGoogleAccessTokenInput,
 } from "./auth.input"
 import { FirebaseService, Sha256Service } from "@global"
-import { AccountKind } from "@common"
+import { AccountKind, SystemRoles } from "@common"
 
 @Injectable()
 export class AuthService {
@@ -20,6 +20,8 @@ export class AuthService {
         private readonly sha256Service: Sha256Service,
         @InjectRepository(AccountMySqlEntity)
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+        @InjectRepository(RoleMySqlEntity)
+        private readonly roleMySqlRepository: Repository<RoleMySqlEntity>,
         private readonly firebaseService: FirebaseService,
     ) { }
 
@@ -34,12 +36,9 @@ export class AuthService {
                         course: true
                     }
                 },
-                accountRoles:{
-                    role: true
-                }
+                roles: true
             }
         })
-        //console.log(account)
         return account
     }
 
@@ -54,7 +53,7 @@ export class AuthService {
         if (!found) throw new NotFoundException("Account not found.")
         if (!this.sha256Service.verifyHash(password, found.password))
             throw new UnauthorizedException("Invalid credentials.")
-        if(found.verified === false){
+        if (found.verified === false) {
             throw new UnauthorizedException("Your account is not verified, please check the email again")
         }
         return found
@@ -73,13 +72,19 @@ export class AuthService {
         let found = await this.accountMySqlRepository.findOneBy({
             externalId: decoded.uid,
         })
+
         if (!found) {
             found = await this.accountMySqlRepository.save({
                 externalId: decoded.uid,
-                email: decoded.email,         
+                email: decoded.email,
                 phoneNumber: decoded.phone_number,
                 avatarUrl: decoded.picture,
                 kind: AccountKind.Google,
+                verified: true,
+            })
+            await this.roleMySqlRepository.save({
+                accountId: found.accountId,
+                name: SystemRoles.User
             })
         }
         return found

@@ -1,5 +1,5 @@
 import { jwtConfig } from "@config"
-import { SessionMySqlEntity, AccountMySqlEntity, AccountRoleMySqlEntity } from "@database"
+import { SessionMySqlEntity, AccountMySqlEntity, RoleMySqlEntity } from "@database"
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
 import { JsonWebTokenError, JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
@@ -12,10 +12,10 @@ export class AuthManagerService {
         private readonly jwtService: JwtService,
         @InjectRepository(AccountMySqlEntity)
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
-        @InjectRepository(AccountRoleMySqlEntity)
-        private readonly accountRoleMySqlRepository: Repository<AccountRoleMySqlEntity>,
         @InjectRepository(SessionMySqlEntity)
         private readonly sessionMySqlRepository: Repository<SessionMySqlEntity>,
+        @InjectRepository(RoleMySqlEntity)
+        private readonly roleMySqlRepository: Repository<RoleMySqlEntity>,
     ) { }
 
     async verifyToken(token: string): Promise<Payload> {
@@ -103,17 +103,14 @@ export class AuthManagerService {
         let { accountRoles } = payload
         
         if (authTokensRequested) {
-            const roles = await this.accountRoleMySqlRepository.find({
+            const roles = await this.roleMySqlRepository.find({
                 where:{
                     accountId
-                },
-                relations:{
-                    role : true
                 }
             })
             accountRoles = roles ? roles
-                .filter(accountRole => accountRole.role.isDisabled === false)
-                .map(accountRole => accountRole.role.name)
+                .filter(accountRole => accountRole.isDisabled === false)
+                .map(accountRole => accountRole.name)
                 : undefined
         }
 
@@ -127,12 +124,6 @@ export class AuthManagerService {
         }
     }
 
-    // async generateSignInOutput<T extends object>(
-    //     authTokensRequested: boolean = false,
-    //     clientId?: string,
-    // ): Promise<AuthOutput>{
-
-    // }
 }
 
 export interface PayloadLike {

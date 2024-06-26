@@ -4,7 +4,7 @@ import { AuthTokenType, Payload } from '@common';
 import { ROLES_KEY } from '../decorators';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AccountMySqlEntity } from '@database';
+import { AccountMySqlEntity, RoleMySqlEntity } from '@database';
 
 
 @Injectable()
@@ -13,6 +13,8 @@ export class RolesGuard implements CanActivate {
     private reflector: Reflector,
     @InjectRepository(AccountMySqlEntity)
     private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+    @InjectRepository(RoleMySqlEntity)
+    private readonly roleMySqlRepository: Repository<RoleMySqlEntity>,
   ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -30,20 +32,15 @@ export class RolesGuard implements CanActivate {
 
       if (refresh) {
 
-        const { accountRoles } = await this.accountMySqlRepository.findOne({
-          where: {
-            accountId
-          },
-          relations: {
-            accountRoles: {
-              role: true
-            }
+        const roles = await this.roleMySqlRepository.find({
+          where:{
+              accountId
           }
-        })
+      })
 
-        userRoles = accountRoles
-          .filter(accRoles => accRoles.role.isDisabled === false)  // Lọc những roles có isDisabled = false
-          .map(accRoles => accRoles.role.name);
+        userRoles = roles
+          .filter(accRoles => accRoles.isDisabled === false)  // Lọc những roles có isDisabled = false
+          .map(accRoles => accRoles.name);
       }
 
       console.log("Required Roles: " + requiredRoles)

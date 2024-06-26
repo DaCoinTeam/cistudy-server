@@ -16,6 +16,7 @@ import {
     PostMediaMySqlEntity,
     PostCommentMediaMySqlEntity,
     PostCommentReplyMySqlEntity,
+    RoleMySqlEntity,
 } from "@database"
 import { PostsService } from "./posts.service"
 
@@ -24,6 +25,7 @@ import { PostsService } from "./posts.service"
         TypeOrmModule.forFeature([
             SessionMySqlEntity,
             AccountMySqlEntity,
+            RoleMySqlEntity,
             PostMySqlEntity,
             CourseMySqlEntity,
             EnrolledInfoMySqlEntity,

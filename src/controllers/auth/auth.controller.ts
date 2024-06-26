@@ -31,7 +31,7 @@ export class AuthController {
     }
 
     @Post("sign-up")
-    @UseInterceptors(GenerateAuthTokensInterceptor)
+    //@UseInterceptors(GenerateAuthTokensInterceptor)
     async signUp(@Body() body: SignUpData) {
         return this.authService.signUp({ data: body })
     }
@@ -47,8 +47,8 @@ export class AuthController {
     }
 
     @Get('verify-registration-page')
-    async getAccountVerificationLink(@Res() res: Response) {
-        const verificationLink = `https://www.facebook.com/`;
+    async getAccountVerificationLink(@Query('token') token :string, @Res() res: Response) {
+        const verificationLink = `https://www.facebook.com/${token}`;
         return res.redirect(verificationLink);
     }
 }

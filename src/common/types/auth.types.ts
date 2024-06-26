@@ -1,6 +1,5 @@
 import { Field, ObjectType } from "@nestjs/graphql"
 import { IsJWT } from "class-validator"
-import { AccountRoleMySqlEntity } from "@database"
 
 @ObjectType()
 export class AuthTokens {
