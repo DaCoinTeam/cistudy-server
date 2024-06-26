@@ -1,5 +1,5 @@
 import { AuthTokens, AuthOutput, ResultsWithMetadata } from "@common"
-import { AccountMySqlEntity, AccountReviewMySqlEntity } from "@database"
+import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity } from "@database"
 import { ObjectType, Int, Field } from "@nestjs/graphql"
 
 @ObjectType()
@@ -49,3 +49,27 @@ export class FindManyAccountReviewsOutput implements AuthOutput<FindManyAccountR
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }
+//
+// @ObjectType()
+// export class FindManySelfCreatedCoursesOutputMetadata {
+//     @Field(() => Int, { nullable: true })
+//         count?: number
+// }
+
+// @ObjectType()
+// export class FindManySelfCreatedCoursesOutputData
+// implements ResultsWithMetadata<CourseMySqlEntity, FindManySelfCreatedCoursesOutputMetadata>
+// {
+//     @Field(() => [CourseMySqlEntity])
+//         results: Array<CourseMySqlEntity>
+//     @Field(() => FindManySelfCreatedCoursesOutputMetadata, { nullable: true })
+//         metadata: FindManySelfCreatedCoursesOutputMetadata
+// }
+
+// @ObjectType()
+// export class FindManySelfCreatedCoursesOutput implements AuthOutput<FindManySelfCreatedCoursesOutputData> {
+//     @Field(() => FindManySelfCreatedCoursesOutputData)
+//         data: FindManySelfCreatedCoursesOutputData
+//     @Field(() => AuthTokens, { nullable: true })
+//         tokens?: AuthTokens
+// }
