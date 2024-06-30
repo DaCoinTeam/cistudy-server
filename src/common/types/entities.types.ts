@@ -12,6 +12,7 @@ registerEnumType(AccountKind, {
 
 export enum SystemRoles {
   User = "user",
+  Instructor = "instructor",
   Moderator = "moderator",
   Administrator = "administrator",
 }

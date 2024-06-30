@@ -20,11 +20,6 @@ export class AccountsResolver {
       return this.accountsService.findManyFollowers({ data })
   }
 
-  @Query(() => [CourseMySqlEntity])
-  async findManyCreatedCourses(@Args("data") data: FindManyCreatedCoursesInputData) {
-      return this.accountsService.findManyCreatedCourses({ data })
-  }
-
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   @Query(() => FindManyAccountsOutput)

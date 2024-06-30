@@ -104,7 +104,7 @@ export class CoursesController {
   @ApiBody({ schema: updateCourseSchema })
   @Put("update-course")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(
     AuthInterceptor,
     FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
@@ -169,7 +169,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Post("create-course-target")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(AuthInterceptor)
   async createCourseTarget(
     @AccountId() accountId: string,
@@ -184,7 +184,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Put("update-course-target")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(AuthInterceptor)
   async updateCourseTarget(
     @AccountId() accountId: string,
@@ -199,7 +199,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Delete("delete-course-target/:courseTargetId")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(AuthInterceptor)
   async deleteCoureTarget(
     @AccountId() accountId: string,
@@ -214,7 +214,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Post("create-section")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(AuthInterceptor)
   async createSection(
     @AccountId() accountId: string,
@@ -229,7 +229,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Post("create-lesson")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(AuthInterceptor)
   async createLesson(
     @AccountId() accountId: string,
@@ -244,7 +244,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Delete("delete-lesson/:lessonId")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(AuthInterceptor)
   async deleteLesson(
     @AccountId() accountId: string,
@@ -261,7 +261,7 @@ export class CoursesController {
   @ApiBody({ schema: createResourcesSchema })
   @Post("create-resources")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(
     AuthInterceptor,
     FileFieldsInterceptor([{ name: "files", maxCount: 10 }]),
@@ -283,7 +283,7 @@ export class CoursesController {
   @ApiBody({ schema: createResourcesSchema })
   @Put("update-lesson")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(
     AuthInterceptor,
     FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
@@ -303,7 +303,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Put("update-section")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(AuthInterceptor)
   async updateSection(
     @AccountId() accountId: string,
@@ -318,7 +318,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Delete("delete-section/:sectionId")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(AuthInterceptor)
   async deleteSection(
     @AccountId() accountId: string,
@@ -333,7 +333,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @Delete("delete-resource/:resourceId")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(AuthInterceptor)
   async deleteResource(
     @AccountId() accountId: string,
@@ -434,7 +434,7 @@ export class CoursesController {
   @ApiBody({ schema: createQuizSchema })
   @Post("create-quiz")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
   async createQuiz(
     @AccountId() accountId: string,
@@ -449,7 +449,7 @@ export class CoursesController {
   @ApiBody({ schema: updateQuizSchema })
   @Put("update-quiz")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
   async updateQuiz(
     @AccountId() accountId: string,

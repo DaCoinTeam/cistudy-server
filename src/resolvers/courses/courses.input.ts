@@ -1,7 +1,7 @@
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
 import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsOptional } from "class-validator"
+import { IsOptional, IsUUID } from "class-validator"
 import { CourseMySqlEntity } from "@database"
 
 @InputType()
@@ -90,6 +90,9 @@ export class FindManyCoursesInputOptions {
     skip?: number
     @Field(() => String, { nullable: true })
     searchValue?: string
+    @IsUUID("4")
+    @Field(() => String, { nullable: true })
+    categoryId?: string
 }
 
 @InputType()

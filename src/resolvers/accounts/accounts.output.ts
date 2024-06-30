@@ -49,27 +49,3 @@ export class FindManyAccountReviewsOutput implements AuthOutput<FindManyAccountR
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }
-//
-// @ObjectType()
-// export class FindManySelfCreatedCoursesOutputMetadata {
-//     @Field(() => Int, { nullable: true })
-//         count?: number
-// }
-
-// @ObjectType()
-// export class FindManySelfCreatedCoursesOutputData
-// implements ResultsWithMetadata<CourseMySqlEntity, FindManySelfCreatedCoursesOutputMetadata>
-// {
-//     @Field(() => [CourseMySqlEntity])
-//         results: Array<CourseMySqlEntity>
-//     @Field(() => FindManySelfCreatedCoursesOutputMetadata, { nullable: true })
-//         metadata: FindManySelfCreatedCoursesOutputMetadata
-// }
-
-// @ObjectType()
-// export class FindManySelfCreatedCoursesOutput implements AuthOutput<FindManySelfCreatedCoursesOutputData> {
-//     @Field(() => FindManySelfCreatedCoursesOutputData)
-//         data: FindManySelfCreatedCoursesOutputData
-//     @Field(() => AuthTokens, { nullable: true })
-//         tokens?: AuthTokens
-// }

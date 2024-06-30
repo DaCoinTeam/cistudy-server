@@ -88,23 +88,6 @@ export class AccountsService {
         return followRelations.map(followRelation => followRelation.follower)
     }
 
-    async findManyCreatedCourses(input: FindManyCreatedCoursesInput): Promise<Array<CourseMySqlEntity>> {
-        const { data } = input
-        const { params, options } = data
-        const { accountId } = params
-        const { take, skip } = { ...options }
-
-        return await this.courseMySqlRepository.find(
-            {
-                where: {
-                    creatorId: accountId,
-                },
-                take,
-                skip
-            }
-        )
-    }
-
     async findManyAccounts(input: FindManyAccountsInput): Promise<FindManyAccountsOutputData> {
         const { data } = input
         const { options } = data

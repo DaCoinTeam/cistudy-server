@@ -1,6 +1,7 @@
 import {
     CategoryMySqlEntity,
     CategoryRelationMySqlEntity,
+    CourseCategoryMySqlEntity,
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
     CourseTargetMySqlEntity,
@@ -236,40 +237,155 @@ export class CoursesService {
     async findManyCourses(
         input: FindManyCoursesInput,
     ): Promise<FindManyCoursesOutputData> {
-        const { data } = input
-        const { options } = data
-        const { skip, take, searchValue } = { ...options }
+        const { data } = input;
+        const { options } = data;
+        const { skip, take, searchValue, categoryId } = { ...options };
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
 
         try {
-            const results = await this.courseMySqlRepository.find(
-                {
+            let results = [];
+
+            if (categoryId) {
+                const category = await this.categoryMySqlRepository.findOne({ where: { categoryId } });
+
+                if (!category) {
+                    throw new NotFoundException(`Category not found`);
+                }
+
+                const currentcategoryLevel = category.level
+
+                switch (currentcategoryLevel) {
+                    case 0: {
+                        const { categoryId } = category;
+
+                        // const level2Categories = await queryRunner.manager
+                        //     .createQueryBuilder(CategoryMySqlEntity, 'c2')
+                        //     .leftJoinAndSelect('c2.courseCategories', 'cc')
+                        //     .leftJoinAndSelect('cc.course', 'cou')
+                        //     .innerJoin(CourseMySqlEntity, "c", "c.courseId = cc.courseId")
+                        //     .innerJoin(CategoryRelationMySqlEntity, 'cr2', 'c2.categoryId = cr2.categoryId')
+                        //     .innerJoin(CategoryMySqlEntity, 'c1', 'cr2.categoryParentId = c1.categoryId')
+                        //     .innerJoin(CategoryRelationMySqlEntity, 'cr1', 'c1.categoryId = cr1.categoryId')
+                        //     .innerJoin(CategoryMySqlEntity, 'c0', 'cr1.categoryParentId = c0.categoryId')
+                        //     .where('c0.level = 0')
+                        //     .andWhere('c1.level = 1')
+                        //     .andWhere('c2.level = 2')
+                        //     .andWhere('c0.categoryId = :categoryId', { categoryId })
+                        //     .getMany();
+                        const level0Category = await this.categoryMySqlRepository.findOne({
+                            where: { categoryId },
+                            relations: {
+                                categoryParentRelations: {
+                                    category: {//lv1
+                                        categoryParentRelations: {
+                                            category: {//lv2
+                                                courseCategories: {
+                                                    course: true
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        })
+                        const level2Categories = level0Category?.categoryParentRelations?.flatMap(
+                            lv1 => lv1.category?.categoryParentRelations?.map(
+                                lv2 => lv2.category
+                            ) || []
+                        ) || [];
+
+                        results = level2Categories.flatMap(cat =>
+                            cat.courseCategories
+                                .filter(cc => cc.course?.title?.toLowerCase().includes(searchValue.toLowerCase()))
+                                .map(cc => cc.course)
+                        ).slice(skip, take);
+                        break;
+                    }
+                    case 1: {
+                        const { categoryId } = category;
+
+                        const level1Categories = await this.categoryMySqlRepository.findOne({
+                            where: {
+                                categoryId
+                            },
+                            relations: {
+                                categoryParentRelations: {
+                                    category: {
+                                        courseCategories: {
+                                            course: true
+                                        }
+                                    }
+                                }
+                            }
+                        })
+
+                        results = level1Categories.categoryParentRelations.flatMap(cat =>
+                            cat.category?.courseCategories?.filter(
+                                cc => cc.course?.title?.toLowerCase().includes(searchValue.toLowerCase())
+                            )
+                            .map(cc => cc.course)
+                        ).slice(skip, take);
+                        break;
+                    }
+                    case 2: {
+                        results = await this.courseMySqlRepository.find({
+                            where: {
+                                courseCategories: {
+                                    categoryId: categoryId,
+                                },
+                                title: Like(`%${searchValue}%`),
+                            },
+                            relations: {
+                                creator: true,
+                                courseCategories: {
+                                    category: true,
+                                },
+                            },
+                            skip,
+                            take,
+                        });
+                        break;
+                    }
+                    default: break;
+                }
+            } else {
+                results = await this.courseMySqlRepository.find({
                     where: {
-                        title: Like(`%${searchValue}%`)
+                        title: Like(`%${searchValue}%`),
                     },
                     skip,
                     take,
                     relations: {
                         creator: true,
                         courseCategories: {
-                            category: true
-                        }
+                            category: true,
+                        },
                     },
-                })
+                });
+            }
+
+
+            const topic = await this.categoryMySqlRepository.find({
+                where: {
+                    level: 2,
+                    name: Like(`%${searchValue}%`),
+                },
+            });
+
 
             const coursesReviews = await this.courseReviewMySqlRepository.find({
                 where: {
-                    courseId: In(results.map(course => course.courseId))
+                    courseId: In(results.map(course => course.courseId)),
                 },
             });
 
             results.forEach(course => {
                 const reviews = coursesReviews.filter(review => review.courseId === course.courseId);
                 const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-                course.courseRate = reviews.length ? (totalRating / reviews.length) : 0;
+                course.courseRate = reviews.length ? totalRating / reviews.length : 0;
             });
 
             const maxRate = Math.max(...results.map(course => course.courseRate));
@@ -277,25 +393,28 @@ export class CoursesService {
 
             const numberOfCoursesResult = await queryRunner.manager
                 .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(CourseMySqlEntity, "course")
-                .getRawOne()
+                .select('COUNT(*)', 'count')
+                .from(CourseMySqlEntity, 'course')
+                .getRawOne();
 
-            await queryRunner.commitTransaction()
+            await queryRunner.commitTransaction();
 
             return {
                 results,
                 metadata: {
                     count: numberOfCoursesResult.count,
-                    highRateCourses
-                }
-            }
+                    highRateCourses,
+                    categories: topic,
+                },
+            };
         } catch (ex) {
-            await queryRunner.rollbackTransaction()
+            await queryRunner.rollbackTransaction();
+            throw ex;
         } finally {
-            await queryRunner.release()
+            await queryRunner.release();
         }
     }
+
 
     async findOneLesson(
         input: FindOneLessonInput,

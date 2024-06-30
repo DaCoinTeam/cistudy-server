@@ -658,7 +658,6 @@ type Query {
   findManyPostCommentReplies(data: FindManyPostCommentRepliesInputData!): FindManyPostCommentRepliesOutput!
   findOneAccount(data: FindOneAccountInputData!): AccountEntity!
   findManyFollowers(data: FindManyFollowersInputData!): [AccountEntity!]!
-  findManyCreatedCourses(data: FindManyCreatedCoursesInputData!): [CourseEntity!]!
   findManyAccounts(data: FindManyAccountsInputData!): FindManyAccountsOutput!
   findManyAccountReviews(data: FindManyAccountReviewsInputData!): FindManyAccountReviewsOutputData!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
@@ -711,6 +710,7 @@ input FindManyCoursesInputOptions {
   take: Int
   skip: Int
   searchValue: String
+  categoryId: String
 }
 
 input FindOneLessonInputData {
@@ -881,20 +881,6 @@ input FindManyFollowersInputData {
 
 input FindManyFollowersInputParams {
   accountId: ID!
-}
-
-input FindManyCreatedCoursesInputData {
-  params: FindManyCreatedCoursesInputParams!
-  options: FindManyCreatedCoursesInputOptions
-}
-
-input FindManyCreatedCoursesInputParams {
-  accountId: String!
-}
-
-input FindManyCreatedCoursesInputOptions {
-  take: Int
-  skip: Int
 }
 
 input FindManyAccountsInputData {
