@@ -114,7 +114,7 @@ export class PostsService {
             await Promise.all(promises)
         }
 
-        let earnAmount : number
+        let earnAmount: number
 
         const numberOfUserPost = await this.postMySqlRepository.find({
             where: {
@@ -125,16 +125,21 @@ export class PostsService {
 
         if (numberOfUserPost.length < 3) {
             post.isRewarded = true
-            const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOneBy({accountId, courseId})
-            earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient
+            const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOneBy({ accountId, courseId })
+            earnAmount = Number.parseFloat(
+                (
+                    priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient
+                ).toFixed(5)
+            )
             await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
         }
 
-        const created = await this.postMySqlRepository.save(post)
+        const { postId } = await this.postMySqlRepository.save(post)
 
         return {
-            message: `A post with id ${created.postId} has been created successfully.`,
+            message: "Post has been created successfully.",
             others: {
+                postId,
                 earnAmount
             }
         }
@@ -254,7 +259,7 @@ export class PostsService {
                 }
             })
 
-            if(allowComments == false){
+            if (allowComments == false) {
                 throw new ConflictException("This post is closed")
             }
 
@@ -280,10 +285,10 @@ export class PostsService {
                 throw new ConflictException("You have already liked this post.")
             }
 
-            const numberOfPostLike = await this.postLikeMySqlRepository.findBy({ postId }) 
-            
+            const numberOfPostLike = await this.postLikeMySqlRepository.findBy({ postId })
+
             const numberOfRewardedLike = numberOfPostLike.filter(likeCount => likeCount.accountId !== creatorId)
-            
+
 
             if (isRewarded) {
                 if (creatorId !== accountId) {
@@ -318,7 +323,7 @@ export class PostsService {
         const { data, files, accountId } = input
         const { postCommentMedias, postId, html } = data
 
-        const { courseId, creatorId, isRewarded, course, allowComments } = await this.postMySqlRepository.findOne({
+        const post = await this.postMySqlRepository.findOne({
             where: {
                 postId
             },
@@ -327,7 +332,13 @@ export class PostsService {
             }
         })
 
-        if(allowComments == false){
+        if(!post){
+            throw new NotFoundException("Post not found or has been deleted")
+        }
+
+        const { courseId, creatorId, isRewarded, course, allowComments } = post
+
+        if (allowComments == false) {
             throw new ConflictException("This post is closed.")
         }
 
@@ -369,11 +380,14 @@ export class PostsService {
         await queryRunner.startTransaction()
 
         try {
-            let earnAmount: number 
-            let isOwner : boolean
+            let earnAmount: number
+            let isOwner: boolean
+            let alreadyRewarded : boolean
 
-            if(creatorId == accountId){
+            if (creatorId == accountId) {
                 isOwner = true
+            }else {
+                alreadyRewarded = false
             }
 
             const isEnrolled = await this.enrolledInfoMySqlRepository.findOne({
@@ -416,8 +430,10 @@ export class PostsService {
                         if (numberOfRewardedComments < 20) {
                             earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient
                             await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
-                            
+
                         }
+                    }else {
+                        alreadyRewarded = true
                     }
 
                 }
@@ -428,8 +444,9 @@ export class PostsService {
                 message: "Comment Posted Successfully",
                 others: {
                     postCommentId,
+                    alreadyRewarded,
                     earnAmount,
-                    isOwner
+                    isOwner, 
                 }
             }
         } catch (ex) {

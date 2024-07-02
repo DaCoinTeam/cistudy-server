@@ -5,6 +5,7 @@ import {
     CourseMySqlEntity,
     FollowMySqlEnitity,
     AccountMySqlEntity,
+    PostMySqlEntity,
 } from "@database"
 import { ProfileService } from "./profile.service"
 
@@ -13,7 +14,8 @@ import { ProfileService } from "./profile.service"
         TypeOrmModule.forFeature([
             AccountMySqlEntity,
             FollowMySqlEnitity,
-            CourseMySqlEntity
+            CourseMySqlEntity,
+            PostMySqlEntity
         ]),
     ],
     providers: [ProfileResolver, ProfileService ],

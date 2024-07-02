@@ -134,7 +134,6 @@ export class PostsService {
                     createdAt: {
                         direction: "DESC"
                     },
-
                 }
             })
 
@@ -162,15 +161,6 @@ export class PostsService {
                 .groupBy("post.postId")
                 .getRawMany()
 
-            // const likedResults = await queryRunner.manager
-            //     .createQueryBuilder()
-            //     .select("post.postId", "postId")
-            //     .addSelect("post_like.liked", "liked")
-            //     .from(PostMySqlEntity, "post")
-            //     .innerJoin(PostLikeMySqlEntity, "post_like", "post.postId = post_like.postId")
-            //     .where("post_like.accountId = :accountId", { accountId })
-            //     .getRawMany()
-
             const numberOfPostsResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
@@ -183,7 +173,6 @@ export class PostsService {
             const results = await Promise.all(posts.map(async (post) => {
                 const numberOfLikes = numberOfLikesResults.find(result => result.postId === post.postId)?.count ?? 0;
                 const numberOfComments = numberOfCommentsResults.find(result => result.postId === post.postId)?.count ?? 0;
-                //const liked = likedResults.find(result => result.postId === post.postId)?.liked ?? false;
 
                 let numberOfRewardedLikesLeft : number;
                 let numberOfRewardedCommentsLeft : number;
@@ -206,8 +195,8 @@ export class PostsService {
                         .orderBy("post_comment.createdAt", "ASC")
                         .getMany();
 
-                    const uniqueRewardedCommenters = new Set(rewardedComments.map(comment => comment.creatorId));
-                    const rewardedCommentsCount = Math.min(uniqueRewardedCommenters.size, 20);
+                    const uniqueRewardedCommentors = new Set(rewardedComments.map(comment => comment.creatorId));
+                    const rewardedCommentsCount = Math.min(uniqueRewardedCommentors.size, 20);
                     numberOfRewardedCommentsLeft = 20 - rewardedCommentsCount;
                 }
 
@@ -215,7 +204,6 @@ export class PostsService {
                     ...post,
                     numberOfLikes,
                     numberOfComments,
-                    //liked,
                     numberOfRewardedLikesLeft,
                     numberOfRewardedCommentsLeft,
                 };

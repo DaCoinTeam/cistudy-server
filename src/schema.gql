@@ -265,6 +265,7 @@ type CourseEntity {
   enrolled: Boolean
   courseProgress: Float
   courseRate: Float
+  numberOfRewardedPostsLeft: Int
 }
 
 type PostLikeEntity {
@@ -304,7 +305,6 @@ type PostEntity {
   numberOfComments: Int
   numberOfRewardedLikesLeft: Int
   numberOfRewardedCommentsLeft: Int
-  liked: Boolean
 }
 
 type PostCommentMediaEntity {

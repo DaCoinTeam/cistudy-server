@@ -87,6 +87,4 @@ export class PostEntity {
     numberOfRewardedLikesLeft?: number
     @Field(() => Int, { nullable: true })
     numberOfRewardedCommentsLeft?: number
-    @Field(() => Boolean, { nullable: true })
-    liked?: boolean
 }

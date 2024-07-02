@@ -19,6 +19,7 @@ export class CreatePostCommentOutputOthers {
     @IsOptional()
     earnAmount?: number
     isOwner?: boolean
+    alreadyRewarded?: boolean
 }
 
 export class CreatePostCommentOutput implements Output<CreatePostCommentOutputOthers>{
@@ -81,6 +82,7 @@ export class DeletePostCommentReplyOutput implements Output{
 }
 
 export class CreatePostOutputOthers{
+    postId? : string
     earnAmount? : number
 }
 
