@@ -271,7 +271,6 @@ type PostLikeEntity {
   postLikeId: ID!
   accountId: String!
   postId: String!
-  liked: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   account: AccountEntity!
@@ -293,6 +292,7 @@ type PostEntity {
   creatorId: ID!
   courseId: ID!
   allowComments: Boolean!
+  isRewarded: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   html: String!
@@ -302,6 +302,8 @@ type PostEntity {
   postReacts: [PostLikeEntity!]!
   numberOfLikes: Int
   numberOfComments: Int
+  numberOfRewardedLikesLeft: Int
+  numberOfRewardedCommentsLeft: Int
   liked: Boolean
 }
 
@@ -332,6 +334,7 @@ type PostCommentEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   html: String!
+  isRewarded: Boolean!
   post: PostEntity!
   creator: AccountEntity!
   postCommentMedias: [PostCommentMediaEntity!]!

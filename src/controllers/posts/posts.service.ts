@@ -1,5 +1,5 @@
 import { StorageService } from "@global"
-import { Injectable, NotFoundException } from "@nestjs/common"
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import {
     CreatePostCommentInput,
     CreatePostInput,
@@ -12,7 +12,7 @@ import {
     DeletePostCommentInput,
     UpdatePostInput,
     DeletePostInput,
-    TogglePostCommentInput,
+    MarkPostCommentRewardedInput,
 } from "./posts.input"
 import {
     PostMySqlEntity,
@@ -31,9 +31,11 @@ import { Repository, DeepPartial, DataSource } from "typeorm"
 import {
     CreatePostCommentOutput,
     CreatePostCommentReplyOutput,
+    CreatePostOutput,
     DeletePostCommentOutput,
     DeletePostCommentReplyOutput,
     DeletePostOutput,
+    MarkPostCommentRewardedOutput,
     ToggleCommentLikePostOutputData,
     ToggleLikePostOutputData,
     UpdatePostCommentOutput,
@@ -54,7 +56,7 @@ export class PostsService {
         @InjectRepository(CourseMySqlEntity)
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
         @InjectRepository(EnrolledInfoMySqlEntity)
-        private readonly enrolledInfoMySqlEntity: Repository<EnrolledInfoMySqlEntity>,
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         @InjectRepository(PostLikeMySqlEntity)
         private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
         @InjectRepository(PostCommentLikeMySqlEntity)
@@ -69,51 +71,79 @@ export class PostsService {
         private readonly dataSource: DataSource,
     ) { }
 
-    async createPost(input: CreatePostInput): Promise<string> {
+    async createPost(input: CreatePostInput): Promise<CreatePostOutput> {
         console.log(input)
         const { data, files, accountId } = input
-
         const { postMedias, title, courseId, html } = data
+
+        const isEnrolled = await this.enrolledInfoMySqlRepository.findOneBy({ accountId, courseId })
+
+        if (!isEnrolled) {
+            throw new ConflictException("You must be enrolled to this course before creating a post inside. ")
+        }
+
         const post: DeepPartial<PostMySqlEntity> = {
             title,
             courseId,
             creatorId: accountId,
-            html,
+            html: html ? html : null,
             postMedias: [],
         }
+        if (files) {
+            const promises: Array<Promise<void>> = []
 
-        const promises: Array<Promise<void>> = []
-        console.log("tong so hinh la :" + postMedias.length)
-        let mediaPosition = 0
-        for (const postMedia of postMedias) {
-            const { mediaIndex, mediaType } = postMedia
+            let mediaPosition = 0
+            for (const postMedia of postMedias) {
+                const { mediaIndex, mediaType } = postMedia
 
-            const position = mediaPosition
-            const promise = async () => {
-                const file = files.at(mediaIndex)
-                const { assetId } = await this.storageService.upload({
-                    rootFile: file,
-                })
-                post.postMedias.push({
-                    position,
-                    mediaId: assetId,
-                    mediaType,
-                } as PostMediaMySqlEntity)
+                const position = mediaPosition
+                const promise = async () => {
+                    const file = files.at(mediaIndex)
+                    const { assetId } = await this.storageService.upload({
+                        rootFile: file,
+                    })
+                    post.postMedias.push({
+                        position,
+                        mediaId: assetId,
+                        mediaType,
+                    } as PostMediaMySqlEntity)
+                }
+                mediaPosition++
+                promises.push(promise())
             }
-            mediaPosition++
-            promises.push(promise())
+            await Promise.all(promises)
         }
-        await Promise.all(promises)
+
+        let earnAmount : number
+
+        const numberOfUserPost = await this.postMySqlRepository.find({
+            where: {
+                creatorId: accountId,
+                courseId
+            }
+        })
+
+        if (numberOfUserPost.length < 3) {
+            post.isRewarded = true
+            const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOneBy({accountId, courseId})
+            earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient
+            await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+        }
 
         const created = await this.postMySqlRepository.save(post)
 
-        return `A post with id ${created.postId} has been created successfully.`
+        return {
+            message: `A post with id ${created.postId} has been created successfully.`,
+            others: {
+                earnAmount
+            }
+        }
     }
 
     async updatePost(input: UpdatePostInput): Promise<UpdatePostOutput> {
         const { data, files, accountId } = input
-
         const { postMedias, title, postId, html } = data
+
         const post: DeepPartial<PostMySqlEntity> = {
             postId,
             title,
@@ -122,28 +152,31 @@ export class PostsService {
             postMedias: [],
         }
 
-        const promises: Array<Promise<void>> = []
+        if (files) {
+            const promises: Array<Promise<void>> = []
+            let mediaPosition = 0
+            for (const postMedia of postMedias) {
+                const { mediaIndex, mediaType } = postMedia
 
-        let mediaPosition = 0
-        for (const postMedia of postMedias) {
-            const { mediaIndex, mediaType } = postMedia
-
-            const position = mediaPosition
-            const promise = async () => {
-                const file = files.at(mediaIndex)
-                const { assetId } = await this.storageService.upload({
-                    rootFile: file,
-                })
-                post.postMedias.push({
-                    position,
-                    mediaId: assetId,
-                    mediaType,
-                } as PostMediaMySqlEntity)
+                const position = mediaPosition
+                const promise = async () => {
+                    const file = files.at(mediaIndex)
+                    const { assetId } = await this.storageService.upload({
+                        rootFile: file,
+                    })
+                    post.postMedias.push({
+                        position,
+                        mediaId: assetId,
+                        mediaType,
+                    } as PostMediaMySqlEntity)
+                }
+                mediaPosition++
+                promises.push(promise())
             }
-            mediaPosition++
-            promises.push(promise())
+            await Promise.all(promises)
         }
-        await Promise.all(promises)
+
+
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -211,47 +244,69 @@ export class PostsService {
         await queryRunner.startTransaction()
         try {
             let earnAmount: number
-            let found = await this.postLikeMySqlRepository.findOne({
+
+            const { courseId, creatorId, isRewarded, course, allowComments } = await this.postMySqlRepository.findOne({
                 where: {
-                    accountId,
-                    postId,
+                    postId
                 },
+                relations: {
+                    course: true
+                }
             })
 
-            if (found === null) {
-                found = await this.postLikeMySqlRepository.save({
-                    accountId,
-                    postId,
-                })
-
-                const { courseId } = await this.postMySqlRepository.findOneBy({
-                    postId,
-                })
-
-                const { priceAtEnrolled } = await this.enrolledInfoMySqlEntity.findOneBy({
-                    accountId,
-                    courseId
-                })
-
-                earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient
-                await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
-            } else {
-                const { postLikeId, liked } = found
-                await this.postLikeMySqlRepository.update(postLikeId, {
-                    liked: !liked,
-                })
+            if(allowComments == false){
+                throw new ConflictException("This post is closed")
             }
 
-            const { postLikeId } = found
+            const isEnrolled = await this.enrolledInfoMySqlRepository.findOne({
+                where: {
+                    accountId,
+                    courseId
+                }
+            })
+
+            if (!isEnrolled) {
+                throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
+            }
+
+            const isLiked = await this.postLikeMySqlRepository.findOne({
+                where: {
+                    accountId,
+                    postId
+                }
+            })
+
+            if (isLiked) {
+                throw new ConflictException("You have already liked this post.")
+            }
+
+            const numberOfPostLike = await this.postLikeMySqlRepository.findBy({ postId }) 
+            
+            const numberOfRewardedLike = numberOfPostLike.filter(likeCount => likeCount.accountId !== creatorId)
+            
+
+            if (isRewarded) {
+                if (creatorId !== accountId) {
+                    const { priceAtEnrolled } = isEnrolled
+                    if (numberOfRewardedLike.length < 20) {
+                        earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient
+                        await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+                    }
+                }
+            }
+
+            const { postLikeId } = await this.postLikeMySqlRepository.save({ accountId, postId })
+
             return {
-                message: "",
+                message: "Post liked successfully.",
                 others: {
-                    postLikeId: postLikeId,
-                    earnAmount: earnAmount
+                    postLikeId,
+                    earnAmount,
                 }
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
+            throw ex
         } finally {
             await queryRunner.release()
         }
@@ -262,6 +317,20 @@ export class PostsService {
     ): Promise<CreatePostCommentOutput> {
         const { data, files, accountId } = input
         const { postCommentMedias, postId, html } = data
+
+        const { courseId, creatorId, isRewarded, course, allowComments } = await this.postMySqlRepository.findOne({
+            where: {
+                postId
+            },
+            relations: {
+                course: true
+            }
+        })
+
+        if(allowComments == false){
+            throw new ConflictException("This post is closed.")
+        }
+
         const postComment: DeepPartial<PostCommentMySqlEntity> = {
             postId,
             creatorId: accountId,
@@ -269,63 +338,99 @@ export class PostsService {
             postCommentMedias: [],
         }
 
-        const promises: Array<Promise<void>> = []
+        if (files) {
+            const promises: Array<Promise<void>> = []
 
-        let mediaPosition = 0
-        for (const postCommentMedia of postCommentMedias) {
-            const { mediaIndex, mediaType } = postCommentMedia
-            const position = mediaPosition
-            const promise = async () => {
-                const file = files.at(mediaIndex)
-                const { assetId } = await this.storageService.upload({
-                    rootFile: file,
-                })
-                postComment.postCommentMedias.push({
-                    position,
-                    mediaId: assetId,
-                    mediaType,
-                } as PostCommentMediaMySqlEntity)
+            let mediaPosition = 0
+            for (const postCommentMedia of postCommentMedias) {
+                const { mediaIndex, mediaType } = postCommentMedia
+                const position = mediaPosition
+                const promise = async () => {
+                    const file = files.at(mediaIndex)
+                    const { assetId } = await this.storageService.upload({
+                        rootFile: file,
+                    })
+                    postComment.postCommentMedias.push({
+                        position,
+                        mediaId: assetId,
+                        mediaType,
+                    } as PostCommentMediaMySqlEntity)
+                }
+                mediaPosition++
+                promises.push(promise())
             }
-            mediaPosition++
-            promises.push(promise())
+
+            await Promise.all(promises)
         }
 
-        await Promise.all(promises)
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
 
         try {
-            const { postCommentId } =
-                await this.postCommentMySqlRepository.save(postComment)
+            let earnAmount: number 
+            let isOwner : boolean
 
-            const { post } = await this.postCommentMySqlRepository.findOne({
+            if(creatorId == accountId){
+                isOwner = true
+            }
+
+            const isEnrolled = await this.enrolledInfoMySqlRepository.findOne({
                 where: {
-                    postCommentId
-                },
-                relations: {
-                    post: {
-                        course: true
-                    }
+                    accountId,
+                    courseId
                 }
             })
 
-            const { priceAtEnrolled } = await this.enrolledInfoMySqlEntity.findOneBy({
-                accountId,
-                courseId: post.courseId
-            })
+            if (!isEnrolled) {
+                throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
+            }
 
-            const earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient
-            await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+            const numberOfPostComments = await this.postCommentMySqlRepository.findBy({ postId });
+            const creatorIdsSeen = new Set();
 
+            const filteredComments = numberOfPostComments.filter(comment => {
+                if (comment.creatorId === creatorId) {
+                    return false;
+                }
+                if (creatorIdsSeen.has(comment.creatorId)) {
+                    return false;
+                }
+                creatorIdsSeen.add(comment.creatorId);
+                return true;
+            });
+
+            const numberOfRewardedComments = filteredComments.length;
+
+            if (isRewarded) {
+                if (creatorId !== accountId) {
+                    const isCommented = await this.postCommentMySqlRepository.find({
+                        where: {
+                            creatorId: accountId,
+                            postId
+                        }
+                    })
+                    if (!isCommented || isCommented.length < 1) {
+                        const { priceAtEnrolled } = isEnrolled
+                        if (numberOfRewardedComments < 20) {
+                            earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient
+                            await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+                            
+                        }
+                    }
+
+                }
+            }
+
+            const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
             return {
                 message: "Comment Posted Successfully",
                 others: {
                     postCommentId,
-                    earnAmount
+                    earnAmount,
+                    isOwner
                 }
-
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -455,13 +560,11 @@ export class PostsService {
                     }
                 })
 
-                const { priceAtEnrolled } = await this.enrolledInfoMySqlEntity.findOneBy({
+                const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOneBy({
                     accountId,
                     courseId: post.courseId
                 })
 
-                earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostCommentEarnCoefficient
-                await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
             } else {
                 const { postCommentLikeId, liked } = found
                 await this.postCommentLikeMySqlRepository.update(postCommentLikeId, {
@@ -536,23 +639,67 @@ export class PostsService {
         return { message: "Reply deleted successfully" }
     }
 
-    async togglePostComment(input: TogglePostCommentInput): Promise<string> {
+    async markPostCommentRewarded(input: MarkPostCommentRewardedInput): Promise<MarkPostCommentRewardedOutput> {
         const { data, accountId } = input
-        const { postId } = data
+        const { postCommentId } = data
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
 
-        const found = await this.postMySqlRepository.findOne({
-            where: {
-                postId,
-                creatorId: accountId
+        try {
+            const postComment = await this.postCommentMySqlRepository.findOne({
+                where: {
+                    postCommentId
+                }
+            })
+
+            if (!postComment) {
+                throw new NotFoundException("Post comment not found")
             }
-        })
 
-        if (!found) {
-            throw new NotFoundException("Post not found or not owned by this account")
+            const post = await this.postMySqlRepository.findOneBy({ postId: postComment.postId })
+
+            if (post.creatorId !== accountId) {
+                throw new ConflictException("You aren't the creator of the post.")
+            }
+
+            if (postComment.creatorId == post.creatorId) {
+                throw new ConflictException("You can't mark your comment as rewarded.")
+            }
+
+            const hasRewardedComment = await this.postCommentMySqlRepository.find({
+                where: {
+                    postId: postComment.postId
+                }
+            })
+
+            if (hasRewardedComment.some(accountComment => accountComment.isRewarded == true)) {
+                throw new ConflictException("There's already exist a rewarded comment")
+            }
+
+            await this.postCommentMySqlRepository.update(postCommentId, { isRewarded: true })
+
+            if (post.isRewarded) {
+                const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOne({
+                    where: {
+                        accountId: postComment.creatorId,
+                        courseId: post.courseId
+                    }
+                })
+
+                const earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.rewardCommentPostEarnCoefficient
+                await this.accountMySqlRepository.increment({ accountId: postComment.creatorId }, "balance", earnAmount)
+            }
+
+            await this.postMySqlRepository.update(post, { allowComments: false })
+
+            return {
+                message: `Comment of user ${postComment.creatorId} has been rewarded and no more comments are allowed to this post`
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
         }
-
-        const { allowComments } = await this.postMySqlRepository.save({ postId, allowComments: !found.allowComments })
-
-        return (allowComments) ? "Post's comment allowed" : "Post's comment closed"
     }
 }

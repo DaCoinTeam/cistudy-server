@@ -217,13 +217,13 @@ implements AuthInput<DeletePostCommentReplyInputData>
   data: DeletePostCommentReplyInputData
 }
 
-export class TogglePostCommentInputData {
+export class MarkPostCommentRewardedData {
     @ApiProperty()
-    postId: string
+    postCommentId: string
 }
 
-export class TogglePostCommentInput implements AuthInput<TogglePostCommentInputData>{
+export class MarkPostCommentRewardedInput implements AuthInput<MarkPostCommentRewardedData>{
     @IsUUID("4")
     accountId: string
-    data: TogglePostCommentInputData
+    data: MarkPostCommentRewardedData
 }

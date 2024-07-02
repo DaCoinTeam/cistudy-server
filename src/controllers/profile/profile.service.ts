@@ -5,6 +5,7 @@ import { StorageService } from "@global"
 import { UpdateProfileInput } from "./profile.input"
 import { AccountMySqlEntity } from "@database"
 import { existKeyNotUndefined } from "@common"
+import { UpdateProfileOutput } from "./profile.output"
 
 @Injectable()
 export class ProfileService {
@@ -14,7 +15,7 @@ export class ProfileService {
     private readonly storageService: StorageService,
     ) {}
 
-    async updateProfile(input: UpdateProfileInput): Promise<string> {
+    async updateProfile(input: UpdateProfileInput): Promise<UpdateProfileOutput> {
         const { accountId, data, files } = input
         const { username, birthdate, avatarIndex, coverPhotoIndex } = data
         //validate to ensure it is image
@@ -62,7 +63,7 @@ export class ProfileService {
         if (existKeyNotUndefined(profile))
             await this.accountMySqlRepository.update(accountId, profile)
 
-        return `A profile with id ${accountId} has updated successfully.`
+        return {message: `A profile with id ${accountId} has updated successfully.`}
     }
     
 }

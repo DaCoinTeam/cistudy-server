@@ -126,3 +126,51 @@ export class CreateCourseCategoriesOutput implements Output {
 export class DeleteCourseCategoryOutput implements Output {
     message: string;
 }
+
+export class CreateSectionOutput implements Output {
+    message: string;
+}
+
+export class UpdateLessonOutput implements Output {
+    message: string;
+}
+//
+export class DeleteLessonOutput implements Output {
+    message: string;
+}
+
+export class CreateCourseTargetOuput implements Output {
+    message: string;
+}
+
+export class UpdateCourseTargetOuput implements Output {
+    message: string;
+}
+
+export class DeleteCourseTargetOuput implements Output {
+    message: string;
+}
+
+export class CreateResourcesOuput implements Output {
+    message: string;
+}
+
+export class UpdateSectionOuput implements Output {
+    message: string;
+}
+
+export class DeleteSectionOuput implements Output {
+    message: string;
+}
+
+export class DeleteResourceOuput implements Output {
+    message: string;
+}
+
+export class CreateQuizOutput implements Output {
+    message: string;
+}
+
+export class CreateLessonOutput implements Output {
+    message: string;
+}

@@ -24,9 +24,9 @@ import {
     CreatePostCommentInputData,
     CreatePostCommentReplyInputData,
     CreatePostInputData,
+    MarkPostCommentRewardedData,
     ToggleLikePostCommentInputData,
     ToggleLikePostInputData,
-    TogglePostCommentInputData,
     UpdatePostCommentInputData,
     UpdatePostCommentReplyInputData,
     UpdatePostInputData,
@@ -141,21 +141,21 @@ export class PostsController {
         return await this.postsService.updatePostComment({ accountId, data, files })
     }
 
-    @ApiBearerAuth()
-    @Delete("delete-post-comment/:postCommentId")
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User)
-    @UseInterceptors(AuthInterceptor)
-    async deletePostComment(
-        @AccountId() accountId: string,
-        @Param("postCommentId") postCommentId: string,
-    ) {
-        return await this.postsService.deletePostComment({
-            accountId, data: {
-                postCommentId
-            }
-        })
-    }
+    // @ApiBearerAuth()
+    // @Delete("delete-post-comment/:postCommentId")
+    // @UseGuards(JwtAuthGuard, RolesGuard)
+    // @Roles(SystemRoles.User)
+    // @UseInterceptors(AuthInterceptor)
+    // async deletePostComment(
+    //     @AccountId() accountId: string,
+    //     @Param("postCommentId") postCommentId: string,
+    // ) {
+    //     return await this.postsService.deletePostComment({
+    //         accountId, data: {
+    //             postCommentId
+    //         }
+    //     })
+    // }
 
     @ApiBearerAuth()
     @Patch("toggle-like-post-comment")
@@ -220,15 +220,15 @@ export class PostsController {
     }
 
     @ApiBearerAuth()
-    @Patch("toggle-post-comment")
+    @Patch("mark-post-comment-rewared")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async togglePostComment(
         @AccountId() accountId: string,
-        @Body() body: TogglePostCommentInputData,
+        @Body() body: MarkPostCommentRewardedData,
     ) {
-        return this.postsService.togglePostComment({
+        return this.postsService.markPostCommentRewarded({
             accountId,
             data: body,
         })

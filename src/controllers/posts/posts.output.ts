@@ -17,7 +17,8 @@ export class CreatePostCommentOutputOthers {
     postCommentId: string
     @ApiProperty()
     @IsOptional()
-    earnAmount: number
+    earnAmount?: number
+    isOwner?: boolean
 }
 
 export class CreatePostCommentOutput implements Output<CreatePostCommentOutputOthers>{
@@ -48,13 +49,13 @@ export class ToggleLikePostOutputOthers {
     postLikeId: string
     @ApiProperty()
     @IsOptional()
-    earnAmount: number
+    earnAmount?: number
 }
 
 export class ToggleLikePostOutputData implements Output<ToggleLikePostOutputOthers>{
     message: string;
     @IsOptional()
-    others: ToggleLikePostOutputOthers;
+    others?: ToggleLikePostOutputOthers;
 }
 
 
@@ -76,5 +77,18 @@ export class UpdatePostCommentReplyOutput implements Output{
 }
 
 export class DeletePostCommentReplyOutput implements Output{
+    message: string;
+}
+
+export class CreatePostOutputOthers{
+    earnAmount? : number
+}
+
+export class CreatePostOutput implements Output<CreatePostOutputOthers>{
+    message: string;
+    others?: CreatePostOutputOthers;
+}
+
+export class MarkPostCommentRewardedOutput implements Output{
     message: string;
 }
