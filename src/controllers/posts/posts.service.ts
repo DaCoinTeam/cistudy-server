@@ -131,6 +131,7 @@ export class PostsService {
                     priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient
                 ).toFixed(5)
             )
+            console.log("Earn Amount: " + earnAmount ? earnAmount : null)
             await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
         }
 
