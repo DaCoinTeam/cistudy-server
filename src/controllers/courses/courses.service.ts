@@ -226,7 +226,7 @@ export class CoursesService {
         })
         return acc
       }, [])
-      console.log(progresses)
+     
       await this.progressMySqlRepository.save(progresses)
 
       await queryRunner.commitTransaction()
