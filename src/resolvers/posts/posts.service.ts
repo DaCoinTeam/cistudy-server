@@ -166,13 +166,21 @@ export class PostsService {
                 .select("COUNT(*)", "count")
                 .from(PostMySqlEntity, "post")
                 .getRawOne()
-
-
+            
+            const likedResults = await queryRunner.manager
+                .createQueryBuilder()
+                .select("post.postId", "postId")
+                .from(PostMySqlEntity, "post")
+                .innerJoin(PostLikeMySqlEntity, "post_like", "post.postId = post_like.postId")
+                .where("post_like.accountId = :accountId", { accountId })
+                .getRawMany()
+            
             await queryRunner.commitTransaction()
 
             const results = await Promise.all(posts.map(async (post) => {
                 const numberOfLikes = numberOfLikesResults.find(result => result.postId === post.postId)?.count ?? 0;
                 const numberOfComments = numberOfCommentsResults.find(result => result.postId === post.postId)?.count ?? 0;
+                const liked = likedResults.some(result => result.postId === post.postId);
 
                 let numberOfRewardedLikesLeft : number;
                 let numberOfRewardedCommentsLeft : number;
@@ -185,8 +193,8 @@ export class PostsService {
                         .orderBy("post_like.createdAt", "ASC")
                         .getMany();
 
-                    const rewardedLikesCount = Math.min(rewardedLikes.length, 20);
-                    numberOfRewardedLikesLeft = 20 - rewardedLikesCount;
+                    const rewardedLikesCount = rewardedLikes.length;
+                    numberOfRewardedLikesLeft = Math.max(20 - rewardedLikesCount, 0);
 
                     const rewardedComments = await queryRunner.manager
                         .createQueryBuilder(PostCommentMySqlEntity, "post_comment")
@@ -196,12 +204,13 @@ export class PostsService {
                         .getMany();
 
                     const uniqueRewardedCommentors = new Set(rewardedComments.map(comment => comment.creatorId));
-                    const rewardedCommentsCount = Math.min(uniqueRewardedCommentors.size, 20);
-                    numberOfRewardedCommentsLeft = 20 - rewardedCommentsCount;
+                    const rewardedCommentsCount = uniqueRewardedCommentors.size;
+                    numberOfRewardedCommentsLeft = Math.max(20 - rewardedCommentsCount, 0);
                 }
 
                 return {
                     ...post,
+                    liked,
                     numberOfLikes,
                     numberOfComments,
                     numberOfRewardedLikesLeft,

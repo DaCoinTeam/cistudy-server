@@ -10,7 +10,12 @@ export const computeDenomination = (amount: bigint, decimals = 18, fractionDigit
     return Number(result / decimalMultiplier)
 }
 
-export const computeRaw = (amount: number, decimals = 18) : bigint => {
+export const computeRaw = (amount: number, decimals = 18): bigint => {
     const mutiplier = 10 ** decimals
     return BigInt(amount * mutiplier)
+}
+
+export const computeFixedFloor = (value: number, fractionDigits: number = 5): number => {
+    const divisor = Math.pow(10, fractionDigits)
+    return Math.floor(value * divisor) / divisor
 }

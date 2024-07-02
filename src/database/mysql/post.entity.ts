@@ -79,6 +79,8 @@ export class PostEntity {
     postReacts: Array<PostLikeEntity>
 
     //graphql
+    @Field(() => Boolean, { nullable: true })
+    liked?: boolean
     @Field(() => Int, { nullable: true })
     numberOfLikes?: number
     @Field(() => Int, { nullable: true })

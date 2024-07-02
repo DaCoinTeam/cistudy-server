@@ -301,6 +301,7 @@ type PostEntity {
   postMedias: [PostMediaEntity!]!
   postComments: [PostCommentEntity!]!
   postReacts: [PostLikeEntity!]!
+  liked: Boolean
   numberOfLikes: Int
   numberOfComments: Int
   numberOfRewardedLikesLeft: Int

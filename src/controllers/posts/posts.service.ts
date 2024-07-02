@@ -43,6 +43,7 @@ import {
     UpdatePostOutput,
 } from "./posts.output"
 import { blockchainConfig } from "@config"
+import { computeFixedFloor } from "@common"
 
 @Injectable()
 export class PostsService {
@@ -126,11 +127,13 @@ export class PostsService {
         if (numberOfUserPost.length < 3) {
             post.isRewarded = true
             const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOneBy({ accountId, courseId })
-            earnAmount = Number.parseFloat(
+
+            console.log(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient)
+            
+            earnAmount = computeFixedFloor
                 (
                     priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient
-                ).toFixed(5)
-            )
+                )
             console.log("Earn Amount: " + earnAmount ? earnAmount : null)
             await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
         }
@@ -333,7 +336,7 @@ export class PostsService {
             }
         })
 
-        if(!post){
+        if (!post) {
             throw new NotFoundException("Post not found or has been deleted")
         }
 
@@ -383,11 +386,11 @@ export class PostsService {
         try {
             let earnAmount: number
             let isOwner: boolean
-            let alreadyRewarded : boolean
+            let alreadyRewarded: boolean
 
             if (creatorId == accountId) {
                 isOwner = true
-            }else {
+            } else {
                 alreadyRewarded = false
             }
 
@@ -433,7 +436,7 @@ export class PostsService {
                             await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
 
                         }
-                    }else {
+                    } else {
                         alreadyRewarded = true
                     }
 
@@ -447,7 +450,7 @@ export class PostsService {
                     postCommentId,
                     alreadyRewarded,
                     earnAmount,
-                    isOwner, 
+                    isOwner,
                 }
             }
         } catch (ex) {
