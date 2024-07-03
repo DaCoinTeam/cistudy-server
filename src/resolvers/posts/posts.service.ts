@@ -17,6 +17,7 @@ import {
 } from "./posts.input"
 import { FindManyPostCommentRepliesOutputData, FindManyPostCommentsOutputData, FindManyPostsOutputData, FindOnePostOutput } from "./posts.output"
 import { PostCommentReplyEntity } from "src/database/mysql/post-comment-reply.entity"
+import { PostLikeEntity } from "src/database/mysql/post-like.entity"
 
 @Injectable()
 export class PostsService {
@@ -27,6 +28,8 @@ export class PostsService {
         private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
         @InjectRepository(PostCommentReplyEntity)
         private readonly postCommentReplyMySqlRepository: Repository<PostCommentReplyEntity>,
+        @InjectRepository(PostLikeMySqlEntity)
+        private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
         private readonly dataSource: DataSource,
     ) { }
 
@@ -130,7 +133,7 @@ export class PostsService {
                 order: {
                     createdAt: {
                         direction: "DESC"
-                    }
+                    },
                 }
             })
 
@@ -140,7 +143,6 @@ export class PostsService {
                 .addSelect("post.postId", "postId")
                 .from(PostMySqlEntity, "post")
                 .innerJoin(PostLikeMySqlEntity, "post_like", "post.postId = post_like.postId")
-                .where("liked = :liked", { liked: true })
                 .andWhere("courseId = :courseId", { courseId })
                 .groupBy("post.postId")
                 .getRawMany()
@@ -159,42 +161,63 @@ export class PostsService {
                 .groupBy("post.postId")
                 .getRawMany()
 
-            const likedResults = await queryRunner.manager
-                .createQueryBuilder()
-                .select("post.postId", "postId")
-                .addSelect("post_like.liked", "liked")
-                .from(PostMySqlEntity, "post")
-                .innerJoin(PostLikeMySqlEntity, "post_like", "post.postId = post_like.postId")
-                .where("post_like.accountId = :accountId", { accountId })
-                .andWhere("post_like.liked = :liked", { liked: true })
-                .getRawMany()
-
             const numberOfPostsResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(PostMySqlEntity, "post")
                 .getRawOne()
-
+            
+            const likedResults = await queryRunner.manager
+                .createQueryBuilder()
+                .select("post.postId", "postId")
+                .from(PostMySqlEntity, "post")
+                .innerJoin(PostLikeMySqlEntity, "post_like", "post.postId = post_like.postId")
+                .where("post_like.accountId = :accountId", { accountId })
+                .getRawMany()
+            
             await queryRunner.commitTransaction()
 
-            const results = posts.map((post) => {
-                const numberOfLikes = numberOfLikesResults.find(
-                    result => result.postId === post.postId,
-                )?.count ?? 0
-                const numberOfComments = numberOfCommentsResults.find(
-                    result => result.postId === post.postId,
-                )?.count ?? 0
-                const liked = likedResults.find(
-                    result => result.postId === post.postId,
-                )?.liked ?? false
+            const results = await Promise.all(posts.map(async (post) => {
+                const numberOfLikes = numberOfLikesResults.find(result => result.postId === post.postId)?.count ?? 0;
+                const numberOfComments = numberOfCommentsResults.find(result => result.postId === post.postId)?.count ?? 0;
+                const liked = likedResults.some(result => result.postId === post.postId);
+
+                let numberOfRewardedLikesLeft : number;
+                let numberOfRewardedCommentsLeft : number;
+
+                if (post.isRewarded) {
+                    const rewardedLikes = await queryRunner.manager
+                        .createQueryBuilder(PostLikeMySqlEntity, "post_like")
+                        .where("post_like.postId = :postId", { postId: post.postId })
+                        .andWhere("post_like.accountId != :creatorId", { creatorId: post.creatorId })
+                        .orderBy("post_like.createdAt", "ASC")
+                        .getMany();
+
+                    const rewardedLikesCount = rewardedLikes.length;
+                    numberOfRewardedLikesLeft = Math.max(20 - rewardedLikesCount, 0);
+
+                    const rewardedComments = await queryRunner.manager
+                        .createQueryBuilder(PostCommentMySqlEntity, "post_comment")
+                        .where("post_comment.postId = :postId", { postId: post.postId })
+                        .andWhere("post_comment.creatorId != :creatorId", { creatorId: post.creatorId })
+                        .orderBy("post_comment.createdAt", "ASC")
+                        .getMany();
+
+                    const uniqueRewardedCommentors = new Set(rewardedComments.map(comment => comment.creatorId));
+                    const rewardedCommentsCount = uniqueRewardedCommentors.size;
+                    numberOfRewardedCommentsLeft = Math.max(20 - rewardedCommentsCount, 0);
+                }
 
                 return {
                     ...post,
+                    liked,
                     numberOfLikes,
                     numberOfComments,
-                    liked
-                }
-            })
+                    numberOfRewardedLikesLeft,
+                    numberOfRewardedCommentsLeft,
+                };
+            }));
+
 
             return ({
                 results,

@@ -70,17 +70,29 @@ import {
   CreateCourseCategoriesOutput,
   CreateCourseOutput,
   CreateCourseReviewOutput,
+  CreateCourseTargetOuput,
+  CreateLessonOutput,
   CreateQuizAttemptOutput,
+  CreateQuizOutput,
+  CreateResourcesOuput,
+  CreateSectionOutput,
   DeleteCategoryOutput,
   DeleteCourseCategoryOutput,
   DeleteCourseReviewOutput,
+  DeleteCourseTargetOuput,
+  DeleteLessonOutput,
+  DeleteResourceOuput,
+  DeleteSectionOuput,
   EnrollCourseOutput,
   FinishQuizAttemptOutput,
   GiftCourseOutput,
   MarkLessonAsCompletedOutput,
   UpdateCourseOutput,
   UpdateCourseReviewOutput,
+  UpdateCourseTargetOuput,
+  UpdateLessonOutput,
   UpdateQuizOutput,
+  UpdateSectionOuput,
 } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
 
@@ -214,7 +226,7 @@ export class CoursesService {
         })
         return acc
       }, [])
-      console.log(progresses)
+     
       await this.progressMySqlRepository.save(progresses)
 
       await queryRunner.commitTransaction()
@@ -415,34 +427,44 @@ export class CoursesService {
     return { message: "Review deleted successfully" }
   }
 
-  async createSection(input: CreateSectionInput): Promise<string> {
+  async createSection(input: CreateSectionInput): Promise<CreateSectionOutput> {
     const { data } = input
     const { courseId, title } = data
-    const course = await this.courseMySqlRepository.findOneBy({
-      courseId,
-    })
-    if (!course) throw new NotFoundException("Course not found.")
-    const created = await this.sectionMySqlRepository.save({
-      courseId,
-      title,
-    })
-    if (created)
-      return `A section with id ${created.sectionId} has been created successfully.`
+
+    try {
+      const course = await this.courseMySqlRepository.findOneBy({
+        courseId,
+      })
+      if (!course) throw new NotFoundException("Course not found.")
+      const created = await this.sectionMySqlRepository.save({
+        courseId,
+        title,
+      })
+
+      return {
+        message: `A section with id ${created.sectionId} has been created successfully.`
+      }
+    } catch (ex) {
+      throw ex
+    }
   }
 
-  async createLesson(input: CreateLessonInput): Promise<string> {
+  async createLesson(input: CreateLessonInput): Promise<CreateLessonOutput> {
     const { title, sectionId } = input.data
-
-    const created = await this.lessonMySqlRepository.save({
-      title,
-      sectionId,
-    })
-
-    if (created)
-      return `A lesson with id ${created.lessonId} has been creeated successfully.`
+    try {
+      const created = await this.lessonMySqlRepository.save({
+        title,
+        sectionId,
+      })
+      return {
+        message: `A lesson with id ${created.lessonId} has been creeated successfully.`
+      }
+    } catch (ex) {
+      throw ex
+    }
   }
 
-  async updateLesson(input: UpdateLessonInput): Promise<string> {
+  async updateLesson(input: UpdateLessonInput): Promise<UpdateLessonOutput> {
     const { data, files } = input
     const { lessonId, title, description, lessonVideoIndex, thumbnailIndex } =
       data
@@ -534,17 +556,17 @@ export class CoursesService {
 
     if (existKeyNotUndefined(lesson))
       await this.lessonMySqlRepository.update(lessonId, lesson)
-    return `A lesson with id ${lessonId} has been updated successfully.`
+    return { message: `A lesson with id ${lessonId} has been updated successfully.` }
   }
 
-  async deleteLesson(input: DeleteLessonInput): Promise<string> {
+  async deleteLesson(input: DeleteLessonInput): Promise<DeleteLessonOutput> {
     const { data } = input
     const { lessonId } = data
     await this.lessonMySqlRepository.delete({ lessonId })
-    return `A lesson with id ${lessonId} has been deleted successfully.`
+    return { message: `A lesson with id ${lessonId} has been deleted successfully.` }
   }
 
-  async createCourseTarget(input: CreateCourseTargetInput): Promise<string> {
+  async createCourseTarget(input: CreateCourseTargetInput): Promise<CreateCourseTargetOuput> {
     const { data } = input
     const { content, courseId } = data
     const maxResult = await this.courseTargetMySqlRepository
@@ -559,26 +581,26 @@ export class CoursesService {
       position: max + 1,
     })
     if (created)
-      return `A course target with id ${created.courseTargetId} has been created successfully.`
+      return { message: `A course target with id ${created.courseTargetId} has been created successfully.` }
   }
 
-  async updateCourseTarget(input: UpdateCourseTargetInput): Promise<string> {
+  async updateCourseTarget(input: UpdateCourseTargetInput): Promise<UpdateCourseTargetOuput> {
     const { data } = input
     const { content, courseTargetId } = data
     await this.courseTargetMySqlRepository.update(courseTargetId, {
       content,
     })
-    return `A course target with id ${courseTargetId} has been updated successfully.`
+    return { message: `A course target with id ${courseTargetId} has been updated successfully.` }
   }
 
-  async deleteCourseTarget(input: DeleteCourseTargetInput): Promise<string> {
+  async deleteCourseTarget(input: DeleteCourseTargetInput): Promise<DeleteCourseTargetOuput> {
     const { data } = input
     const { courseTargetId } = data
     await this.courseTargetMySqlRepository.delete({ courseTargetId })
-    return `A course target with id ${courseTargetId} has been deleted successfully.`
+    return { message: `A course target with id ${courseTargetId} has been deleted successfully.` }
   }
 
-  async createResources(input: CreateResourcesInput): Promise<string> {
+  async createResources(input: CreateResourcesInput): Promise<CreateResourcesOuput> {
     const { files, data } = input
     const { lessonId } = data
 
@@ -601,30 +623,30 @@ export class CoursesService {
     await Promise.all(promises)
 
     await this.resourceMySqlRepository.save(resources)
-    return `Resources with ids ${resources.map((resource) => resource.resourceId)} has been created successfully.`
+    return { message: `Resources with ids ${resources.map((resource) => resource.resourceId)} has been created successfully.` }
   }
 
-  async updateSection(input: UpdateSectionInput): Promise<string> {
+  async updateSection(input: UpdateSectionInput): Promise<UpdateSectionOuput> {
     const { data } = input
     const { sectionId, title } = data
     await this.sectionMySqlRepository.update(sectionId, {
       title,
     })
-    return `A section with id  ${sectionId} has been updated successfully.`
+    return { message: `A section with id  ${sectionId} has been updated successfully.` }
   }
 
-  async deleteSection(input: DeleteSectionInput): Promise<string> {
+  async deleteSection(input: DeleteSectionInput): Promise<DeleteSectionOuput> {
     const { data } = input
     const { sectionId } = data
     await this.sectionMySqlRepository.delete({ sectionId })
-    return `A section with id ${sectionId} has been deleted successfully.`
+    return { message: `A section with id ${sectionId} has been deleted successfully.` }
   }
 
-  async deleteResource(input: DeleteResourceInput): Promise<string> {
+  async deleteResource(input: DeleteResourceInput): Promise<DeleteResourceOuput> {
     const { data } = input
     const { resourceId } = data
     await this.resourceMySqlRepository.delete({ resourceId })
-    return `A resource with id ${resourceId} has been deleted successfully.`
+    return { message: `A resource with id ${resourceId} has been deleted successfully.` }
   }
 
   //apis only
@@ -653,7 +675,7 @@ export class CoursesService {
       let parentLevels: number[] = [];
       if (categoryParentIds && categoryParentIds.length > 0) {
         const parentCategories = await this.categoryMySqlRepository.find({
-          where:{
+          where: {
             categoryId: In(categoryParentIds)
           }
         });
@@ -668,7 +690,7 @@ export class CoursesService {
       let childLevels: number[] = [];
       if (categoryIds && categoryIds.length > 0) {
         const childCategories = await this.categoryMySqlRepository.find({
-          where:{
+          where: {
             categoryId: In(categoryIds)
           }
         });
@@ -700,7 +722,7 @@ export class CoursesService {
           throw new ConflictException(`There's already existed category named ${name} at this level`);
         }
       }
-      
+
       const createdCategory = await this.categoryMySqlRepository.save({
         name,
         imageId,
@@ -875,7 +897,7 @@ export class CoursesService {
     }
   }
 
-  async createQuiz(input: CreateQuizInput): Promise<string> {
+  async createQuiz(input: CreateQuizInput): Promise<CreateQuizOutput> {
     const { data, files } = input
     const { lessonId, quizQuestions, timeLimit } = data
     //Tìm quiz trong db, nếu chưa có thì tạo mới, nếu có thì chỉ thêm question và answer
@@ -966,7 +988,9 @@ export class CoursesService {
       }
       await Promise.all(questionPromises)
 
-      return `A quiz with id ${availableQuiz.quizId} has been created successfully.`
+      return {
+        message: `A quiz with id ${availableQuiz.quizId} has been created successfully.`
+      }
     } catch (ex) {
       await queryRunner.rollbackTransaction()
       throw ex

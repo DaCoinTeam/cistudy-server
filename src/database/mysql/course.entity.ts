@@ -152,4 +152,7 @@ export class CourseEntity {
 
     @Field(() => Float, {nullable: true})
     courseRate : number
+
+    @Field(() => Int, { nullable: true })
+    numberOfRewardedPostsLeft?: number
 }

@@ -39,8 +39,12 @@ export class PostCommentEntity {
         updatedAt: Date
 
     @Field(() => String)
-    @Column({ type: "longtext" })
+    @Column({ type: "longtext", nullable: true })
         html: string
+
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: false })
+    isRewarded: boolean
 
     @Field(() => PostEntity)
     @ManyToOne(() => PostEntity, (post) => post.postComments, { onDelete: "CASCADE"})

@@ -1,4 +1,4 @@
-import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, LessonMySqlEntity, ProgressMySqlEntity, SectionMySqlEntity, AccountMySqlEntity } from "@database"
+import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, LessonMySqlEntity, ProgressMySqlEntity, SectionMySqlEntity, AccountMySqlEntity, PostMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { Repository, DataSource } from "typeorm"
 import {
@@ -14,6 +14,8 @@ export class ProfileService {
     constructor(
     @InjectRepository(CourseMySqlEntity)
     private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+    @InjectRepository(PostMySqlEntity)
+    private readonly postMySqlRepository: Repository<PostMySqlEntity>,
     private readonly dataSource: DataSource,
     ) {}
 
@@ -121,7 +123,18 @@ export class ProfileService {
                 .andWhere("progress.isCompleted = :isCompleted", { isCompleted: true })
                 .groupBy("course.courseId")
                 .getRawMany();
-    
+
+            const numberOfRewardedPosts = await this.postMySqlRepository.find({
+                where:{
+                    creatorId: accountId
+                },
+                order:{
+                    createdAt: "ASC"
+                }
+            })
+
+            const numberOfRewardedPostsLeft = 3 - Math.min(numberOfRewardedPosts.length, 3);
+
             await queryRunner.commitTransaction();
             return {
                 results: courses.map(course => {
@@ -139,7 +152,8 @@ export class ProfileService {
     
                     course.creator.numberOfFollowers = numberOfFollowers;
                     course.courseProgress = progress;
-    
+                    course.numberOfRewardedPostsLeft = numberOfRewardedPostsLeft
+                    
                     return course;
                 }),
                 metadata: {

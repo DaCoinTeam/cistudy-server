@@ -39,6 +39,10 @@ export class PostEntity {
     @Column({ type: "boolean", default: true })
     allowComments: boolean
 
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: false })
+    isRewarded: boolean
+
     @Field(() => Date)
     @CreateDateColumn()
     createdAt: Date
@@ -48,7 +52,7 @@ export class PostEntity {
     updatedAt: Date
 
     @Field(() => String)
-    @Column({ type: "longtext" })
+    @Column({ type: "longtext", nullable: true })
     html: string
 
     @ManyToOne(() => CourseEntity, (course) => course.posts)
@@ -75,10 +79,14 @@ export class PostEntity {
     postReacts: Array<PostLikeEntity>
 
     //graphql
+    @Field(() => Boolean, { nullable: true })
+    liked?: boolean
     @Field(() => Int, { nullable: true })
     numberOfLikes?: number
     @Field(() => Int, { nullable: true })
     numberOfComments?: number
-    @Field(() => Boolean, { nullable: true })
-    liked?: boolean
+    @Field(() => Int, { nullable: true })
+    numberOfRewardedLikesLeft?: number
+    @Field(() => Int, { nullable: true })
+    numberOfRewardedCommentsLeft?: number
 }

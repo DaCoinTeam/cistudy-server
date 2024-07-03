@@ -265,13 +265,13 @@ type CourseEntity {
   enrolled: Boolean
   courseProgress: Float
   courseRate: Float
+  numberOfRewardedPostsLeft: Int
 }
 
 type PostLikeEntity {
   postLikeId: ID!
   accountId: String!
   postId: String!
-  liked: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   account: AccountEntity!
@@ -293,6 +293,7 @@ type PostEntity {
   creatorId: ID!
   courseId: ID!
   allowComments: Boolean!
+  isRewarded: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   html: String!
@@ -300,9 +301,11 @@ type PostEntity {
   postMedias: [PostMediaEntity!]!
   postComments: [PostCommentEntity!]!
   postReacts: [PostLikeEntity!]!
+  liked: Boolean
   numberOfLikes: Int
   numberOfComments: Int
-  liked: Boolean
+  numberOfRewardedLikesLeft: Int
+  numberOfRewardedCommentsLeft: Int
 }
 
 type PostCommentMediaEntity {
@@ -332,6 +335,7 @@ type PostCommentEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   html: String!
+  isRewarded: Boolean!
   post: PostEntity!
   creator: AccountEntity!
   postCommentMedias: [PostCommentMediaEntity!]!

@@ -70,7 +70,7 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            console.log(courseId)
+            
             const results = await this.courseReviewMySqlRepository.find({
                 where: { courseId },
                 relations: {
@@ -81,7 +81,7 @@ export class CoursesService {
                 take,
                 order: { createdAt: 'DESC' }
             });
-            console.log(results)
+           
             const numberOfCourseReviewsResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")

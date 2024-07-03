@@ -10,7 +10,7 @@ import {
 } from "typeorm"
 import { AccountEntity } from "./account.entity"
 import { CourseEntity } from "./course.entity"
-import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
+import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { ProgressEntity } from "./progress.entity"
 
 @ObjectType()
@@ -66,4 +66,5 @@ export class EnrolledInfoEntity {
     @Field(() => [ProgressEntity])
     @OneToMany(() => ProgressEntity, (courseProgress) => courseProgress.enrolledInfo)
     courseProgress: Array<ProgressEntity>
+
 }
