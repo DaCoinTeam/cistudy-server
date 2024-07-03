@@ -7,4 +7,4 @@ import { TransactionMongoEntity, TransactionMongoEntitySchema } from "@database"
     imports: [MongooseModule.forFeature([{ name: TransactionMongoEntity.name, schema: TransactionMongoEntitySchema }])],
     providers: [BlockchainEvmService],
 })
-export class BlockchainEvmModule {}
+export class BlockchainEvmModule { }
