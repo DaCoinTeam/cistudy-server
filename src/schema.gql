@@ -396,7 +396,7 @@ type AccountEntity {
   phoneNumber: String
   username: String
   balance: Float
-  walletId: ID
+  walletAddress: String
   firstName: String
   lastName: String
   birthdate: DateTime

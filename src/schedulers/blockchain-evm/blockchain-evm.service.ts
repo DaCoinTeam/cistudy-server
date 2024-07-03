@@ -1,8 +1,8 @@
 import {
     ChainId,
-    ERC20Contract,
+    EnrollManagerContract,
     chainInfos,
-    decodeTransferLog,
+    decodeEnrolledLog,
     getWebSocketProvider,
 } from "@blockchain"
 import { blockchainConfig, databaseConfig } from "@config"
@@ -24,7 +24,7 @@ export class BlockchainEvmService implements OnModuleInit {
     private readonly logger = new Logger(BlockchainEvmService.name)
 
     private web3s: Record<ChainId, Web3<RegisteredSubscription>>
-    private erc20Contracts: Record<ChainId, ERC20Contract>
+    private enrollManagerContracts: Record<ChainId, EnrollManagerContract>
     private pingIntervals: Record<ChainId, NodeJS.Timeout>
     private subscriptions: Record<ChainId, LogsSubscription>
 
@@ -34,7 +34,7 @@ export class BlockchainEvmService implements OnModuleInit {
     ) {
         const defaultValue = { [ChainId.KalytnTestnet]: undefined }
         this.web3s = { ...defaultValue }
-        this.erc20Contracts = { ...defaultValue }
+        this.enrollManagerContracts = { ...defaultValue }
         this.pingIntervals = { ...defaultValue }
         this.subscriptions = { ...defaultValue }
     }
@@ -56,9 +56,9 @@ export class BlockchainEvmService implements OnModuleInit {
                 const provider = getWebSocketProvider(_chainId)
                 this.web3s[_chainId] = new Web3(provider)
 
-                this.erc20Contracts[_chainId] = new ERC20Contract(
+                this.enrollManagerContracts[_chainId] = new EnrollManagerContract(
                     _chainId,
-                    chainInfos[_chainId].primaryToken,
+                    chainInfos[_chainId].enrollManagerAddress,
                     provider,
                 )
 
@@ -136,15 +136,15 @@ export class BlockchainEvmService implements OnModuleInit {
         const provider = getWebSocketProvider(chainId)
 
         const web3 = this.web3s[chainId]
-        let contract = this.erc20Contracts[chainId]
-        contract = new ERC20Contract(
+        let contract = this.enrollManagerContracts[chainId]
+        contract = new EnrollManagerContract(
             chainId,
-            chainInfos[chainId].primaryToken,
+            chainInfos[chainId].enrollManagerAddress,
             provider,
         )
 
         this.subscriptions[chainId]?.removeAllListeners()
-        this.subscriptions[chainId] = contract.contract.events.Transfer()
+        this.subscriptions[chainId] = contract.contract.events.Enrolled()
 
         const subscription = this.subscriptions[chainId]
 
@@ -153,31 +153,27 @@ export class BlockchainEvmService implements OnModuleInit {
         })
         subscription.on("data", async (log) => {
             try {
-                const { from, to, value } = decodeTransferLog(log)
-                if (
-                    web3.utils.toChecksumAddress(to as string) !==
-                    blockchainConfig().evmAddress
-                )
-                    return
-
+                console.log("called")
+                const { payAmount, creatorAddr, feeToAddr } = decodeEnrolledLog(log)
+                
                 this.logger.verbose(`TRANSACTION VERIFIED: ${log.transactionHash}`)
+                console.log( payAmount, creatorAddr, feeToAddr )
+                // await this.transactionMongoModel.create({
+                //     transactionHash: log.transactionHash,
+                //     from,
+                //     to,
+                //     value,
+                //     log,
+                // })
 
-                await this.transactionMongoModel.create({
-                    transactionHash: log.transactionHash,
-                    from,
-                    to,
-                    value,
-                    log,
-                })
+                // const message: BlockchainEvmServiceMessage = {
+                //     transactionHash: log.transactionHash,
+                // }
 
-                const message: BlockchainEvmServiceMessage = {
-                    transactionHash: log.transactionHash,
-                }
-
-                await this.redisPubClient.publish(
-                    BlockchainEvmService.name,
-                    JSON.stringify(message),
-                )
+                // await this.redisPubClient.publish(
+                //     BlockchainEvmService.name,
+                //     JSON.stringify(message),
+                // )
             } catch (ex) {
                 this.logger.error(ex)
             }
