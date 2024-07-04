@@ -193,8 +193,10 @@ export class BlockchainEvmService implements OnModuleInit {
               },
           })
 
+              console.log(accountId)
+
               const updatedBalance = balance + computeDenomination(value as bigint)
-              console.log(balance, computeDenomination(value as bigint))
+              console.log(updatedBalance)
               await this.accountMySqlRepository.update(accountId, {
                   balance: updatedBalance,
               })

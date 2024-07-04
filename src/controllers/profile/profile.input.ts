@@ -22,3 +22,12 @@ export class UpdateProfileInput implements AuthInput<UpdateProfileData> {
     files: Array<Express.Multer.File>
 }
 
+export class WithdrawData {
+    @ApiProperty()
+        withdrawAmount?: number
+}
+export class WithdrawInput implements AuthInput<WithdrawData> {
+    @IsUUID("4")
+    	accountId: string
+    data: WithdrawData
+}

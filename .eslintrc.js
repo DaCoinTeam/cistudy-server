@@ -33,7 +33,7 @@ module.exports = {
             "error",
             4
         ],
-		"no-mixed-spaces-and-tabs": "off",
+        "no-mixed-spaces-and-tabs": "off",
         "linebreak-style": "off",
         "quotes": [
             "error",

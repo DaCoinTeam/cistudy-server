@@ -175,11 +175,11 @@ export class AccountEntity {
 
     @Field(() => [ReportAccountEntity])
     @OneToMany(() => ReportAccountEntity, (reportAccounts) => reportAccounts.reportedAccountId, { nullable: true })
-    reportAccounts?: Array<ReportAccountEntity>
+        reportAccounts?: Array<ReportAccountEntity>
 
     @Field(() => [ReportAccountEntity])
     @OneToMany(() => ReportAccountEntity, (accountReports) => accountReports.reporterAccount, { nullable: true })
-    accountReports?: Array<ReportAccountEntity>
+        accountReports?: Array<ReportAccountEntity>
     
     //graphql
     @Field(() => Boolean)
