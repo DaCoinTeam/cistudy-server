@@ -98,3 +98,10 @@ export enum ReportProcessStatus {
 registerEnumType(ReportProcessStatus,{
   name: "ReportProcessStatus"
 })
+
+export enum ReportType {
+  Account = "account",
+  Course = "course",
+  Post = "post",
+  PostComment = "postComment"
+}

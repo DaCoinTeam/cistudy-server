@@ -258,11 +258,11 @@ export class AccountsService {
 
         const exist = await this.roleMySqlRepository.findOneBy({ accountId, name: roleName })
 
-        if(exist){
+        if (exist) {
             throw new ConflictException("This user already have this role")
         }
 
-        const {name} = await this.roleMySqlRepository.save({
+        const { name } = await this.roleMySqlRepository.save({
             accountId,
             name: roleName,
         })
@@ -281,8 +281,8 @@ export class AccountsService {
         if (!found) {
             throw new NotFoundException("Role Not Found");
         }
-        
-        if(found.name === SystemRoles.User){
+
+        if (found.name === SystemRoles.User) {
             throw new ConflictException(`Cannot disable role ${SystemRoles.User} from this account`)
         }
 
@@ -308,9 +308,9 @@ export class AccountsService {
         await queryRunner.startTransaction();
 
         try {
-   
+
             if (deleteRoleIds && deleteRoleIds.length > 0) {
-                
+
                 const userRoles = await this.roleMySqlRepository.find({
                     where: { roleId: In(deleteRoleIds) },
                 });
@@ -318,7 +318,7 @@ export class AccountsService {
                 if (existUserRole) {
                     throw new ConflictException(`Cannot delete role ${SystemRoles.User} from this account.`);
                 }
-                
+
                 await this.roleMySqlRepository.delete({ accountId, roleId: In(deleteRoleIds) });
             }
 
@@ -338,7 +338,7 @@ export class AccountsService {
                     await this.roleMySqlRepository.save(newRole);
                 }
             }
-            
+
             await queryRunner.commitTransaction();
 
             return {
@@ -358,23 +358,23 @@ export class AccountsService {
         const { data, accountId } = input;
         const { reportedAccountId, description } = data
 
-        if(accountId === reportedAccountId){
+        if (accountId === reportedAccountId) {
             throw new ConflictException("You cannot report yourself.");
         }
-        
-        const reportedAccount = await this.accountMySqlRepository.findOneBy({accountId: reportedAccountId})
 
-        if(!reportedAccount){
+        const reportedAccount = await this.accountMySqlRepository.findOneBy({ accountId: reportedAccountId })
+
+        if (!reportedAccount) {
             throw new NotFoundException("Reported user is not found or has been deleted")
         }
 
         const processing = await this.reportAccountMySqlRepository.find({
-            where:{
+            where: {
                 reportedAccountId
             }
         })
 
-        if(processing && processing.some(processing => processing.processStatus === ReportProcessStatus.Processing)){
+        if (processing && processing.some(processing => processing.processStatus === ReportProcessStatus.Processing)) {
             throw new ConflictException("You have reported this accout before and it is processing. Try update your report instead.")
         }
 
@@ -386,7 +386,7 @@ export class AccountsService {
 
         return {
             message: `A report to user ${reportedAccount.accountId} has been submitted.`,
-            others:{
+            others: {
                 reportAccountId
             }
         };
@@ -396,48 +396,48 @@ export class AccountsService {
         const { data, accountId } = input;
         const { reportAccountId, description } = data
 
-        const found = await this.reportAccountMySqlRepository.findOneBy({reportAccountId})
+        const found = await this.reportAccountMySqlRepository.findOneBy({ reportAccountId })
 
-        if(!found){
+        if (!found) {
             throw new NotFoundException("Account's report not found.")
         }
 
-        if(found.processStatus !== ReportProcessStatus.Processing){
+        if (found.processStatus !== ReportProcessStatus.Processing) {
             throw new ConflictException("This report has been resolved and closed.")
         }
 
-        if(found.reporterAccountId !== accountId){
+        if (found.reporterAccountId !== accountId) {
             throw new ConflictException("You isn't the owner of this report.")
         }
 
-        await this.reportAccountMySqlRepository.update(reportAccountId, {description})
+        await this.reportAccountMySqlRepository.update(reportAccountId, { description })
 
         return {
             message: `Your Report has been updated successfully`,
-            others:{
+            others: {
                 reportAccountId
             }
         };
     }
 
-    async resolveAccountReport (input : ResolveAccountReportInput) : Promise<ResolveAccountReportOutput> {
-        const {data} = input
-        const { reportAccountId, processNote, processStatus} = data
+    async resolveAccountReport(input: ResolveAccountReportInput): Promise<ResolveAccountReportOutput> {
+        const { data } = input
+        const { reportAccountId, processNote, processStatus } = data
 
-        const found = await this.reportAccountMySqlRepository.findOneBy({reportAccountId})
+        const found = await this.reportAccountMySqlRepository.findOneBy({ reportAccountId })
 
-        if(! found){
+        if (!found) {
             throw new NotFoundException("Report not found")
         }
 
-        if(found.processStatus !== ReportProcessStatus.Processing){
+        if (found.processStatus !== ReportProcessStatus.Processing) {
             throw new ConflictException("This report has already been resolved")
         }
 
-        await this.reportAccountMySqlRepository.update(reportAccountId, {processStatus, processNote})
+        await this.reportAccountMySqlRepository.update(reportAccountId, { processStatus, processNote })
 
-        return{
-            message : "Report successfully resolved and closed."
+        return {
+            message: "Report successfully resolved and closed."
         }
     }
 }

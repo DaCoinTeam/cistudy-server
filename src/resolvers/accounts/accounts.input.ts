@@ -103,24 +103,24 @@ implements AuthInput<FindManyAccountsInputData>
 @InputType()
 export class FindManyAccountReviewsInputParams {
     @Field(() => ID)
-    accountId: string
+        accountId: string
 }
 
 @InputType()
 export class FindManyAccountReviewsInputOptions {
     @Field(() => Int, { nullable: true })
-    take?: number
+        take?: number
     @Field(() => Int, { nullable: true })
-    skip?: number
+        skip?: number
 }
 
 @InputType()
 export class FindManyAccountReviewsInputData implements ParamsWithOptions<FindManyAccountReviewsInputParams, FindManyAccountReviewsInputOptions> {
     @Field(() => FindManyAccountReviewsInputParams)
-    params: FindManyAccountReviewsInputParams
+        params: FindManyAccountReviewsInputParams
     @Field(() => FindManyAccountReviewsInputOptions, { nullable: true })
     @IsOptional()
-    options?: FindManyAccountReviewsInputOptions
+        options?: FindManyAccountReviewsInputOptions
 }
 
 export class FindManyAccountReviewsInput implements Input<FindManyAccountReviewsInputData> {
@@ -130,25 +130,25 @@ export class FindManyAccountReviewsInput implements Input<FindManyAccountReviews
 @InputType()
 export class FindManyReportsInputParams {
     @Field(() => String, { nullable: true })
-    filterReports? : string
+        filterReports? : string
 }
 
 @InputType()
 export class FindManyReportsInputOptions {
     @Field(() => Int, { nullable: true })
-    take?: number
+        take?: number
     @Field(() => Int, { nullable: true })
-    skip?: number
+        skip?: number
 }
 
 @InputType()
 export class FindManyReportsInputData implements ParamsWithOptions<FindManyReportsInputParams,FindManyReportsInputOptions>{
     @Field(() => FindManyReportsInputParams, { nullable: true })
     @IsOptional()
-    params: FindManyReportsInputParams
+        params: FindManyReportsInputParams
     @Field(() => FindManyReportsInputOptions, { nullable: true })
     @IsOptional()
-    options?: FindManyReportsInputOptions
+        options?: FindManyReportsInputOptions
 }
 
 export class FindManyReportsInput implements AuthInput<FindManyReportsInputData> {

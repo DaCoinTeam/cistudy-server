@@ -33,7 +33,9 @@ import {
     ToggleLikePostInputData,
     UpdatePostCommentInputData,
     UpdatePostCommentReplyInputData,
+    UpdatePostCommentReportInputData,
     UpdatePostInputData,
+    UpdatePostReportInputData,
 } from "./posts.input"
 
 import {
@@ -263,6 +265,36 @@ export class PostsController {
         @Body() body: CreatePostCommentReportInputData,
     ) {
         return this.postsService.createPostCommentReport({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("update-post-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async updatePostReport(
+        @AccountId() accountId: string,
+        @Body() body: UpdatePostReportInputData,
+    ) {
+        return this.postsService.updatePostReport({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("update-post-comment-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async updateCourseReport(
+        @AccountId() accountId: string,
+        @Body() body: UpdatePostCommentReportInputData,
+    ) {
+        return this.postsService.updatePostCommentReport({
             accountId,
             data: body,
         })

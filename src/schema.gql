@@ -598,6 +598,18 @@ type FindManyPostCommentRepliesOutput {
   tokens: AuthTokens
 }
 
+type ReportModel {
+  reportId: ID
+  type: String
+  reporterAccountId: ID
+  reportContentId: ID
+  description: String
+  processStatus: String
+  processNote: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
 type FindManyAccountsOutputMetadata {
   count: Int
 }
@@ -619,6 +631,15 @@ type FindManyAccountReviewsOutputMetadata {
 type FindManyAccountReviewsOutputData {
   results: [AccountReviewEntity!]!
   metadata: FindManyAccountReviewsOutputMetadata
+}
+
+type FindManyReportOutputMetadata {
+  count: Int
+}
+
+type FindManyReportOutputData {
+  results: [ReportModel!]!
+  metadata: FindManyReportOutputMetadata
 }
 
 type FindManySelfCreatedCoursesOutputMetadata {
@@ -722,6 +743,7 @@ type Query {
   findManyFollowers(data: FindManyFollowersInputData!): [AccountEntity!]!
   findManyAccounts(data: FindManyAccountsInputData!): FindManyAccountsOutput!
   findManyAccountReviews(data: FindManyAccountReviewsInputData!): FindManyAccountReviewsOutputData!
+  findManyReports(data: FindManyReportsInputData!): FindManyReportOutputData!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
@@ -965,6 +987,20 @@ input FindManyAccountReviewsInputParams {
 }
 
 input FindManyAccountReviewsInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManyReportsInputData {
+  params: FindManyReportsInputParams
+  options: FindManyReportsInputOptions
+}
+
+input FindManyReportsInputParams {
+  filterReports: String
+}
+
+input FindManyReportsInputOptions {
   take: Int
   skip: Int
 }

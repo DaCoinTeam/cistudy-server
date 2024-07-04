@@ -21,41 +21,41 @@ import { ReportPostCommentEntity } from "./report-post-comment.entity"
 export class PostCommentEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    postCommentId: string
+        postCommentId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    creatorId: string
+        creatorId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    postId: string
+        postId: string
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-    updatedAt: Date
+        updatedAt: Date
 
     @Field(() => String)
     @Column({ type: "longtext", nullable: true })
-    html: string
+        html: string
 
     @Field(() => Boolean)
     @Column({ type: "boolean", default: false })
-    isRewarded: boolean
+        isRewarded: boolean
 
     @Field(() => PostEntity)
     @ManyToOne(() => PostEntity, (post) => post.postComments, { onDelete: "CASCADE" })
     @JoinColumn({ name: "postId" })
-    post: PostEntity
+        post: PostEntity
 
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (account) => account.postComments)
     @JoinColumn({ name: "creatorId" })
-    creator: AccountEntity
+        creator: AccountEntity
 
     @Field(() => [PostCommentMediaEntity])
     @OneToMany(
@@ -63,19 +63,19 @@ export class PostCommentEntity {
         (postCommentMedia) => postCommentMedia.postComment,
         { cascade: true },
     )
-    postCommentMedias: Array<PostCommentMediaEntity>
+        postCommentMedias: Array<PostCommentMediaEntity>
 
     @OneToMany(
         () => PostCommentLikeEntity,
         (postCommentLike) => postCommentLike.postComment,
     )
-    postCommentLikes: Array<PostCommentLikeEntity>
+        postCommentLikes: Array<PostCommentLikeEntity>
 
     @OneToMany(
         () => PostCommentReplyEntity,
         (postCommentReply) => postCommentReply.postComment,
     )
-    postCommentReplies: Array<PostCommentReplyEntity>
+        postCommentReplies: Array<PostCommentReplyEntity>
 
     @Field(() => [ReportPostCommentEntity])
     @OneToMany(
@@ -83,15 +83,15 @@ export class PostCommentEntity {
         (reportPostComment) => reportPostComment.reportedPostComment,
         { onDelete: "CASCADE" },
     )
-    postCommentReports: Array<ReportPostCommentEntity>
+        postCommentReports: Array<ReportPostCommentEntity>
     
     //graphql
     @Field(() => Int, { nullable: true })
-    numberOfLikes?: number
+        numberOfLikes?: number
     @Field(() => Int, { nullable: true })
-    numberOfReplies?: number
+        numberOfReplies?: number
     @Field(() => Boolean, { nullable: true })
-    liked?: boolean
+        liked?: boolean
     @Field(() => Boolean, { nullable: true })
-    isOwner?: boolean
+        isOwner?: boolean
 }

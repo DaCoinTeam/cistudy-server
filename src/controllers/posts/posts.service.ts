@@ -13,7 +13,6 @@ import {
     UpdatePostInput,
     DeletePostInput,
     MarkPostCommentRewardedInput,
-    CreatePostReportInputData,
     CreatePostReportInput,
     UpdatePostReportInput,
     CreatePostCommentReportInput,
@@ -149,10 +148,9 @@ export class PostsService {
 
             console.log(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient)
 
-            earnAmount = computeFixedFloor
-                (
-                    priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient
-                )
+            earnAmount = computeFixedFloor(
+                priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient
+            )
             console.log("Earn Amount: " + earnAmount ? earnAmount : null)
             await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
         }
@@ -180,6 +178,20 @@ export class PostsService {
             postMedias: [],
         }
 
+        const updatePost = await this.postMySqlRepository.findOne({
+            where: {
+                postId
+            }
+        })
+
+        if (!updatePost) {
+            throw new NotFoundException("Post not found or has been deleted.")
+        }
+
+        if(updatePost.creatorId !== accountId){
+            throw new ConflictException("You are not the owner of this post")
+        }
+        
         if (files) {
             const promises: Array<Promise<void>> = []
             let mediaPosition = 0
@@ -424,21 +436,21 @@ export class PostsService {
                 throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
             }
 
-            const numberOfPostComments = await this.postCommentMySqlRepository.findBy({ postId });
-            const creatorIdsSeen = new Set();
+            const numberOfPostComments = await this.postCommentMySqlRepository.findBy({ postId })
+            const creatorIdsSeen = new Set()
 
             const filteredComments = numberOfPostComments.filter(comment => {
                 if (comment.creatorId === creatorId) {
-                    return false;
+                    return false
                 }
                 if (creatorIdsSeen.has(comment.creatorId)) {
-                    return false;
+                    return false
                 }
-                creatorIdsSeen.add(comment.creatorId);
-                return true;
-            });
+                creatorIdsSeen.add(comment.creatorId)
+                return true
+            })
 
-            const numberOfRewardedComments = filteredComments.length;
+            const numberOfRewardedComments = filteredComments.length
 
             if (isRewarded) {
                 if (creatorId !== accountId) {
@@ -587,23 +599,6 @@ export class PostsService {
                     accountId,
                     postCommentId,
                 })
-
-                const { post } = await this.postCommentMySqlRepository.findOne({
-                    where: {
-                        postCommentId
-                    },
-                    relations: {
-                        post: {
-                            course: true
-                        }
-                    }
-                })
-
-                const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOneBy({
-                    accountId,
-                    courseId: post.courseId
-                })
-
             } else {
                 const { postCommentLikeId, liked } = found
                 await this.postCommentLikeMySqlRepository.update(postCommentLikeId, {
@@ -744,7 +739,7 @@ export class PostsService {
     }
 
     async createPostReport(input: CreatePostReportInput): Promise<CreatePostReportOutput> {
-        const { data, accountId } = input;
+        const { data, accountId } = input
         const { reportedPostId, description } = data
 
         const reportedPost = await this.postMySqlRepository.findOneBy({ postId: reportedPostId })
@@ -774,11 +769,11 @@ export class PostsService {
             others: {
                 reportPostId
             }
-        };
+        }
     }
 
     async updatePostReport(input: UpdatePostReportInput): Promise<UpdatePostReportOutput> {
-        const { data, accountId } = input;
+        const { data, accountId } = input
         const { reportPostId, description } = data
 
         const found = await this.reportPostMySqlRepository.findOneBy({ reportPostId })
@@ -798,15 +793,15 @@ export class PostsService {
         await this.reportPostMySqlRepository.update(reportPostId, { description })
 
         return {
-            message: `Your Report has been updated successfully`,
+            message: "Your Report has been updated successfully",
             others: {
                 reportPostId
             }
-        };
+        }
     }
 
     async createPostCommentReport(input: CreatePostCommentReportInput): Promise<CreatePostCommentReportOutput> {
-        const { data, accountId } = input;
+        const { data, accountId } = input
         const { reportedPostCommentId, description } = data
 
         const reportedPostComment = await this.postCommentMySqlRepository.findOneBy({ postCommentId: reportedPostCommentId })
@@ -836,11 +831,11 @@ export class PostsService {
             others: {
                 reportPostCommentId
             }
-        };
+        }
     }
 
     async updatePostCommentReport(input: UpdatePostCommentReportInput): Promise<UpdatePostCommentReportOutput> {
-        const { data, accountId } = input;
+        const { data, accountId } = input
         const { reportPostCommentId, description } = data
 
         const found = await this.reportPostCommentMySqlRepository.findOneBy({ reportPostCommentId })
@@ -860,11 +855,11 @@ export class PostsService {
         await this.reportPostCommentMySqlRepository.update(reportPostCommentId, { description })
 
         return {
-            message: `Your Report has been updated successfully`,
+            message: "Your Report has been updated successfully",
             others: {
                 reportPostCommentId
             }
-        };
+        }
     }
 
     async resolvePostReport(input: ResolvePostReportInput): Promise<ResolvePostReportOutput> {

@@ -6,6 +6,10 @@ import {
     FollowMySqlEnitity,
     AccountMySqlEntity,
     AccountReviewMySqlEntity,
+    ReportAccountMySqlEntity,
+    ReportCourseMySqlEntity,
+    ReportPostMySqlEntity,
+    ReportPostCommentMySqlEntity,
 } from "@database"
 import { AccountsService } from "./accounts.service"
 
@@ -15,7 +19,11 @@ import { AccountsService } from "./accounts.service"
             AccountMySqlEntity,
             FollowMySqlEnitity,
             CourseMySqlEntity,
-            AccountReviewMySqlEntity
+            AccountReviewMySqlEntity,
+            ReportAccountMySqlEntity,
+            ReportCourseMySqlEntity,
+            ReportPostMySqlEntity,
+            ReportPostCommentMySqlEntity
         ]),
     ],
     providers: [AccountsResolver, AccountsService],
