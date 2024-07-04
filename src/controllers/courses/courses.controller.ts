@@ -28,6 +28,7 @@ import {
   CreateCategoryInputData,
   CreateCertificateInputData,
   CreateCourseCategoriesInputData,
+  CreateCourseReportInputData,
   CreateCourseReviewInputData,
   CreateCourseTargetInputData,
   CreateLessonInputData,
@@ -40,7 +41,9 @@ import {
   FinishQuizAttemptInputData,
   GiftCourseInputData,
   MarkLessonAsCompletedInputData,
+  ResolveCourseReportInputData,
   UpdateCourseInputData,
+  UpdateCourseReportInputData,
   UpdateCourseReviewInputData,
   UpdateCourseTargetInputData,
   UpdateLessonInputData,
@@ -509,4 +512,49 @@ export class CoursesController {
   ) {
     return await this.coursesService.giftCourse({ accountId, data })
   }
+
+  @ApiBearerAuth()
+    @Post("create-course-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async createCourseReport(
+        @AccountId() accountId: string,
+        @Body() body: CreateCourseReportInputData,
+    ) {
+        return this.coursesService.createCourseReport({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("update-course-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async updateCourseReport(
+        @AccountId() accountId: string,
+        @Body() body: UpdateCourseReportInputData,
+    ) {
+        return this.coursesService.updateCourseReport({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("resolve-course-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Moderator)
+    @UseInterceptors(AuthInterceptor)
+    async resolveCourseReport(
+        @AccountId() accountId: string,
+        @Body() body: ResolveCourseReportInputData,
+    ) {
+        return this.coursesService.resolveCourseReport({
+            accountId,
+            data: body,
+        })
+    }
 }

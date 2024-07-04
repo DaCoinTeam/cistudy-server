@@ -235,6 +235,19 @@ type CourseCategoryEntity {
   category: CategoryEntity
 }
 
+type ReportCourseEntity {
+  reportCourseId: ID!
+  reporterAccountId: ID!
+  reportedCourseId: ID!
+  description: String
+  processStatus: String!
+  processNote: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  reporterAccount: AccountEntity!
+  reportedCourse: CourseEntity!
+}
+
 type CourseEntity {
   courseId: ID!
   title: String
@@ -260,7 +273,8 @@ type CourseEntity {
   cartCourses: [CartCourseEntity!]!
   certificate: [CertificateEntity!]!
   orderCourses: [OrderCourseEntity!]!
-  courseReview: CourseReviewEntity
+  courseReview: [CourseReviewEntity!]
+  courseReports: [ReportCourseEntity!]
   numberOfEnrollments: Int
   enrolled: Boolean
   courseProgress: Float
@@ -287,6 +301,19 @@ type PostMediaEntity {
   post: PostEntity!
 }
 
+type ReportPostEntity {
+  reportPostId: ID!
+  reporterAccountId: ID!
+  reportedPostId: ID!
+  description: String
+  processStatus: String!
+  processNote: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  reporterAccount: AccountEntity!
+  reportedPost: PostEntity!
+}
+
 type PostEntity {
   postId: ID!
   title: String!
@@ -301,6 +328,7 @@ type PostEntity {
   postMedias: [PostMediaEntity!]!
   postComments: [PostCommentEntity!]!
   postReacts: [PostLikeEntity!]!
+  postReports: [ReportPostEntity!]!
   liked: Boolean
   numberOfLikes: Int
   numberOfComments: Int
@@ -328,6 +356,19 @@ type PostCommentReplyEntity {
   creator: AccountEntity!
 }
 
+type ReportPostCommentEntity {
+  reportPostCommentId: ID!
+  reporterAccountId: ID!
+  reportedPostCommentId: ID!
+  description: String
+  processStatus: String!
+  processNote: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  reporterAccount: AccountEntity!
+  reportedPostComment: PostCommentEntity!
+}
+
 type PostCommentEntity {
   postCommentId: ID!
   creatorId: ID!
@@ -339,9 +380,11 @@ type PostCommentEntity {
   post: PostEntity!
   creator: AccountEntity!
   postCommentMedias: [PostCommentMediaEntity!]!
+  postCommentReports: [ReportPostCommentEntity!]!
   numberOfLikes: Int
   numberOfReplies: Int
   liked: Boolean
+  isOwner: Boolean
 }
 
 type FollowEntity {
@@ -386,6 +429,19 @@ type RoleEntity {
   accountRoles: AccountEntity!
 }
 
+type ReportAccountEntity {
+  reportAccountId: ID!
+  reporterAccountId: ID!
+  reportedAccountId: ID!
+  description: String
+  processStatus: String!
+  processNote: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  reporterAccount: AccountEntity!
+  reportedAccount: AccountEntity!
+}
+
 type AccountEntity {
   accountId: ID!
   email: String!
@@ -418,6 +474,8 @@ type AccountEntity {
   quizAttempts: [QuizAttemptEntity!]!
   accountReviews: [AccountReviewEntity!]!
   selfReviews: [AccountReviewEntity!]!
+  reportAccounts: [ReportAccountEntity!]!
+  accountReports: [ReportAccountEntity!]!
   followed: Boolean!
   numberOfFollowers: Int!
 }

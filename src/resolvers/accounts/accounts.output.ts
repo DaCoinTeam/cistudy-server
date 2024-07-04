@@ -49,3 +49,12 @@ export class FindManyAccountReviewsOutput implements AuthOutput<FindManyAccountR
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }
+
+@ObjectType()
+export class FindManyReportOutputData{
+    
+}
+
+export class FindManyReportOutput implements AuthOutput<FindManyReportOutputData> {
+
+}

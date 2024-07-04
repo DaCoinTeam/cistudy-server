@@ -1,11 +1,11 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, DeepPartial, In, Repository } from "typeorm"
-import { CreateAccountReviewInput, DeleteCourseInput, DeleteAccountReviewInput, ToggleFollowInput, UpdateAccountReviewInput, VerifyCourseInput, ToggleRoleInput, CreateAccountRoleInput, UpdateAccountRoleInput } from "./accounts.input"
-import { AccountMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, AccountReviewMySqlEntity, RoleMySqlEntity } from "@database"
-import { CreateAccountReviewOutput, CreateAccountRoleOutput, ToggleRoleOutput, UpdateAccountRoleOutput, VerifyCourseOuput } from "./accounts.output"
+import { CreateAccountReviewInput, DeleteCourseInput, DeleteAccountReviewInput, ToggleFollowInput, UpdateAccountReviewInput, VerifyCourseInput, ToggleRoleInput, CreateAccountRoleInput, UpdateAccountRoleInput, CreateAccountReportInput, UpdateAccountReportInput, ResolveAccountReportInput } from "./accounts.input"
+import { AccountMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, AccountReviewMySqlEntity, RoleMySqlEntity, ReportAccountMySqlEntity } from "@database"
+import { CreateAccountReportOutput, CreateAccountReviewOutput, CreateAccountRoleOutput, ResolveAccountReportOutput, ToggleRoleOutput, UpdateAccountReportOutput, UpdateAccountRoleOutput, VerifyCourseOuput } from "./accounts.output"
 import { JwtService } from "@nestjs/jwt"
-import { SystemRoles } from "@common"
+import { ReportProcessStatus, SystemRoles } from "@common"
 
 @Injectable()
 export class AccountsService {
@@ -20,6 +20,8 @@ export class AccountsService {
         private readonly accountReviewMySqlRepository: Repository<AccountReviewMySqlEntity>,
         @InjectRepository(RoleMySqlEntity)
         private readonly roleMySqlRepository: Repository<RoleMySqlEntity>,
+        @InjectRepository(ReportAccountMySqlEntity)
+        private readonly reportAccountMySqlRepository: Repository<ReportAccountMySqlEntity>,
         private readonly dataSource: DataSource,
         private readonly jwtService: JwtService
     ) { }
@@ -349,6 +351,93 @@ export class AccountsService {
         } finally {
             // Release query runner
             await queryRunner.release();
+        }
+    }
+
+    async createAccountReport(input: CreateAccountReportInput): Promise<CreateAccountReportOutput> {
+        const { data, accountId } = input;
+        const { reportedAccountId, description } = data
+
+        if(accountId === reportedAccountId){
+            throw new ConflictException("You cannot report yourself.");
+        }
+        
+        const reportedAccount = await this.accountMySqlRepository.findOneBy({accountId: reportedAccountId})
+
+        if(!reportedAccount){
+            throw new NotFoundException("Reported user is not found or has been deleted")
+        }
+
+        const processing = await this.reportAccountMySqlRepository.find({
+            where:{
+                reportedAccountId
+            }
+        })
+
+        if(processing && processing.some(processing => processing.processStatus === ReportProcessStatus.Processing)){
+            throw new ConflictException("You have reported this accout before and it is processing. Try update your report instead.")
+        }
+
+        const { reportAccountId } = await this.reportAccountMySqlRepository.save({
+            reporterAccountId: accountId,
+            reportedAccountId,
+            description
+        })
+
+        return {
+            message: `A report to user ${reportedAccount.accountId} has been submitted.`,
+            others:{
+                reportAccountId
+            }
+        };
+    }
+
+    async updateAccountReport(input: UpdateAccountReportInput): Promise<UpdateAccountReportOutput> {
+        const { data, accountId } = input;
+        const { reportAccountId, description } = data
+
+        const found = await this.reportAccountMySqlRepository.findOneBy({reportAccountId})
+
+        if(!found){
+            throw new NotFoundException("Account's report not found.")
+        }
+
+        if(found.processStatus !== ReportProcessStatus.Processing){
+            throw new ConflictException("This report has been resolved and closed.")
+        }
+
+        if(found.reporterAccountId !== accountId){
+            throw new ConflictException("You isn't the owner of this report.")
+        }
+
+        await this.reportAccountMySqlRepository.update(reportAccountId, {description})
+
+        return {
+            message: `Your Report has been updated successfully`,
+            others:{
+                reportAccountId
+            }
+        };
+    }
+
+    async resolveAccountReport (input : ResolveAccountReportInput) : Promise<ResolveAccountReportOutput> {
+        const {data} = input
+        const { reportAccountId, processNote, processStatus} = data
+
+        const found = await this.reportAccountMySqlRepository.findOneBy({reportAccountId})
+
+        if(! found){
+            throw new NotFoundException("Report not found")
+        }
+
+        if(found.processStatus !== ReportProcessStatus.Processing){
+            throw new ConflictException("This report has already been resolved")
+        }
+
+        await this.reportAccountMySqlRepository.update(reportAccountId, {processStatus, processNote})
+
+        return{
+            message : "Report successfully resolved and closed."
         }
     }
 }

@@ -27,7 +27,8 @@ import {
     ProgressMySqlEntity,
     QuizAttemptMySqlEntity,
     AccountMySqlEntity,
-    RoleMySqlEntity
+    RoleMySqlEntity,
+    ReportCourseMySqlEntity
 } from "@database"
 import { CoursesService } from "./courses.service"
 import { MongooseModule } from "@nestjs/mongoose"
@@ -64,7 +65,8 @@ import { CourseCategoryEntity } from "src/database/mysql/course-category.entity"
             QuizQuestionMediaMySqlEntity,
             QuizAttemptMySqlEntity,
             ProgressMySqlEntity,
-            RoleMySqlEntity
+            RoleMySqlEntity,
+            ReportCourseMySqlEntity
         ]),
     ],
     controllers: [CoursesController],

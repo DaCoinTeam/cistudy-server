@@ -1,6 +1,6 @@
 import { Output } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsOptional } from "class-validator";
+import { IsOptional, IsUUID } from "class-validator";
 
 export class CreatePostCommentReplyOutputOthers {
     @ApiProperty()
@@ -92,5 +92,53 @@ export class CreatePostOutput implements Output<CreatePostOutputOthers>{
 }
 
 export class MarkPostCommentRewardedOutput implements Output{
+    message: string;
+}
+
+export class CreatePostReportOutputOthers{
+    @IsUUID("4")
+    reportPostId : string
+}
+
+export class CreatePostReportOutput implements Output<CreatePostReportOutputOthers> {
+    message: string;
+    others?: CreatePostReportOutputOthers;
+}
+
+export class UpdatePostReportOutputOthers{
+    @IsUUID("4")
+    reportPostId : string
+}
+
+export class UpdatePostReportOutput implements Output<UpdatePostReportOutputOthers> {
+    message: string;
+    others?: UpdatePostReportOutputOthers;
+}
+
+export class CreatePostCommentReportOutputOthers{
+    @IsUUID("4")
+    reportPostCommentId : string
+}
+
+export class CreatePostCommentReportOutput implements Output<CreatePostCommentReportOutputOthers> {
+    message: string;
+    others?: CreatePostCommentReportOutputOthers;
+}
+
+export class UpdatePostCommentReportOutputOthers{
+    @IsUUID("4")
+    reportPostCommentId : string
+}
+
+export class UpdatePostCommentReportOutput implements Output<UpdatePostCommentReportOutputOthers> {
+    message: string;
+    others?: UpdatePostCommentReportOutputOthers;
+}
+
+export class ResolvePostReportOutput implements Output {
+    message: string;
+}
+
+export class ResolvePostCommentReportOutput implements Output {
     message: string;
 }

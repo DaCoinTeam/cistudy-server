@@ -21,6 +21,7 @@ import { CartCourseEntity } from "./cart-course.enity"
 import { CertificateEntity } from "./certificate"
 import { OrderCourseEntity } from "./order-course.entity"
 import { CourseCategoryEntity } from "./course-category.entity"
+import { ReportCourseEntity } from "./report-course.entity"
 
 
 interface CourseIncludes {
@@ -126,19 +127,23 @@ export class CourseEntity {
 
     @Field(() => [CartCourseEntity])
     @OneToMany(() => CartCourseEntity, (cartCourse) => cartCourse.course)
-    cartCourses?: CartCourseEntity;
+    cartCourses?: Array<CartCourseEntity>;
 
     @Field(() => [CertificateEntity])
     @OneToMany(() => CertificateEntity, (certificate) => certificate.course)
-    certificate?: CertificateEntity;
+    certificate?: Array<CertificateEntity>;
 
     @Field(() => [OrderCourseEntity])
     @OneToMany(() => OrderCourseEntity, (orders) => orders.course)
-    orderCourses: OrderCourseEntity
+    orderCourses: Array<OrderCourseEntity>
 
-    @Field(() => CourseReviewEntity, { nullable: true })
+    @Field(() => [CourseReviewEntity], { nullable: true })
     @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.course)
-    courseReview?: CourseReviewEntity
+    courseReview?: Array<CourseReviewEntity>
+
+    @Field(() => [ReportCourseEntity], { nullable: true })
+    @OneToMany(() => ReportCourseEntity, (reportCourse) => reportCourse.reportedCourse, {nullable: true})
+    courseReports?: Array<ReportCourseEntity>
 
     //graphql
     @Field(() => Int, { nullable: true })

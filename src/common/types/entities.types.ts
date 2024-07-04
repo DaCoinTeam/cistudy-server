@@ -89,11 +89,12 @@ registerEnumType(CourseApproveStatus, {
   name: "CourseApproveStatus",
 })
 
-// export enum QuizQuestionType {
-//   Multiple_Choice = "multiple_choice",
-//   Essay = "essay"
-// }
+export enum ReportProcessStatus {
+  Processing = "processing",
+  Approved = "approved",
+  Rejected = "rejected"
+}
 
-// registerEnumType(QuizQuestionType,{
-//   name: "QuizQuestionType"
-// })
+registerEnumType(ReportProcessStatus,{
+  name: "ReportProcessStatus"
+})

@@ -13,6 +13,13 @@ import {
     UpdatePostInput,
     DeletePostInput,
     MarkPostCommentRewardedInput,
+    CreatePostReportInputData,
+    CreatePostReportInput,
+    UpdatePostReportInput,
+    CreatePostCommentReportInput,
+    UpdatePostCommentReportInput,
+    ResolvePostReportInput,
+    ResolvePostCommentReportInput,
 } from "./posts.input"
 import {
     PostMySqlEntity,
@@ -25,25 +32,33 @@ import {
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     AccountMySqlEntity,
+    ReportPostMySqlEntity,
+    ReportPostCommentMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DeepPartial, DataSource } from "typeorm"
 import {
     CreatePostCommentOutput,
     CreatePostCommentReplyOutput,
+    CreatePostCommentReportOutput,
     CreatePostOutput,
+    CreatePostReportOutput,
     DeletePostCommentOutput,
     DeletePostCommentReplyOutput,
     DeletePostOutput,
     MarkPostCommentRewardedOutput,
+    ResolvePostCommentReportOutput,
+    ResolvePostReportOutput,
     ToggleCommentLikePostOutputData,
     ToggleLikePostOutputData,
     UpdatePostCommentOutput,
     UpdatePostCommentReplyOutput,
+    UpdatePostCommentReportOutput,
     UpdatePostOutput,
+    UpdatePostReportOutput,
 } from "./posts.output"
 import { blockchainConfig } from "@config"
-import { computeFixedFloor } from "@common"
+import { ReportProcessStatus, computeFixedFloor } from "@common"
 
 @Injectable()
 export class PostsService {
@@ -68,6 +83,10 @@ export class PostsService {
         private readonly postCommentMediaMySqlRepository: Repository<PostCommentMediaMySqlEntity>,
         @InjectRepository(PostCommentReplyMySqlEntity)
         private readonly postCommentReplyMySqlRepository: Repository<PostCommentReplyMySqlEntity>,
+        @InjectRepository(ReportPostMySqlEntity)
+        private readonly reportPostMySqlRepository: Repository<ReportPostMySqlEntity>,
+        @InjectRepository(ReportPostCommentMySqlEntity)
+        private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
         private readonly storageService: StorageService,
         private readonly dataSource: DataSource,
     ) { }
@@ -129,7 +148,7 @@ export class PostsService {
             const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOneBy({ accountId, courseId })
 
             console.log(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient)
-            
+
             earnAmount = computeFixedFloor
                 (
                     priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient
@@ -298,7 +317,7 @@ export class PostsService {
                 if (creatorId !== accountId) {
                     const { priceAtEnrolled } = isEnrolled
                     if (numberOfRewardedLike.length < 20) {
-                        earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient
+                        earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient)
                         await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
                     }
                 }
@@ -432,9 +451,8 @@ export class PostsService {
                     if (!isCommented || isCommented.length < 1) {
                         const { priceAtEnrolled } = isEnrolled
                         if (numberOfRewardedComments < 20) {
-                            earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient
+                            earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient)
                             await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
-
                         }
                     } else {
                         alreadyRewarded = true
@@ -707,8 +725,8 @@ export class PostsService {
                         courseId: post.courseId
                     }
                 })
-
-                const earnAmount = priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.rewardCommentPostEarnCoefficient
+                
+                const earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.rewardCommentPostEarnCoefficient)
                 await this.accountMySqlRepository.increment({ accountId: postComment.creatorId }, "balance", earnAmount)
             }
 
@@ -719,8 +737,175 @@ export class PostsService {
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
+            throw ex
         } finally {
             await queryRunner.release()
+        }
+    }
+
+    async createPostReport(input: CreatePostReportInput): Promise<CreatePostReportOutput> {
+        const { data, accountId } = input;
+        const { reportedPostId, description } = data
+
+        const reportedPost = await this.postMySqlRepository.findOneBy({ postId: reportedPostId })
+
+        if (!reportedPost) {
+            throw new NotFoundException("Reported post is not found or has been deleted")
+        }
+
+        const processing = await this.reportPostMySqlRepository.find({
+            where: {
+                reportedPostId
+            }
+        })
+
+        if (processing && processing.some(processing => processing.processStatus === ReportProcessStatus.Processing)) {
+            throw new ConflictException("You have reported this accout before and it is processing. Try update your report instead.")
+        }
+
+        const { reportPostId } = await this.reportPostMySqlRepository.save({
+            reporterAccountId: accountId,
+            reportedPostId,
+            description
+        })
+
+        return {
+            message: `A report to post ${reportedPost.title} has been submitted.`,
+            others: {
+                reportPostId
+            }
+        };
+    }
+
+    async updatePostReport(input: UpdatePostReportInput): Promise<UpdatePostReportOutput> {
+        const { data, accountId } = input;
+        const { reportPostId, description } = data
+
+        const found = await this.reportPostMySqlRepository.findOneBy({ reportPostId })
+
+        if (!found) {
+            throw new NotFoundException("Post's report not found.")
+        }
+
+        if (found.processStatus !== ReportProcessStatus.Processing) {
+            throw new ConflictException("This report has been resolved and closed.")
+        }
+
+        if (found.reporterAccountId !== accountId) {
+            throw new ConflictException("You aren't the owner of this report.")
+        }
+
+        await this.reportPostMySqlRepository.update(reportPostId, { description })
+
+        return {
+            message: `Your Report has been updated successfully`,
+            others: {
+                reportPostId
+            }
+        };
+    }
+
+    async createPostCommentReport(input: CreatePostCommentReportInput): Promise<CreatePostCommentReportOutput> {
+        const { data, accountId } = input;
+        const { reportedPostCommentId, description } = data
+
+        const reportedPostComment = await this.postCommentMySqlRepository.findOneBy({ postCommentId: reportedPostCommentId })
+
+        if (!reportedPostComment) {
+            throw new NotFoundException("Reported post's comment is not found or has been deleted")
+        }
+
+        const processing = await this.reportPostCommentMySqlRepository.find({
+            where: {
+                reportedPostCommentId
+            }
+        })
+
+        if (processing && processing.some(processing => processing.processStatus === ReportProcessStatus.Processing)) {
+            throw new ConflictException("You have reported this accout before and it is processing. Try update your report instead.")
+        }
+
+        const { reportPostCommentId } = await this.reportPostCommentMySqlRepository.save({
+            reporterAccountId: accountId,
+            reportedPostCommentId,
+            description
+        })
+
+        return {
+            message: `A report to a post's comment with id ${reportedPostComment.postCommentId} has been submitted.`,
+            others: {
+                reportPostCommentId
+            }
+        };
+    }
+
+    async updatePostCommentReport(input: UpdatePostCommentReportInput): Promise<UpdatePostCommentReportOutput> {
+        const { data, accountId } = input;
+        const { reportPostCommentId, description } = data
+
+        const found = await this.reportPostCommentMySqlRepository.findOneBy({ reportPostCommentId })
+
+        if (!found) {
+            throw new NotFoundException("Post comment's report not found.")
+        }
+
+        if (found.processStatus !== ReportProcessStatus.Processing) {
+            throw new ConflictException("This report has been resolved and closed.")
+        }
+
+        if (found.reporterAccountId !== accountId) {
+            throw new ConflictException("You aren't the owner of this report.")
+        }
+
+        await this.reportPostCommentMySqlRepository.update(reportPostCommentId, { description })
+
+        return {
+            message: `Your Report has been updated successfully`,
+            others: {
+                reportPostCommentId
+            }
+        };
+    }
+
+    async resolvePostReport(input: ResolvePostReportInput): Promise<ResolvePostReportOutput> {
+        const { data } = input
+        const { reportPostId, processNote, processStatus } = data
+
+        const found = await this.reportPostMySqlRepository.findOneBy({ reportPostId })
+
+        if (!found) {
+            throw new NotFoundException("Report not found")
+        }
+
+        if(found.processStatus !== ReportProcessStatus.Processing){
+            throw new ConflictException("This report has already been resolved")
+        }
+
+        await this.reportPostMySqlRepository.update(reportPostId, { processStatus, processNote })
+
+        return {
+            message: "Report successfully resolved and closed."
+        }
+    }
+
+    async resolvePostCommentReport(input: ResolvePostCommentReportInput): Promise<ResolvePostCommentReportOutput> {
+        const { data } = input
+        const { reportPostCommentId, processNote, processStatus } = data
+
+        const found = await this.reportPostCommentMySqlRepository.findOneBy({ reportPostCommentId })
+
+        if (!found) {
+            throw new NotFoundException("Report not found")
+        }
+        
+        if(found.processStatus !== ReportProcessStatus.Processing){
+            throw new ConflictException("This report has already been resolved")
+        }
+
+        await this.reportPostCommentMySqlRepository.update(reportPostCommentId, { processStatus, processNote })
+
+        return {
+            message: "Report successfully resolved and closed."
         }
     }
 }

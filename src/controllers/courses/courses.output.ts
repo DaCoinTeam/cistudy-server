@@ -174,3 +174,27 @@ export class CreateQuizOutput implements Output {
 export class CreateLessonOutput implements Output {
     message: string;
 }
+
+export class CreateCourseReportOutputOthers{
+    @IsUUID("4")
+    reportCourseId : string
+}
+
+export class CreateCourseReportOutput implements Output<CreateCourseReportOutputOthers> {
+    message: string;
+    others?: CreateCourseReportOutputOthers;
+}
+
+export class UpdateCourseReportOutputOthers{
+    @IsUUID("4")
+    reportCourseId : string
+}
+
+export class UpdateCourseReportOutput implements Output<UpdateCourseReportOutputOthers> {
+    message: string;
+    others?: UpdateCourseReportOutputOthers;
+}
+
+export class ResolveCourseReportOutput implements Output {
+    message: string;
+}

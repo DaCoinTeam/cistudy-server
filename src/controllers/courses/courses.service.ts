@@ -22,6 +22,7 @@ import {
   AccountMySqlEntity,
   CategoryRelationMySqlEntity,
   CourseCategoryMySqlEntity,
+  ReportCourseMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, In } from "typeorm"
@@ -55,12 +56,16 @@ import {
   DeleteCategoryInput,
   CreateCourseCategoriesInput,
   DeleteCourseCategoryInput,
+  CreateCourseReportInput,
+  UpdateCourseReportInput,
+  ResolveCourseReportInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import {
   ProcessStatus,
   QuizAttemptStatus,
+  ReportProcessStatus,
   VideoType,
   existKeyNotUndefined,
 } from "@common"
@@ -69,6 +74,7 @@ import {
   CreateCertificateOutput,
   CreateCourseCategoriesOutput,
   CreateCourseOutput,
+  CreateCourseReportOutput,
   CreateCourseReviewOutput,
   CreateCourseTargetOuput,
   CreateLessonOutput,
@@ -87,7 +93,9 @@ import {
   FinishQuizAttemptOutput,
   GiftCourseOutput,
   MarkLessonAsCompletedOutput,
+  ResolveCourseReportOutput,
   UpdateCourseOutput,
+  UpdateCourseReportOutput,
   UpdateCourseReviewOutput,
   UpdateCourseTargetOuput,
   UpdateLessonOutput,
@@ -135,6 +143,8 @@ export class CoursesService {
     private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
     @InjectRepository(AccountMySqlEntity)
     private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+    @InjectRepository(ReportCourseMySqlEntity)
+    private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
     private readonly storageService: StorageService,
     private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
     private readonly dataSource: DataSource,
@@ -226,7 +236,7 @@ export class CoursesService {
         })
         return acc
       }, [])
-     
+
       await this.progressMySqlRepository.save(progresses)
 
       await queryRunner.commitTransaction()
@@ -1593,4 +1603,85 @@ export class CoursesService {
 
   }
 
+  async createCourseReport(input: CreateCourseReportInput): Promise<CreateCourseReportOutput> {
+    const { data, accountId } = input;
+    const { reportedCourseId, description } = data
+
+    const reportedCourse = await this.courseMySqlRepository.findOneBy({ courseId: reportedCourseId })
+
+    if (!reportedCourse) {
+      throw new NotFoundException("Reported course is not found or has been deleted")
+    }
+
+    const processing = await this.reportCourseMySqlRepository.find({
+      where: {
+        reportedCourseId
+      }
+    })
+
+    if (processing && processing.some(processing => processing.processStatus === ReportProcessStatus.Processing)) {
+      throw new ConflictException("You have reported this accout before and it is processing. Try update your report instead.")
+    }
+
+    const { reportCourseId } = await this.reportCourseMySqlRepository.save({
+      reporterAccountId: accountId,
+      reportedCourseId,
+      description
+    })
+
+    return {
+      message: `A report to course ${reportedCourse.title} has been submitted.`,
+      others: {
+        reportCourseId
+      }
+    };
+  }
+
+  async updateCourseReport(input: UpdateCourseReportInput): Promise<UpdateCourseReportOutput> {
+    const { data, accountId } = input;
+    const { reportCourseId, description } = data
+
+    const found = await this.reportCourseMySqlRepository.findOneBy({ reportCourseId })
+
+    if (!found) {
+      throw new NotFoundException("Course's report not found.")
+    }
+
+    if (found.processStatus !== ReportProcessStatus.Processing) {
+      throw new ConflictException("This report has been resolved and closed.")
+    }
+
+    if (found.reporterAccountId !== accountId) {
+      throw new ConflictException("You isn't the owner of this report.")
+    }
+
+    await this.reportCourseMySqlRepository.update(reportCourseId, { description })
+
+    return {
+      message: `Your Report has been updated successfully`,
+      others: {
+        reportCourseId
+      }
+    };
+  }
+
+  async resolveCourseReport(input: ResolveCourseReportInput): Promise<ResolveCourseReportOutput> {
+    const { data } = input
+    const { reportCourseId, processNote, processStatus } = data
+
+    const found = await this.reportCourseMySqlRepository.findOneBy({ reportCourseId })
+
+    if (!found) {
+      throw new NotFoundException("Report not found")
+    }
+    
+    if (found.processStatus !== ReportProcessStatus.Processing) {
+      throw new ConflictException("This report has already been resolved")
+    }
+    await this.reportCourseMySqlRepository.update(reportCourseId, { processStatus, processNote })
+
+    return {
+      message: "Report successfully resolved and closed."
+    }
+  }
 }
