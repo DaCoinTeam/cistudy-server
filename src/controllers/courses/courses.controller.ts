@@ -25,7 +25,6 @@ import {
     Roles,
 } from "../shared"
 import {
-    CheckCumulativeAmountInputData,
     CreateCategoryInputData,
     CreateCertificateInputData,
     CreateCourseCategoriesInputData,
@@ -82,22 +81,6 @@ export class CoursesController {
             accountId,
         })
     }
-
-  @ApiBearerAuth()
-  @Patch("check-cumulative-amount")
-  // cái route này xài JWT Guard, tức là nếu jwt hợp lệ thì qua cửa, còn không hợp lệ thì 401
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  //@Roles(SystemRoles.User)
-  @UseInterceptors(AuthInterceptor)
-  async checkCumulativeAmount(
-    @AccountId() accountId: string,
-    @Body() data: CheckCumulativeAmountInputData,
-  ) {
-      return await this.coursesService.checkCumulativeAmount({
-          accountId,
-          data,
-      })
-  }
 
   // trang trí để cho swagger biết đây là api cần auth
   @ApiBearerAuth()
@@ -524,6 +507,6 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() data: GiftCourseInputData,
   ) {
-    return await this.coursesService.giftCourse({ accountId, data })
+      return await this.coursesService.giftCourse({ accountId, data })
   }
 }

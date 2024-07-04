@@ -6,99 +6,101 @@ import {
     Inject,
 } from "@nestjs/common"
 import {
-  CategoryMySqlEntity,
-  CertificateMySqlEntity,
-  CourseMySqlEntity,
-  CourseReviewMySqlEntity,
-  CourseTargetMySqlEntity,
-  LessonMySqlEntity,
-  QuizQuestionAnswerMySqlEntity,
-  QuizMySqlEntity,
-  ResourceMySqlEntity,
-  SectionMySqlEntity,
-  QuizQuestionMySqlEntity,
-  QuizQuestionMediaMySqlEntity,
-  ProgressMySqlEntity,
-  QuizAttemptMySqlEntity,
-  AccountMySqlEntity,
-  CategoryRelationMySqlEntity,
-  CourseCategoryMySqlEntity,
-  ReportCourseMySqlEntity,
+    CategoryMySqlEntity,
+    CertificateMySqlEntity,
+    CourseMySqlEntity,
+    CourseReviewMySqlEntity,
+    CourseTargetMySqlEntity,
+    LessonMySqlEntity,
+    QuizQuestionAnswerMySqlEntity,
+    QuizMySqlEntity,
+    ResourceMySqlEntity,
+    SectionMySqlEntity,
+    QuizQuestionMySqlEntity,
+    QuizQuestionMediaMySqlEntity,
+    ProgressMySqlEntity,
+    QuizAttemptMySqlEntity,
+    AccountMySqlEntity,
+    CategoryRelationMySqlEntity,
+    CourseCategoryMySqlEntity,
+    ReportCourseMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, In } from "typeorm"
 import { StorageService } from "@global"
 import {
-  CreateCourseInput,
-  CreateSectionInput,
-  CreateLessonInput,
-  UpdateCourseInput,
-  CreateCourseTargetInput,
-  UpdateCourseTargetInput,
-  DeleteCourseTargetInput,
-  CreateResourcesInput,
-  UpdateLessonInput,
-  DeleteLessonInput,
-  DeleteSectionInput,
-  UpdateSectionInput,
-  DeleteResourceInput,
-  EnrollCourseInput,
-  CreateCategoryInput,
-  CreateCourseReviewInput,
-  UpdateCourseReviewInput,
-  DeleteCourseReviewInput,
-  CreateCertificateInput,
-  CreateQuizInput,
-  UpdateQuizInput,
-  MarkLessonAsCompletedInput,
-  CreateQuizAttemptInput,
-  FinishQuizAttemptInput,
-  GiftCourseInput,
-  DeleteCategoryInput,
-  CreateCourseCategoriesInput,
-  DeleteCourseCategoryInput,
+    CreateCourseInput,
+    CreateSectionInput,
+    CreateLessonInput,
+    UpdateCourseInput,
+    CreateCourseTargetInput,
+    UpdateCourseTargetInput,
+    DeleteCourseTargetInput,
+    CreateResourcesInput,
+    UpdateLessonInput,
+    DeleteLessonInput,
+    DeleteSectionInput,
+    UpdateSectionInput,
+    DeleteResourceInput,
+    EnrollCourseInput,
+    CreateCategoryInput,
+    CreateCourseReviewInput,
+    UpdateCourseReviewInput,
+    DeleteCourseReviewInput,
+    CreateCertificateInput,
+    CreateQuizInput,
+    UpdateQuizInput,
+    MarkLessonAsCompletedInput,
+    CreateQuizAttemptInput,
+    FinishQuizAttemptInput,
+    GiftCourseInput,
+    DeleteCategoryInput,
+    CreateCourseCategoriesInput,
+    DeleteCourseCategoryInput,
+    CheckCumulativeAmountInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import {
-  ProcessStatus,
-  QuizAttemptStatus,
-  VideoType,
-  existKeyNotUndefined,
+    ProcessStatus,
+    QuizAttemptStatus,
+    VideoType,
+    computeDenomination,
+    computeRaw,
+    existKeyNotUndefined,
 } from "@common"
 import {
-  CreateCategoryOutput,
-  CreateCertificateOutput,
-  CreateCourseCategoriesOutput,
-  CreateCourseOutput,
-  CreateCourseReviewOutput,
-  CreateCourseTargetOuput,
-  CreateLessonOutput,
-  CreateQuizAttemptOutput,
-  CreateQuizOutput,
-  CreateResourcesOuput,
-  CreateSectionOutput,
-  DeleteCategoryOutput,
-  DeleteCourseCategoryOutput,
-  DeleteCourseReviewOutput,
-  DeleteCourseTargetOuput,
-  DeleteLessonOutput,
-  DeleteResourceOuput,
-  DeleteSectionOuput,
-  EnrollCourseOutput,
-  FinishQuizAttemptOutput,
-  GiftCourseOutput,
-  MarkLessonAsCompletedOutput,
-  UpdateCourseOutput,
-  UpdateCourseReviewOutput,
-  UpdateCourseTargetOuput,
-  UpdateLessonOutput,
-  UpdateQuizOutput,
-  UpdateSectionOuput,
+    CheckCumulativeAmountOutput,
+    CreateCategoryOutput,
+    CreateCertificateOutput,
+    CreateCourseCategoriesOutput,
+    CreateCourseOutput,
+    CreateCourseReviewOutput,
+    CreateCourseTargetOuput,
+    CreateLessonOutput,
+    CreateQuizAttemptOutput,
+    CreateQuizOutput,
+    CreateResourcesOuput,
+    CreateSectionOutput,
+    DeleteCategoryOutput,
+    DeleteCourseCategoryOutput,
+    DeleteCourseReviewOutput,
+    DeleteCourseTargetOuput,
+    DeleteLessonOutput,
+    DeleteResourceOuput,
+    DeleteSectionOuput,
+    EnrollCourseOutput,
+    FinishQuizAttemptOutput,
+    GiftCourseOutput,
+    MarkLessonAsCompletedOutput,
+    UpdateCourseOutput,
+    UpdateCourseReviewOutput,
+    UpdateCourseTargetOuput,
+    UpdateLessonOutput,
+    UpdateQuizOutput,
+    UpdateSectionOuput,
 } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
-import { InjectModel } from "@nestjs/mongoose"
-import { Model, Types } from "mongoose"
 
 @Injectable()
 export class CoursesService {
@@ -143,38 +145,6 @@ export class CoursesService {
     private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
     private readonly dataSource: DataSource,
     ) {}
-
-    async checkCumulativeAmount(
-        input: CheckCumulativeAmountInput,
-    ): Promise<CheckCumulativeAmountOutput> {
-        const { data } = input
-        const { price, creatorWalletAddress } = data
-
-        const _price = computeRaw(price)
-
-        const transactions = await this.transactionMongoModel
-            .find({
-                isValidated: false,
-                creatorAddress: creatorWalletAddress,
-            })
-            .sort({ createdAt: -1 })
-
-        const cumulativeAmount = transactions.reduce((acc, { value }) => {
-            return acc + BigInt(value)
-        }, BigInt(0))
-
-        const enough = cumulativeAmount >= _price
-        return {
-            message: enough
-                ? "Cummulative amount is enough to enroll."
-                : "Cummulative amount is not enough to enroll. Please transfer more tokens.",
-            others: {
-                enough,
-                cummulativeAmount: cumulativeAmount.toString(),
-                differentAmounts: (cumulativeAmount - _price).toString()
-            },
-        }
-    }
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
         const { data, accountId } = input
@@ -226,55 +196,6 @@ export class CoursesService {
 
             const price = computeRaw(enableDiscount ? discountPrice : coursePrice)
 
-            for (
-                let currentQueryIndex = 0;
-                currentQueryIndex < _numberOfQueries;
-                currentQueryIndex++
-            ) {
-                const transactions = await this.transactionMongoModel
-                    .find({
-                        isValidated: false,
-                        creatorAddress: walletAddress,
-                    })
-                    .sort({ createdAt: -1 })
-
-                const cumulativeAmount = transactions.reduce((acc, { value }) => {
-                    return acc + BigInt(value)
-                }, BigInt(0))
-
-                if (cumulativeAmount < price) {
-                    if (currentQueryIndex === numberOfQueries - 1) {
-                        throw new ConflictException(
-                            "Cumulative amount not enough to enroll the course.",
-                        )
-                    }
-                } else {
-                    let currentCumulativeAmount: bigint = BigInt(0)
-                    const updatedTransactions: Array<
-            TransactionMongoEntity & {
-              _id: Types.ObjectId
-            }
-          > = []
-                    for (const transaction of transactions) {
-                        currentCumulativeAmount += BigInt(transaction.value)
-                        updatedTransactions.push(transaction)
-                        if (currentCumulativeAmount >= price) {
-                            break
-                        }
-                    }
-                    await this.transactionMongoModel.updateMany(
-                        { _id: { $in: updatedTransactions.map(({ _id }) => _id) } },
-                        {
-                            $set: {
-                                isValidated: true,
-                            },
-                        },
-                    )
-                    break
-                }
-
-                await sleep(_queryInterval * 1000)
-            }
 
             //await this.cacheManager.set(accountId, courseId)
             // if (!cachedTransaction) throw new NotFoundException("The code either expired or never existed.")
@@ -328,20 +249,20 @@ export class CoursesService {
                 endDate,
             })
 
-      const progresses = sections.reduce((acc, section) => {
-        section.lessons.forEach((lesson) => {
-          acc.push({
-            enrolledInfoId,
-            lessonId: lesson.lessonId,
-            isCompleted: false,
-          })
-        })
-        return acc
-      }, [])
+            // const progresses = sections.reduce((acc, section) => {
+            //     section.lessons.forEach((lesson) => {
+            //         acc.push({
+            //             enrolledInfoId,
+            //             lessonId: lesson.lessonId,
+            //             isCompleted: false,
+            //         })
+            //     })
+            //     return acc
+            // }, [])
      
-      await this.progressMySqlRepository.save(progresses)
+            // await this.progressMySqlRepository.save(progresses)
 
-            await queryRunner.commitTransaction()
+            // await queryRunner.commitTransaction()
 
             return {
                 message: `Enrolled to course ${courseId} successfully`,
@@ -1753,17 +1674,17 @@ export class CoursesService {
 
             await this.progressMySqlRepository.save(progresses)
 
-      await queryRunner.commitTransaction()
-      return {
-        message: `Account with email ${receiveAccountEmail} have received and enrolled to course ${course.title}`
-      }
-    } catch (ex) {
-      await queryRunner.rollbackTransaction()
-      throw ex
-    } finally {
-      await queryRunner.release()
-    }
+            await queryRunner.commitTransaction()
+            return {
+                message: `Account with email ${receiveAccountEmail} have received and enrolled to course ${course.title}`
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
 
-  }
+    }
 
 }
