@@ -467,7 +467,7 @@ export class CoursesService {
     async createSection(input: CreateSectionInput): Promise<CreateSectionOutput> {
         const { data } = input
         const { courseId, title } = data
-
+ 
         try {
             const course = await this.courseMySqlRepository.findOneBy({
                 courseId,
