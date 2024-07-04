@@ -1,6 +1,8 @@
-import { AuthInput, SystemRoles, VerifyStatus } from "@common"
+import { AuthInput, CourseApproveStatus, ReportProcessStatus, SystemRoles, VerifyStatus } from "@common"
+import { InputType } from "@nestjs/graphql"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsUUID, Max, Min } from "class-validator"
+import { IsUUID, Max, Min, MinLength, minLength } from "class-validator"
+import { app } from "firebase-admin"
 
 export class ToggleFollowInputData {
     @IsUUID("4")
@@ -153,4 +155,48 @@ export class UpdateAccountRoleInputData {
 export class UpdateAccountRoleInput implements AuthInput<UpdateAccountRoleInputData> {
     accountId: string
     data: UpdateAccountRoleInputData
+}
+
+export class CreateAccountReportInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    reportedAccountId: string
+    @ApiProperty()
+    @MinLength(20)
+    description: string
+}
+
+export class CreateAccountReportInput implements AuthInput<CreateAccountReportInputData> {
+    accountId: string
+    data: CreateAccountReportInputData
+}
+
+export class UpdateAccountReportInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    reportAccountId : string
+    @ApiProperty()
+    @MinLength(20)
+    description: string
+}
+
+export class UpdateAccountReportInput implements AuthInput<UpdateAccountReportInputData> {
+    accountId: string
+    data: UpdateAccountReportInputData
+}
+
+export class ResolveAccountReportInputData {
+    @ApiProperty()
+    @IsUUID("4")
+    reportAccountId : string
+    @ApiProperty()
+    processStatus : ReportProcessStatus
+    @ApiProperty()
+    @MinLength(20)
+    processNote : string
+}
+
+export class ResolveAccountReportInput implements AuthInput<ResolveAccountReportInputData> {
+    accountId: string
+    data: ResolveAccountReportInputData
 }

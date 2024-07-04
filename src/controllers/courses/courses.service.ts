@@ -6,100 +6,95 @@ import {
     Inject,
 } from "@nestjs/common"
 import {
-    CategoryMySqlEntity,
-    CertificateMySqlEntity,
-    CourseMySqlEntity,
-    CourseReviewMySqlEntity,
-    CourseTargetMySqlEntity,
-    LessonMySqlEntity,
-    QuizQuestionAnswerMySqlEntity,
-    QuizMySqlEntity,
-    ResourceMySqlEntity,
-    SectionMySqlEntity,
-    QuizQuestionMySqlEntity,
-    QuizQuestionMediaMySqlEntity,
-    ProgressMySqlEntity,
-    QuizAttemptMySqlEntity,
-    AccountMySqlEntity,
-    CategoryRelationMySqlEntity,
-    CourseCategoryMySqlEntity,
-    TransactionMongoEntity,
+  CategoryMySqlEntity,
+  CertificateMySqlEntity,
+  CourseMySqlEntity,
+  CourseReviewMySqlEntity,
+  CourseTargetMySqlEntity,
+  LessonMySqlEntity,
+  QuizQuestionAnswerMySqlEntity,
+  QuizMySqlEntity,
+  ResourceMySqlEntity,
+  SectionMySqlEntity,
+  QuizQuestionMySqlEntity,
+  QuizQuestionMediaMySqlEntity,
+  ProgressMySqlEntity,
+  QuizAttemptMySqlEntity,
+  AccountMySqlEntity,
+  CategoryRelationMySqlEntity,
+  CourseCategoryMySqlEntity,
+  ReportCourseMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, In } from "typeorm"
 import { StorageService } from "@global"
 import {
-    CreateCourseInput,
-    CreateSectionInput,
-    CreateLessonInput,
-    UpdateCourseInput,
-    CreateCourseTargetInput,
-    UpdateCourseTargetInput,
-    DeleteCourseTargetInput,
-    CreateResourcesInput,
-    UpdateLessonInput,
-    DeleteLessonInput,
-    DeleteSectionInput,
-    UpdateSectionInput,
-    DeleteResourceInput,
-    EnrollCourseInput,
-    CreateCategoryInput,
-    CreateCourseReviewInput,
-    UpdateCourseReviewInput,
-    DeleteCourseReviewInput,
-    CreateCertificateInput,
-    CreateQuizInput,
-    UpdateQuizInput,
-    MarkLessonAsCompletedInput,
-    CreateQuizAttemptInput,
-    FinishQuizAttemptInput,
-    GiftCourseInput,
-    DeleteCategoryInput,
-    CreateCourseCategoriesInput,
-    DeleteCourseCategoryInput,
-    CheckCumulativeAmountInput,
+  CreateCourseInput,
+  CreateSectionInput,
+  CreateLessonInput,
+  UpdateCourseInput,
+  CreateCourseTargetInput,
+  UpdateCourseTargetInput,
+  DeleteCourseTargetInput,
+  CreateResourcesInput,
+  UpdateLessonInput,
+  DeleteLessonInput,
+  DeleteSectionInput,
+  UpdateSectionInput,
+  DeleteResourceInput,
+  EnrollCourseInput,
+  CreateCategoryInput,
+  CreateCourseReviewInput,
+  UpdateCourseReviewInput,
+  DeleteCourseReviewInput,
+  CreateCertificateInput,
+  CreateQuizInput,
+  UpdateQuizInput,
+  MarkLessonAsCompletedInput,
+  CreateQuizAttemptInput,
+  FinishQuizAttemptInput,
+  GiftCourseInput,
+  DeleteCategoryInput,
+  CreateCourseCategoriesInput,
+  DeleteCourseCategoryInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import {
-    ProcessStatus,
-    QuizAttemptStatus,
-    VideoType,
-    computeDenomination,
-    computeRaw,
-    existKeyNotUndefined,
-    sleep,
+  ProcessStatus,
+  QuizAttemptStatus,
+  VideoType,
+  existKeyNotUndefined,
 } from "@common"
 import {
-    CheckCumulativeAmountOutput,
-    CreateCategoryOutput,
-    CreateCertificateOutput,
-    CreateCourseCategoriesOutput,
-    CreateCourseOutput,
-    CreateCourseReviewOutput,
-    CreateCourseTargetOuput,
-    CreateLessonOutput,
-    CreateQuizAttemptOutput,
-    CreateQuizOutput,
-    CreateResourcesOuput,
-    CreateSectionOutput,
-    DeleteCategoryOutput,
-    DeleteCourseCategoryOutput,
-    DeleteCourseReviewOutput,
-    DeleteCourseTargetOuput,
-    DeleteLessonOutput,
-    DeleteResourceOuput,
-    DeleteSectionOuput,
-    EnrollCourseOutput,
-    FinishQuizAttemptOutput,
-    GiftCourseOutput,
-    MarkLessonAsCompletedOutput,
-    UpdateCourseOutput,
-    UpdateCourseReviewOutput,
-    UpdateCourseTargetOuput,
-    UpdateLessonOutput,
-    UpdateQuizOutput,
-    UpdateSectionOuput,
+  CreateCategoryOutput,
+  CreateCertificateOutput,
+  CreateCourseCategoriesOutput,
+  CreateCourseOutput,
+  CreateCourseReviewOutput,
+  CreateCourseTargetOuput,
+  CreateLessonOutput,
+  CreateQuizAttemptOutput,
+  CreateQuizOutput,
+  CreateResourcesOuput,
+  CreateSectionOutput,
+  DeleteCategoryOutput,
+  DeleteCourseCategoryOutput,
+  DeleteCourseReviewOutput,
+  DeleteCourseTargetOuput,
+  DeleteLessonOutput,
+  DeleteResourceOuput,
+  DeleteSectionOuput,
+  EnrollCourseOutput,
+  FinishQuizAttemptOutput,
+  GiftCourseOutput,
+  MarkLessonAsCompletedOutput,
+  UpdateCourseOutput,
+  UpdateCourseReviewOutput,
+  UpdateCourseTargetOuput,
+  UpdateLessonOutput,
+  UpdateQuizOutput,
+  UpdateSectionOuput,
 } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
 import { InjectModel } from "@nestjs/mongoose"
@@ -144,8 +139,6 @@ export class CoursesService {
     private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
     @InjectRepository(AccountMySqlEntity)
     private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
-    @InjectModel(TransactionMongoEntity.name)
-    private readonly transactionMongoModel: Model<TransactionMongoEntity>,
     private readonly storageService: StorageService,
     private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
     private readonly dataSource: DataSource,
@@ -335,18 +328,18 @@ export class CoursesService {
                 endDate,
             })
 
-            // const progresses = sections.reduce((acc, section) => {
-            //     section.lessons.forEach((lesson) => {
-            //         acc.push({
-            //             enrolledInfoId,
-            //             lessonId: lesson.lessonId,
-            //             isCompleted: false,
-            //         })
-            //     })
-            //     return acc
-            // }, [])
-
-            // await this.progressMySqlRepository.save(progresses)
+      const progresses = sections.reduce((acc, section) => {
+        section.lessons.forEach((lesson) => {
+          acc.push({
+            enrolledInfoId,
+            lessonId: lesson.lessonId,
+            isCompleted: false,
+          })
+        })
+        return acc
+      }, [])
+     
+      await this.progressMySqlRepository.save(progresses)
 
             await queryRunner.commitTransaction()
 
@@ -1760,15 +1753,17 @@ export class CoursesService {
 
             await this.progressMySqlRepository.save(progresses)
 
-            await queryRunner.commitTransaction()
-            return {
-                message: `Account with email ${receiveAccountEmail} have received and enrolled to course ${course.title}`,
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
-        }
+      await queryRunner.commitTransaction()
+      return {
+        message: `Account with email ${receiveAccountEmail} have received and enrolled to course ${course.title}`
+      }
+    } catch (ex) {
+      await queryRunner.rollbackTransaction()
+      throw ex
+    } finally {
+      await queryRunner.release()
     }
+
+  }
+
 }

@@ -39,3 +39,27 @@ export class UpdateRoleOutput implements Output{
 export class UpdateAccountRoleOutput implements Output{
     message: string;
 }
+
+export class CreateAccountReportOutputOthers {
+    @IsUUID("4")
+    reportAccountId : string
+}
+
+export class CreateAccountReportOutput implements Output<CreateAccountReportOutputOthers>{
+    message: string;
+    others?: CreateAccountReportOutputOthers;
+}
+
+export class UpdateAccountReportOutputOthers {
+    @IsUUID("4")
+    reportAccountId : string
+}
+
+export class UpdateAccountReportOutput implements Output<UpdateAccountReportOutputOthers>{
+    message: string;
+    others?: UpdateAccountReportOutputOthers;
+}
+
+export class ResolveAccountReportOutput implements Output{
+    message: string;   
+}

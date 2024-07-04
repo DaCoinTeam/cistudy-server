@@ -16,6 +16,7 @@ import { CertificateEntity } from "./certificate"
 import { QuizAttemptEntity } from "./quiz-attempt.entity"
 import { AccountReviewEntity } from "./account-review.entity"
 import { RoleEntity } from "./role.entity"
+import { ReportAccountEntity } from "./report-account.entity"
 
 
 @ObjectType()
@@ -172,6 +173,14 @@ export class AccountEntity {
     @OneToMany(() => AccountReviewEntity, (selfReviews) => selfReviews.reviewedAccount, { nullable: true })
         selfReviews?: Array<AccountReviewEntity>
 
+    @Field(() => [ReportAccountEntity])
+    @OneToMany(() => ReportAccountEntity, (reportAccounts) => reportAccounts.reportedAccountId, { nullable: true })
+    reportAccounts?: Array<ReportAccountEntity>
+
+    @Field(() => [ReportAccountEntity])
+    @OneToMany(() => ReportAccountEntity, (accountReports) => accountReports.reporterAccount, { nullable: true })
+    accountReports?: Array<ReportAccountEntity>
+    
     //graphql
     @Field(() => Boolean)
         followed?: boolean

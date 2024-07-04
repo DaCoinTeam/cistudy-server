@@ -524,6 +524,6 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() data: GiftCourseInputData,
   ) {
-      return await this.coursesService.giftCourse({ accountId, data })
+    return await this.coursesService.giftCourse({ accountId, data })
   }
 }

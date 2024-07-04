@@ -17,6 +17,8 @@ import {
     PostCommentMediaMySqlEntity,
     PostCommentReplyMySqlEntity,
     RoleMySqlEntity,
+    ReportPostMySqlEntity,
+    ReportPostCommentMySqlEntity,
 } from "@database"
 import { PostsService } from "./posts.service"
 
@@ -37,7 +39,9 @@ import { PostsService } from "./posts.service"
             PostCommentLikeMySqlEntity,
             PostMediaMySqlEntity,
             PostCommentMediaMySqlEntity,
-            PostCommentReplyMySqlEntity
+            PostCommentReplyMySqlEntity,
+            ReportPostMySqlEntity,
+            ReportPostCommentMySqlEntity
         ]),
     ],
     controllers: [PostsController],

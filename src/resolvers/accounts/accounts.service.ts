@@ -1,9 +1,9 @@
 import { CourseMySqlEntity, FollowMySqlEnitity, AccountMySqlEntity, AccountReviewMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { DataSource, Repository } from "typeorm"
-import { FindManyCreatedCoursesInput, FindManyFollowersInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindOneAccountInput } from "./accounts.input"
+import { FindManyFollowersInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindOneAccountInput, FindManyReportsInput } from "./accounts.input"
 import { InjectRepository } from "@nestjs/typeorm"
-import { FindManyAccountReviewsOutputData, FindManyAccountsOutputData } from "./accounts.output"
+import { FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyReportOutput } from "./accounts.output"
 @Injectable()
 export class AccountsService {
     constructor(
@@ -160,7 +160,16 @@ export class AccountsService {
         } finally {
             await queryRunner.release()
         }
+    }
 
+    async findManyReports(input: FindManyReportsInput): Promise<FindManyReportOutput> {
+        const { accountId, data } = input
+        const { params, options } = data
+        const { filterReports } = params
+        const { skip, take } = options
         
+        let reports = []
+        
+        return
     }
 }

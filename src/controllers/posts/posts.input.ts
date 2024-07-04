@@ -1,6 +1,6 @@
-import { AuthInput, MediaType } from "@common"
+import { AuthInput, MediaType, ReportProcessStatus } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsInt, IsUUID } from "class-validator"
+import { IsInt, IsUUID, MinLength } from "class-validator"
 
 // CREATE POST
 export class PostMediaInputData {
@@ -226,4 +226,90 @@ export class MarkPostCommentRewardedInput implements AuthInput<MarkPostCommentRe
     @IsUUID("4")
     accountId: string
     data: MarkPostCommentRewardedData
+}
+
+export class CreatePostReportInputData {
+    @ApiProperty()
+    reportedPostId: string
+    @ApiProperty()
+    @MinLength(20)
+    description: string
+}
+
+export class CreatePostReportInput implements AuthInput<CreatePostReportInputData>{
+    accountId: string
+    data: CreatePostReportInputData
+}
+
+export class UpdatePostReportInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    reportPostId : string
+    @ApiProperty()
+    @MinLength(20)
+    description: string
+}
+
+export class UpdatePostReportInput implements AuthInput<UpdatePostReportInputData> {
+    accountId: string
+    data: UpdatePostReportInputData
+}
+
+export class CreatePostCommentReportInputData {
+    @ApiProperty()
+    reportedPostCommentId: string
+    @ApiProperty()
+    @MinLength(20)
+    description: string
+}
+
+export class CreatePostCommentReportInput implements AuthInput<CreatePostCommentReportInputData>{
+    accountId: string
+    data: CreatePostCommentReportInputData
+}
+
+export class UpdatePostCommentReportInputData {
+    @IsUUID("4")
+    @ApiProperty()
+    reportPostCommentId : string
+    @ApiProperty()
+    @MinLength(20)
+    description: string
+}
+
+export class UpdatePostCommentReportInput implements AuthInput<UpdatePostCommentReportInputData> {
+    accountId: string
+    data: UpdatePostCommentReportInputData
+}
+
+export class ResolvePostReportInputData {
+    @ApiProperty()
+    @IsUUID("4")
+    reportPostId : string
+    @ApiProperty()
+    processStatus : ReportProcessStatus
+    @ApiProperty()
+    @MinLength(20)
+    processNote : string
+}
+
+export class ResolvePostReportInput implements AuthInput<ResolvePostReportInputData> {
+    accountId: string
+    data: ResolvePostReportInputData
+}
+
+export class ResolvePostCommentReportInputData {
+    @ApiProperty()
+    @IsUUID("4")
+    reportPostCommentId : string
+    @ApiProperty()
+    processStatus : ReportProcessStatus
+    @ApiProperty()
+    @MinLength(20)
+    processNote : string
+}
+
+export class ResolvePostCommentReportInput implements AuthInput<ResolvePostCommentReportInputData> {
+    accountId: string
+    data: ResolvePostCommentReportInputData
 }

@@ -127,3 +127,32 @@ export class FindManyAccountReviewsInput implements Input<FindManyAccountReviews
     data: FindManyAccountReviewsInputData
 }
 
+@InputType()
+export class FindManyReportsInputParams {
+    @Field(() => String, { nullable: true })
+    filterReports? : string
+}
+
+@InputType()
+export class FindManyReportsInputOptions {
+    @Field(() => Int, { nullable: true })
+    take?: number
+    @Field(() => Int, { nullable: true })
+    skip?: number
+}
+
+@InputType()
+export class FindManyReportsInputData implements ParamsWithOptions<FindManyReportsInputParams,FindManyReportsInputOptions>{
+    @Field(() => FindManyReportsInputParams, { nullable: true })
+    @IsOptional()
+    params: FindManyReportsInputParams
+    @Field(() => FindManyReportsInputOptions, { nullable: true })
+    @IsOptional()
+    options?: FindManyReportsInputOptions
+}
+
+export class FindManyReportsInput implements AuthInput<FindManyReportsInputData> {
+    accountId: string
+    data: FindManyReportsInputData
+}
+

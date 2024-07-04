@@ -15,6 +15,7 @@ import { AccountEntity } from "./account.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { AccountMySqlEntity } from "."
 import { PostMediaEntity } from "./post-media.entity"
+import { ReportPostEntity } from "./report-post.entity"
 
 @ObjectType()
 @Entity("post")
@@ -77,6 +78,10 @@ export class PostEntity {
     @Field(() => [PostLikeEntity])
     @OneToMany(() => PostLikeEntity, (postReact) => postReact.post)
     postReacts: Array<PostLikeEntity>
+
+    @Field(() => [ReportPostEntity])
+    @OneToMany(() => ReportPostEntity, (postReport) => postReport.reportedPost)
+    postReports: Array<ReportPostEntity>
 
     //graphql
     @Field(() => Boolean, { nullable: true })

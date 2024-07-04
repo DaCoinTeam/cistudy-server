@@ -23,8 +23,12 @@ import { JwtAuthGuard, AuthInterceptor, AccountId, DataFromBody, Roles } from ".
 import {
     CreatePostCommentInputData,
     CreatePostCommentReplyInputData,
+    CreatePostCommentReportInputData,
     CreatePostInputData,
+    CreatePostReportInputData,
     MarkPostCommentRewardedData,
+    ResolvePostCommentReportInputData,
+    ResolvePostReportInputData,
     ToggleLikePostCommentInputData,
     ToggleLikePostInputData,
     UpdatePostCommentInputData,
@@ -85,7 +89,7 @@ export class PostsController {
     @ApiBearerAuth()
     @Delete("delete-post/:postId")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User)
+    @Roles(SystemRoles.User, SystemRoles.Moderator)
     @UseInterceptors(AuthInterceptor)
     async deletePost(@AccountId() accountId: string, @Param("postId") postId: string) {
         return await this.postsService.deletePost({
@@ -141,21 +145,21 @@ export class PostsController {
         return await this.postsService.updatePostComment({ accountId, data, files })
     }
 
-    // @ApiBearerAuth()
-    // @Delete("delete-post-comment/:postCommentId")
-    // @UseGuards(JwtAuthGuard, RolesGuard)
-    // @Roles(SystemRoles.User)
-    // @UseInterceptors(AuthInterceptor)
-    // async deletePostComment(
-    //     @AccountId() accountId: string,
-    //     @Param("postCommentId") postCommentId: string,
-    // ) {
-    //     return await this.postsService.deletePostComment({
-    //         accountId, data: {
-    //             postCommentId
-    //         }
-    //     })
-    // }
+    @ApiBearerAuth()
+    @Delete("delete-post-comment/:postCommentId")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Moderator)
+    @UseInterceptors(AuthInterceptor)
+    async deletePostComment(
+        @AccountId() accountId: string,
+        @Param("postCommentId") postCommentId: string,
+    ) {
+        return await this.postsService.deletePostComment({
+            accountId, data: {
+                postCommentId
+            }
+        })
+    }
 
     @ApiBearerAuth()
     @Patch("toggle-like-post-comment")
@@ -220,7 +224,7 @@ export class PostsController {
     }
 
     @ApiBearerAuth()
-    @Patch("mark-post-comment-rewared")
+    @Patch("mark-post-comment-rewarded")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
@@ -229,6 +233,66 @@ export class PostsController {
         @Body() body: MarkPostCommentRewardedData,
     ) {
         return this.postsService.markPostCommentRewarded({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-post-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async createPostReport(
+        @AccountId() accountId: string,
+        @Body() body: CreatePostReportInputData,
+    ) {
+        return this.postsService.createPostReport({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-post-comment-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async createPostCommentReport(
+        @AccountId() accountId: string,
+        @Body() body: CreatePostCommentReportInputData,
+    ) {
+        return this.postsService.createPostCommentReport({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("resolve-post-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Moderator)
+    @UseInterceptors(AuthInterceptor)
+    async resolvePostReport(
+        @AccountId() accountId: string,
+        @Body() body: ResolvePostReportInputData,
+    ) {
+        return this.postsService.resolvePostReport({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("resolve-post-comment-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Moderator)
+    @UseInterceptors(AuthInterceptor)
+    async resolvePostCommentReport(
+        @AccountId() accountId: string,
+        @Body() body: ResolvePostCommentReportInputData,
+    ) {
+        return this.postsService.resolvePostCommentReport({
             accountId,
             data: body,
         })

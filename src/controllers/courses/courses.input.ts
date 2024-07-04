@@ -1,14 +1,7 @@
 import { AuthEmptyDataInput, AuthInput, MediaType } from "@common"
+import { QuizQuestionAnswerMySqlEntity } from "@database"
 import { ApiProperty } from "@nestjs/swagger"
-import {
-    IsInt,
-    IsNumber,
-    IsOptional,
-    IsUUID,
-    Length,
-    Max,
-    Min,
-} from "class-validator"
+import { IsInt, IsNumber, IsOptional, IsUUID, Length, Max, Min, MinLength, max, min } from "class-validator"
 
 export class CreateCourseInput implements AuthEmptyDataInput {
   @IsUUID("4")

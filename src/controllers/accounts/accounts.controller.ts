@@ -5,7 +5,7 @@ import {
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { AccountsService } from "./accounts.service"
 import { AuthInterceptor, JwtAuthGuard, AccountId, Roles } from "../shared"
-import { CreateAccountReviewInputData, CreateAccountRoleInputData, CreateRoleInputData, DeleteCourseInputData, ToggleFollowInputData, ToggleRoleInputData, UpdateAccountReviewInputData, UpdateAccountRoleInputData, UpdateRoleInputData, VerifyCourseInputData } from "./accounts.input"
+import { CreateAccountReportInputData, CreateAccountReviewInputData, CreateAccountRoleInputData, CreateRoleInputData, DeleteCourseInputData, ResolveAccountReportInputData, ToggleFollowInputData, ToggleRoleInputData, UpdateAccountReportInputData, UpdateAccountReviewInputData, UpdateAccountRoleInputData, UpdateRoleInputData, VerifyCourseInputData } from "./accounts.input"
 import { RolesGuard } from "../shared/guards/role.guard"
 import { SystemRoles } from "@common"
 
@@ -139,6 +139,51 @@ export class AccountsController {
         @Body() body: UpdateAccountRoleInputData,
     ) {
         return this.accountsService.updateAccountRole({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-account-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async createAccountReport(
+        @AccountId() accountId: string,
+        @Body() body: CreateAccountReportInputData,
+    ) {
+        return this.accountsService.createAccountReport({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("update-account-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async updateAccountReport(
+        @AccountId() accountId: string,
+        @Body() body: UpdateAccountReportInputData,
+    ) {
+        return this.accountsService.updateAccountReport({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("resolve-account-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Moderator)
+    @UseInterceptors(AuthInterceptor)
+    async resolveAccountReport(
+        @AccountId() accountId: string,
+        @Body() body: ResolveAccountReportInputData,
+    ) {
+        return this.accountsService.resolveAccountReport({
             accountId,
             data: body,
         })
