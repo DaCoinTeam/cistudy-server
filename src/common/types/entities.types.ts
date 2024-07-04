@@ -34,7 +34,7 @@ export enum OrderStatus {
 }
 
 registerEnumType(OrderStatus, {
-  name: "OrderStatus"
+    name: "OrderStatus"
 })
 
 registerEnumType(VerifyStatus, {
@@ -76,7 +76,7 @@ export enum QuizAttemptStatus {
 }
 
 registerEnumType(QuizAttemptStatus, {
-  name: "QuizAttemptStatus",
+    name: "QuizAttemptStatus",
 })
 
 export enum CourseApproveStatus {
@@ -86,7 +86,7 @@ export enum CourseApproveStatus {
 }
 
 registerEnumType(CourseApproveStatus, {
-  name: "CourseApproveStatus",
+    name: "CourseApproveStatus",
 })
 
 // export enum QuizQuestionType {

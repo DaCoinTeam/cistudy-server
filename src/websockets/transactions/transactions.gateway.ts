@@ -45,38 +45,18 @@ export class TransactionsGateway implements OnModuleInit {
     private readonly server: Server
 
     redisPubClient: RedisClientType
-    redisTransactionsServiceSubClient: RedisClientType
     redisBlockchainEvmServiceSubClient: RedisClientType
 
     async onModuleInit() {
         this.redisPubClient = createClient({
             url: `redis://${databaseConfig().redis.host}:${databaseConfig().redis.port}`,
         })
-        this.redisTransactionsServiceSubClient = this.redisPubClient.duplicate()
         this.redisBlockchainEvmServiceSubClient = this.redisPubClient.duplicate()
 
         await Promise.all([
             this.redisPubClient.connect(),
-            this.redisTransactionsServiceSubClient.connect(),
             this.redisBlockchainEvmServiceSubClient.connect()
         ])
-
-        this.redisTransactionsServiceSubClient.subscribe(
-            TransactionsGateway.name,
-            async (message: string) => {
-                const parsed: TransactionsServiceMessage = JSON.parse(message)
-
-                const transactionGatewayMessages =
-                        ((await this.cacheManager.get(
-                            TransactionsGateway.name,
-                        )) as Array<TransactionsServiceMessage>) ?? []
-
-                await this.cacheManager.set(TransactionsGateway.name, [
-                    ...transactionGatewayMessages,
-                    parsed,
-                ])
-            }
-        )
 
         this.redisBlockchainEvmServiceSubClient.subscribe(
             BlockchainEvmService.name,
@@ -85,9 +65,9 @@ export class TransactionsGateway implements OnModuleInit {
                 const parsed: BlockchainEvmServiceMessage = JSON.parse(message)
 
                 const blockchainEvmServiceMessages =
-                        ((await this.cacheManager.get(
-                            BlockchainEvmService.name,
-                        )) as Array<BlockchainEvmServiceMessage>) ?? []
+                    ((await this.cacheManager.get(
+                        BlockchainEvmService.name,
+                    )) as Array<BlockchainEvmServiceMessage>) ?? []
 
                 await this.cacheManager.set(BlockchainEvmService.name, [
                     ...blockchainEvmServiceMessages,
@@ -97,11 +77,11 @@ export class TransactionsGateway implements OnModuleInit {
         )
     }
 
-        @Interval(5000)
+    @Interval(5000)
     async verifyTransactions() {
         let [blockchainEvmServiceMessages, transactionGatewayMessages] = await Promise.all([
-                this.cacheManager.get(BlockchainEvmService.name) as Promise<Array<BlockchainEvmServiceMessage>>,
-                this.cacheManager.get(TransactionsGateway.name) as Promise<Array<TransactionsServiceMessage>>
+            this.cacheManager.get(BlockchainEvmService.name) as Promise<Array<BlockchainEvmServiceMessage>>,
+            this.cacheManager.get(TransactionsGateway.name) as Promise<Array<TransactionsServiceMessage>>
         ])
 
         blockchainEvmServiceMessages = blockchainEvmServiceMessages ?? []
@@ -138,30 +118,30 @@ export class TransactionsGateway implements OnModuleInit {
         })
     }
 
-        @UseGuards(JwtAuthGuard)
-        @UseInterceptors(AuthInterceptor)
-        @SubscribeMessage(VERIFY_TRANSACTION)
-        async handleVerifyTransaction(
-            @ConnectedSocket() client: Socket,
-            @MessageBody() data: VerifyTransactionInputData,
-            @AccountId() accountId: string,
-        ): Promise < WsResponse < VerifyTransactionOutputData >> {
-            console.log("C")
-            const { transactionHash } = data
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @SubscribeMessage(VERIFY_TRANSACTION)
+    async handleVerifyTransaction(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() data: VerifyTransactionInputData,
+        @AccountId() accountId: string,
+    ): Promise<WsResponse<VerifyTransactionOutputData>> {
+        console.log("C")
+        const { transactionHash } = data
 
-            const message: TransactionsServiceMessage = {
-                transactionHash,
-                clientId: client.id,
-                accountId,
-            }
-
-            await this.redisPubClient.publish(
-                TransactionsGateway.name,
-                JSON.stringify(message),
-            )
-
-            return { event: VERIFY_TRANSACTION, data: {} }
+        const message: TransactionsServiceMessage = {
+            transactionHash,
+            clientId: client.id,
+            accountId,
         }
+
+        await this.redisPubClient.publish(
+            TransactionsGateway.name,
+            JSON.stringify(message),
+        )
+
+        return { event: VERIFY_TRANSACTION, data: {} }
+    }
 }
 
 export interface TransactionsServiceMessage {

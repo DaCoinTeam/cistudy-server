@@ -55,9 +55,7 @@ export class AccountEntity {
 
     @Field(() => Float, { nullable: true })
     @Column({
-        type: "decimal",
-        precision: 10,
-        scale: 5,
+        type: "float",
         default: 0,
     })
         balance: number

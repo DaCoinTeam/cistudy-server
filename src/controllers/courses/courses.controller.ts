@@ -1,60 +1,61 @@
 import {
-  Controller,
-  Post,
-  UseInterceptors,
-  UseGuards,
-  UploadedFiles,
-  Body,
-  Put,
-  Delete,
-  Param,
-  Patch,
+    Controller,
+    Post,
+    UseInterceptors,
+    UseGuards,
+    UploadedFiles,
+    Body,
+    Put,
+    Delete,
+    Param,
+    Patch,
 } from "@nestjs/common"
 import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
-  ApiHeader,
-  ApiTags,
+    ApiBearerAuth,
+    ApiBody,
+    ApiConsumes,
+    ApiHeader,
+    ApiTags,
 } from "@nestjs/swagger"
 import {
-  AccountId,
-  AuthInterceptor,
-  JwtAuthGuard,
-  DataFromBody,
-  Roles,
+    AccountId,
+    AuthInterceptor,
+    JwtAuthGuard,
+    DataFromBody,
+    Roles,
 } from "../shared"
 import {
-  CreateCategoryInputData,
-  CreateCertificateInputData,
-  CreateCourseCategoriesInputData,
-  CreateCourseReviewInputData,
-  CreateCourseTargetInputData,
-  CreateLessonInputData,
-  CreateQuizAttemptInputData,
-  CreateQuizInputData,
-  CreateResourcesInputData,
-  CreateSectionInputData,
-  DeleteCourseCategoryInputData,
-  EnrollCourseInputData,
-  FinishQuizAttemptInputData,
-  GiftCourseInputData,
-  MarkLessonAsCompletedInputData,
-  UpdateCourseInputData,
-  UpdateCourseReviewInputData,
-  UpdateCourseTargetInputData,
-  UpdateLessonInputData,
-  UpdateQuizInputData,
-  //UpdateQuizInputData,
-  UpdateSectionInputData,
+    CheckCumulativeAmountInputData,
+    CreateCategoryInputData,
+    CreateCertificateInputData,
+    CreateCourseCategoriesInputData,
+    CreateCourseReviewInputData,
+    CreateCourseTargetInputData,
+    CreateLessonInputData,
+    CreateQuizAttemptInputData,
+    CreateQuizInputData,
+    CreateResourcesInputData,
+    CreateSectionInputData,
+    DeleteCourseCategoryInputData,
+    EnrollCourseInputData,
+    FinishQuizAttemptInputData,
+    GiftCourseInputData,
+    MarkLessonAsCompletedInputData,
+    UpdateCourseInputData,
+    UpdateCourseReviewInputData,
+    UpdateCourseTargetInputData,
+    UpdateLessonInputData,
+    UpdateQuizInputData,
+    //UpdateQuizInputData,
+    UpdateSectionInputData,
 } from "./courses.input"
 
 import {
-  createCategorySchema,
-  createQuizSchema,
-  createResourcesSchema,
-  updateCourseSchema,
-  updateQuizSchema,
+    createCategorySchema,
+    createQuizSchema,
+    createResourcesSchema,
+    updateCourseSchema,
+    updateQuizSchema,
 } from "./courses.schema"
 
 import { Files, SystemRoles } from "@common"
@@ -64,22 +65,38 @@ import { RolesGuard } from "../shared/guards/role.guard"
 
 @ApiTags("Courses")
 @ApiHeader({
-  name: "Client-Id",
-  description: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
+    name: "Client-Id",
+    description: "4e2fa8d7-1f75-4fad-b500-454a93c78935",
 })
 @Controller("api/courses")
 export class CoursesController {
-  constructor(private readonly coursesService: CoursesService) { }
+    constructor(private readonly coursesService: CoursesService) {}
 
   @ApiBearerAuth()
   @Post("create-course")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(SystemRoles.User)
   @UseInterceptors(AuthInterceptor)
-  async createCourse(@AccountId() accountId: string) {
-    return await this.coursesService.createCourse({
-      accountId,
-    })
+    async createCourse(@AccountId() accountId: string) {
+        return await this.coursesService.createCourse({
+            accountId,
+        })
+    }
+
+  @ApiBearerAuth()
+  @Patch("check-cumulative-amount")
+  // cái route này xài JWT Guard, tức là nếu jwt hợp lệ thì qua cửa, còn không hợp lệ thì 401
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  //@Roles(SystemRoles.User)
+  @UseInterceptors(AuthInterceptor)
+  async checkCumulativeAmount(
+    @AccountId() accountId: string,
+    @Body() data: CheckCumulativeAmountInputData,
+  ) {
+      return await this.coursesService.checkCumulativeAmount({
+          accountId,
+          data,
+      })
   }
 
   // trang trí để cho swagger biết đây là api cần auth
@@ -87,16 +104,16 @@ export class CoursesController {
   @Patch("enroll-course")
   // cái route này xài JWT Guard, tức là nếu jwt hợp lệ thì qua cửa, còn không hợp lệ thì 401
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(SystemRoles.User)
+  //@Roles(SystemRoles.User)
   @UseInterceptors(AuthInterceptor)
   async enrollCourse(
     @AccountId() accountId: string,
     @Body() data: EnrollCourseInputData,
   ) {
-    return await this.coursesService.enrollCourse({
-      accountId,
-      data,
-    })
+      return await this.coursesService.enrollCourse({
+          accountId,
+          data,
+      })
   }
 
   @ApiBearerAuth()
@@ -106,19 +123,19 @@ export class CoursesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(
-    AuthInterceptor,
-    FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
   )
   async updateCourse(
     @AccountId() accountId: string,
     @DataFromBody() data: UpdateCourseInputData,
     @UploadedFiles() { files }: Files,
   ) {
-    return this.coursesService.updateCourse({
-      accountId,
-      data,
-      files,
-    })
+      return this.coursesService.updateCourse({
+          accountId,
+          data,
+          files,
+      })
   }
 
   @ApiBearerAuth()
@@ -130,10 +147,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() body: CreateCourseReviewInputData,
   ) {
-    return this.coursesService.createCourseReview({
-      accountId,
-      data: body,
-    })
+      return this.coursesService.createCourseReview({
+          accountId,
+          data: body,
+      })
   }
 
   @ApiBearerAuth()
@@ -145,10 +162,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() body: UpdateCourseReviewInputData,
   ) {
-    return this.coursesService.updateCourseReview({
-      accountId,
-      data: body,
-    })
+      return this.coursesService.updateCourseReview({
+          accountId,
+          data: body,
+      })
   }
 
   @ApiBearerAuth()
@@ -160,10 +177,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Param("courseReviewId") courseReviewId: string,
   ) {
-    return this.coursesService.deleteCourseReview({
-      accountId,
-      data: { courseReviewId },
-    })
+      return this.coursesService.deleteCourseReview({
+          accountId,
+          data: { courseReviewId },
+      })
   }
 
   @ApiBearerAuth()
@@ -175,10 +192,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() body: CreateCourseTargetInputData,
   ) {
-    return this.coursesService.createCourseTarget({
-      accountId,
-      data: body,
-    })
+      return this.coursesService.createCourseTarget({
+          accountId,
+          data: body,
+      })
   }
 
   @ApiBearerAuth()
@@ -190,10 +207,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() body: UpdateCourseTargetInputData,
   ) {
-    return this.coursesService.updateCourseTarget({
-      accountId,
-      data: body,
-    })
+      return this.coursesService.updateCourseTarget({
+          accountId,
+          data: body,
+      })
   }
 
   @ApiBearerAuth()
@@ -205,10 +222,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Param("courseTargetId") courseTargetId: string,
   ) {
-    return this.coursesService.deleteCourseTarget({
-      accountId,
-      data: { courseTargetId },
-    })
+      return this.coursesService.deleteCourseTarget({
+          accountId,
+          data: { courseTargetId },
+      })
   }
 
   @ApiBearerAuth()
@@ -220,10 +237,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() body: CreateSectionInputData,
   ) {
-    return this.coursesService.createSection({
-      accountId,
-      data: body,
-    })
+      return this.coursesService.createSection({
+          accountId,
+          data: body,
+      })
   }
 
   @ApiBearerAuth()
@@ -235,10 +252,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() data: CreateLessonInputData,
   ) {
-    return this.coursesService.createLesson({
-      accountId,
-      data,
-    })
+      return this.coursesService.createLesson({
+          accountId,
+          data,
+      })
   }
 
   @ApiBearerAuth()
@@ -250,10 +267,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Param("lessonId") lessonId: string,
   ) {
-    return this.coursesService.deleteLesson({
-      accountId,
-      data: { lessonId },
-    })
+      return this.coursesService.deleteLesson({
+          accountId,
+          data: { lessonId },
+      })
   }
 
   @ApiBearerAuth()
@@ -263,19 +280,19 @@ export class CoursesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(
-    AuthInterceptor,
-    FileFieldsInterceptor([{ name: "files", maxCount: 10 }]),
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files", maxCount: 10 }]),
   )
   async createResoures(
     @AccountId() accountId: string,
     @DataFromBody() data: CreateResourcesInputData,
     @UploadedFiles() { files }: Files,
   ) {
-    return this.coursesService.createResources({
-      accountId,
-      data,
-      files,
-    })
+      return this.coursesService.createResources({
+          accountId,
+          data,
+          files,
+      })
   }
 
   @ApiBearerAuth()
@@ -285,19 +302,19 @@ export class CoursesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(SystemRoles.User, SystemRoles.Instructor)
   @UseInterceptors(
-    AuthInterceptor,
-    FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
   )
   async updateLesson(
     @AccountId() accountId: string,
     @DataFromBody() data: UpdateLessonInputData,
     @UploadedFiles() { files }: Files,
   ) {
-    return this.coursesService.updateLesson({
-      accountId,
-      data,
-      files,
-    })
+      return this.coursesService.updateLesson({
+          accountId,
+          data,
+          files,
+      })
   }
 
   @ApiBearerAuth()
@@ -309,10 +326,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() body: UpdateSectionInputData,
   ) {
-    return this.coursesService.updateSection({
-      accountId,
-      data: body,
-    })
+      return this.coursesService.updateSection({
+          accountId,
+          data: body,
+      })
   }
 
   @ApiBearerAuth()
@@ -324,10 +341,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Param("sectionId") sectionId: string,
   ) {
-    return this.coursesService.deleteSection({
-      accountId,
-      data: { sectionId },
-    })
+      return this.coursesService.deleteSection({
+          accountId,
+          data: { sectionId },
+      })
   }
 
   @ApiBearerAuth()
@@ -339,10 +356,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Param("resourceId") resourceId: string,
   ) {
-    return this.coursesService.deleteResource({
-      accountId,
-      data: { resourceId },
-    })
+      return this.coursesService.deleteResource({
+          accountId,
+          data: { resourceId },
+      })
   }
 
   @ApiBearerAuth()
@@ -352,19 +369,19 @@ export class CoursesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(SystemRoles.User)
   @UseInterceptors(
-    AuthInterceptor,
-    FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
+      AuthInterceptor,
+      FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
   )
   async createCategory(
     @AccountId() accountId: string,
     @DataFromBody() data: CreateCategoryInputData,
     @UploadedFiles() { files }: Files,
   ) {
-    return this.coursesService.createCategory({
-      accountId,
-      data,
-      files,
-    })
+      return this.coursesService.createCategory({
+          accountId,
+          data,
+          files,
+      })
   }
 
   @ApiBearerAuth()
@@ -376,12 +393,12 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Param("categoryId") categoryId: string,
   ) {
-    return await this.coursesService.deleteCategory({
-      accountId,
-      data: {
-        categoryId,
-      },
-    })
+      return await this.coursesService.deleteCategory({
+          accountId,
+          data: {
+              categoryId,
+          },
+      })
   }
 
   @ApiBearerAuth()
@@ -393,10 +410,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() data: CreateCourseCategoriesInputData,
   ) {
-    return this.coursesService.createCourseCategories({
-      accountId,
-      data
-    })
+      return this.coursesService.createCourseCategories({
+          accountId,
+          data,
+      })
   }
 
   @ApiBearerAuth()
@@ -408,10 +425,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() data: DeleteCourseCategoryInputData,
   ) {
-    return this.coursesService.deleteCourseCategory({
-      accountId,
-      data
-    })
+      return this.coursesService.deleteCourseCategory({
+          accountId,
+          data,
+      })
   }
 
   @ApiBearerAuth()
@@ -423,10 +440,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() data: CreateCertificateInputData,
   ) {
-    return await this.coursesService.createCourseCertificate({
-      accountId,
-      data,
-    })
+      return await this.coursesService.createCourseCertificate({
+          accountId,
+          data,
+      })
   }
 
   @ApiBearerAuth()
@@ -441,7 +458,7 @@ export class CoursesController {
     @DataFromBody() data: CreateQuizInputData,
     @UploadedFiles() { files }: Files,
   ) {
-    return await this.coursesService.createQuiz({ accountId, data, files })
+      return await this.coursesService.createQuiz({ accountId, data, files })
   }
 
   @ApiBearerAuth()
@@ -456,7 +473,7 @@ export class CoursesController {
     @DataFromBody() data: UpdateQuizInputData,
     @UploadedFiles() { files }: Files,
   ) {
-    return await this.coursesService.updateQuiz({ accountId, data, files })
+      return await this.coursesService.updateQuiz({ accountId, data, files })
   }
 
   @ApiBearerAuth()
@@ -468,10 +485,10 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() data: MarkLessonAsCompletedInputData,
   ) {
-    return await this.coursesService.markLessonAsCompleted({
-      accountId,
-      data,
-    })
+      return await this.coursesService.markLessonAsCompleted({
+          accountId,
+          data,
+      })
   }
 
   @ApiBearerAuth()
@@ -483,7 +500,7 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() data: CreateQuizAttemptInputData,
   ) {
-    return await this.coursesService.createQuizAttempt({ accountId, data })
+      return await this.coursesService.createQuizAttempt({ accountId, data })
   }
 
   @ApiBearerAuth()
@@ -495,7 +512,7 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() data: FinishQuizAttemptInputData,
   ) {
-    return await this.coursesService.finishQuizAttempt({ accountId, data })
+      return await this.coursesService.finishQuizAttempt({ accountId, data })
   }
 
   @ApiBearerAuth()
@@ -507,6 +524,6 @@ export class CoursesController {
     @AccountId() accountId: string,
     @Body() data: GiftCourseInputData,
   ) {
-    return await this.coursesService.giftCourse({ accountId, data })
+      return await this.coursesService.giftCourse({ accountId, data })
   }
 }

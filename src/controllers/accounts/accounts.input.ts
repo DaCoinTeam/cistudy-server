@@ -1,29 +1,27 @@
-import { AuthInput, CourseApproveStatus, SystemRoles, VerifyStatus } from "@common"
-import { InputType } from "@nestjs/graphql"
+import { AuthInput, SystemRoles, VerifyStatus } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID, Max, Min } from "class-validator"
-import { app } from "firebase-admin"
 
 export class ToggleFollowInputData {
     @IsUUID("4")
     @ApiProperty()
-    followedAccountId: string
+        followedAccountId: string
 }
 
 export class ToggleFollowInput implements AuthInput<ToggleFollowInputData> {
     @IsUUID("4")
     @ApiProperty()
-    accountId: string
+        accountId: string
     data: ToggleFollowInputData
 }
 
 export class VerifyCourseInputData {
     @IsUUID("4")
     @ApiProperty()
-    courseId: string
+        courseId: string
 
     @ApiProperty()
-    verifyStatus: VerifyStatus
+        verifyStatus: VerifyStatus
 
 }
 
@@ -35,7 +33,7 @@ export class VerifyCourseInput implements AuthInput<VerifyCourseInputData> {
 export class DeleteCourseInputData {
     @IsUUID("4")
     @ApiProperty()
-    courseIds: Array<string>
+        courseIds: Array<string>
 }
 
 export class DeleteCourseInput implements AuthInput<DeleteCourseInputData> {
@@ -46,15 +44,15 @@ export class DeleteCourseInput implements AuthInput<DeleteCourseInputData> {
 export class CreateAccountReviewInputData {
     @IsUUID("4")
     @ApiProperty()
-    reviewedAccountId: string
+        reviewedAccountId: string
 
     @ApiProperty()
-    content: string
+        content: string
 
     @Min(1)
     @Max(5)
     @ApiProperty()
-    rating: number
+        rating: number
 }
 
 export class CreateAccountReviewInput implements AuthInput<CreateAccountReviewInputData> {
@@ -65,15 +63,15 @@ export class CreateAccountReviewInput implements AuthInput<CreateAccountReviewIn
 export class UpdateAccountReviewInputData {
     @IsUUID("4")
     @ApiProperty()
-    accountReviewId: string
+        accountReviewId: string
 
     @ApiProperty()
-    content?: string
+        content?: string
 
     @Min(1)
     @Max(5)
     @ApiProperty()
-    rating?: number
+        rating?: number
 }
 
 export class UpdateAccountReviewInput implements AuthInput<UpdateAccountReviewInputData> {
@@ -84,7 +82,7 @@ export class UpdateAccountReviewInput implements AuthInput<UpdateAccountReviewIn
 export class DeleteAccountReviewInputData {
     @IsUUID("4")
     @ApiProperty()
-    accountReviewId: string
+        accountReviewId: string
 }
 
 export class DeleteAccountReviewInput implements AuthInput<DeleteAccountReviewInputData> {
@@ -95,7 +93,7 @@ export class DeleteAccountReviewInput implements AuthInput<DeleteAccountReviewIn
 
 export class CreateRoleInputData {
     @ApiProperty()
-    name: string
+        name: string
 }
 
 export class CreateRoleInput implements AuthInput<CreateRoleInputData> {
@@ -106,10 +104,10 @@ export class CreateRoleInput implements AuthInput<CreateRoleInputData> {
 export class CreateAccountRoleInputData {
     @IsUUID("4")
     @ApiProperty()
-    accountId: string
+        accountId: string
 
     @ApiProperty()
-    roleName: SystemRoles
+        roleName: SystemRoles
 }
 
 export class CreateAccountRoleInput implements AuthInput<CreateAccountRoleInputData> {
@@ -119,7 +117,7 @@ export class CreateAccountRoleInput implements AuthInput<CreateAccountRoleInputD
 
 export class ToggleRoleInputData {
     @ApiProperty()
-    roleId: string
+        roleId: string
 }
 
 export class ToggleRoleInput implements AuthInput<ToggleRoleInputData> {
@@ -129,10 +127,10 @@ export class ToggleRoleInput implements AuthInput<ToggleRoleInputData> {
 
 export class UpdateRoleInputData {
     @ApiProperty()
-    roleId: string
+        roleId: string
 
     @ApiProperty()
-    name: string
+        name: string
 }
 
 export class UpdateRoleInput implements AuthInput<UpdateRoleInputData> {
@@ -143,13 +141,13 @@ export class UpdateRoleInput implements AuthInput<UpdateRoleInputData> {
 export class UpdateAccountRoleInputData {
     @IsUUID("4")
     @ApiProperty()
-    accountId: string
+        accountId: string
 
     @ApiProperty()
-    roles: Array<SystemRoles>
+        roles: Array<SystemRoles>
 
     @ApiProperty()
-    deleteRoleIds : Array<string>
+        deleteRoleIds : Array<string>
 }
 
 export class UpdateAccountRoleInput implements AuthInput<UpdateAccountRoleInputData> {
