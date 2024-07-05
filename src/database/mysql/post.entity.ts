@@ -36,7 +36,7 @@ export class PostEntity {
         courseId: string
 
     @Field(() => Boolean)
-    @Column({ type: "boolean", default: true })
+    @Column({ type: "boolean", default: false })
         isCompleted: boolean
 
     @Field(() => Boolean)
