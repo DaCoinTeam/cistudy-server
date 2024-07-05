@@ -9,7 +9,7 @@ import {
     UpdateDateColumn,
 } from "typeorm"
 import { AccountEntity } from "./account.entity"
-import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { OrderCourseEntity } from "./order-course.entity"
 import { OrderStatus } from "@common"
 
@@ -19,43 +19,43 @@ export class OrderEntity {
     //Order Details (OrderId and CreateDate)
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    orderId: string
+        orderId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    accountId: string
+        accountId: string
 
     @Field(() => String)
     @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.Pending })
-    orderStatus: OrderStatus
+        orderStatus: OrderStatus
 
     @Field(() => [OrderCourseEntity], {nullable: true})
     @OneToMany(() => OrderCourseEntity, (orderCourse) => orderCourse.order)
-    orderCourses: Array<OrderCourseEntity>
+        orderCourses: Array<OrderCourseEntity>
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date, { nullable: true })
     @Column({ type: "date", nullable: true })
-    completeDate: Date
+        completeDate: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-    updatedAt: Date
+        updatedAt: Date
 
     @Field(() => Date, { nullable: true })
     @Column({ type: "datetime", nullable: true })
-    paymentDue: Date
+        paymentDue: Date
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ type: "boolean", default: false })
-    isDeleted: Boolean
+        isDeleted: boolean
 
     //relations
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (account) => account.orders)
     @JoinColumn({ name: "accountId" })
-    account: AccountEntity
+        account: AccountEntity
 }

@@ -8,7 +8,7 @@ export type TransactionMongoEntityDocument = HydratedDocument<TransactionMongoEn
 @ObjectType()
 @Schema({
     collection: "transaction"
-}) 
+})
 export class TransactionMongoEntity {
     @Field(() => String)
     @Prop()
@@ -27,7 +27,7 @@ export class TransactionMongoEntity {
         value: string
 
     @Field(() => Boolean, { nullable: true })
-    @Prop({ type: Boolean, default: false})
+    @Prop({ type: Boolean, default: false })
         isValidated: boolean
 
     @Field(() => Date)

@@ -11,14 +11,13 @@ import {
     UpdatePostCommentInput,
     DeletePostCommentInput,
     UpdatePostInput,
-    DeletePostInput,
-    MarkPostCommentRewardedInput,
-    CreatePostReportInput,
+    DeletePostInput, CreatePostReportInput,
     UpdatePostReportInput,
     CreatePostCommentReportInput,
     UpdatePostCommentReportInput,
     ResolvePostReportInput,
     ResolvePostCommentReportInput,
+    MarkPostCommentAsSolutionInput
 } from "./posts.input"
 import {
     PostMySqlEntity,
@@ -45,8 +44,7 @@ import {
     DeletePostCommentOutput,
     DeletePostCommentReplyOutput,
     DeletePostOutput,
-    MarkPostCommentRewardedOutput,
-    ResolvePostCommentReportOutput,
+    MarkPostCommentAsSolutionOutput, ResolvePostCommentReportOutput,
     ResolvePostReportOutput,
     ToggleCommentLikePostOutputData,
     ToggleLikePostOutputData,
@@ -54,7 +52,7 @@ import {
     UpdatePostCommentReplyOutput,
     UpdatePostCommentReportOutput,
     UpdatePostOutput,
-    UpdatePostReportOutput,
+    UpdatePostReportOutput
 } from "./posts.output"
 import { blockchainConfig } from "@config"
 import { ReportProcessStatus, computeFixedFloor } from "@common"
@@ -143,7 +141,7 @@ export class PostsService {
         })
 
         if (numberOfUserPost.length < 3) {
-            post.isRewarded = true
+            post.isRewardable = true
             const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOneBy({ accountId, courseId })
 
             console.log(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient)
@@ -192,6 +190,10 @@ export class PostsService {
             throw new ConflictException("You are not the owner of this post")
         }
         
+        if(updatePost.isCompleted){
+            throw new ConflictException("This post is closed.")
+        }
+
         if (files) {
             const promises: Array<Promise<void>> = []
             let mediaPosition = 0
@@ -285,7 +287,7 @@ export class PostsService {
         try {
             let earnAmount: number
 
-            const { courseId, creatorId, isRewarded, course, allowComments } = await this.postMySqlRepository.findOne({
+            const { courseId, creatorId, isRewardable, course, isCompleted } = await this.postMySqlRepository.findOne({
                 where: {
                     postId
                 },
@@ -294,7 +296,7 @@ export class PostsService {
                 }
             })
 
-            if (allowComments == false) {
+            if (isCompleted == true) {
                 throw new ConflictException("This post is closed")
             }
 
@@ -325,7 +327,7 @@ export class PostsService {
             const numberOfRewardedLike = numberOfPostLike.filter(likeCount => likeCount.accountId !== creatorId)
 
 
-            if (isRewarded) {
+            if (isRewardable) {
                 if (creatorId !== accountId) {
                     const { priceAtEnrolled } = isEnrolled
                     if (numberOfRewardedLike.length < 20) {
@@ -371,9 +373,9 @@ export class PostsService {
             throw new NotFoundException("Post not found or has been deleted")
         }
 
-        const { courseId, creatorId, isRewarded, course, allowComments } = post
+        const { courseId, creatorId, isRewardable, course, isCompleted } = post
 
-        if (allowComments == false) {
+        if (isCompleted) {
             throw new ConflictException("This post is closed.")
         }
 
@@ -452,7 +454,7 @@ export class PostsService {
 
             const numberOfRewardedComments = filteredComments.length
 
-            if (isRewarded) {
+            if (isRewardable) {
                 if (creatorId !== accountId) {
                     const isCommented = await this.postCommentMySqlRepository.find({
                         where: {
@@ -485,6 +487,7 @@ export class PostsService {
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
+            throw ex
         } finally {
             await queryRunner.release()
         }
@@ -493,7 +496,7 @@ export class PostsService {
     async updatePostComment(
         input: UpdatePostCommentInput,
     ): Promise<UpdatePostCommentOutput> {
-        const { data, files } = input
+        const { data, files, accountId } = input
         const { postCommentMedias, postCommentId, html } = data
         const postComment: DeepPartial<PostCommentMySqlEntity> = {
             postCommentId,
@@ -529,6 +532,27 @@ export class PostsService {
         await queryRunner.startTransaction()
 
         try {
+            const postComment = await this.postCommentMySqlRepository.findOne({
+                where: {
+                    postCommentId
+                },
+                relations:{
+                    post: true
+                }
+            })
+
+            if(!postComment){
+                throw new NotFoundException("Post comment not found or has been deleted.")
+            }
+
+            if(postComment.creatorId !== accountId){
+                throw new ConflictException("You are not the owner of this comment.")
+            }
+
+            if(postComment.post.isCompleted){
+                throw new ConflictException("This post is closed.")
+            }
+
             const deletedPostCommentMedias =
                 await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
             await this.postCommentMediaMySqlRepository.delete({ postCommentId })
@@ -632,6 +656,23 @@ export class PostsService {
         await queryRunner.startTransaction()
 
         try {
+            const postComment = await this.postCommentMySqlRepository.findOne({
+                where: {
+                    postCommentId
+                },
+                relations:{
+                    post: true
+                }
+            })
+
+            if(!postComment){
+                throw new NotFoundException("Post comment not found or has been deleted.")
+            }
+
+            if(postComment.post.isCompleted){
+                throw new ConflictException("This post is closed.")
+            }
+            
             const { postCommentReplyId } = await this.postCommentReplyMySqlRepository.save({
                 content,
                 creatorId: accountId,
@@ -655,6 +696,25 @@ export class PostsService {
         const { data } = input
         const { content, postCommentReplyId } = data
 
+        const commentReply = await this.postCommentReplyMySqlRepository.findOne({
+            where:{
+                postCommentReplyId
+            },
+            relations:{
+                postComment:{
+                    post: true
+                }
+            }
+        })
+
+        if(!commentReply){
+            throw new NotFoundException("Comment's reply not found or has been deleted")
+        }
+
+        if(commentReply.postComment.post.isCompleted){
+            throw new ConflictException("This post is closed.")
+        }
+
         await this.postCommentReplyMySqlRepository.update(postCommentReplyId, {
             content,
         })
@@ -673,7 +733,7 @@ export class PostsService {
         return { message: "Reply deleted successfully" }
     }
 
-    async markPostCommentRewarded(input: MarkPostCommentRewardedInput): Promise<MarkPostCommentRewardedOutput> {
+    async markPostCommentAsSolution(input: MarkPostCommentAsSolutionInput): Promise<MarkPostCommentAsSolutionOutput> {
         const { data, accountId } = input
         const { postCommentId } = data
         const queryRunner = this.dataSource.createQueryRunner()
@@ -698,7 +758,7 @@ export class PostsService {
             }
 
             if (postComment.creatorId == post.creatorId) {
-                throw new ConflictException("You can't mark your comment as rewarded.")
+                throw new ConflictException("You can't mark your comment as a solution.")
             }
 
             const hasRewardedComment = await this.postCommentMySqlRepository.find({
@@ -707,13 +767,13 @@ export class PostsService {
                 }
             })
 
-            if (hasRewardedComment.some(accountComment => accountComment.isRewarded == true)) {
-                throw new ConflictException("There's already exist a rewarded comment")
+            if (hasRewardedComment.some(accountComment => accountComment.isSolution == true)) {
+                throw new ConflictException("There's already exist a solution comment")
             }
 
-            await this.postCommentMySqlRepository.update(postCommentId, { isRewarded: true })
+            await this.postCommentMySqlRepository.update(postCommentId, { isSolution: true })
 
-            if (post.isRewarded) {
+            if (post.isRewardable) {
                 const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOne({
                     where: {
                         accountId: postComment.creatorId,
@@ -725,10 +785,10 @@ export class PostsService {
                 await this.accountMySqlRepository.increment({ accountId: postComment.creatorId }, "balance", earnAmount)
             }
 
-            await this.postMySqlRepository.update(post, { allowComments: false })
+            await this.postMySqlRepository.update(post, { isCompleted: true })
 
             return {
-                message: `Comment of user ${postComment.creatorId} has been rewarded and no more comments are allowed to this post`
+                message: `Comment of user ${postComment.creatorId} has been marked as a solution and no more comments are allowed to this post`
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()

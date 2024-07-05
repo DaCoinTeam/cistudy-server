@@ -52,13 +52,13 @@ export const abi = [
         "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "payAmount",
-                "type": "uint256"
+                "indexed": true,
+                "internalType": "address",
+                "name": "senderAddr",
+                "type": "address"
             },
             {
-                "indexed": false,
+                "indexed": true,
                 "internalType": "address",
                 "name": "creatorAddr",
                 "type": "address"
@@ -68,6 +68,12 @@ export const abi = [
                 "internalType": "address",
                 "name": "feeToAddr",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "payAmount",
+                "type": "uint256"
             }
         ],
         "name": "Enrolled",

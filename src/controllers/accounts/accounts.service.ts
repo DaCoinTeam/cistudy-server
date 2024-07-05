@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { DataSource, DeepPartial, In, Repository } from "typeorm"
+import { DataSource, In, Repository } from "typeorm"
 import { CreateAccountReviewInput, DeleteCourseInput, DeleteAccountReviewInput, ToggleFollowInput, UpdateAccountReviewInput, VerifyCourseInput, ToggleRoleInput, CreateAccountRoleInput, UpdateAccountRoleInput, CreateAccountReportInput, UpdateAccountReportInput, ResolveAccountReportInput } from "./accounts.input"
 import { AccountMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, AccountReviewMySqlEntity, RoleMySqlEntity, ReportAccountMySqlEntity } from "@database"
 import { CreateAccountReportOutput, CreateAccountReviewOutput, CreateAccountRoleOutput, ResolveAccountReportOutput, ToggleRoleOutput, UpdateAccountReportOutput, UpdateAccountRoleOutput, VerifyCourseOuput } from "./accounts.output"
@@ -62,8 +62,8 @@ export class AccountsService {
 
 
     async verifyCourse(input: VerifyCourseInput): Promise<VerifyCourseOuput> {
-        const { accountId, data } = input;
-        const { courseId, verifyStatus } = data;
+        const { data } = input
+        const { courseId, verifyStatus } = data
 
         const course = await this.courseMySqlRepository.findOne({
             where: {
@@ -87,7 +87,7 @@ export class AccountsService {
     }
 
     async deleteCourses(input: DeleteCourseInput): Promise<string> {
-        const { accountId, data } = input
+        const { data } = input
         const { courseIds } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -154,10 +154,10 @@ export class AccountsService {
                 .leftJoin("enrolled_info.course", "course")
                 .where("course.creatorId = :reviewedAccountId", { reviewedAccountId })
                 .andWhere("enrolled_info.accountId = :accountId", { accountId })
-                .getRawOne();
+                .getRawOne()
 
             if (hasEnrolledCourse.count < 1) {
-                throw new ConflictException("You must enroll in at least one course created by this account to write a review.");
+                throw new ConflictException("You must enroll in at least one course created by this account to write a review.")
             }
 
             const { accountReviewId } = await this.accountReviewMySqlRepository.save({ content, rating, reviewedAccountId, accountId })
@@ -197,13 +197,13 @@ export class AccountsService {
                 throw new NotFoundException("This review is not found or not owned by sender")
             }
 
-            const dateReviewed = new Date(found.createdAt);
-            const restrictUpdate = new Date(dateReviewed);
-            restrictUpdate.setMinutes(restrictUpdate.getMinutes() + 30);
+            const dateReviewed = new Date(found.createdAt)
+            const restrictUpdate = new Date(dateReviewed)
+            restrictUpdate.setMinutes(restrictUpdate.getMinutes() + 30)
 
-            const currentDate = new Date();
+            const currentDate = new Date()
             if (currentDate.getTime() < restrictUpdate.getTime()) {
-                throw new ConflictException("You can only update the review after 30 minutes");
+                throw new ConflictException("You can only update the review after 30 minutes")
             }
 
             await this.accountReviewMySqlRepository.update(accountReviewId, { content, rating })
@@ -219,8 +219,8 @@ export class AccountsService {
     }
 
     async deleteAccountReview(input: DeleteAccountReviewInput): Promise<string> {
-        const { data, accountId } = input;
-        const { accountReviewId } = data;
+        const { data, accountId } = input
+        const { accountReviewId } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -232,14 +232,14 @@ export class AccountsService {
                     accountReviewId,
                     accountId
                 }
-            });
+            })
 
             if (!review) {
                 // nó chỉ quăng lỗi khi mà cái review không tìm thấy hoặc nó không thuộc về người đó
-                throw new NotFoundException("This review is not found or not owned by sender.");
+                throw new NotFoundException("This review is not found or not owned by sender.")
             }
 
-            await this.accountReviewMySqlRepository.delete({ accountReviewId });
+            await this.accountReviewMySqlRepository.delete({ accountReviewId })
 
             return "Account review deleted successfully"
         } catch (ex) {
@@ -252,7 +252,7 @@ export class AccountsService {
     }
 
     async createAccountRole(input: CreateAccountRoleInput): Promise<CreateAccountRoleOutput> {
-        const { data } = input;
+        const { data } = input
         const { accountId, roleName } = data
 
 
@@ -269,17 +269,17 @@ export class AccountsService {
 
         return {
             message: `Role "${name}" have been added to account successfully`,
-        };
+        }
     }
 
     async toggleRole(input: ToggleRoleInput): Promise<ToggleRoleOutput> {
-        const { data } = input;
+        const { data } = input
         const { roleId } = data
 
         const found = await this.roleMySqlRepository.findOneBy({ roleId })
 
         if (!found) {
-            throw new NotFoundException("Role Not Found");
+            throw new NotFoundException("Role Not Found")
         }
 
         if (found.name === SystemRoles.User) {
@@ -295,17 +295,17 @@ export class AccountsService {
     }
 
     async updateAccountRole(input: UpdateAccountRoleInput): Promise<UpdateAccountRoleOutput> {
-        const { data } = input;
-        const { accountId, roles, deleteRoleIds } = data;
+        const { data } = input
+        const { accountId, roles, deleteRoleIds } = data
 
-        const currentRoles = await this.roleMySqlRepository.find({ where: { accountId } });
+        const currentRoles = await this.roleMySqlRepository.find({ where: { accountId } })
         if (!currentRoles || currentRoles.length === 0) {
-            throw new NotFoundException("This account doesn't have any roles.");
+            throw new NotFoundException("This account doesn't have any roles.")
         }
 
-        const queryRunner = this.roleMySqlRepository.manager.connection.createQueryRunner();
-        await queryRunner.connect();
-        await queryRunner.startTransaction();
+        const queryRunner = this.roleMySqlRepository.manager.connection.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
 
         try {
 
@@ -313,53 +313,53 @@ export class AccountsService {
 
                 const userRoles = await this.roleMySqlRepository.find({
                     where: { roleId: In(deleteRoleIds) },
-                });
-                const existUserRole = userRoles.some((role) => role.name === SystemRoles.User);
+                })
+                const existUserRole = userRoles.some((role) => role.name === SystemRoles.User)
                 if (existUserRole) {
-                    throw new ConflictException(`Cannot delete role ${SystemRoles.User} from this account.`);
+                    throw new ConflictException(`Cannot delete role ${SystemRoles.User} from this account.`)
                 }
 
-                await this.roleMySqlRepository.delete({ accountId, roleId: In(deleteRoleIds) });
+                await this.roleMySqlRepository.delete({ accountId, roleId: In(deleteRoleIds) })
             }
 
             if (roles && roles.length > 0) {
                 const existingRoles = await this.roleMySqlRepository.find({
                     where: { accountId, name: In(roles) },
-                });
-                const existingRolesSet = new Set(existingRoles.map((role) => role.name));
+                })
+                const existingRolesSet = new Set(existingRoles.map((role) => role.name))
 
                 // Thêm role mới nếu chưa có, lọc ra role có rồi thì k thêm lại
-                const rolesToAdd = roles.filter((role) => !existingRolesSet.has(role));
+                const rolesToAdd = roles.filter((role) => !existingRolesSet.has(role))
                 for (const role of rolesToAdd) {
                     const newRole: Partial<RoleMySqlEntity> = {
                         accountId,
                         name: role,
-                    };
-                    await this.roleMySqlRepository.save(newRole);
+                    }
+                    await this.roleMySqlRepository.save(newRole)
                 }
             }
 
-            await queryRunner.commitTransaction();
+            await queryRunner.commitTransaction()
 
             return {
-                message: 'Account roles updated successfully.',
-            };
+                message: "Account roles updated successfully.",
+            }
         } catch (error) {
             // Rollback transaction on error
-            await queryRunner.rollbackTransaction();
-            throw error;
+            await queryRunner.rollbackTransaction()
+            throw error
         } finally {
             // Release query runner
-            await queryRunner.release();
+            await queryRunner.release()
         }
     }
 
     async createAccountReport(input: CreateAccountReportInput): Promise<CreateAccountReportOutput> {
-        const { data, accountId } = input;
+        const { data, accountId } = input
         const { reportedAccountId, description } = data
 
         if (accountId === reportedAccountId) {
-            throw new ConflictException("You cannot report yourself.");
+            throw new ConflictException("You cannot report yourself.")
         }
 
         const reportedAccount = await this.accountMySqlRepository.findOneBy({ accountId: reportedAccountId })
@@ -389,11 +389,11 @@ export class AccountsService {
             others: {
                 reportAccountId
             }
-        };
+        }
     }
 
     async updateAccountReport(input: UpdateAccountReportInput): Promise<UpdateAccountReportOutput> {
-        const { data, accountId } = input;
+        const { data, accountId } = input
         const { reportAccountId, description } = data
 
         const found = await this.reportAccountMySqlRepository.findOneBy({ reportAccountId })
@@ -413,11 +413,11 @@ export class AccountsService {
         await this.reportAccountMySqlRepository.update(reportAccountId, { description })
 
         return {
-            message: `Your Report has been updated successfully`,
+            message: "Your Report has been updated successfully",
             others: {
                 reportAccountId
             }
-        };
+        }
     }
 
     async resolveAccountReport(input: ResolveAccountReportInput): Promise<ResolveAccountReportOutput> {

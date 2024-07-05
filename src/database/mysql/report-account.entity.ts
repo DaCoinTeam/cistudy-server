@@ -5,11 +5,8 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
     CreateDateColumn,
-    UpdateDateColumn,
-    OneToOne
-} from "typeorm"
-import { Field, Float, ID, ObjectType, Int } from "@nestjs/graphql"
-import { CourseEntity } from "./course.entity"
+    UpdateDateColumn} from "typeorm"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { AccountEntity } from "./account.entity"
 import { ReportProcessStatus } from "@common"
 
@@ -18,45 +15,45 @@ import { ReportProcessStatus } from "@common"
 export class ReportAccountEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    reportAccountId: string
+        reportAccountId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    reporterAccountId: string
+        reporterAccountId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    reportedAccountId: string
+        reportedAccountId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 200, nullable: true })
-    description: string
+        description: string
 
     @Field(() => String)
     @Column({ type: "enum", enum: ReportProcessStatus, default: ReportProcessStatus.Processing })
-    processStatus: ReportProcessStatus
+        processStatus: ReportProcessStatus
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 2000, nullable: true })
-    processNote: string
+        processNote: string
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-    updatedAt: Date
+        updatedAt: Date
 
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (account) => account.reportAccounts, { nullable: true })
     @JoinColumn({ name: "reporterAccountId" })
-    reporterAccount: AccountEntity
+        reporterAccount: AccountEntity
 
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (account) => account.accountReports, { nullable: true })
     @JoinColumn({ name: "reportedAccountId" })
-    reportedAccount: AccountEntity
+        reportedAccount: AccountEntity
 }
 /*
 report_id	UUID	PRIMARY KEY

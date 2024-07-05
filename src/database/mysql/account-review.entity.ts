@@ -5,11 +5,8 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
     CreateDateColumn,
-    UpdateDateColumn,
-    OneToOne
-} from "typeorm"
-import { Field, Float, ID, ObjectType, Int } from "@nestjs/graphql"
-import { CourseEntity } from "./course.entity"
+    UpdateDateColumn} from "typeorm"
+import { Field, ID, ObjectType, Int } from "@nestjs/graphql"
 import { AccountEntity } from "./account.entity"
 
 @ObjectType()
@@ -37,19 +34,19 @@ export class AccountReviewEntity {
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-    updatedAt: Date
+        updatedAt: Date
 
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (course) => course.courseReview ,{ nullable: true })
     @JoinColumn({ name: "accountId" })
-    account: AccountEntity
+        account: AccountEntity
 
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (account) => account.courseReview ,{ nullable: true })
     @JoinColumn({ name: "reviewedAccountId" })
-    reviewedAccount: AccountEntity
+        reviewedAccount: AccountEntity
 }

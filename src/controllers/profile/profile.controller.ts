@@ -4,13 +4,15 @@ import {
     UseGuards,
     UploadedFiles,
     Put,
+    Patch,
+    Body,
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { AccountId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import { Files } from "@common"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { ProfileService } from "./profile.service"
-import { UpdateProfileData } from "./profile.input"
+import { UpdateProfileData, WithdrawData } from "./profile.input"
 import { updateProfileSchema } from "./profile.schema"
 
 @ApiTags("Profile")
@@ -42,6 +44,22 @@ export class ProfileController{
     		accountId,
             data,
     		files
+    	}) 
+    }
+
+    @ApiBearerAuth()
+    @Patch("withdraw")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+        AuthInterceptor
+    )
+    async withdraw(
+        @AccountId() accountId: string,
+        @Body() data: WithdrawData,
+    ) {     
+    	return this.profileService.withdraw({
+    		accountId,
+            data
     	}) 
     }
 }

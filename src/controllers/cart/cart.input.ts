@@ -1,40 +1,40 @@
-import { AuthEmptyDataInput, AuthInput } from "@common";
-import { ApiProperty } from "@nestjs/swagger";
-import { IsUUID } from "class-validator";
+import { AuthInput } from "@common"
+import { ApiProperty } from "@nestjs/swagger"
+import { IsUUID } from "class-validator"
 
 
 export class AddToCartInputData {
     @IsUUID("4")
     @ApiProperty()
-    courseId : string
+        courseId : string
 }
 
 export class AddToCartInput implements AuthInput<AddToCartInputData>{
     @IsUUID("4")
-    accountId: string
+        accountId: string
     @ApiProperty()
-    data: AddToCartInputData
+        data: AddToCartInputData
 }
 
 export class DeleteFromCartInputData {
     @ApiProperty()
-    cartCourseIds : string[]
+        cartCourseIds : string[]
 }
 
 export class DeleteFromCartInput implements AuthInput<DeleteFromCartInputData>{
     @IsUUID("4")
-    accountId: string;
-    data: DeleteFromCartInputData;
+        accountId: string
+    data: DeleteFromCartInputData
 }
 
 
 export class CheckOutInputData {
     @ApiProperty()
-    cartCourseIds: string[]
+        cartCourseIds: string[]
 }
 
 export class CheckOutInput implements AuthInput<CheckOutInputData>{
     @IsUUID("4")
-    accountId: string
-    data: CheckOutInputData;
+        accountId: string
+    data: CheckOutInputData
 }

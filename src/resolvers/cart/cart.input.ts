@@ -1,27 +1,25 @@
-import { ParamsOnly, Input, AuthInput, OptionsOnly, AuthEmptyDataInput, OrderStatus } from "@common";
-import { OrderMySqlEntity } from "@database";
-import { Field, ID, InputType, Int } from "@nestjs/graphql";
-import { IsOptional } from "class-validator";
+import { ParamsOnly, AuthInput, OptionsOnly, AuthEmptyDataInput, OrderStatus } from "@common"
+import { Field, ID, InputType, Int } from "@nestjs/graphql"
 
 
 export class FindOneCartInput implements AuthEmptyDataInput {
-    accountId: string;
+    accountId: string
 }
 
 @InputType()
 export class FindOneOrderInputParams {
     @Field(() => ID)
-    orderId: string
+        orderId: string
 }
 
 @InputType()
 export class FindOneOrderInputData implements ParamsOnly<FindOneOrderInputParams> {
     @Field(() => FindOneOrderInputParams)
-    params: FindOneOrderInputParams
+        params: FindOneOrderInputParams
 }
 
 export class FindOneOrderInput implements AuthInput<FindOneOrderInputData> {
-    accountId: string;
+    accountId: string
     data: FindOneOrderInputData
 }
 
@@ -29,23 +27,23 @@ export class FindOneOrderInput implements AuthInput<FindOneOrderInputData> {
 @InputType()
 export class FindManyAccountOrdersInputOptions {
     @Field(() => Int, { nullable: true })
-    take?: number
+        take?: number
     @Field(() => Int, { nullable: true })
-    skip?: number
+        skip?: number
     @Field(() => String)
-    orderStatus: OrderStatus
+        orderStatus: OrderStatus
 }
 
 @InputType()
 export class FindManyAccountOrdersInputData
-    implements
+implements
     OptionsOnly<FindManyAccountOrdersInputOptions> {
     @Field(() => FindManyAccountOrdersInputOptions, { nullable: true })
-    options?: FindManyAccountOrdersInputOptions
+        options?: FindManyAccountOrdersInputOptions
 }
 
 export class FindManyAccountOrdersInput implements AuthInput<FindManyAccountOrdersInputData> {
-    accountId: string;
+    accountId: string
     data: FindManyAccountOrdersInputData
 }
 

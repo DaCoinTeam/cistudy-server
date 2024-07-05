@@ -4,8 +4,6 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
-    OneToOne,
-    PrimaryColumn,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 
@@ -22,32 +20,32 @@ export class CartCourseEntity {
     //Main fields
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    cartCourseId: string
+        cartCourseId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    cartId: string
+        cartId: string
     
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    courseId: string
+        courseId: string
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-    updatedAt: Date
+        updatedAt: Date
     // Relations
     @Field(() => CourseEntity)
     @ManyToOne(() => CourseEntity, (course) => course.cartCourses)
     @JoinColumn({ name: "courseId" })
-    course: CourseEntity;
+        course: CourseEntity
 
     @Field(() => CartEntity)
     @ManyToOne(() => CartEntity, (cart) => cart.cartCourses, { onDelete: "CASCADE"})
     @JoinColumn({ name: "cartId" })
-    cart: CartEntity;
+        cart: CartEntity
 
 }

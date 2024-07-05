@@ -45,7 +45,7 @@ export class PostCommentEntity {
 
     @Field(() => Boolean)
     @Column({ type: "boolean", default: false })
-        isRewarded: boolean
+        isSolution: boolean
 
     @Field(() => PostEntity)
     @ManyToOne(() => PostEntity, (post) => post.postComments, { onDelete: "CASCADE" })
@@ -84,7 +84,7 @@ export class PostCommentEntity {
         { onDelete: "CASCADE" },
     )
         postCommentReports: Array<ReportPostCommentEntity>
-    
+
     //graphql
     @Field(() => Int, { nullable: true })
         numberOfLikes?: number
@@ -94,4 +94,6 @@ export class PostCommentEntity {
         liked?: boolean
     @Field(() => Boolean, { nullable: true })
         isOwner?: boolean
+    @Field(() => Boolean, { nullable: true })
+        isRewardable?: boolean
 }

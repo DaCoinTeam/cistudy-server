@@ -17,31 +17,31 @@ import { Field, ID, ObjectType } from "@nestjs/graphql"
 export class SectionEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    sectionId: string
+        sectionId: string
 
     @Field(() => String)
     @Column({ type: "varchar", length: 200 })
-    title: string
+        title: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    courseId: string
+        courseId: string
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-    updatedAt: Date
+        updatedAt: Date
 
     @Field(() => CourseEntity)
     @ManyToOne(() => CourseEntity, (course) => course.sections)
     @JoinColumn({ name: "courseId" })
-    course: CourseEntity
+        course: CourseEntity
 
     @Field(() => [LessonEntity])
     @OneToMany(() => LessonEntity, (video) => video.section, { cascade: true })
-    lessons: Array<LessonEntity>
+        lessons: Array<LessonEntity>
 
 }

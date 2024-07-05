@@ -1,12 +1,12 @@
-import { Output } from "@common";
+import { Output } from "@common"
 
 
 
 export class SignUpOutput implements Output{
-    message: string;
+    message: string
 }
 
 export class VerifyRegistrationOutput implements Output {
-    message: string;
+    message: string
 
 }

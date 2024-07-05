@@ -1,12 +1,10 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
-  JoinColumn,
-  ManyToOne,
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    CreateDateColumn,
+    UpdateDateColumn,
+    OneToMany,
 } from "typeorm"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { CourseCategoryEntity } from "./course-category.entity"
@@ -17,49 +15,49 @@ import { CategoryRelationEntity } from "./category-relation.entity"
 export class CategoryEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn("uuid")
-  categoryId: string
+      categoryId: string
 
   @Field(() => Int, { defaultValue: 0 })
   @Column({ type: "int", default: 0 })
-  level: number
+      level: number
 
   @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 1000, nullable: true })
-  name: string
+      name: string
 
   @Field(() => ID, { nullable: true })
   @Column({ type: "uuid", length: 36, nullable: true })
-  imageId?: string
+      imageId?: string
 
   @Field(() => Date)
   @CreateDateColumn()
-  createdAt: Date
+      createdAt: Date
 
   @Field(() => Date)
   @UpdateDateColumn()
-  updatedAt: Date
+      updatedAt: Date
 
   @Field(() => [CourseCategoryEntity], { nullable: true })
   @OneToMany(
-    () => CourseCategoryEntity,
-    (courseCategory) => courseCategory.category,
+      () => CourseCategoryEntity,
+      (courseCategory) => courseCategory.category,
   )
-  courseCategories: Array<CourseCategoryEntity>
+      courseCategories: Array<CourseCategoryEntity>
 
   @Field(() => [CategoryRelationEntity], { nullable: true })
   @OneToMany(
-    () => CategoryRelationEntity,
-    (categoryParentRelation) => categoryParentRelation.categoryParent,
-    { cascade: true }
+      () => CategoryRelationEntity,
+      (categoryParentRelation) => categoryParentRelation.categoryParent,
+      { cascade: true }
   )
-  categoryParentRelations: Array<CategoryRelationEntity>
+      categoryParentRelations: Array<CategoryRelationEntity>
 
   @Field(() => [CategoryRelationEntity], { nullable: true })
   @OneToMany(
-    () => CategoryRelationEntity,
-    (categoryRelation) => categoryRelation.category,
-    { cascade: true }
+      () => CategoryRelationEntity,
+      (categoryRelation) => categoryRelation.category,
+      { cascade: true }
   )
-  categoryRelations: Array<CategoryRelationEntity>
+      categoryRelations: Array<CategoryRelationEntity>
 
 }

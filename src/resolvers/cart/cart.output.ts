@@ -1,4 +1,4 @@
-import { AuthOutput, AuthTokens, Output, ResultsWithMetadata } from "@common"
+import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
 import { CartMySqlEntity, OrderMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 
@@ -6,19 +6,19 @@ import { Field, Int, ObjectType } from "@nestjs/graphql"
 @ObjectType()
 export class FindOneCartOutput implements AuthOutput<CartMySqlEntity> {
     @Field(() => CartMySqlEntity)
-    data: CartMySqlEntity
+        data: CartMySqlEntity
 
     @Field(() => AuthTokens, { nullable: true })
-    tokens?: AuthTokens
+        tokens?: AuthTokens
 }
 
 @ObjectType()
 export class FindOneOrderOutput implements AuthOutput<OrderMySqlEntity> {
     @Field(() => OrderMySqlEntity)
-    data: OrderMySqlEntity
+        data: OrderMySqlEntity
 
     @Field(() => AuthTokens, { nullable: true })
-    tokens?: AuthTokens
+        tokens?: AuthTokens
 }
 
 @ObjectType()

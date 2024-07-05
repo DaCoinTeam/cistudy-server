@@ -21,65 +21,65 @@ import { ProgressEntity } from "./progress.entity"
 export class LessonEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    lessonId: string
+        lessonId: string
 
     @Field(() => String)
     @Column({ type: "varchar", length: 150 })
-    title: string
+        title: string
 
     @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36, nullable: true })
-    thumbnailId?: string
+        thumbnailId?: string
 
     @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36, nullable: true })
-    lessonVideoId?: string
+        lessonVideoId?: string
 
     @Field(() => ID)
     @Column({ name: "sectionId", type: "uuid", length: 36 })
-    sectionId: string
+        sectionId: string
 
     @Field(() => String)
     @Column({ type: "enum", enum: ProcessStatus, default: ProcessStatus.Pending })
-    processStatus: ProcessStatus
+        processStatus: ProcessStatus
 
     @Field(() => String)
     @Column({ type: "enum", enum: VideoType, default: VideoType.MP4 })
-    videoType: VideoType
+        videoType: VideoType
 
     @Field(() => Int)
     @Column({ type: "int", default: 0 })
-    numberOfViews: number
+        numberOfViews: number
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", nullable: true })
-    description: string
+        description: string
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-    updatedAt: Date
+        updatedAt: Date
 
     @Field(() => SectionEntity)
     @ManyToOne(() => SectionEntity, (section) => section.lessons, {
         onDelete: "CASCADE",
     })
     @JoinColumn({ name: "sectionId" })
-    section: SectionEntity
+        section: SectionEntity
 
     @Field(() => [ResourceEntity])
     @OneToMany(() => ResourceEntity, (resource) => resource.lesson)
-    resources: Array<ResourceEntity>
+        resources: Array<ResourceEntity>
 
     @Field(() => QuizEntity, { nullable: true })
     @OneToOne(() => QuizEntity, (quiz) => quiz.quizId, { nullable: true })
     @JoinColumn()
-    quiz?: QuizEntity
+        quiz?: QuizEntity
 
     @Field(() => [ProgressEntity])
     @OneToMany(() => ProgressEntity, (accountProgress) => accountProgress.lesson)
-    accountProgresses? : Array<ProgressEntity>
+        accountProgresses? : Array<ProgressEntity>
 }

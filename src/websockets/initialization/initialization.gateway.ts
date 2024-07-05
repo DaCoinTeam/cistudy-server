@@ -2,7 +2,6 @@ import { Inject, Logger, UseGuards, UseInterceptors } from "@nestjs/common"
 
 import {
     ConnectedSocket,
-    MessageBody,
     OnGatewayConnection,
     OnGatewayDisconnect,
     SubscribeMessage,
@@ -23,31 +22,33 @@ import { Cache } from "cache-manager"
     cors: {
         origin: "*",
     },
-    
 })
-export class InitializationGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class InitializationGateway
+implements OnGatewayConnection, OnGatewayDisconnect
+{
     private readonly logger = new Logger(InitializationGateway.name)
 
-    constructor(
-        @Inject(CACHE_MANAGER) private cacheManager: Cache
-    ) { }
+    constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
-    @WebSocketServer()
+  @WebSocketServer()
     private readonly server: Server
 
-    handleConnection(client: Socket) {
-        this.logger.verbose(client.id)
-    }
+  handleConnection(client: Socket) {
+      this.logger.verbose(client.id)
+  }
 
-    async handleDisconnect(client: Socket) {
-        await this.cacheManager.del(client.id)
-    }
+  async handleDisconnect(client: Socket) {
+      await this.cacheManager.del(client.id)
+  }
 
-    @UseGuards(JwtAuthGuard)
-    @UseInterceptors(AuthInterceptor)
-    @SubscribeMessage(INITIALIZE)
-    async handleInitialize(@ConnectedSocket() client: Socket, @AccountId() accountId: string): Promise<WsResponse<InitializeOutputData>> {
-        await this.cacheManager.set(client.id, accountId)
-        return { event: INITIALIZED, data: "sdadasdasdasdd" }
-    }
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  @SubscribeMessage(INITIALIZE)
+  async handleInitialize(
+    @ConnectedSocket() client: Socket,
+    @AccountId() accountId: string,
+  ): Promise<WsResponse<InitializeOutputData>> {
+      await this.cacheManager.set(client.id, accountId)
+      return { event: INITIALIZED, data: "Connected" }
+  }
 }

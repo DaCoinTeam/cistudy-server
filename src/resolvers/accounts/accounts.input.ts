@@ -1,4 +1,4 @@
-import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@common"
+import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions, ReportType } from "@common"
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
 import { IsOptional, IsUUID } from "class-validator"
 
@@ -156,3 +156,14 @@ export class FindManyReportsInput implements AuthInput<FindManyReportsInputData>
     data: FindManyReportsInputData
 }
 
+export class FindOneReportInputData {
+    @Field(() => String, { nullable: true })
+        reportType : ReportType
+    @Field(() => String, { nullable: true })
+        reportId : string
+}
+
+export class FindOneReportInput implements AuthInput<FindOneReportInputData> {
+    accountId: string
+    data: FindOneReportInputData
+}
