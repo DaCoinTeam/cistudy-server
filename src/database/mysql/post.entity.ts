@@ -85,6 +85,8 @@ export class PostEntity {
     //graphql
     @Field(() => Boolean, { nullable: true })
         liked?: boolean
+    @Field(() => Boolean, { nullable: true })
+        isOwner?: boolean
     @Field(() => Int, { nullable: true })
         numberOfLikes?: number
     @Field(() => Int, { nullable: true })

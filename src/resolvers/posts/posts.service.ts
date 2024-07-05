@@ -209,6 +209,7 @@ export class PostsService {
                 const numberOfLikes = numberOfLikesResults.find(result => result.postId === post.postId)?.count ?? 0
                 const numberOfComments = numberOfCommentsResults.find(result => result.postId === post.postId)?.count ?? 0
                 const liked = likedResults.some(result => result.postId === post.postId)
+                const isOwner = (post.creatorId === accountId)
 
                 let numberOfRewardedLikesLeft: number
                 let numberOfRewardedCommentsLeft: number
@@ -239,6 +240,7 @@ export class PostsService {
                 return {
                     ...post,
                     liked,
+                    isOwner,
                     numberOfLikes,
                     numberOfComments,
                     numberOfRewardedLikesLeft,
