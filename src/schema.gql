@@ -324,6 +324,7 @@ type PostEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   html: String!
+  course: CourseEntity!
   creator: AccountEntity!
   postMedias: [PostMediaEntity!]!
   postComments: [PostCommentEntity!]

@@ -52,7 +52,7 @@ export class ReportCourseEntity {
         reporterAccount: AccountEntity
 
     @Field(() => CourseEntity)
-    @ManyToOne(() => CourseEntity, (course) => course.courseReports, { nullable: true })
+    @ManyToOne(() => CourseEntity, (course) => course.courseReports, { nullable: true , onDelete: "CASCADE"})
     @JoinColumn({ name: "reportedCourseId" })
         reportedCourse: CourseEntity
 }

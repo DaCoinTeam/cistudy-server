@@ -173,6 +173,7 @@ export class CoursesService {
                 price: coursePrice,
                 duration,
                 sections,
+                creatorId
             } = await this.courseMySqlRepository.findOne({
                 where: {
                     courseId,
@@ -191,8 +192,9 @@ export class CoursesService {
             if (balance < minimumBalanceRequired) {
                 throw new ConflictException("Your account does not have sufficient balance to enroll in this course.")
             }
-
+            //const courseCreatorShares = 
             await this.accountMySqlRepository.update(accountId, {balance : balance - minimumBalanceRequired})
+            await this.accountMySqlRepository.update({accountId : creatorId}, {balance : balance - minimumBalanceRequired})
 
             const enrollDate = new Date()
             const endDate = new Date(enrollDate)

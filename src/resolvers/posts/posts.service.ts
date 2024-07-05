@@ -164,7 +164,7 @@ export class PostsService {
                     },
                 }
             })
-
+            console.log(posts)
             const numberOfLikesResults = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(post_like.postId)", "count")
@@ -188,12 +188,6 @@ export class PostsService {
                 .where("courseId = :courseId", { courseId })
                 .groupBy("post.postId")
                 .getRawMany()
-
-            const numberOfPostsResult = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(PostMySqlEntity, "post")
-                .getRawOne()
 
             const likedResults = await queryRunner.manager
                 .createQueryBuilder()
@@ -252,7 +246,7 @@ export class PostsService {
             return ({
                 results,
                 metadata: {
-                    count: numberOfPostsResult.count
+                    count: posts.length
                 }
             })
         } catch (ex) {

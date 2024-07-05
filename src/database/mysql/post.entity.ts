@@ -55,6 +55,7 @@ export class PostEntity {
     @Column({ type: "longtext", nullable: true })
         html: string
 
+    @Field(() => CourseEntity)
     @ManyToOne(() => CourseEntity, (course) => course.posts)
     @JoinColumn({ name: "courseId" })
         course: CourseEntity

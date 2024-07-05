@@ -51,7 +51,7 @@ export class ReportAccountEntity {
         reporterAccount: AccountEntity
 
     @Field(() => AccountEntity)
-    @ManyToOne(() => AccountEntity, (account) => account.accountReports, { nullable: true })
+    @ManyToOne(() => AccountEntity, (account) => account.accountReports, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "reportedAccountId" })
         reportedAccount: AccountEntity
 }
