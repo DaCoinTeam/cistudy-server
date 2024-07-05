@@ -1,27 +1,26 @@
-import { Field, ID, Int, ObjectType } from "@nestjs/graphql";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { QuizEntity } from "./quiz.entity";
-import { MediaType } from "@common";
-import { QuizQuestionEntity } from "./quiz-question.entity";
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { MediaType } from "@common"
+import { QuizQuestionEntity } from "./quiz-question.entity"
 
 @ObjectType()
 @Entity("quiz-question-media")
 export class QuizQuestionMediaEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    quizQuestionMediaId: string
+        quizQuestionMediaId: string
 
     @Field(() => Int)
     @Column({ type: "int", default: 0 })
-    position: number
+        position: number
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    mediaId: string
+        mediaId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    quizQuestionId: string
+        quizQuestionId: string
 
     @Field(() => String)
     @Column({
@@ -29,18 +28,18 @@ export class QuizQuestionMediaEntity {
         enum: MediaType,
         default: MediaType.Image,
     })
-    mediaType: MediaType
+        mediaType: MediaType
 
     @Field(() => QuizQuestionEntity)
     @ManyToOne(() => QuizQuestionEntity, (quiz) => quiz.questionMedias, { onDelete: "CASCADE" })
     @JoinColumn({ name: "quizQuestionId" })
-    quiz: QuizQuestionEntity
+        quiz: QuizQuestionEntity
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-    updatedAt: Date
+        updatedAt: Date
 }

@@ -71,24 +71,24 @@ export class AuthService {
             const decoded = await this.jwtService.verifyAsync(token, {
                 ignoreExpiration: false,
                 secret: jwtConfig().secret,
-            });
+            })
 
             if (!decoded || !decoded.accountId || accountId !== decoded.accountId) {
-                throw new NotFoundException('Invalid token');
+                throw new NotFoundException("Invalid token")
             }
 
             const account = await this.accountMySqlRepository.findOne({
                 where: {
                     accountId
                 },
-            });
+            })
 
             if (!account) {
-                throw new NotFoundException('Account not found');
+                throw new NotFoundException("Account not found")
             }
 
             if (account.verified) {
-                throw new ConflictException('Account already verified');
+                throw new ConflictException("Account already verified")
             }
 
             await this.roleMySqlRepository.save({

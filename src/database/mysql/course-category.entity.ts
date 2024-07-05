@@ -1,5 +1,5 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql"
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 import { CourseEntity } from "./course.entity"
 import { CategoryEntity } from "./category.entity"
 
@@ -29,10 +29,10 @@ export class CourseCategoryEntity {
     @Field(() => CourseEntity)
     @ManyToOne(() => CourseEntity, (course) => course.courseCategories, {cascade: true})
     @JoinColumn({ name: "courseId" })
-    course: CourseEntity
+        course: CourseEntity
 
     @Field(() => CategoryEntity, {nullable: true})
     @ManyToOne(() => CategoryEntity, (category) => category.courseCategories, {onDelete: "CASCADE"})
     @JoinColumn({ name: "categoryId" })
-    category: CategoryEntity
+        category: CategoryEntity
 }

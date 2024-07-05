@@ -56,9 +56,7 @@ export class AccountEntity {
 
     @Field(() => Float, { nullable: true })
     @Column({
-        type: "decimal",
-        precision: 10,
-        scale: 5,
+        type: "float",
         default: 0,
     })
         balance: number
@@ -177,11 +175,11 @@ export class AccountEntity {
 
     @Field(() => [ReportAccountEntity])
     @OneToMany(() => ReportAccountEntity, (reportAccounts) => reportAccounts.reportedAccountId, { nullable: true })
-    reportAccounts?: Array<ReportAccountEntity>
+        reportAccounts?: Array<ReportAccountEntity>
 
     @Field(() => [ReportAccountEntity])
     @OneToMany(() => ReportAccountEntity, (accountReports) => accountReports.reporterAccount, { nullable: true })
-    accountReports?: Array<ReportAccountEntity>
+        accountReports?: Array<ReportAccountEntity>
     
     //graphql
     @Field(() => Boolean)

@@ -1,5 +1,5 @@
 import { Payload } from "@common"
-import { createParamDecorator, ExecutionContext, SetMetadata } from "@nestjs/common"
+import { createParamDecorator, ExecutionContext } from "@nestjs/common"
 
 export const DataFromBody = createParamDecorator((_, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest()

@@ -2,7 +2,7 @@ import {
     ConflictException,
     Injectable,
     NotFoundException,
-    InternalServerErrorException,
+    InternalServerErrorException
 } from "@nestjs/common"
 import {
     CategoryMySqlEntity,
@@ -19,9 +19,7 @@ import {
     QuizQuestionMediaMySqlEntity,
     ProgressMySqlEntity,
     QuizAttemptMySqlEntity,
-    AccountMySqlEntity,
-    CourseCategoryMySqlEntity,
-    ReportCourseMySqlEntity,
+    AccountMySqlEntity, CourseCategoryMySqlEntity
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, In } from "typeorm"
@@ -54,18 +52,16 @@ import {
     GiftCourseInput,
     DeleteCategoryInput,
     CreateCourseCategoriesInput,
-    DeleteCourseCategoryInput,
-    CreateCourseReportInput,
-    UpdateCourseReportInput,
-    ResolveCourseReportInput,
+    DeleteCourseCategoryInput
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
 import {
     ProcessStatus,
     QuizAttemptStatus,
-    ReportProcessStatus,
     VideoType,
+    computeDenomination,
+    computeRaw,
     existKeyNotUndefined,
 } from "@common"
 import {
@@ -73,7 +69,6 @@ import {
     CreateCertificateOutput,
     CreateCourseCategoriesOutput,
     CreateCourseOutput,
-    CreateCourseReportOutput,
     CreateCourseReviewOutput,
     CreateCourseTargetOuput,
     CreateLessonOutput,
@@ -92,64 +87,61 @@ import {
     FinishQuizAttemptOutput,
     GiftCourseOutput,
     MarkLessonAsCompletedOutput,
-    ResolveCourseReportOutput,
     UpdateCourseOutput,
-    UpdateCourseReportOutput,
     UpdateCourseReviewOutput,
     UpdateCourseTargetOuput,
     UpdateLessonOutput,
     UpdateQuizOutput,
-    UpdateSectionOuput,
+    UpdateSectionOuput
 } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
 
 @Injectable()
 export class CoursesService {
     constructor(
-    @InjectRepository(CourseMySqlEntity)
-    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-    @InjectRepository(SectionMySqlEntity)
-    private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
-    @InjectRepository(LessonMySqlEntity)
-    private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
-    @InjectRepository(CourseTargetMySqlEntity)
-    private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
-    @InjectRepository(ResourceMySqlEntity)
-    private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
-    @InjectRepository(EnrolledInfoEntity)
-    private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoEntity>,
-    @InjectRepository(CategoryMySqlEntity)
-    private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
-    @InjectRepository(CourseCategoryMySqlEntity)
-    private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
-    @InjectRepository(CourseReviewMySqlEntity)
-    private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
-    @InjectRepository(CertificateMySqlEntity)
-    private readonly courseCertificateMySqlEntity: Repository<CertificateMySqlEntity>,
-    @InjectRepository(QuizMySqlEntity)
-    private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
-    @InjectRepository(QuizQuestionMySqlEntity)
-    private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
-    @InjectRepository(QuizQuestionAnswerMySqlEntity)
-    private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
-    @InjectRepository(QuizQuestionMediaMySqlEntity)
-    private readonly quizQuestionMediaMySqlRepository: Repository<QuizQuestionMediaMySqlEntity>,
-    @InjectRepository(ProgressMySqlEntity)
-    private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
-    @InjectRepository(QuizAttemptMySqlEntity)
-    private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
-    @InjectRepository(AccountMySqlEntity)
-    private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
-    @InjectRepository(ReportCourseMySqlEntity)
-    private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
-    private readonly storageService: StorageService,
-    private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
-    private readonly dataSource: DataSource,
+        @InjectRepository(CourseMySqlEntity)
+        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(SectionMySqlEntity)
+        private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
+        @InjectRepository(LessonMySqlEntity)
+        private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
+        @InjectRepository(CourseTargetMySqlEntity)
+        private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+        @InjectRepository(ResourceMySqlEntity)
+        private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+        @InjectRepository(EnrolledInfoEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoEntity>,
+        @InjectRepository(CategoryMySqlEntity)
+        private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
+        @InjectRepository(CourseCategoryMySqlEntity)
+        private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
+        @InjectRepository(CourseReviewMySqlEntity)
+        private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
+        @InjectRepository(CertificateMySqlEntity)
+        private readonly courseCertificateMySqlEntity: Repository<CertificateMySqlEntity>,
+        @InjectRepository(QuizMySqlEntity)
+        private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+        @InjectRepository(QuizQuestionMySqlEntity)
+        private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
+        @InjectRepository(QuizQuestionAnswerMySqlEntity)
+        private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
+        @InjectRepository(QuizQuestionMediaMySqlEntity)
+        private readonly quizQuestionMediaMySqlRepository: Repository<QuizQuestionMediaMySqlEntity>,
+        @InjectRepository(ProgressMySqlEntity)
+        private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
+        @InjectRepository(QuizAttemptMySqlEntity)
+        private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
+        @InjectRepository(AccountMySqlEntity)
+        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+        private readonly storageService: StorageService,
+        private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
+        private readonly dataSource: DataSource,
     ) { }
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
         const { data, accountId } = input
         const { courseId } = data
+
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -165,32 +157,20 @@ export class CoursesService {
 
             const now = new Date()
 
-            const activeEnrollment = enrollments.some(enrollment => new Date(enrollment.endDate) > now)
+            const enrolled = enrollments.some(
+                (enrollment) => new Date(enrollment.endDate) > now,
+            )
 
-            if (activeEnrollment) {
-                throw new ConflictException("This user is already enrolled in that course.")
+            if (enrolled) {
+                throw new ConflictException(
+                    "This user is already enrolled in that course.",
+                )
             }
-
-            // const cachedTransaction = (await this.cacheManager.get(code)) as CodeValue
-            // if (!cachedTransaction) throw new NotFoundException("The code either expired or never existed.")
-
-            // const { transactionHash } = cachedTransaction
-            // const transaction = await this.transactionMongoModel.findOne({
-            //     transactionHash
-            // })
-            // if (!transaction) {
-            //     throw new NotFoundException("Transaction not found.")
-            // }
-
-            // const { _id, isValidated, value } = transaction
-
-            // if (isValidated) throw new ConflictException("This transaction is validated.")
 
             const {
                 enableDiscount,
                 discountPrice,
                 price: coursePrice,
-                title,
                 duration,
                 sections,
             } = await this.courseMySqlRepository.findOne({
@@ -204,13 +184,16 @@ export class CoursesService {
                 },
             })
 
-            const price = enableDiscount ? discountPrice : coursePrice
-            // if (BigInt(value) < computeRaw(price)) throw new ConflictException("Value is not enough.")
+            const price = computeRaw(enableDiscount ? discountPrice : coursePrice)
+            const minimumBalanceRequired = computeDenomination(price)
+            const { balance } = await this.accountMySqlRepository.findOneBy({ accountId })
 
-            // await this.transactionMongoModel.findOneAndUpdate({ _id }, {
-            //     isValidated: true
-            // },
-            // )
+            if (balance < minimumBalanceRequired) {
+                throw new ConflictException("Your account does not have sufficient balance to enroll in this course.")
+            }
+
+            await this.accountMySqlRepository.update(accountId, {balance : balance - minimumBalanceRequired})
+
             const enrollDate = new Date()
             const endDate = new Date(enrollDate)
             endDate.setMonth(endDate.getMonth() + duration)
@@ -219,7 +202,7 @@ export class CoursesService {
                 courseId,
                 accountId,
                 enrolled: true,
-                priceAtEnrolled: price,
+                priceAtEnrolled: minimumBalanceRequired,
                 endDate,
             })
 
@@ -239,7 +222,7 @@ export class CoursesService {
             await queryRunner.commitTransaction()
 
             return {
-                message: "Enrolled to Course " + title,
+                message: `Enrolled to course ${courseId} successfully`,
                 others: { enrolledInfoId },
             }
         } catch (ex) {
@@ -290,7 +273,7 @@ export class CoursesService {
         const promises: Array<Promise<void>> = []
 
         const { previewVideoId, thumbnailId } =
-      await this.courseMySqlRepository.findOneBy({ courseId })
+            await this.courseMySqlRepository.findOneBy({ courseId })
 
         if (Number.isInteger(previewVideoIndex)) {
             const promise = async () => {
@@ -357,7 +340,9 @@ export class CoursesService {
         })
 
         if (!enrolled) {
-            throw new ConflictException("You must have been enrolled to the course to post a review")
+            throw new ConflictException(
+                "You must have been enrolled to the course to post a review",
+            )
         }
 
         const reviewed = await this.courseReviewMySqlRepository.findOne({
@@ -365,7 +350,9 @@ export class CoursesService {
         })
 
         if (reviewed) {
-            throw new ConflictException("You have already has a review on this course")
+            throw new ConflictException(
+                "You have already has a review on this course",
+            )
         }
 
         try {
@@ -438,9 +425,10 @@ export class CoursesService {
         const { data } = input
         const { courseId, title } = data
 
-       
-        const course = await this.courseMySqlRepository.findOneBy({courseId})
 
+        const course = await this.courseMySqlRepository.findOneBy({
+            courseId,
+        })
         if (!course) throw new NotFoundException("Course not found.")
         const created = await this.sectionMySqlRepository.save({
             courseId,
@@ -448,30 +436,31 @@ export class CoursesService {
         })
 
         return {
-            message: `A section with id ${created.sectionId} has been created successfully.`
+            message: `A section with id ${created.sectionId} has been created successfully.`,
         }
-       
+
     }
 
     async createLesson(input: CreateLessonInput): Promise<CreateLessonOutput> {
         const { title, sectionId } = input.data
-        
+
         const created = await this.lessonMySqlRepository.save({
-            title, sectionId
+            title,
+            sectionId,
         })
         return {
-            message: `A lesson with id ${created.lessonId} has been creeated successfully.`
+            message: `A lesson with id ${created.lessonId} has been creeated successfully.`,
         }
-       
+
     }
 
     async updateLesson(input: UpdateLessonInput): Promise<UpdateLessonOutput> {
         const { data, files } = input
         const { lessonId, title, description, lessonVideoIndex, thumbnailIndex } =
-      data
+            data
 
         const { thumbnailId, lessonVideoId } =
-      await this.lessonMySqlRepository.findOneBy({ lessonId })
+            await this.lessonMySqlRepository.findOneBy({ lessonId })
 
         const promises: Array<Promise<void>> = []
 
@@ -557,17 +546,23 @@ export class CoursesService {
 
         if (existKeyNotUndefined(lesson))
             await this.lessonMySqlRepository.update(lessonId, lesson)
-        return { message: `A lesson with id ${lessonId} has been updated successfully.` }
+        return {
+            message: `A lesson with id ${lessonId} has been updated successfully.`,
+        }
     }
 
     async deleteLesson(input: DeleteLessonInput): Promise<DeleteLessonOutput> {
         const { data } = input
         const { lessonId } = data
         await this.lessonMySqlRepository.delete({ lessonId })
-        return { message: `A lesson with id ${lessonId} has been deleted successfully.` }
+        return {
+            message: `A lesson with id ${lessonId} has been deleted successfully.`,
+        }
     }
 
-    async createCourseTarget(input: CreateCourseTargetInput): Promise<CreateCourseTargetOuput> {
+    async createCourseTarget(
+        input: CreateCourseTargetInput,
+    ): Promise<CreateCourseTargetOuput> {
         const { data } = input
         const { content, courseId } = data
         const maxResult = await this.courseTargetMySqlRepository
@@ -582,26 +577,38 @@ export class CoursesService {
             position: max + 1,
         })
         if (created)
-            return { message: `A course target with id ${created.courseTargetId} has been created successfully.` }
+            return {
+                message: `A course target with id ${created.courseTargetId} has been created successfully.`,
+            }
     }
 
-    async updateCourseTarget(input: UpdateCourseTargetInput): Promise<UpdateCourseTargetOuput> {
+    async updateCourseTarget(
+        input: UpdateCourseTargetInput,
+    ): Promise<UpdateCourseTargetOuput> {
         const { data } = input
         const { content, courseTargetId } = data
         await this.courseTargetMySqlRepository.update(courseTargetId, {
             content,
         })
-        return { message: `A course target with id ${courseTargetId} has been updated successfully.` }
+        return {
+            message: `A course target with id ${courseTargetId} has been updated successfully.`,
+        }
     }
 
-    async deleteCourseTarget(input: DeleteCourseTargetInput): Promise<DeleteCourseTargetOuput> {
+    async deleteCourseTarget(
+        input: DeleteCourseTargetInput,
+    ): Promise<DeleteCourseTargetOuput> {
         const { data } = input
         const { courseTargetId } = data
         await this.courseTargetMySqlRepository.delete({ courseTargetId })
-        return { message: `A course target with id ${courseTargetId} has been deleted successfully.` }
+        return {
+            message: `A course target with id ${courseTargetId} has been deleted successfully.`,
+        }
     }
 
-    async createResources(input: CreateResourcesInput): Promise<CreateResourcesOuput> {
+    async createResources(
+        input: CreateResourcesInput,
+    ): Promise<CreateResourcesOuput> {
         const { files, data } = input
         const { lessonId } = data
 
@@ -624,7 +631,9 @@ export class CoursesService {
         await Promise.all(promises)
 
         await this.resourceMySqlRepository.save(resources)
-        return { message: `Resources with ids ${resources.map((resource) => resource.resourceId)} has been created successfully.` }
+        return {
+            message: `Resources with ids ${resources.map((resource) => resource.resourceId)} has been created successfully.`,
+        }
     }
 
     async updateSection(input: UpdateSectionInput): Promise<UpdateSectionOuput> {
@@ -633,21 +642,29 @@ export class CoursesService {
         await this.sectionMySqlRepository.update(sectionId, {
             title,
         })
-        return { message: `A section with id  ${sectionId} has been updated successfully.` }
+        return {
+            message: `A section with id  ${sectionId} has been updated successfully.`,
+        }
     }
 
     async deleteSection(input: DeleteSectionInput): Promise<DeleteSectionOuput> {
         const { data } = input
         const { sectionId } = data
         await this.sectionMySqlRepository.delete({ sectionId })
-        return { message: `A section with id ${sectionId} has been deleted successfully.` }
+        return {
+            message: `A section with id ${sectionId} has been deleted successfully.`,
+        }
     }
 
-    async deleteResource(input: DeleteResourceInput): Promise<DeleteResourceOuput> {
+    async deleteResource(
+        input: DeleteResourceInput,
+    ): Promise<DeleteResourceOuput> {
         const { data } = input
         const { resourceId } = data
         await this.resourceMySqlRepository.delete({ resourceId })
-        return { message: `A resource with id ${resourceId} has been deleted successfully.` }
+        return {
+            message: `A resource with id ${resourceId} has been deleted successfully.`,
+        }
     }
 
     //apis only
@@ -677,13 +694,15 @@ export class CoursesService {
             if (categoryParentIds && categoryParentIds.length > 0) {
                 const parentCategories = await this.categoryMySqlRepository.find({
                     where: {
-                        categoryId: In(categoryParentIds)
-                    }
+                        categoryId: In(categoryParentIds),
+                    },
                 })
-                parentLevels = parentCategories.map(category => category.level)
+                parentLevels = parentCategories.map((category) => category.level)
 
                 if (new Set(parentLevels).size !== 1) {
-                    throw new ConflictException("All parent categories must be at the same level")
+                    throw new ConflictException(
+                        "All parent categories must be at the same level",
+                    )
                 }
                 level = parentLevels[0] + 1
             }
@@ -692,13 +711,15 @@ export class CoursesService {
             if (categoryIds && categoryIds.length > 0) {
                 const childCategories = await this.categoryMySqlRepository.find({
                     where: {
-                        categoryId: In(categoryIds)
-                    }
+                        categoryId: In(categoryIds),
+                    },
                 })
-                childLevels = childCategories.map(category => category.level)
+                childLevels = childCategories.map((category) => category.level)
 
                 if (new Set(childLevels).size !== 1) {
-                    throw new ConflictException("All child categories must be at the same level")
+                    throw new ConflictException(
+                        "All child categories must be at the same level",
+                    )
                 }
 
                 if (!categoryParentIds) {
@@ -711,16 +732,20 @@ export class CoursesService {
 
             if (categoryParentIds && categoryIds) {
                 if (childLevels[0] - parentLevels[0] !== 2) {
-                    throw new ConflictException("The level difference between child and parent categories must be 2")
+                    throw new ConflictException(
+                        "The level difference between child and parent categories must be 2",
+                    )
                 }
                 const found = await this.categoryMySqlRepository.find({
                     where: {
-                        level
-                    }
+                        level,
+                    },
                 })
 
-                if (found.some(categoryName => categoryName.name === name)) {
-                    throw new ConflictException(`There's already existed category named ${name} at this level`)
+                if (found.some((categoryName) => categoryName.name === name)) {
+                    throw new ConflictException(
+                        `There's already existed category named ${name} at this level`,
+                    )
                 }
             }
 
@@ -754,7 +779,6 @@ export class CoursesService {
         }
     }
 
-
     async deleteCategory(
         input: DeleteCategoryInput,
     ): Promise<DeleteCategoryOutput> {
@@ -782,7 +806,9 @@ export class CoursesService {
         }
     }
 
-    async createCourseCategories(input: CreateCourseCategoriesInput): Promise<CreateCourseCategoriesOutput> {
+    async createCourseCategories(
+        input: CreateCourseCategoriesInput,
+    ): Promise<CreateCourseCategoriesOutput> {
         const { data } = input
         const { courseId, categoryIds } = data
 
@@ -791,16 +817,19 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            const courseCategories = categoryIds.map(categoryId => ({
+            const courseCategories = categoryIds.map((categoryId) => ({
                 courseId,
                 categoryId,
             }))
 
             //await this.courseCategoryMySqlRepository.save(courseCategories);
-            await queryRunner.manager.save(CourseCategoryMySqlEntity, courseCategories)
+            await queryRunner.manager.save(
+                CourseCategoryMySqlEntity,
+                courseCategories,
+            )
 
             return {
-                message: "Course Category has been created successfully"
+                message: "Course Category has been created successfully",
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -808,7 +837,6 @@ export class CoursesService {
         } finally {
             await queryRunner.release()
         }
-
     }
 
     async deleteCourseCategory(
@@ -825,14 +853,18 @@ export class CoursesService {
             const found = await this.courseCategoryMySqlRepository.findOne({
                 where: {
                     courseId,
-                    categoryId
-                }
+                    categoryId,
+                },
             })
 
-            if (!found) throw new NotFoundException("No specified course found in this category")
+            if (!found)
+                throw new NotFoundException(
+                    "No specified course found in this category",
+                )
 
             await this.courseCategoryMySqlRepository.delete({
-                categoryId, courseId
+                categoryId,
+                courseId,
             })
 
             await queryRunner.commitTransaction()
@@ -862,7 +894,9 @@ export class CoursesService {
 
         const now = new Date()
 
-        const activeEnrollment = enrollments.some(enrollment => new Date(enrollment.endDate) > now)
+        const activeEnrollment = enrollments.some(
+            (enrollment) => new Date(enrollment.endDate) > now,
+        )
 
         if (activeEnrollment) {
             const found = await this.courseCertificateMySqlEntity.findOne({
@@ -873,10 +907,15 @@ export class CoursesService {
             })
 
             if (found) {
-                throw new ConflictException("You have already get certificate of this course")
+                throw new ConflictException(
+                    "You have already get certificate of this course",
+                )
             }
-        } else // Báo lỗi người dùng không có lượt đăng kí khóa học nào còn hạn sử dụng
-            throw new NotFoundException("You do not have any active enrollments in this course that remain valid. ")
+        } // Báo lỗi người dùng không có lượt đăng kí khóa học nào còn hạn sử dụng
+        else
+            throw new NotFoundException(
+                "You do not have any active enrollments in this course that remain valid. ",
+            )
 
         const achievedDate = new Date()
         const expireDate = new Date(achievedDate)
@@ -888,7 +927,6 @@ export class CoursesService {
             achievedDate,
             expireDate,
         })
-
 
         return {
             message: "Certificate Created Successfully",
@@ -961,7 +999,7 @@ export class CoursesService {
                     await Promise.all(mediaPromises)
                 }
                 const { quizQuestionId } =
-          await this.quizQuestionMySqlRepository.save(quizQuestion)
+                    await this.quizQuestionMySqlRepository.save(quizQuestion)
 
                 if (!answers || answers.length < 2) {
                     throw new ConflictException("Question must have at least 2 answers")
@@ -990,7 +1028,7 @@ export class CoursesService {
             await Promise.all(questionPromises)
 
             return {
-                message: `A quiz with id ${availableQuiz.quizId} has been created successfully.`
+                message: `A quiz with id ${availableQuiz.quizId} has been created successfully.`,
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -1091,9 +1129,9 @@ export class CoursesService {
                 }
 
                 const deletedQuizQuestionMedias =
-          await this.quizQuestionMediaMySqlRepository.findBy({
-              quizQuestionId: In(quizQuestionIdsToDelete),
-          })
+                    await this.quizQuestionMediaMySqlRepository.findBy({
+                        quizQuestionId: In(quizQuestionIdsToDelete),
+                    })
 
                 const mediaIds = deletedQuizQuestionMedias.map(
                     (quizQuestionMediaIdsToDelete) =>
@@ -1209,17 +1247,17 @@ export class CoursesService {
                     }
 
                     const numberOfCorrectQuizQuestionAnswersResult =
-            await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(QuizQuestionAnswerMySqlEntity, "quiz-question-answer")
-                .where("quiz-question-answer.quizQuestionId = :quizQuestionId", {
-                    quizQuestionId,
-                })
-                .andWhere("quiz-question-answer.isCorrect = :isCorrect", {
-                    isCorrect: true,
-                })
-                .getRawOne()
+                        await queryRunner.manager
+                            .createQueryBuilder()
+                            .select("COUNT(*)", "count")
+                            .from(QuizQuestionAnswerMySqlEntity, "quiz-question-answer")
+                            .where("quiz-question-answer.quizQuestionId = :quizQuestionId", {
+                                quizQuestionId,
+                            })
+                            .andWhere("quiz-question-answer.isCorrect = :isCorrect", {
+                                isCorrect: true,
+                            })
+                            .getRawOne()
                     const numberOfQuizQuestionAnswersResult = await queryRunner.manager
                         .createQueryBuilder()
                         .select("COUNT(*)", "count")
@@ -1282,12 +1320,15 @@ export class CoursesService {
             const { enrolledInfo } = progress
 
             if (!enrolledInfo || enrolledInfo.accountId !== accountId) {
-                throw new NotFoundException("You haven't enrolled to course that has this lesson")
+                throw new NotFoundException(
+                    "You haven't enrolled to course that has this lesson",
+                )
             }
 
             const now = new Date()
 
-            if (now > enrolledInfo.endDate) throw new ConflictException("This Course has expired")
+            if (now > enrolledInfo.endDate)
+                throw new ConflictException("This Course has expired")
 
             await this.progressMySqlRepository.update(
                 { lessonId },
@@ -1304,7 +1345,6 @@ export class CoursesService {
             await queryRunner.release()
         }
     }
-
 
     async createQuizAttempt(
         input: CreateQuizAttemptInput,
@@ -1444,8 +1484,8 @@ export class CoursesService {
 
             const questionAnswerCountMap: { [key: string]: number } = {}
 
-            quizQuestionAnswerIds.forEach(answerId => {
-                questionsWithCorrectAnswers.forEach(question => {
+            quizQuestionAnswerIds.forEach((answerId) => {
+                questionsWithCorrectAnswers.forEach((question) => {
                     if (question.correctAnswers.includes(answerId)) {
                         if (!questionAnswerCountMap[question.quizQuestionId]) {
                             questionAnswerCountMap[question.quizQuestionId] = 0
@@ -1455,10 +1495,10 @@ export class CoursesService {
                 })
             })
 
-
-            questionsWithCorrectAnswers.forEach(question => {
+            questionsWithCorrectAnswers.forEach((question) => {
                 const correctAnswerCount = question.correctAnswers.length
-                const accountAnswerCount = questionAnswerCountMap[question.quizQuestionId] || 0
+                const accountAnswerCount =
+                    questionAnswerCountMap[question.quizQuestionId] || 0
                 maxPoints += Number(question.point)
                 if (accountAnswerCount === correctAnswerCount) {
                     totalPoints += Number(question.point)
@@ -1490,72 +1530,44 @@ export class CoursesService {
     }
 
     async giftCourse(input: GiftCourseInput): Promise<GiftCourseOutput> {
-        const { data } = input
+        const { data, accountId } = input
         const { courseId, receiveAccountEmail } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
         try {
-            const receiveAccount = await this.accountMySqlRepository.findOneBy({ email: receiveAccountEmail })
+            const receiveAccount = await this.accountMySqlRepository.findOneBy({
+                email: receiveAccountEmail,
+            })
 
-            if (!receiveAccount) {
-                throw new NotFoundException("Receive account not found or they aren't a CiStudy member")
+            if (!receiveAccount || receiveAccount.verified === false) {
+                throw new NotFoundException(
+                    "Receive account not found or they aren't verified",
+                )
             }
-
+            
             const enrolled = await this.enrolledInfoMySqlRepository.findOne({
                 where: {
                     accountId: receiveAccount.accountId,
-                    courseId
-                }
+                    courseId,
+                },
             })
 
             if (enrolled) {
-                throw new ConflictException("This account has already enrolled to this course")
+                throw new ConflictException(
+                    "This account has already enrolled to this course",
+                )
             }
-
-            // const cachedTransaction = (await this.cacheManager.get(code)) as CodeValue
-            // if (!cachedTransaction) throw new NotFoundException("The code either expired or never existed.")
-
-            // const { transactionHash } = cachedTransaction
-            // const transaction = await this.transactionMongoModel.findOne({
-            //     transactionHash
-            // })
-            // if (!transaction) {
-            //     throw new NotFoundException("Transaction not found.")
-            // }
-
-            // const { _id, isValidated, value } = transaction
-
-            // if (isValidated) throw new ConflictException("This transaction is validated.")
 
             const {
                 enableDiscount,
                 discountPrice,
                 price: coursePrice,
+                duration,
+                sections,
+                title
             } = await this.courseMySqlRepository.findOne({
-                where: {
-                    courseId,
-                },
-            })
-
-            const price = enableDiscount ? discountPrice : coursePrice
-            // if (BigInt(value) < computeRaw(price)) throw new ConflictException("Value is not enough.")
-
-            // await this.transactionMongoModel.findOneAndUpdate({ _id }, {
-            //     isValidated: true
-            // },
-            // )
-
-            await this.enrolledInfoMySqlRepository.save({
-                enrolledInfoId: enrolled?.enrolledInfoId,
-                courseId,
-                accountId: receiveAccount.accountId,
-                enrolled: true,
-                priceAtEnrolled: price
-            })
-
-            const course = await this.courseMySqlRepository.findOne({
                 where: {
                     courseId,
                 },
@@ -1566,12 +1578,33 @@ export class CoursesService {
                 },
             })
 
-            const progresses = course.sections.reduce((acc, section) => {
-                section.lessons.forEach(lesson => {
+            const price = computeRaw(enableDiscount ? discountPrice : coursePrice)
+            const minimumBalanceRequired = computeDenomination(price)
+            const { balance } = await this.accountMySqlRepository.findOneBy({ accountId })
+
+            if (balance < minimumBalanceRequired) {
+                throw new ConflictException("Your account does not have sufficient balance to gift this course.")
+            }
+
+            await this.accountMySqlRepository.update(accountId, {balance : balance - minimumBalanceRequired})
+
+            const enrollDate = new Date()
+            const endDate = new Date(enrollDate)
+            endDate.setMonth(endDate.getMonth() + duration)
+
+            const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
+                courseId,
+                accountId: receiveAccount.accountId,
+                enrolled: true,
+                priceAtEnrolled: minimumBalanceRequired,
+                endDate,
+            })
+
+            const progresses = sections.reduce((acc, section) => {
+                section.lessons.forEach((lesson) => {
                     acc.push({
-                        accountId: receiveAccount.accountId,
-                        lessonId: lesson.lessonId,
-                        isCompleted: false // Giả sử bạn muốn khởi tạo với `isCompleted` là false
+                        enrolledInfoId,
+                        lessonId: lesson.lessonId
                     })
                 })
                 return acc
@@ -1581,7 +1614,7 @@ export class CoursesService {
 
             await queryRunner.commitTransaction()
             return {
-                message: `Account with email ${receiveAccountEmail} have received and enrolled to course ${course.title}`
+                message: `Account with email ${receiveAccountEmail} have received and enrolled to course ${title}`
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -1592,85 +1625,4 @@ export class CoursesService {
 
     }
 
-    async createCourseReport(input: CreateCourseReportInput): Promise<CreateCourseReportOutput> {
-        const { data, accountId } = input
-        const { reportedCourseId, description } = data
-
-        const reportedCourse = await this.courseMySqlRepository.findOneBy({ courseId: reportedCourseId })
-
-        if (!reportedCourse) {
-            throw new NotFoundException("Reported course is not found or has been deleted")
-        }
-
-        const processing = await this.reportCourseMySqlRepository.find({
-            where: {
-                reportedCourseId
-            }
-        })
-
-        if (processing && processing.some(processing => processing.processStatus === ReportProcessStatus.Processing)) {
-            throw new ConflictException("You have reported this accout before and it is processing. Try update your report instead.")
-        }
-
-        const { reportCourseId } = await this.reportCourseMySqlRepository.save({
-            reporterAccountId: accountId,
-            reportedCourseId,
-            description
-        })
-
-        return {
-            message: `A report to course ${reportedCourse.title} has been submitted.`,
-            others: {
-                reportCourseId
-            }
-        }
-    }
-
-    async updateCourseReport(input: UpdateCourseReportInput): Promise<UpdateCourseReportOutput> {
-        const { data, accountId } = input
-        const { reportCourseId, description } = data
-
-        const found = await this.reportCourseMySqlRepository.findOneBy({ reportCourseId })
-
-        if (!found) {
-            throw new NotFoundException("Course's report not found.")
-        }
-
-        if (found.processStatus !== ReportProcessStatus.Processing) {
-            throw new ConflictException("This report has been resolved and closed.")
-        }
-
-        if (found.reporterAccountId !== accountId) {
-            throw new ConflictException("You isn't the owner of this report.")
-        }
-
-        await this.reportCourseMySqlRepository.update(reportCourseId, { description })
-
-        return {
-            message: "Your Report has been updated successfully",
-            others: {
-                reportCourseId
-            }
-        }
-    }
-
-    async resolveCourseReport(input: ResolveCourseReportInput): Promise<ResolveCourseReportOutput> {
-        const { data } = input
-        const { reportCourseId, processNote, processStatus } = data
-
-        const found = await this.reportCourseMySqlRepository.findOneBy({ reportCourseId })
-
-        if (!found) {
-            throw new NotFoundException("Report not found")
-        }
-
-        if (found.processStatus !== ReportProcessStatus.Processing) {
-            throw new ConflictException("This report has already been resolved")
-        }
-        await this.reportCourseMySqlRepository.update(reportCourseId, { processStatus, processNote })
-
-        return {
-            message: "Report successfully resolved and closed."
-        }
-    }
 }

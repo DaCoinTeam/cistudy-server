@@ -1,10 +1,9 @@
-import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { AccountEntity } from "./account.entity";
-import { QuizEntity } from "./quiz.entity";
-import { QuizAttemptStatus } from "@common";
-import { QuizQuestionEntity } from "./quiz-question.entity";
-import { QuizQuestionAnswerEntity } from "./quiz-question-answer.entity";
+import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { AccountEntity } from "./account.entity"
+import { QuizEntity } from "./quiz.entity"
+import { QuizAttemptStatus } from "@common"
+import { QuizQuestionAnswerEntity } from "./quiz-question-answer.entity"
 //import { QuizAttemptAnswerEntity } from "./quiz-attempt-answer.entity";
 
 @ObjectType()
@@ -13,43 +12,43 @@ export class QuizAttemptEntity {
 
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    quizAttemptId: string
+        quizAttemptId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    quizId: string
+        quizId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    accountId: string
+        accountId: string
 
     @Field(() => Float, { nullable: true })
     @Column({ type: "float", default: 0, nullable: true })
-    score: Number;
+        score: number
 
     @Field(() => String)
     @Column({ type: "enum", enum: QuizAttemptStatus, default: QuizAttemptStatus.Started })
-    attemptStatus: QuizAttemptStatus
+        attemptStatus: QuizAttemptStatus
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-    updatedAt: Date
+        updatedAt: Date
 
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (account) => account.quizAttempts, { onDelete: "CASCADE" })
     @JoinColumn({ name: "accountId" })
-    account: AccountEntity
+        account: AccountEntity
 
     @Field(() => QuizEntity)
     @ManyToOne(() => QuizEntity, (quiz) => quiz.quizAttempts, { onDelete : "CASCADE" })
     @JoinColumn({ name: "quizId" })
-    quiz: QuizEntity
+        quiz: QuizEntity
 
     @Field(() => [QuizQuestionAnswerEntity])
     @OneToMany(() => QuizQuestionAnswerEntity, (quizQuestionAnswer) => quizQuestionAnswer.attempt, { onDelete: "CASCADE" ,nullable: true })
-    questionAnswers: Array<QuizQuestionAnswerEntity>
+        questionAnswers: Array<QuizQuestionAnswerEntity>
 }

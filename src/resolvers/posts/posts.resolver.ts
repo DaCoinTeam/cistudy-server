@@ -16,7 +16,7 @@ import {
     FindOnePostCommentOutput,
     FindOnePostOutput,
 } from "./posts.output"
-import { PostMySqlEntity } from "@database"
+
 
 @Resolver()
 export class PostsResolver {

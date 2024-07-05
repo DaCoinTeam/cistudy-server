@@ -5,10 +5,8 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
     CreateDateColumn,
-    UpdateDateColumn,
-    OneToOne
-} from "typeorm"
-import { Field, Float, ID, ObjectType, Int } from "@nestjs/graphql"
+    UpdateDateColumn} from "typeorm"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { CourseEntity } from "./course.entity"
 import { AccountEntity } from "./account.entity"
 import { ReportProcessStatus } from "@common"
@@ -18,44 +16,44 @@ import { ReportProcessStatus } from "@common"
 export class ReportCourseEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    reportCourseId: string
+        reportCourseId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    reporterAccountId: string
+        reporterAccountId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    reportedCourseId: string
+        reportedCourseId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 200, nullable: true })
-    description: string
+        description: string
 
     @Field(() => String)
     @Column({ type: "enum", enum: ReportProcessStatus, default: ReportProcessStatus.Processing })
-    processStatus: ReportProcessStatus
+        processStatus: ReportProcessStatus
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 2000, nullable: true })
-    processNote: string
+        processNote: string
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-    updatedAt: Date
+        updatedAt: Date
 
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (course) => course.courseReview, { nullable: true })
     @JoinColumn({ name: "reporterAccountId" })
-    reporterAccount: AccountEntity
+        reporterAccount: AccountEntity
 
     @Field(() => CourseEntity)
     @ManyToOne(() => CourseEntity, (course) => course.courseReports, { nullable: true })
     @JoinColumn({ name: "reportedCourseId" })
-    reportedCourse: CourseEntity
+        reportedCourse: CourseEntity
 }
 

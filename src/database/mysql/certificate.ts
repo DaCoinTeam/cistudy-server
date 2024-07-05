@@ -15,37 +15,37 @@ export class CertificateEntity {
 
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    certificateId: string
+        certificateId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    courseId: string
+        courseId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    accountId: string
+        accountId: string
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date, { nullable: true })
     @Column({ type: "date" , nullable: true })
-    achievedDate: Date
+        achievedDate: Date
 
     @Field(() => Date, { nullable: true })
     @Column({ type: "date" , nullable: true })
-    expireDate: Date
+        expireDate: Date
     //relations
 
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (account) => account.certificates)
     @JoinColumn({ name: "accountId" })
-    account: AccountEntity
+        account: AccountEntity
 
     @Field(() => CourseEntity, { nullable: true })
     @ManyToOne(() => CourseEntity, (course) => course.certificate)
     @JoinColumn({ name: "courseId" })
-    course: CourseEntity
+        course: CourseEntity
 
 }

@@ -1,9 +1,9 @@
-import { CourseMySqlEntity, FollowMySqlEnitity, AccountMySqlEntity, AccountReviewMySqlEntity, ReportAccountMySqlEntity, ReportCourseMySqlEntity, ReportPostMySqlEntity, ReportPostCommentMySqlEntity } from "@database"
+import { FollowMySqlEnitity, AccountMySqlEntity, AccountReviewMySqlEntity, ReportAccountMySqlEntity, ReportCourseMySqlEntity, ReportPostMySqlEntity, ReportPostCommentMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { DataSource, Repository } from "typeorm"
 import { FindManyFollowersInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindOneAccountInput, FindManyReportsInput } from "./accounts.input"
 import { InjectRepository } from "@nestjs/typeorm"
-import { FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyReportOutput, FindManyReportOutputData } from "./accounts.output"
+import { FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyReportOutputData } from "./accounts.output"
 import { ReportModel } from "src/database/abstract/report.abstract"
 import { ReportType } from "@common"
 
@@ -16,8 +16,6 @@ export class AccountsService {
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
         @InjectRepository(FollowMySqlEnitity)
         private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
-        @InjectRepository(CourseMySqlEntity)
-        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
         @InjectRepository(AccountReviewMySqlEntity)
         private readonly accountReviewMySqlRepository: Repository<AccountReviewMySqlEntity>,
         @InjectRepository(ReportAccountMySqlEntity)
@@ -176,7 +174,7 @@ export class AccountsService {
     }
 
     async findManyReports(input: FindManyReportsInput): Promise<FindManyReportOutputData> {
-        const { accountId, data } = input
+        const { data } = input
         const { params, options } = data
         const { filterReports } = params
         const { skip, take } = options
@@ -184,7 +182,7 @@ export class AccountsService {
         let reports: ReportModel[] = []
 
         if (!filterReports || filterReports.includes(ReportType.Account)) {
-            const accountReports = await this.reportAccountMySqlRepository.find({});
+            const accountReports = await this.reportAccountMySqlRepository.find({})
             reports = reports.concat(accountReports.map(report => ({
                 reportId: report.reportAccountId,
                 type: ReportType.Account,
@@ -195,11 +193,11 @@ export class AccountsService {
                 processNote: report.processNote,
                 createdAt: report.createdAt,
                 updatedAt: report.updatedAt
-            })));
+            })))
         }
 
         if (!filterReports || filterReports.includes(ReportType.Course)) {
-            const courseReports = await this.reportCourseMySqlRepository.find({});
+            const courseReports = await this.reportCourseMySqlRepository.find({})
             reports = reports.concat(courseReports.map(report => ({
                 reportId: report.reportCourseId,
                 type: ReportType.Course,
@@ -210,11 +208,11 @@ export class AccountsService {
                 processNote: report.processNote,
                 createdAt: report.createdAt,
                 updatedAt: report.updatedAt
-            })));
+            })))
         }
 
         if (!filterReports || filterReports.includes(ReportType.Post)) {
-            const postReports = await this.reportPostMySqlRepository.find({});
+            const postReports = await this.reportPostMySqlRepository.find({})
             reports = reports.concat(postReports.map(report => ({
                 reportId: report.reportPostId,
                 type: ReportType.Post,
@@ -225,11 +223,11 @@ export class AccountsService {
                 processNote: report.processNote,
                 createdAt: report.createdAt,
                 updatedAt: report.updatedAt
-            })));
+            })))
         }
 
         if (!filterReports || filterReports.includes(ReportType.PostComment)) {
-            const postCommentReports = await this.reportPostCommentMySqlRepository.find({});
+            const postCommentReports = await this.reportPostCommentMySqlRepository.find({})
             reports = reports.concat(postCommentReports.map(report => ({
                 reportId: report.reportPostCommentId,
                 type: ReportType.PostComment,
@@ -240,7 +238,7 @@ export class AccountsService {
                 processNote: report.processNote,
                 createdAt: report.createdAt,
                 updatedAt: report.updatedAt
-            })));
+            })))
         }
 
         return {

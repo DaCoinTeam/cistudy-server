@@ -1,12 +1,11 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    ManyToOne,
+    JoinColumn,
+    CreateDateColumn,
+    UpdateDateColumn,
 } from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { CategoryEntity } from "./category.entity"
@@ -16,37 +15,37 @@ import { CategoryEntity } from "./category.entity"
 export class CategoryRelationEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn("uuid")
-  categoryRelationId: string
+      categoryRelationId: string
 
   @Field(() => Date)
   @CreateDateColumn()
-  createdAt: Date
+      createdAt: Date
 
   @Field(() => Date)
   @UpdateDateColumn()
-  updatedAt: Date
+      updatedAt: Date
 
   @Field(() => ID)
   @Column({ type: "uuid", length: 36 })
-  categoryId: string
+      categoryId: string
 
   @Field(() => ID)
   @Column({ type: "uuid", length: 36 })
-  categoryParentId: string
+      categoryParentId: string
 
   @Field(() => CategoryEntity, {nullable: true})
   @ManyToOne(() => CategoryEntity, (category) => category.categoryRelations, {
-    onDelete: "CASCADE",
+      onDelete: "CASCADE",
   })
   @JoinColumn({ name: "categoryId" })
-  category: CategoryEntity
+      category: CategoryEntity
 
   @Field(() => CategoryEntity, {nullable : true})
   @ManyToOne(
-    () => CategoryEntity,
-    (category) => category.categoryParentRelations,
-    { onDelete: "CASCADE" },
+      () => CategoryEntity,
+      (category) => category.categoryParentRelations,
+      { onDelete: "CASCADE" },
   )
   @JoinColumn({ name: "categoryParentId" })
-  categoryParent: CategoryEntity
+      categoryParent: CategoryEntity
 }

@@ -1,6 +1,5 @@
 import {
-    Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne,
-    PrimaryColumn,
+    Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, 
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm"
@@ -14,23 +13,23 @@ export class OrderCourseEntity {
     //Order Details (OrderId and CreateDate)
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    orderCourseId: string
+        orderCourseId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    courseId: string
+        courseId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    orderId: string
+        orderId: string
 
     @Field(() => Float, { defaultValue: 0 })
     @Column({ type: "float", default: 0 })
-    discountedPrice: number
+        discountedPrice: number
 
     @Field(() => Float, { defaultValue: 0 })
     @Column({ type: "float", default: 0 })
-    price: number
+        price: number
 
     @Field(() => Date)
     @CreateDateColumn()
@@ -43,10 +42,10 @@ export class OrderCourseEntity {
     @Field(() => OrderEntity)
     @ManyToOne(() => OrderEntity, (order) => order.orderCourses)
     @JoinColumn({ name: "orderId" })
-    order: OrderEntity
+        order: OrderEntity
 
     @Field(() => CourseEntity)
     @ManyToOne(() => CourseEntity, (course) => course.orderCourses)
     @JoinColumn({ name: "courseId" })
-    course: CourseEntity
+        course: CourseEntity
 }

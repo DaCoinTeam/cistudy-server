@@ -3,11 +3,8 @@ import {
     CreateDateColumn,
     Entity,
     JoinColumn,
-    ManyToOne,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-
+    ManyToOne, PrimaryGeneratedColumn,
+    UpdateDateColumn
 } from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { AccountEntity } from "./account.entity"
@@ -20,27 +17,27 @@ export class RoleEntity {
     //Main fields
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    roleId: string
+        roleId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    accountId: string
+        accountId: string
 
     @Field(() => String)
     @Column({ type: "enum", enum: SystemRoles})
-    name: SystemRoles
+        name: SystemRoles
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ type: "boolean", default: false })
-    isDisabled: Boolean;
+        isDisabled: boolean
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-    updatedAt: Date
+        updatedAt: Date
 
     // Relations
     @Field(() => AccountEntity)
@@ -50,5 +47,5 @@ export class RoleEntity {
         { onDelete : "CASCADE" }
     )
     @JoinColumn({ name: "accountId" })
-    accountRoles: AccountEntity;
+        accountRoles: AccountEntity
 }

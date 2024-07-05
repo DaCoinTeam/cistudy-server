@@ -5,5 +5,5 @@ export const Metadata = createParamDecorator((_, ctx: ExecutionContext) => {
     return request.metadata
 })
 
-export const ROLES_KEY = 'roles';
-export const Roles = (...roles: String[]) => SetMetadata(ROLES_KEY, roles);
+export const ROLES_KEY = "roles"
+export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles)

@@ -26,7 +26,7 @@ import {
     CreatePostCommentReportInputData,
     CreatePostInputData,
     CreatePostReportInputData,
-    MarkPostCommentRewardedData,
+    MarkPostCommentAsSolutionInputData,
     ResolvePostCommentReportInputData,
     ResolvePostReportInputData,
     ToggleLikePostCommentInputData,
@@ -226,15 +226,15 @@ export class PostsController {
     }
 
     @ApiBearerAuth()
-    @Patch("mark-post-comment-rewarded")
+    @Patch("mark-post-comment-as-solution")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
-    async togglePostComment(
+    async markPostCommentAsSolution(
         @AccountId() accountId: string,
-        @Body() body: MarkPostCommentRewardedData,
+        @Body() body: MarkPostCommentAsSolutionInputData,
     ) {
-        return this.postsService.markPostCommentRewarded({
+        return this.postsService.markPostCommentAsSolution({
             accountId,
             data: body,
         })

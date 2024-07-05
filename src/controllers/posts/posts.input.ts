@@ -217,23 +217,23 @@ implements AuthInput<DeletePostCommentReplyInputData>
   data: DeletePostCommentReplyInputData
 }
 
-export class MarkPostCommentRewardedData {
+export class MarkPostCommentAsSolutionInputData {
     @ApiProperty()
-    postCommentId: string
+        postCommentId: string
 }
 
-export class MarkPostCommentRewardedInput implements AuthInput<MarkPostCommentRewardedData>{
+export class MarkPostCommentAsSolutionInput implements AuthInput<MarkPostCommentAsSolutionInputData>{
     @IsUUID("4")
-    accountId: string
-    data: MarkPostCommentRewardedData
+        accountId: string
+    data: MarkPostCommentAsSolutionInputData
 }
 
 export class CreatePostReportInputData {
     @ApiProperty()
-    reportedPostId: string
+        reportedPostId: string
     @ApiProperty()
     @MinLength(20)
-    description: string
+        description: string
 }
 
 export class CreatePostReportInput implements AuthInput<CreatePostReportInputData>{
@@ -244,10 +244,10 @@ export class CreatePostReportInput implements AuthInput<CreatePostReportInputDat
 export class UpdatePostReportInputData {
     @IsUUID("4")
     @ApiProperty()
-    reportPostId : string
+        reportPostId : string
     @ApiProperty()
     @MinLength(20)
-    description: string
+        description: string
 }
 
 export class UpdatePostReportInput implements AuthInput<UpdatePostReportInputData> {
@@ -257,10 +257,10 @@ export class UpdatePostReportInput implements AuthInput<UpdatePostReportInputDat
 
 export class CreatePostCommentReportInputData {
     @ApiProperty()
-    reportedPostCommentId: string
+        reportedPostCommentId: string
     @ApiProperty()
     @MinLength(20)
-    description: string
+        description: string
 }
 
 export class CreatePostCommentReportInput implements AuthInput<CreatePostCommentReportInputData>{
@@ -271,10 +271,10 @@ export class CreatePostCommentReportInput implements AuthInput<CreatePostComment
 export class UpdatePostCommentReportInputData {
     @IsUUID("4")
     @ApiProperty()
-    reportPostCommentId : string
+        reportPostCommentId : string
     @ApiProperty()
     @MinLength(20)
-    description: string
+        description: string
 }
 
 export class UpdatePostCommentReportInput implements AuthInput<UpdatePostCommentReportInputData> {
@@ -285,12 +285,12 @@ export class UpdatePostCommentReportInput implements AuthInput<UpdatePostComment
 export class ResolvePostReportInputData {
     @ApiProperty()
     @IsUUID("4")
-    reportPostId : string
+        reportPostId : string
     @ApiProperty()
-    processStatus : ReportProcessStatus
+        processStatus : ReportProcessStatus
     @ApiProperty()
     @MinLength(20)
-    processNote : string
+        processNote : string
 }
 
 export class ResolvePostReportInput implements AuthInput<ResolvePostReportInputData> {
@@ -301,12 +301,12 @@ export class ResolvePostReportInput implements AuthInput<ResolvePostReportInputD
 export class ResolvePostCommentReportInputData {
     @ApiProperty()
     @IsUUID("4")
-    reportPostCommentId : string
+        reportPostCommentId : string
     @ApiProperty()
-    processStatus : ReportProcessStatus
+        processStatus : ReportProcessStatus
     @ApiProperty()
     @MinLength(20)
-    processNote : string
+        processNote : string
 }
 
 export class ResolvePostCommentReportInput implements AuthInput<ResolvePostCommentReportInputData> {

@@ -18,6 +18,7 @@ import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     AuthManagerService,
     Bento4Service,
+    BlockchainService,
     FfmpegService,
     FirebaseService,
     MailerService,
@@ -57,6 +58,7 @@ import { JwtStrategy } from "./strategies"
         ShellService,
         StorageService,
         JwtStrategy,
+        BlockchainService
     ],
     providers: [
         JwtService,
@@ -68,7 +70,8 @@ import { JwtStrategy } from "./strategies"
         Sha256Service,
         ShellService,
         StorageService,
-        JwtStrategy
+        JwtStrategy,
+        BlockchainService
     ],
 })
 export class GlobalModule { }

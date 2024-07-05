@@ -13,7 +13,6 @@ import { PostCommentEntity } from "./post-comment.entity"
 import { PostLikeEntity } from "./post-like.entity"
 import { AccountEntity } from "./account.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
-import { AccountMySqlEntity } from "."
 import { PostMediaEntity } from "./post-media.entity"
 import { ReportPostEntity } from "./report-post.entity"
 
@@ -22,76 +21,76 @@ import { ReportPostEntity } from "./report-post.entity"
 export class PostEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    postId: string
+        postId: string
 
     @Field(() => String)
     @Column({ type: "varchar", length: 500 })
-    title: string
+        title: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    creatorId: string
+        creatorId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-    courseId: string
+        courseId: string
 
     @Field(() => Boolean)
     @Column({ type: "boolean", default: true })
-    allowComments: boolean
+        isCompleted: boolean
 
     @Field(() => Boolean)
     @Column({ type: "boolean", default: false })
-    isRewarded: boolean
+        isRewardable: boolean
 
     @Field(() => Date)
     @CreateDateColumn()
-    createdAt: Date
+        createdAt: Date
 
     @Field(() => Date)
     @UpdateDateColumn()
-    updatedAt: Date
+        updatedAt: Date
 
     @Field(() => String)
     @Column({ type: "longtext", nullable: true })
-    html: string
+        html: string
 
     @ManyToOne(() => CourseEntity, (course) => course.posts)
     @JoinColumn({ name: "courseId" })
-    course: CourseEntity
+        course: CourseEntity
 
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (account) => account.posts)
     @JoinColumn({ name: "creatorId" })
-    creator: AccountEntity
+        creator: AccountEntity
 
     @Field(() => [PostMediaEntity])
     @OneToMany(() => PostMediaEntity, (postMedia) => postMedia.post, {
         cascade: true,
     })
-    postMedias: Array<PostMediaEntity>
+        postMedias: Array<PostMediaEntity>
 
     @Field(() => [PostCommentEntity])
     @OneToMany(() => PostCommentEntity, (postComment) => postComment.post)
-    postComments: Array<PostCommentEntity>
+        postComments: Array<PostCommentEntity>
 
     @Field(() => [PostLikeEntity])
     @OneToMany(() => PostLikeEntity, (postReact) => postReact.post)
-    postReacts: Array<PostLikeEntity>
+        postReacts: Array<PostLikeEntity>
 
     @Field(() => [ReportPostEntity])
     @OneToMany(() => ReportPostEntity, (postReport) => postReport.reportedPost)
-    postReports: Array<ReportPostEntity>
+        postReports: Array<ReportPostEntity>
 
     //graphql
     @Field(() => Boolean, { nullable: true })
-    liked?: boolean
+        liked?: boolean
     @Field(() => Int, { nullable: true })
-    numberOfLikes?: number
+        numberOfLikes?: number
     @Field(() => Int, { nullable: true })
-    numberOfComments?: number
+        numberOfComments?: number
     @Field(() => Int, { nullable: true })
-    numberOfRewardedLikesLeft?: number
+        numberOfRewardedLikesLeft?: number
     @Field(() => Int, { nullable: true })
-    numberOfRewardedCommentsLeft?: number
+        numberOfRewardedCommentsLeft?: number
 }

@@ -38,17 +38,17 @@ export class AuthController {
 
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @Patch('verify-registration')
+    @Patch("verify-registration")
     async verifyRegistration(
         @Body() data: VerifyRegistrationInputData,
         @AccountId() accountId : string
     ){
-    return this.authService.verifyRegistration({accountId, data});
+        return this.authService.verifyRegistration({accountId, data})
     }
 
-    @Get('verify-registration-page')
-    async getAccountVerificationLink(@Query('token') token :string, @Res() res: Response) {
-        const verificationLink = `https://www.facebook.com/${token}`;
-        return res.redirect(verificationLink);
+    @Get("verify-registration-page")
+    async getAccountVerificationLink(@Query("token") token :string, @Res() res: Response) {
+        const verificationLink = `https://www.facebook.com/${token}`
+        return res.redirect(verificationLink)
     }
 }

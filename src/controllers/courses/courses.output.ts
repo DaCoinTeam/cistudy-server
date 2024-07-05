@@ -1,10 +1,23 @@
-import { AuthOutput, Output } from "@common"
-import { ApiProperty, ApiResponse } from "@nestjs/swagger"
-import { IsOptional, IsUUID } from "class-validator"
+import { Output } from "@common"
+import { ApiProperty } from "@nestjs/swagger"
+import { IsUUID } from "class-validator"
 
 export class CreateCourseOutputOthers {
     @ApiProperty()
-    courseId: string
+        courseId: string
+}
+
+export class CheckCumulativeAmountOutput implements Output<CheckCumulativeAmountOutputOthers> {
+    message: string
+    others: CheckCumulativeAmountOutputOthers
+}
+export class CheckCumulativeAmountOutputOthers {
+    @ApiProperty()
+        enough: boolean
+    @ApiProperty()
+        cummulativeAmount: string
+    @ApiProperty()
+        differentAmounts: string
 }
 
 export class CreateCourseOutput implements Output<CreateCourseOutputOthers> {
@@ -13,7 +26,7 @@ export class CreateCourseOutput implements Output<CreateCourseOutputOthers> {
 }
 export class EnrollCourseOuputOthers {
     @ApiProperty()
-    enrolledInfoId: string
+        enrolledInfoId: string
 }
 export class EnrollCourseOutput implements Output<EnrollCourseOuputOthers> {
     message: string
@@ -26,7 +39,7 @@ export class UpdateCourseOutput implements Output {
 
 export class CreateCategoryOutputOthers {
     @ApiProperty()
-    categoryId: string
+        categoryId: string
 }
 
 export class CreateCategoryOutput implements Output<CreateCategoryOutputOthers> {
@@ -40,7 +53,7 @@ export class DeleteCategoryOutput implements Output {
 
 export class CreateSubcategoryOutputOthers {
     @ApiProperty()
-    subcategoryId: string
+        subcategoryId: string
 }
 
 export class CreateSubcategoryOutput implements Output<CreateSubcategoryOutputOthers> {
@@ -50,7 +63,7 @@ export class CreateSubcategoryOutput implements Output<CreateSubcategoryOutputOt
 
 export class CreateTopicOutputOthers {
     @ApiProperty()
-    topicId: string
+        topicId: string
 }
 
 export class CreateTopicOutput implements Output<CreateTopicOutputOthers> {
@@ -76,12 +89,12 @@ export class DeleteCourseReviewOutput implements Output {
 
 export class CreateCertificateOutputOthers {
     @ApiProperty()
-    certificateId: string
+        certificateId: string
 }
 
 export class CreateCertificateOutput implements Output<CreateCertificateOutputOthers> {
     message: string
-    others?: CreateCertificateOutputOthers;
+    others?: CreateCertificateOutputOthers
 }
 
 export class DeleteQuizOutput implements Output {
@@ -89,7 +102,7 @@ export class DeleteQuizOutput implements Output {
 }
 
 export class UpdateQuizOutput implements Output {
-    message: string;
+    message: string
 }
 
 export class MarkLessonAsCompletedOutput implements Output {
@@ -99,12 +112,12 @@ export class MarkLessonAsCompletedOutput implements Output {
 export class CreateQuizAttemptOutputOthers {
     @IsUUID()
     @ApiProperty()
-    quizAttemptId: string
+        quizAttemptId: string
 }
 
 export class CreateQuizAttemptOutput implements Output<CreateQuizAttemptOutputOthers> {
-    message: string;
-    others?: CreateQuizAttemptOutputOthers;
+    message: string
+    others?: CreateQuizAttemptOutputOthers
 }
 
 export class FinishQuizAttemptOutputOther {
@@ -112,89 +125,89 @@ export class FinishQuizAttemptOutputOther {
 }
 export class FinishQuizAttemptOutput implements Output<FinishQuizAttemptOutputOther> {
     message: string
-    others?: FinishQuizAttemptOutputOther;
+    others?: FinishQuizAttemptOutputOther
 }
 
 export class GiftCourseOutput implements Output {
-    message: string;
+    message: string
 }
 
 export class CreateCourseCategoriesOutput implements Output {
-    message: string;
+    message: string
 }
 
 export class DeleteCourseCategoryOutput implements Output {
-    message: string;
+    message: string
 }
 
 export class CreateSectionOutput implements Output {
-    message: string;
+    message: string
 }
 
 export class UpdateLessonOutput implements Output {
-    message: string;
+    message: string
 }
 //
 export class DeleteLessonOutput implements Output {
-    message: string;
+    message: string
 }
 
 export class CreateCourseTargetOuput implements Output {
-    message: string;
+    message: string
 }
 
 export class UpdateCourseTargetOuput implements Output {
-    message: string;
+    message: string
 }
 
 export class DeleteCourseTargetOuput implements Output {
-    message: string;
+    message: string
 }
 
 export class CreateResourcesOuput implements Output {
-    message: string;
+    message: string
 }
 
 export class UpdateSectionOuput implements Output {
-    message: string;
+    message: string
 }
 
 export class DeleteSectionOuput implements Output {
-    message: string;
+    message: string
 }
 
 export class DeleteResourceOuput implements Output {
-    message: string;
+    message: string
 }
 
 export class CreateQuizOutput implements Output {
-    message: string;
+    message: string
 }
 
 export class CreateLessonOutput implements Output {
-    message: string;
+    message: string
 }
 
 export class CreateCourseReportOutputOthers{
     @IsUUID("4")
-    reportCourseId : string
+        reportCourseId : string
 }
 
 export class CreateCourseReportOutput implements Output<CreateCourseReportOutputOthers> {
-    message: string;
-    others?: CreateCourseReportOutputOthers;
+    message: string
+    others?: CreateCourseReportOutputOthers
 }
 
 export class UpdateCourseReportOutputOthers{
     @IsUUID("4")
-    reportCourseId : string
+        reportCourseId : string
 }
 
 export class UpdateCourseReportOutput implements Output<UpdateCourseReportOutputOthers> {
-    message: string;
-    others?: UpdateCourseReportOutputOthers;
+    message: string
+    others?: UpdateCourseReportOutputOthers
 }
 
 export class ResolveCourseReportOutput implements Output {
-    message: string;
+    message: string
 }

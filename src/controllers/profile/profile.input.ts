@@ -1,6 +1,7 @@
 import { AuthInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID } from "class-validator"
+import { Address } from "web3"
 
 export class UpdateProfileData {
     @ApiProperty()
@@ -11,6 +12,8 @@ export class UpdateProfileData {
         coverPhotoIndex?: number
     @ApiProperty()
         birthdate?: Date
+    @ApiProperty()
+        walletAddress?: Address
 }
 export class UpdateProfileInput implements AuthInput<UpdateProfileData> {
     @IsUUID("4")
@@ -19,3 +22,12 @@ export class UpdateProfileInput implements AuthInput<UpdateProfileData> {
     files: Array<Express.Multer.File>
 }
 
+export class WithdrawData {
+    @ApiProperty()
+        withdrawAmount?: number
+}
+export class WithdrawInput implements AuthInput<WithdrawData> {
+    @IsUUID("4")
+    	accountId: string
+    data: WithdrawData
+}

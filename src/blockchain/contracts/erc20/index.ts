@@ -7,7 +7,8 @@ import { getHttpProvider } from "../../providers"
 export class ERC20Contract {
     private web3: Web3
     contract: Contract<typeof abi>
-    private sender?: Address
+    sender?: Address
+    address: Address
 
     constructor(
         chainId: ChainId,
@@ -16,8 +17,9 @@ export class ERC20Contract {
         sender?: string
     ) {
         if (!provider) provider = getHttpProvider(chainId)
+        this.address = address
         this.web3 = new Web3(provider)
-        this.contract = new this.web3.eth.Contract(abi, address, this.web3)
+        this.contract = new this.web3.eth.Contract(abi, this.address, this.web3)
 
         this.sender = sender
     }
@@ -80,16 +82,11 @@ export class ERC20Contract {
         }
     }
 
-    async transfer(recipient: Address, amount: bigint) {
-        try {
-            return this.contract.methods.transfer(recipient, amount).send({
-                from: this.sender,
-                gas: GAS_LIMIT,
-                gasPrice: GAS_PRICE,
-            })
-        } catch (ex) {
-            console.log(ex)
-            return null
+    transfer(recipient: Address, amount: bigint) {
+        return {
+            encodeABI: () => {
+                return this.contract.methods.transfer(recipient, amount).encodeABI()
+            } 
         }
     }
 }

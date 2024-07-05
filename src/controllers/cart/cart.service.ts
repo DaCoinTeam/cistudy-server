@@ -1,9 +1,9 @@
-import { CartMySqlEntity, CartCourseMySqlEntity, CourseMySqlEntity, OrderMySqlEntity, OrderCourseMySqlEntity, AccountMySqlEntity } from "@database";
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { DataSource, In, Repository } from "typeorm";
-import { AddToCartInput, CheckOutInput, DeleteFromCartInput } from "./cart.input";
-import { AddToCartOutput, CheckOutOutput, DeleteFromCartOutput } from "./cart.output";
+import { CartMySqlEntity, CartCourseMySqlEntity, CourseMySqlEntity, OrderMySqlEntity, OrderCourseMySqlEntity, AccountMySqlEntity } from "@database"
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
+import { InjectRepository } from "@nestjs/typeorm"
+import { DataSource, In, Repository } from "typeorm"
+import { AddToCartInput, CheckOutInput, DeleteFromCartInput } from "./cart.input"
+import { AddToCartOutput, CheckOutOutput, DeleteFromCartOutput } from "./cart.output"
 
 @Injectable()
 export class CartService {
@@ -25,7 +25,7 @@ export class CartService {
 
 
     async addToCart(input: AddToCartInput): Promise<AddToCartOutput> {
-        const { data, accountId } = input;
+        const { data, accountId } = input
         const { courseId } = data
         console.log("accountId là : " + accountId)
         let accountCart = await this.cartMySqlRepository.findOne({ where: { cartId: accountId } })
@@ -51,11 +51,11 @@ export class CartService {
             others: {
                 cartCourseId
             }
-        };
+        }
     }
 
     async deleteFromCart(input: DeleteFromCartInput): Promise<DeleteFromCartOutput> {
-        const { accountId, data } = input;
+        const { accountId, data } = input
         const { cartCourseIds } = data
 
         const accountCart = await this.cartMySqlRepository.findOne({
@@ -84,7 +84,7 @@ export class CartService {
         try {
             const now = new Date()
             const paymentDue = new Date(now)
-            paymentDue.setDate(paymentDue.getDate() + 1);
+            paymentDue.setDate(paymentDue.getDate() + 1)
 
             const order = await queryRunner.manager.save(OrderMySqlEntity, {
                 accountId,
@@ -100,8 +100,8 @@ export class CartService {
                 }
             })
 
-            const orderCourses = [];
-            const deleteCartCourses = [];
+            const orderCourses = []
+            const deleteCartCourses = []
 
             for (const course of cartCourses) {
                 orderCourses.push({
@@ -109,9 +109,9 @@ export class CartService {
                     orderId: order.orderId,
                     discountedPrice: course.course.discountPrice,
                     price: course.course.price,
-                });
+                })
 
-                deleteCartCourses.push({ cartCourseId: course.cartCourseId });
+                deleteCartCourses.push({ cartCourseId: course.cartCourseId })
             }
 
             await queryRunner.manager.save(OrderCourseMySqlEntity, orderCourses)

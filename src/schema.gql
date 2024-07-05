@@ -319,8 +319,8 @@ type PostEntity {
   title: String!
   creatorId: ID!
   courseId: ID!
-  allowComments: Boolean!
-  isRewarded: Boolean!
+  isCompleted: Boolean!
+  isRewardable: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   html: String!
@@ -376,7 +376,7 @@ type PostCommentEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   html: String!
-  isRewarded: Boolean!
+  isSolution: Boolean!
   post: PostEntity!
   creator: AccountEntity!
   postCommentMedias: [PostCommentMediaEntity!]!
@@ -385,6 +385,7 @@ type PostCommentEntity {
   numberOfReplies: Int
   liked: Boolean
   isOwner: Boolean
+  isRewardable: Boolean
 }
 
 type FollowEntity {

@@ -1,10 +1,10 @@
 
-import { CartMySqlEntity, CartCourseMySqlEntity, OrderMySqlEntity } from "@database";
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { DataSource, Repository } from "typeorm";
-import { FindManyAccountOrdersInput, FindOneCartInput, FindOneOrderInput } from "./cart.input";
-import { FindManyAccountOrdersOutputData } from "./cart.output";
+import { CartMySqlEntity, CartCourseMySqlEntity, OrderMySqlEntity } from "@database"
+import { Injectable } from "@nestjs/common"
+import { InjectRepository } from "@nestjs/typeorm"
+import { DataSource, Repository } from "typeorm"
+import { FindManyAccountOrdersInput, FindOneCartInput, FindOneOrderInput } from "./cart.input"
+import { FindManyAccountOrdersOutputData } from "./cart.output"
 
 
 @Injectable()
@@ -32,7 +32,7 @@ export class CartService {
                     cart: true
                 }
             }
-        });
+        })
 
         return cart
     }

@@ -3,8 +3,7 @@ import { Injectable } from "@nestjs/common"
 import { Repository, DataSource } from "typeorm"
 import {
     FindManyEnrolledCoursesInput,
-    FindManySelfCreatedCoursesInput,
-    GenerateReportInput,
+    FindManySelfCreatedCoursesInput
 } from "./profile.input"
 import { InjectRepository } from "@nestjs/typeorm"
 import { FindManyEnrolledCoursesOutputData, FindManySelfCreatedCoursesOutputData } from "./profile.output"
@@ -62,13 +61,13 @@ export class ProfileService {
     }
     
     async findManyEnrolledCourses(input: FindManyEnrolledCoursesInput): Promise<FindManyEnrolledCoursesOutputData> {
-        const { data, accountId } = input;
-        const { options } = data;
-        const { take, skip } = { ...options };
+        const { data, accountId } = input
+        const { options } = data
+        const { take, skip } = { ...options }
     
-        const queryRunner = this.dataSource.createQueryRunner();
-        await queryRunner.connect();
-        await queryRunner.startTransaction();
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
     
         try {
             const courses = await this.courseMySqlRepository.find({
@@ -87,7 +86,7 @@ export class ProfileService {
                         enrolled: true
                     }
                 }
-            });
+            })
     
             const numberOfFollowersResults = await queryRunner.manager
                 .createQueryBuilder()
@@ -98,7 +97,7 @@ export class ProfileService {
                 .innerJoin(FollowMySqlEnitity, "follow", "account.accountId = follow.followerId")
                 .where("followed = :followed", { followed: true })
                 .groupBy("course.courseId")
-                .getRawMany();
+                .getRawMany()
     
             const numberOfEnrolledCoursesResult = await queryRunner.manager
                 .createQueryBuilder()
@@ -107,7 +106,7 @@ export class ProfileService {
                 .innerJoin(EnrolledInfoMySqlEntity, "enrolledInfo", "course.courseId = enrolledInfo.courseId")
                 .where("enrolledInfo.accountId = :accountId", { accountId })
                 .andWhere("enrolledInfo.enrolled = :enrolled", { enrolled: true })
-                .getRawOne();
+                .getRawOne()
     
             const progressResults = await queryRunner.manager
                 .createQueryBuilder()
@@ -122,7 +121,7 @@ export class ProfileService {
                 .where("enrolledInfo.accountId = :accountId", { accountId })
                 .andWhere("progress.isCompleted = :isCompleted", { isCompleted: true })
                 .groupBy("course.courseId")
-                .getRawMany();
+                .getRawMany()
 
             const numberOfRewardedPosts = await this.postMySqlRepository.find({
                 where:{
@@ -133,39 +132,39 @@ export class ProfileService {
                 }
             })
 
-            const numberOfRewardedPostsLeft = 3 - Math.min(numberOfRewardedPosts.length, 3);
+            const numberOfRewardedPostsLeft = 3 - Math.min(numberOfRewardedPosts.length, 3)
 
-            await queryRunner.commitTransaction();
+            await queryRunner.commitTransaction()
             return {
                 results: courses.map(course => {
                     const numberOfFollowers = numberOfFollowersResults.find(
                         result => result.courseId === course.courseId,
-                    )?.count ?? 0;
+                    )?.count ?? 0
     
                     const courseProgress = progressResults.find(
                         result => result.courseId === course.courseId
-                    );
+                    )
     
-                    const totalLessons = course.sections.reduce((acc, section) => acc + section.lessons.length, 0);
-                    const completedLessons = courseProgress?.completedLessons ?? 0;
-                    const progress = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
+                    const totalLessons = course.sections.reduce((acc, section) => acc + section.lessons.length, 0)
+                    const completedLessons = courseProgress?.completedLessons ?? 0
+                    const progress = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0
     
-                    course.creator.numberOfFollowers = numberOfFollowers;
-                    course.courseProgress = progress;
+                    course.creator.numberOfFollowers = numberOfFollowers
+                    course.courseProgress = progress
                     course.numberOfRewardedPostsLeft = numberOfRewardedPostsLeft
                     
-                    return course;
+                    return course
                 }),
                 metadata: {
                     count: numberOfEnrolledCoursesResult.count
                 }
-            };
+            }
         } catch (ex) {
-            console.log(ex);
-            await queryRunner.rollbackTransaction();
-            throw ex;
+            console.log(ex)
+            await queryRunner.rollbackTransaction()
+            throw ex
         } finally {
-            await queryRunner.release();
+            await queryRunner.release()
         }
     }
     

@@ -50,7 +50,7 @@ export class SignUpInput implements Input<SignUpData> {
 
 export class VerifyRegistrationInputData{
     @ApiProperty()
-    token : string
+        token : string
 }
 
 export class VerifyRegistrationInput implements AuthInput<VerifyRegistrationInputData> {
