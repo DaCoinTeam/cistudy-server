@@ -751,13 +751,13 @@ export class PostsService {
                 throw new NotFoundException("Post comment not found")
             }
 
-            const post = await this.postMySqlRepository.findOneBy({ postId: postComment.postId })
+            const {creatorId, isRewardable, courseId, postId} = await this.postMySqlRepository.findOneBy({ postId: postComment.postId })
 
-            if (post.creatorId !== accountId) {
+            if (creatorId !== accountId) {
                 throw new ConflictException("You aren't the creator of the post.")
             }
 
-            if (postComment.creatorId == post.creatorId) {
+            if (postComment.creatorId == creatorId) {
                 throw new ConflictException("You can't mark your comment as a solution.")
             }
 
@@ -773,11 +773,11 @@ export class PostsService {
 
             await this.postCommentMySqlRepository.update(postCommentId, { isSolution: true })
 
-            if (post.isRewardable) {
+            if (isRewardable) {
                 const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOne({
                     where: {
                         accountId: postComment.creatorId,
-                        courseId: post.courseId
+                        courseId
                     }
                 })
                 
@@ -785,7 +785,7 @@ export class PostsService {
                 await this.accountMySqlRepository.increment({ accountId: postComment.creatorId }, "balance", earnAmount)
             }
 
-            await this.postMySqlRepository.update(post, { isCompleted: true })
+            await this.postMySqlRepository.update(postId, { isCompleted: true })
 
             return {
                 message: `Comment of user ${postComment.creatorId} has been marked as a solution and no more comments are allowed to this post`

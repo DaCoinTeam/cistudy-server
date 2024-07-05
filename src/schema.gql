@@ -330,6 +330,7 @@ type PostEntity {
   postReacts: [PostLikeEntity!]!
   postReports: [ReportPostEntity!]!
   liked: Boolean
+  isOwner: Boolean
   numberOfLikes: Int
   numberOfComments: Int
   numberOfRewardedLikesLeft: Int
