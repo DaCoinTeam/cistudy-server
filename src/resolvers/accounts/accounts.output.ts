@@ -55,25 +55,26 @@ export class FindManyAccountReviewsOutput implements AuthOutput<FindManyAccountR
 }
 
 @ObjectType()
-export class FindManyReportOutputMetadata {
+export class FindManyReportsOutputMetadata {
     @Field(() => Int, { nullable: true })
         count?: number
 }
 
 @ObjectType()
-export class FindManyReportOutputData
-implements ResultsWithMetadata<ReportModel, FindManyReportOutputMetadata>
+export class FindManyReportsOutputData
+implements ResultsWithMetadata<ReportModel, FindManyReportsOutputMetadata>
 {
     @Field(() => [ReportModel])
         results: Array<ReportModel>
-    @Field(() => FindManyReportOutputMetadata, { nullable: true })
-        metadata: FindManyReportOutputMetadata
+    @Field(() => FindManyReportsOutputMetadata, { nullable: true })
+        metadata: FindManyReportsOutputMetadata
 }
 
 @ObjectType()
-export class FindManyReportOutput implements AuthOutput<FindManyReportOutputData> {
-    @Field(() => FindManyReportOutputData)
-        data: FindManyReportOutputData
+export class FindManyReportOutput implements AuthOutput<FindManyReportsOutputData> {
+    @Field(() => FindManyReportsOutputData)
+        data: FindManyReportsOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }
+

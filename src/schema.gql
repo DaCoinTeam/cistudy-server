@@ -326,7 +326,7 @@ type PostEntity {
   html: String!
   creator: AccountEntity!
   postMedias: [PostMediaEntity!]!
-  postComments: [PostCommentEntity!]!
+  postComments: [PostCommentEntity!]
   postReacts: [PostLikeEntity!]!
   postReports: [ReportPostEntity!]!
   liked: Boolean
@@ -634,13 +634,13 @@ type FindManyAccountReviewsOutputData {
   metadata: FindManyAccountReviewsOutputMetadata
 }
 
-type FindManyReportOutputMetadata {
+type FindManyReportsOutputMetadata {
   count: Int
 }
 
-type FindManyReportOutputData {
+type FindManyReportsOutputData {
   results: [ReportModel!]!
-  metadata: FindManyReportOutputMetadata
+  metadata: FindManyReportsOutputMetadata
 }
 
 type FindManySelfCreatedCoursesOutputMetadata {
@@ -744,7 +744,7 @@ type Query {
   findManyFollowers(data: FindManyFollowersInputData!): [AccountEntity!]!
   findManyAccounts(data: FindManyAccountsInputData!): FindManyAccountsOutput!
   findManyAccountReviews(data: FindManyAccountReviewsInputData!): FindManyAccountReviewsOutputData!
-  findManyReports(data: FindManyReportsInputData!): FindManyReportOutputData!
+  findManyReports(data: FindManyReportsInputData!): FindManyReportsOutputData!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!

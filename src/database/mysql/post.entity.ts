@@ -70,7 +70,7 @@ export class PostEntity {
     })
         postMedias: Array<PostMediaEntity>
 
-    @Field(() => [PostCommentEntity])
+    @Field(() => [PostCommentEntity], {nullable: true})
     @OneToMany(() => PostCommentEntity, (postComment) => postComment.post)
         postComments: Array<PostCommentEntity>
 
