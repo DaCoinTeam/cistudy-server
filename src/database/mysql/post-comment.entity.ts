@@ -93,7 +93,7 @@ export class PostCommentEntity {
     @Field(() => Boolean, { nullable: true })
         liked?: boolean
     @Field(() => Boolean, { nullable: true })
-        isOwner?: boolean
+        isCommentOwner?: boolean
     @Field(() => Boolean, { nullable: true })
         isRewardable?: boolean
 }

@@ -87,7 +87,7 @@ export class PostEntity {
     @Field(() => Boolean, { nullable: true })
         liked?: boolean
     @Field(() => Boolean, { nullable: true })
-        isOwner?: boolean
+        isPostOwner?: boolean
     @Field(() => Int, { nullable: true })
         numberOfLikes?: number
     @Field(() => Int, { nullable: true })

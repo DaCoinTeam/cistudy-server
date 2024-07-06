@@ -331,7 +331,7 @@ type PostEntity {
   postReacts: [PostLikeEntity!]!
   postReports: [ReportPostEntity!]!
   liked: Boolean
-  isOwner: Boolean
+  isPostOwner: Boolean
   numberOfLikes: Int
   numberOfComments: Int
   numberOfRewardedLikesLeft: Int
@@ -386,7 +386,7 @@ type PostCommentEntity {
   numberOfLikes: Int
   numberOfReplies: Int
   liked: Boolean
-  isOwner: Boolean
+  isCommentOwner: Boolean
   isRewardable: Boolean
 }
 

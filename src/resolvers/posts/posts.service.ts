@@ -97,7 +97,7 @@ export class PostsService {
                 const rewardedCommentsCount = uniqueRewardedCommentors.size
                 numberOfRewardedCommentsLeft = Math.max(20 - rewardedCommentsCount, 0)
             }
-            
+
             const liked = await this.postLikeMySqlRepository.findOne({
                 where:{
                     postId,
@@ -112,6 +112,7 @@ export class PostsService {
             post.numberOfRewardedLikesLeft = numberOfRewardedLikesLeft
             post.numberOfRewardedCommentsLeft = numberOfRewardedCommentsLeft
             post.liked = liked ? true : false
+            post.isPostOwner = (accountId === post.creatorId)
 
             return {
                 data: post,
@@ -211,7 +212,7 @@ export class PostsService {
                 const numberOfLikes = numberOfLikesResults.find(result => result.postId === post.postId)?.count ?? 0
                 const numberOfComments = numberOfCommentsResults.find(result => result.postId === post.postId)?.count ?? 0
                 const liked = likedResults.some(result => result.postId === post.postId)
-                const isOwner = (post.creatorId === accountId)
+                const isPostOwner = (post.creatorId === accountId)
 
                 let numberOfRewardedLikesLeft: number
                 let numberOfRewardedCommentsLeft: number
@@ -242,7 +243,7 @@ export class PostsService {
                 return {
                     ...post,
                     liked,
-                    isOwner,
+                    isPostOwner,
                     numberOfLikes,
                     numberOfComments,
                     numberOfRewardedLikesLeft,
@@ -366,7 +367,7 @@ export class PostsService {
                 const liked = likedResults.find(
                     result => result.postCommentId === postComment.postCommentId,
                 )?.liked ?? false
-                const isOwner = (postComment.creatorId === accountId)
+                const isCommentOwner = (postComment.creatorId === accountId)
                 const isSolution = postComment.isSolution === true
                 const isRewardable = uniqueRewardedComments.some(
                     comment => comment.postCommentId === postComment.postCommentId
@@ -377,7 +378,7 @@ export class PostsService {
                     numberOfLikes,
                     numberOfReplies,
                     liked,
-                    isOwner,
+                    isCommentOwner,
                     isSolution,
                     isRewardable
                 }
