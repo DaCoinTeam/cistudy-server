@@ -187,14 +187,16 @@ export class CoursesService {
 
             const price = computeRaw(enableDiscount ? discountPrice : coursePrice)
             const minimumBalanceRequired = computeDenomination(price)
+            const courseCreatorShares = computeDenomination(price / BigInt(2))
+            
             const { balance } = await this.accountMySqlRepository.findOneBy({ accountId })
 
             if (balance < minimumBalanceRequired) {
                 throw new ConflictException("Your account does not have sufficient balance to enroll in this course.")
             }
-            //const courseCreatorShares = 
+
             await this.accountMySqlRepository.update(accountId, {balance : balance - minimumBalanceRequired})
-            await this.accountMySqlRepository.update({accountId : creatorId}, {balance : balance - minimumBalanceRequired})
+            await this.accountMySqlRepository.increment({accountId : creatorId}, "balance", courseCreatorShares)
 
             const enrollDate = new Date()
             const endDate = new Date(enrollDate)
@@ -1568,7 +1570,8 @@ export class CoursesService {
                 price: coursePrice,
                 duration,
                 sections,
-                title
+                title,
+                creatorId
             } = await this.courseMySqlRepository.findOne({
                 where: {
                     courseId,
@@ -1579,16 +1582,18 @@ export class CoursesService {
                     },
                 },
             })
+            const { balance } = await this.accountMySqlRepository.findOneBy({ accountId })
 
             const price = computeRaw(enableDiscount ? discountPrice : coursePrice)
             const minimumBalanceRequired = computeDenomination(price)
-            const { balance } = await this.accountMySqlRepository.findOneBy({ accountId })
-
+            const courseCreatorShares = computeDenomination(price / BigInt(2))
+            
             if (balance < minimumBalanceRequired) {
                 throw new ConflictException("Your account does not have sufficient balance to gift this course.")
             }
 
             await this.accountMySqlRepository.update(accountId, {balance : balance - minimumBalanceRequired})
+            await this.accountMySqlRepository.increment({accountId : creatorId}, "balance", courseCreatorShares)
 
             const enrollDate = new Date()
             const endDate = new Date(enrollDate)

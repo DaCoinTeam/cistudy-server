@@ -767,7 +767,7 @@ export class PostsService {
                 }
             })
 
-            if (hasRewardedComment.some(accountComment => accountComment.isSolution == true)) {
+            if (hasRewardedComment.some(accountComment => accountComment.isSolution === true)) {
                 throw new ConflictException("There's already exist a solution comment")
             }
 
