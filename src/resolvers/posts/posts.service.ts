@@ -43,7 +43,7 @@ export class PostsService {
         await queryRunner.startTransaction()
 
         try {
-            const post = await queryRunner.manager.findOne(PostMySqlEntity, {
+            const post = await this.postMySqlRepository.findOne({
                 where: {
                     postId
                 },
@@ -58,7 +58,7 @@ export class PostsService {
                     postMedias: true,
                 },
             })
-
+            console.log(post)
             const numberOfLikes = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
@@ -97,13 +97,21 @@ export class PostsService {
                 const rewardedCommentsCount = uniqueRewardedCommentors.size
                 numberOfRewardedCommentsLeft = Math.max(20 - rewardedCommentsCount, 0)
             }
+            
+            const liked = await this.postLikeMySqlRepository.findOne({
+                where:{
+                    postId,
+                    accountId
+                }
+            })
+
             await queryRunner.commitTransaction()
 
             post.numberOfLikes = numberOfLikes.count
             post.numberOfComments = numberOfComments.count
             post.numberOfRewardedLikesLeft = numberOfRewardedLikesLeft
             post.numberOfRewardedCommentsLeft = numberOfRewardedCommentsLeft
-            post.liked = (accountId === post.creatorId)
+            post.liked = liked ? true : false
 
             return {
                 data: post,
