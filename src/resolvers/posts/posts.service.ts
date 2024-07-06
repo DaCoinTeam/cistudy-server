@@ -214,8 +214,8 @@ export class PostsService {
                 const liked = likedResults.some(result => result.postId === post.postId)
                 const isPostOwner = (post.creatorId === accountId)
 
-                let numberOfRewardedLikesLeft: number
-                let numberOfRewardedCommentsLeft: number
+                let numberOfRewardableLikesLeft: number
+                let numberOfRewardableCommentsLeft: number
 
                 if (post.isRewardable) {
                     const rewardedLikes = await queryRunner.manager
@@ -226,7 +226,7 @@ export class PostsService {
                         .getMany()
 
                     const rewardedLikesCount = rewardedLikes.length
-                    numberOfRewardedLikesLeft = Math.max(20 - rewardedLikesCount, 0)
+                    numberOfRewardableLikesLeft = Math.max(20 - rewardedLikesCount, 0)
 
                     const rewardedComments = await queryRunner.manager
                         .createQueryBuilder(PostCommentMySqlEntity, "post_comment")
@@ -237,7 +237,7 @@ export class PostsService {
 
                     const uniqueRewardedCommentors = new Set(rewardedComments.map(comment => comment.creatorId))
                     const rewardedCommentsCount = uniqueRewardedCommentors.size
-                    numberOfRewardedCommentsLeft = Math.max(20 - rewardedCommentsCount, 0)
+                    numberOfRewardableCommentsLeft = Math.max(20 - rewardedCommentsCount, 0)
                 }
 
                 return {
@@ -246,8 +246,8 @@ export class PostsService {
                     isPostOwner,
                     numberOfLikes,
                     numberOfComments,
-                    numberOfRewardedLikesLeft,
-                    numberOfRewardedCommentsLeft,
+                    numberOfRewardableLikesLeft,
+                    numberOfRewardableCommentsLeft,
                 }
             }))
 
