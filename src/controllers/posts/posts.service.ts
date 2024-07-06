@@ -532,7 +532,7 @@ export class PostsService {
         await queryRunner.startTransaction()
 
         try {
-            const postComment = await this.postCommentMySqlRepository.findOne({
+            const accountPostComment = await this.postCommentMySqlRepository.findOne({
                 where: {
                     postCommentId
                 },
@@ -541,15 +541,15 @@ export class PostsService {
                 }
             })
 
-            if(!postComment){
+            if(!accountPostComment){
                 throw new NotFoundException("Post comment not found or has been deleted.")
             }
 
-            if(postComment.creatorId !== accountId){
+            if(accountPostComment.creatorId !== accountId){
                 throw new ConflictException("You are not the owner of this comment.")
             }
 
-            if(postComment.post.isCompleted){
+            if(accountPostComment.post.isCompleted){
                 throw new ConflictException("This post is closed.")
             }
 
