@@ -72,8 +72,8 @@ export class PostsService {
                 .where("post_comment.postId = :postId", { postId })
                 .getRawOne()
 
-            let numberOfRewardedLikesLeft: number
-            let numberOfRewardedCommentsLeft: number
+            let numberOfRewardableLikesLeft: number
+            let numberOfRewardableCommentsLeft: number
 
             if (post.isRewardable) {
                 const rewardedLikes = await queryRunner.manager
@@ -84,7 +84,7 @@ export class PostsService {
                     .getMany()
 
                 const rewardedLikesCount = rewardedLikes.length
-                numberOfRewardedLikesLeft = Math.max(20 - rewardedLikesCount, 0)
+                numberOfRewardableLikesLeft = Math.max(20 - rewardedLikesCount, 0)
 
                 const rewardedComments = await queryRunner.manager
                     .createQueryBuilder(PostCommentMySqlEntity, "post_comment")
@@ -95,7 +95,7 @@ export class PostsService {
 
                 const uniqueRewardedCommentors = new Set(rewardedComments.map(comment => comment.creatorId))
                 const rewardedCommentsCount = uniqueRewardedCommentors.size
-                numberOfRewardedCommentsLeft = Math.max(20 - rewardedCommentsCount, 0)
+                numberOfRewardableCommentsLeft = Math.max(20 - rewardedCommentsCount, 0)
             }
 
             const liked = await this.postLikeMySqlRepository.findOne({
@@ -109,8 +109,8 @@ export class PostsService {
 
             post.numberOfLikes = numberOfLikes.count
             post.numberOfComments = numberOfComments.count
-            post.numberOfRewardedLikesLeft = numberOfRewardedLikesLeft
-            post.numberOfRewardedCommentsLeft = numberOfRewardedCommentsLeft
+            post.numberOfRewardableLikesLeft = numberOfRewardableLikesLeft
+            post.numberOfRewardableCommentsLeft = numberOfRewardableCommentsLeft
             post.liked = liked ? true : false
             post.isPostOwner = (accountId === post.creatorId)
 

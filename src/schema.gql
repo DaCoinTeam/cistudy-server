@@ -334,8 +334,8 @@ type PostEntity {
   isPostOwner: Boolean
   numberOfLikes: Int
   numberOfComments: Int
-  numberOfRewardedLikesLeft: Int
-  numberOfRewardedCommentsLeft: Int
+  numberOfRewardableLikesLeft: Int
+  numberOfRewardableCommentsLeft: Int
 }
 
 type PostCommentMediaEntity {

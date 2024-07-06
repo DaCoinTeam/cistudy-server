@@ -93,7 +93,7 @@ export class PostEntity {
     @Field(() => Int, { nullable: true })
         numberOfComments?: number
     @Field(() => Int, { nullable: true })
-        numberOfRewardedLikesLeft?: number
+        numberOfRewardableLikesLeft?: number
     @Field(() => Int, { nullable: true })
-        numberOfRewardedCommentsLeft?: number
+        numberOfRewardableCommentsLeft?: number
 }
