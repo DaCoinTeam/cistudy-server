@@ -243,11 +243,14 @@ export class CoursesService {
             creatorId: accountId,
         })
 
-        if (created)
-            return {
-                message: "Course " + created.title + "created Successfully",
-                others: { courseId: created.courseId },
-            }
+        if (!created){
+            throw new ConflictException("Error whil creating new course")
+        }
+        
+        return {
+            message: "Course " + created.title + "created Successfully",
+            others: { courseId: created.courseId },
+        }
     }
 
     async updateCourse(input: UpdateCourseInput): Promise<UpdateCourseOutput> {
