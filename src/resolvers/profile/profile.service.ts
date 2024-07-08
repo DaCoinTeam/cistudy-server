@@ -168,5 +168,8 @@ export class ProfileService {
         }
     }
     
+    // async findManySentReports (input : FindManySentReportsInput) : Promise<FindManySentReportsOutput>{
+
+    // }
 
 }

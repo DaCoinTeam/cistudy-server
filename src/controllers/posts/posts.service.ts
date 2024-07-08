@@ -15,8 +15,6 @@ import {
     UpdatePostReportInput,
     CreatePostCommentReportInput,
     UpdatePostCommentReportInput,
-    ResolvePostReportInput,
-    ResolvePostCommentReportInput,
     MarkPostCommentAsSolutionInput
 } from "./posts.input"
 import {
@@ -44,8 +42,7 @@ import {
     DeletePostCommentOutput,
     DeletePostCommentReplyOutput,
     DeletePostOutput,
-    MarkPostCommentAsSolutionOutput, ResolvePostCommentReportOutput,
-    ResolvePostReportOutput,
+    MarkPostCommentAsSolutionOutput,
     ToggleCommentLikePostOutputData,
     ToggleLikePostOutputData,
     UpdatePostCommentOutput,
@@ -106,6 +103,7 @@ export class PostsService {
             html: html ? html : null,
             postMedias: [],
         }
+
         if (files) {
             const promises: Array<Promise<void>> = []
 
@@ -144,12 +142,10 @@ export class PostsService {
             post.isRewardable = true
             const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOneBy({ accountId, courseId })
 
-            console.log(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient)
-
             earnAmount = computeFixedFloor(
                 priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient
             )
-            console.log("Earn Amount: " + earnAmount ? earnAmount : null)
+
             await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
         }
 
@@ -218,8 +214,6 @@ export class PostsService {
             await Promise.all(promises)
         }
 
-
-
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
@@ -236,6 +230,7 @@ export class PostsService {
             const mediaIds = deletedPostMedias.map(
                 (deletedPostMedia) => deletedPostMedia.mediaId,
             )
+
             await this.storageService.delete(...mediaIds)
 
             return { message: "Post Updated Successfully" }
@@ -254,9 +249,11 @@ export class PostsService {
         await queryRunner.connect()
         await queryRunner.startTransaction()
         try {
+
             const deletedPostMedias = await this.postMediaMySqlRepository.findBy({
                 postId,
             })
+
             await this.postMySqlRepository.delete({ postId })
 
             await queryRunner.commitTransaction()
@@ -267,6 +264,7 @@ export class PostsService {
             await this.storageService.delete(...mediaIds)
 
             return { message: "Post Deleted Successfully" }
+
         } catch (ex) {
             await queryRunner.rollbackTransaction()
         } finally {
@@ -411,7 +409,6 @@ export class PostsService {
             await Promise.all(promises)
         }
 
-
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
@@ -498,35 +495,38 @@ export class PostsService {
     ): Promise<UpdatePostCommentOutput> {
         const { data, files, accountId } = input
         const { postCommentMedias, postCommentId, html } = data
+
         const postComment: DeepPartial<PostCommentMySqlEntity> = {
             postCommentId,
             html,
             postCommentMedias: [],
         }
 
-        const promises: Array<Promise<void>> = []
+        if(files){
+            const promises: Array<Promise<void>> = []
 
-        let mediaPosition = 0
-        for (const postCommentMedia of postCommentMedias) {
-            const { mediaIndex, mediaType } = postCommentMedia
-            const position = mediaPosition
-            const promise = async () => {
-                const file = files.at(mediaIndex)
-                const { assetId } = await this.storageService.upload({
-                    rootFile: file,
-                })
-                postComment.postCommentMedias.push({
-                    position,
-                    mediaId: assetId,
-                    mediaType,
-                } as PostCommentMediaMySqlEntity)
+            let mediaPosition = 0
+            for (const postCommentMedia of postCommentMedias) {
+                const { mediaIndex, mediaType } = postCommentMedia
+                const position = mediaPosition
+                const promise = async () => {
+                    const file = files.at(mediaIndex)
+                    const { assetId } = await this.storageService.upload({
+                        rootFile: file,
+                    })
+                    postComment.postCommentMedias.push({
+                        position,
+                        mediaId: assetId,
+                        mediaType,
+                    } as PostCommentMediaMySqlEntity)
+                }
+                mediaPosition++
+                promises.push(promise())
             }
-            mediaPosition++
-            promises.push(promise())
+
+            await Promise.all(promises)
         }
-
-        await Promise.all(promises)
-
+        
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
@@ -922,45 +922,4 @@ export class PostsService {
         }
     }
 
-    async resolvePostReport(input: ResolvePostReportInput): Promise<ResolvePostReportOutput> {
-        const { data } = input
-        const { reportPostId, processNote, processStatus } = data
-
-        const found = await this.reportPostMySqlRepository.findOneBy({ reportPostId })
-
-        if (!found) {
-            throw new NotFoundException("Report not found")
-        }
-
-        if(found.processStatus !== ReportProcessStatus.Processing){
-            throw new ConflictException("This report has already been resolved")
-        }
-
-        await this.reportPostMySqlRepository.update(reportPostId, { processStatus, processNote })
-
-        return {
-            message: "Report successfully resolved and closed."
-        }
-    }
-
-    async resolvePostCommentReport(input: ResolvePostCommentReportInput): Promise<ResolvePostCommentReportOutput> {
-        const { data } = input
-        const { reportPostCommentId, processNote, processStatus } = data
-
-        const found = await this.reportPostCommentMySqlRepository.findOneBy({ reportPostCommentId })
-
-        if (!found) {
-            throw new NotFoundException("Report not found")
-        }
-        
-        if(found.processStatus !== ReportProcessStatus.Processing){
-            throw new ConflictException("This report has already been resolved")
-        }
-
-        await this.reportPostCommentMySqlRepository.update(reportPostCommentId, { processStatus, processNote })
-
-        return {
-            message: "Report successfully resolved and closed."
-        }
-    }
 }

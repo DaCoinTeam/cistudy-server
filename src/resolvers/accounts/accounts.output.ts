@@ -71,7 +71,7 @@ implements ResultsWithMetadata<ReportModel, FindManyReportsOutputMetadata>
 }
 
 @ObjectType()
-export class FindManyReportOutput implements AuthOutput<FindManyReportsOutputData> {
+export class FindManyReportsOutput implements AuthOutput<FindManyReportsOutputData> {
     @Field(() => FindManyReportsOutputData)
         data: FindManyReportsOutputData
     @Field(() => AuthTokens, { nullable: true })

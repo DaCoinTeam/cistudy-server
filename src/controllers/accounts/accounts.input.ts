@@ -1,4 +1,4 @@
-import { AuthInput, ReportProcessStatus, SystemRoles, VerifyStatus } from "@common"
+import { AuthInput, ReportProcessStatus, ReportType, SystemRoles, VerifyStatus } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID, Max, Min, MinLength } from "class-validator"
 
@@ -183,10 +183,12 @@ export class UpdateAccountReportInput implements AuthInput<UpdateAccountReportIn
     data: UpdateAccountReportInputData
 }
 
-export class ResolveAccountReportInputData {
+export class ResolveReportInputData {
     @ApiProperty()
     @IsUUID("4")
-        reportAccountId : string
+        reportId : string
+    @ApiProperty()
+        type : ReportType
     @ApiProperty()
         processStatus : ReportProcessStatus
     @ApiProperty()
@@ -194,7 +196,7 @@ export class ResolveAccountReportInputData {
         processNote : string
 }
 
-export class ResolveAccountReportInput implements AuthInput<ResolveAccountReportInputData> {
+export class ResolveReportInput implements AuthInput<ResolveReportInputData> {
     accountId: string
-    data: ResolveAccountReportInputData
+    data: ResolveReportInputData
 }

@@ -645,6 +645,11 @@ type FindManyReportsOutputData {
   metadata: FindManyReportsOutputMetadata
 }
 
+type FindManyReportsOutput {
+  data: FindManyReportsOutputData!
+  tokens: AuthTokens
+}
+
 type FindManySelfCreatedCoursesOutputMetadata {
   count: Int
 }
@@ -746,7 +751,7 @@ type Query {
   findManyFollowers(data: FindManyFollowersInputData!): [AccountEntity!]!
   findManyAccounts(data: FindManyAccountsInputData!): FindManyAccountsOutput!
   findManyAccountReviews(data: FindManyAccountReviewsInputData!): FindManyAccountReviewsOutputData!
-  findManyReports(data: FindManyReportsInputData!): FindManyReportsOutputData!
+  findManyReports(data: FindManyReportsInputData!): FindManyReportsOutput!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!

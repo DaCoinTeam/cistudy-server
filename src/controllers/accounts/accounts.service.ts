@@ -1,11 +1,41 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, In, Repository } from "typeorm"
-import { CreateAccountReviewInput, DeleteCourseInput, DeleteAccountReviewInput, ToggleFollowInput, UpdateAccountReviewInput, VerifyCourseInput, ToggleRoleInput, CreateAccountRoleInput, UpdateAccountRoleInput, CreateAccountReportInput, UpdateAccountReportInput, ResolveAccountReportInput } from "./accounts.input"
-import { AccountMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, AccountReviewMySqlEntity, RoleMySqlEntity, ReportAccountMySqlEntity } from "@database"
-import { CreateAccountReportOutput, CreateAccountReviewOutput, CreateAccountRoleOutput, ResolveAccountReportOutput, ToggleRoleOutput, UpdateAccountReportOutput, UpdateAccountRoleOutput, VerifyCourseOuput } from "./accounts.output"
+import { CreateAccountReviewInput, 
+    DeleteCourseInput, 
+    DeleteAccountReviewInput, 
+    ToggleFollowInput, 
+    UpdateAccountReviewInput, 
+    VerifyCourseInput, 
+    ToggleRoleInput, 
+    CreateAccountRoleInput, 
+    UpdateAccountRoleInput, 
+    CreateAccountReportInput, 
+    UpdateAccountReportInput, 
+    ResolveReportInput 
+} from "./accounts.input"
+import { AccountMySqlEntity, 
+    CourseMySqlEntity, 
+    EnrolledInfoMySqlEntity, 
+    FollowMySqlEnitity, 
+    AccountReviewMySqlEntity, 
+    RoleMySqlEntity, 
+    ReportAccountMySqlEntity, 
+    ReportCourseMySqlEntity,
+    ReportPostMySqlEntity,
+    ReportPostCommentMySqlEntity
+} from "@database"
+import { CreateAccountReportOutput, 
+    CreateAccountReviewOutput, 
+    CreateAccountRoleOutput, 
+    ResolveReportOutput, 
+    ToggleRoleOutput, 
+    UpdateAccountReportOutput, 
+    UpdateAccountRoleOutput, 
+    VerifyCourseOuput 
+} from "./accounts.output"
 import { JwtService } from "@nestjs/jwt"
-import { ReportProcessStatus, SystemRoles } from "@common"
+import { ReportProcessStatus, ReportType, SystemRoles } from "@common"
 
 @Injectable()
 export class AccountsService {
@@ -22,6 +52,12 @@ export class AccountsService {
         private readonly roleMySqlRepository: Repository<RoleMySqlEntity>,
         @InjectRepository(ReportAccountMySqlEntity)
         private readonly reportAccountMySqlRepository: Repository<ReportAccountMySqlEntity>,
+        @InjectRepository(ReportCourseMySqlEntity)
+        private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
+        @InjectRepository(ReportPostMySqlEntity)
+        private readonly reportPostMySqlRepository: Repository<ReportPostMySqlEntity>,
+        @InjectRepository(ReportPostCommentMySqlEntity)
+        private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
         private readonly dataSource: DataSource,
         private readonly jwtService: JwtService
     ) { }
@@ -303,7 +339,7 @@ export class AccountsService {
             throw new NotFoundException("This account doesn't have any roles.")
         }
 
-        const queryRunner = this.roleMySqlRepository.manager.connection.createQueryRunner()
+        const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
 
@@ -420,24 +456,65 @@ export class AccountsService {
         }
     }
 
-    async resolveAccountReport(input: ResolveAccountReportInput): Promise<ResolveAccountReportOutput> {
+    async resolveReport(input: ResolveReportInput): Promise<ResolveReportOutput> {
         const { data } = input
-        const { reportAccountId, processNote, processStatus } = data
-
-        const found = await this.reportAccountMySqlRepository.findOneBy({ reportAccountId })
-
-        if (!found) {
-            throw new NotFoundException("Report not found")
-        }
-
-        if (found.processStatus !== ReportProcessStatus.Processing) {
-            throw new ConflictException("This report has already been resolved")
-        }
-
-        await this.reportAccountMySqlRepository.update(reportAccountId, { processStatus, processNote })
-
-        return {
-            message: "Report successfully resolved and closed."
+        const { reportId, type, processNote, processStatus } = data
+    
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+    
+        try {
+            let repository
+            let reportIdentifier
+    
+            switch (type) {
+            case ReportType.Account:
+                repository = this.reportAccountMySqlRepository
+                reportIdentifier = { reportAccountId: reportId }
+                break
+            case ReportType.Course:
+                repository = this.reportCourseMySqlRepository
+                reportIdentifier = { reportCourseId: reportId }
+                break
+            case ReportType.Post:
+                repository = this.reportPostMySqlRepository
+                reportIdentifier = { reportPostId: reportId }
+                break
+            case ReportType.PostComment:
+                repository = this.reportPostCommentMySqlRepository
+                reportIdentifier = { reportPostCommentId: reportId }
+                break
+            default:
+                throw new BadRequestException("Invalid report type")
+            }
+    
+            const found = await repository.findOneBy(reportIdentifier)
+    
+            if (!found) {
+                throw new NotFoundException("Report not found")
+            }
+    
+            if (found.processStatus !== ReportProcessStatus.Processing) {
+                throw new ConflictException("This report has already been resolved")
+            }
+    
+            await repository.update(reportIdentifier, { processStatus, processNote })
+    
+            await queryRunner.commitTransaction()
+    
+            return {
+                message: "Report resolved successfully.",
+            }
+        } catch (error) {
+            // Rollback transaction on error
+            await queryRunner.rollbackTransaction()
+            throw error
+        } finally {
+            // Release query runner
+            await queryRunner.release()
         }
     }
+    
+
 }

@@ -60,6 +60,6 @@ export class UpdateAccountReportOutput implements Output<UpdateAccountReportOutp
     others?: UpdateAccountReportOutputOthers
 }
 
-export class ResolveAccountReportOutput implements Output{
+export class ResolveReportOutput implements Output{
     message: string   
 }

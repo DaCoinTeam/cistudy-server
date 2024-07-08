@@ -20,6 +20,9 @@ import {
     AccountReviewMySqlEntity,
     RoleMySqlEntity,
     ReportAccountMySqlEntity,
+    ReportCourseMySqlEntity,
+    ReportPostMySqlEntity,
+    ReportPostCommentMySqlEntity,
 
 } from "@database"
 import { AccountsService } from "./accounts.service"
@@ -44,7 +47,10 @@ import { AccountsService } from "./accounts.service"
             QuizAttemptMySqlEntity,
             AccountReviewMySqlEntity,
             RoleMySqlEntity,
-            ReportAccountMySqlEntity
+            ReportAccountMySqlEntity,
+            ReportCourseMySqlEntity,
+            ReportPostMySqlEntity,
+            ReportPostCommentMySqlEntity
         ]),
     ],
     controllers: [AccountsController],
