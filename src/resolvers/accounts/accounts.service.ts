@@ -4,7 +4,7 @@ import { DataSource, Repository } from "typeorm"
 import { FindManyFollowersInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindOneAccountInput, FindManyReportsInput, FindOneReportInput } from "./accounts.input"
 import { InjectRepository } from "@nestjs/typeorm"
 import { FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyReportsOutputData } from "./accounts.output"
-import { ReportModel } from "src/database/abstract/report.abstract"
+import { ReportModel } from "src/database/dto/report.dto"
 import { ReportType } from "@common"
 
 @Injectable()

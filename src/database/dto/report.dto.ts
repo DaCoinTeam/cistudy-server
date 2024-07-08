@@ -1,25 +1,25 @@
-import { ReportProcessStatus, ReportType } from "@common";
-import { Field, ID, ObjectType } from "@nestjs/graphql";
+import { ReportProcessStatus, ReportType } from "@common"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 
 
 @ObjectType()
-export abstract class ReportModel {
+export class ReportModel {
     @Field(() => ID, { nullable: true })
-    reportId: string;
+        reportId: string
     @Field(() => String, { nullable: true })
-    type: ReportType;
+        type: ReportType
     @Field(() => ID, { nullable: true })
-    reporterAccountId: string;
+        reporterAccountId: string
     @Field(() => ID, { nullable: true })
-    reportContentId: string;
+        reportContentId: string
     @Field(() => String, { nullable: true })
-    description: string
+        description: string
     @Field(() => String, { nullable: true })
-    processStatus: ReportProcessStatus;
+        processStatus: ReportProcessStatus
     @Field(() => String, { nullable: true })
-    processNote: string
+        processNote: string
     @Field(() => Date, { nullable: true })
-    createdAt: Date
+        createdAt: Date
     @Field(() => Date, { nullable: true })
-    updatedAt: Date
+        updatedAt: Date
 }

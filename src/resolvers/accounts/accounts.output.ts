@@ -1,7 +1,7 @@
 import { AuthTokens, AuthOutput, ResultsWithMetadata } from "@common"
 import { AccountMySqlEntity, AccountReviewMySqlEntity } from "@database"
 import { ObjectType, Int, Field } from "@nestjs/graphql"
-import { ReportModel } from "src/database/abstract/report.abstract"
+import { ReportModel } from "src/database/dto/report.dto"
 
 
 

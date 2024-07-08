@@ -259,21 +259,6 @@ export class CoursesService {
                 switch (currentcategoryLevel) {
                 case 0: {
                     const { categoryId } = category
-
-                    // const level2Categories = await queryRunner.manager
-                    //     .createQueryBuilder(CategoryMySqlEntity, 'c2')
-                    //     .leftJoinAndSelect('c2.courseCategories', 'cc')
-                    //     .leftJoinAndSelect('cc.course', 'cou')
-                    //     .innerJoin(CourseMySqlEntity, "c", "c.courseId = cc.courseId")
-                    //     .innerJoin(CategoryRelationMySqlEntity, 'cr2', 'c2.categoryId = cr2.categoryId')
-                    //     .innerJoin(CategoryMySqlEntity, 'c1', 'cr2.categoryParentId = c1.categoryId')
-                    //     .innerJoin(CategoryRelationMySqlEntity, 'cr1', 'c1.categoryId = cr1.categoryId')
-                    //     .innerJoin(CategoryMySqlEntity, 'c0', 'cr1.categoryParentId = c0.categoryId')
-                    //     .where('c0.level = 0')
-                    //     .andWhere('c1.level = 1')
-                    //     .andWhere('c2.level = 2')
-                    //     .andWhere('c0.categoryId = :categoryId', { categoryId })
-                    //     .getMany();
                     const level0Category = await this.categoryMySqlRepository.findOne({
                         where: { categoryId },
                         relations: {
@@ -384,7 +369,19 @@ export class CoursesService {
             results.forEach(course => {
                 const reviews = coursesReviews.filter(review => review.courseId === course.courseId)
                 const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0)
+                const ratingCounts = [1, 2, 3, 4, 5].map(star => 
+                    reviews.filter(review => review.rating === star).length
+                )
                 course.courseRate = reviews.length ? totalRating / reviews.length : 0
+                
+                course.courseRatings = {
+                    overallCourseRating: course.courseRate,
+                    numberOf1StarRatings: ratingCounts[0],
+                    numberOf2StarRatings: ratingCounts[1],
+                    numberOf3StarRatings: ratingCounts[2],
+                    numberOf4StarRatings: ratingCounts[3],
+                    numberOf5StarRatings: ratingCounts[4],
+                }
             })
 
             const maxRate = Math.max(...results.map(course => course.courseRate))

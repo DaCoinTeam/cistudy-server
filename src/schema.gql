@@ -248,6 +248,15 @@ type ReportCourseEntity {
   reportedCourse: CourseEntity!
 }
 
+type CourseRatingDTO {
+  overallCourseRating: Float
+  numberOf1StarRatings: Int
+  numberOf2StarRatings: Int
+  numberOf3StarRatings: Int
+  numberOf4StarRatings: Int
+  numberOf5StarRatings: Int
+}
+
 type CourseEntity {
   courseId: ID!
   title: String
@@ -280,6 +289,7 @@ type CourseEntity {
   courseProgress: Float
   courseRate: Float
   numberOfRewardedPostsLeft: Int
+  courseRatings: CourseRatingDTO
 }
 
 type PostLikeEntity {

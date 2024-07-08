@@ -25,7 +25,7 @@ implements ResultsWithMetadata<CourseMySqlEntity, FindManyCoursesOutputMetadata>
 }
 
 @ObjectType()
-export class FindManyPostsOutput implements AuthOutput<FindManyCoursesOutputData> {
+export class FindManyCoursesOutput implements AuthOutput<FindManyCoursesOutputData> {
     @Field(() => FindManyCoursesOutputData)
         data: FindManyCoursesOutputData
     @Field(() => AuthTokens, { nullable: true })
