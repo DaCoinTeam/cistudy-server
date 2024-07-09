@@ -41,6 +41,7 @@ import {
     FinishQuizAttemptInputData,
     GiftCourseInputData,
     MarkLessonAsCompletedInputData,
+    ResolveCourseReportInputData,
     UpdateCourseInputData,
     UpdateCourseReportInputData,
     UpdateCourseReviewInputData,
@@ -537,6 +538,21 @@ export class CoursesController {
         @Body() body: UpdateCourseReportInputData,
     ) {
         return this.coursesService.updateCourseReport({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("resolve-course-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Moderator)
+    @UseInterceptors(AuthInterceptor)
+    async resolveAccountReport(
+        @AccountId() accountId: string,
+        @Body() body: ResolveCourseReportInputData,
+    ) {
+        return this.coursesService.resolveCourseReport({
             accountId,
             data: body,
         })

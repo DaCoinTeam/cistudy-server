@@ -175,7 +175,7 @@ export class AccountsController {
     }
 
     @ApiBearerAuth()
-    @Patch("resolve-report")
+    @Patch("resolve-account-report")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User, SystemRoles.Moderator)
     @UseInterceptors(AuthInterceptor)

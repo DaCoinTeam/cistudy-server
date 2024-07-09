@@ -99,6 +99,6 @@ export class CoursesResolver {
 
     @Query(() => [CategoryMySqlEntity])
     async findManyCategories() {
-        return await this.coursesService.findManyRootCategories()
+        return await this.coursesService.findManyCategories()
     }
 }

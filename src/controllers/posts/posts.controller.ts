@@ -27,6 +27,8 @@ import {
     CreatePostInputData,
     CreatePostReportInputData,
     MarkPostCommentAsSolutionInputData,
+    ResolvePostCommentReportInputData,
+    ResolvePostReportInputData,
     ToggleLikePostCommentInputData,
     ToggleLikePostInputData,
     UpdatePostCommentInputData,
@@ -298,4 +300,33 @@ export class PostsController {
         })
     }
 
+    @ApiBearerAuth()
+    @Patch("resolve-post-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Moderator)
+    @UseInterceptors(AuthInterceptor)
+    async resolvePostReport(
+        @AccountId() accountId: string,
+        @Body() body: ResolvePostReportInputData,
+    ) {
+        return this.postsService.resolvePostReport({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("resolve-post-comment-report")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Moderator)
+    @UseInterceptors(AuthInterceptor)
+    async resolvePostCommentReport(
+        @AccountId() accountId: string,
+        @Body() body: ResolvePostCommentReportInputData,
+    ) {
+        return this.postsService.resolvePostCommentReport({
+            accountId,
+            data: body,
+        })
+    }
 }
