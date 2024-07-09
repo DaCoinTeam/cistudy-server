@@ -1,4 +1,4 @@
-import { AuthEmptyDataInput, AuthInput, MediaType } from "@common"
+import { AuthEmptyDataInput, AuthInput, MediaType, ReportProcessStatus } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsInt, IsNumber, IsOptional, IsUUID, Length, Max, Min, MinLength } from "class-validator"
 
@@ -613,4 +613,20 @@ export class UpdateCourseReportInputData {
 export class UpdateCourseReportInput implements AuthInput<UpdateCourseReportInputData> {
     accountId: string
     data: UpdateCourseReportInputData
+}
+
+export class ResolveCourseReportInputData {
+    @ApiProperty()
+    @IsUUID("4")
+        reportCourseId : string
+    @ApiProperty()
+        processStatus : ReportProcessStatus
+    @ApiProperty()
+    @MinLength(20)
+        processNote : string
+}
+
+export class ResolveCourseReportInput implements AuthInput<ResolveCourseReportInputData> {
+    accountId: string
+    data: ResolveCourseReportInputData
 }

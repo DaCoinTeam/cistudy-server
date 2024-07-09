@@ -5,7 +5,7 @@ import {
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { AccountsService } from "./accounts.service"
 import { AuthInterceptor, JwtAuthGuard, AccountId, Roles } from "../shared"
-import { CreateAccountReportInputData, CreateAccountReviewInputData, CreateAccountRoleInputData, DeleteCourseInputData, ResolveReportInputData, ToggleFollowInputData, ToggleRoleInputData, UpdateAccountReportInputData, UpdateAccountReviewInputData, UpdateAccountRoleInputData, VerifyCourseInputData } from "./accounts.input"
+import { CreateAccountReportInputData, CreateAccountReviewInputData, CreateAccountRoleInputData, DeleteCourseInputData, ResolveAccountReportInputData, ToggleFollowInputData, ToggleRoleInputData, UpdateAccountReportInputData, UpdateAccountReviewInputData, UpdateAccountRoleInputData, VerifyCourseInputData } from "./accounts.input"
 import { RolesGuard } from "../shared/guards/role.guard"
 import { SystemRoles } from "@common"
 
@@ -181,9 +181,9 @@ export class AccountsController {
     @UseInterceptors(AuthInterceptor)
     async resolveAccountReport(
         @AccountId() accountId: string,
-        @Body() body: ResolveReportInputData,
+        @Body() body: ResolveAccountReportInputData,
     ) {
-        return this.accountsService.resolveReport({
+        return this.accountsService.resolveAccountReport({
             accountId,
             data: body,
         })

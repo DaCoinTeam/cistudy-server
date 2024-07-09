@@ -15,7 +15,9 @@ import {
     UpdatePostReportInput,
     CreatePostCommentReportInput,
     UpdatePostCommentReportInput,
-    MarkPostCommentAsSolutionInput
+    MarkPostCommentAsSolutionInput,
+    ResolvePostCommentReportInput,
+    ResolvePostReportInput
 } from "./posts.input"
 import {
     PostMySqlEntity,
@@ -43,6 +45,8 @@ import {
     DeletePostCommentReplyOutput,
     DeletePostOutput,
     MarkPostCommentAsSolutionOutput,
+    ResolvePostCommentReportOutput,
+    ResolvePostReportOutput,
     ToggleCommentLikePostOutputData,
     ToggleLikePostOutputData,
     UpdatePostCommentOutput,
@@ -922,4 +926,45 @@ export class PostsService {
         }
     }
 
+    async resolvePostReport(input: ResolvePostReportInput): Promise<ResolvePostReportOutput> {
+        const { data } = input
+        const { reportPostId, processNote, processStatus } = data
+
+        const found = await this.reportPostMySqlRepository.findOneBy({ reportPostId })
+
+        if (!found) {
+            throw new NotFoundException("Report not found")
+        }
+
+        if(found.processStatus !== ReportProcessStatus.Processing){
+            throw new ConflictException("This report has already been resolved")
+        }
+
+        await this.reportPostMySqlRepository.update(reportPostId, { processStatus, processNote })
+
+        return {
+            message: "Report successfully resolved and closed."
+        }
+    }
+
+    async resolvePostCommentReport(input: ResolvePostCommentReportInput): Promise<ResolvePostCommentReportOutput> {
+        const { data } = input
+        const { reportPostCommentId, processNote, processStatus } = data
+
+        const found = await this.reportPostCommentMySqlRepository.findOneBy({ reportPostCommentId })
+
+        if (!found) {
+            throw new NotFoundException("Report not found")
+        }
+        
+        if(found.processStatus !== ReportProcessStatus.Processing){
+            throw new ConflictException("This report has already been resolved")
+        }
+
+        await this.reportPostCommentMySqlRepository.update(reportPostCommentId, { processStatus, processNote })
+
+        return {
+            message: "Report successfully resolved and closed."
+        }
+    }
 }

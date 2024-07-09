@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common"
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, In, Repository } from "typeorm"
 import { CreateAccountReviewInput, 
@@ -12,7 +12,7 @@ import { CreateAccountReviewInput,
     UpdateAccountRoleInput, 
     CreateAccountReportInput, 
     UpdateAccountReportInput, 
-    ResolveReportInput 
+    ResolveAccountReportInput
 } from "./accounts.input"
 import { AccountMySqlEntity, 
     CourseMySqlEntity, 
@@ -28,14 +28,14 @@ import { AccountMySqlEntity,
 import { CreateAccountReportOutput, 
     CreateAccountReviewOutput, 
     CreateAccountRoleOutput, 
-    ResolveReportOutput, 
+    ResolveAccountReportOutput, 
     ToggleRoleOutput, 
     UpdateAccountReportOutput, 
     UpdateAccountRoleOutput, 
     VerifyCourseOuput 
 } from "./accounts.output"
 import { JwtService } from "@nestjs/jwt"
-import { ReportProcessStatus, ReportType, SystemRoles } from "@common"
+import { ReportProcessStatus, SystemRoles } from "@common"
 
 @Injectable()
 export class AccountsService {
@@ -456,63 +456,24 @@ export class AccountsService {
         }
     }
 
-    async resolveReport(input: ResolveReportInput): Promise<ResolveReportOutput> {
+    async resolveAccountReport(input: ResolveAccountReportInput): Promise<ResolveAccountReportOutput> {
         const { data } = input
-        const { reportId, type, processNote, processStatus } = data
-    
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-    
-        try {
-            let repository
-            let reportIdentifier
-    
-            switch (type) {
-            case ReportType.Account:
-                repository = this.reportAccountMySqlRepository
-                reportIdentifier = { reportAccountId: reportId }
-                break
-            case ReportType.Course:
-                repository = this.reportCourseMySqlRepository
-                reportIdentifier = { reportCourseId: reportId }
-                break
-            case ReportType.Post:
-                repository = this.reportPostMySqlRepository
-                reportIdentifier = { reportPostId: reportId }
-                break
-            case ReportType.PostComment:
-                repository = this.reportPostCommentMySqlRepository
-                reportIdentifier = { reportPostCommentId: reportId }
-                break
-            default:
-                throw new BadRequestException("Invalid report type")
-            }
-    
-            const found = await repository.findOneBy(reportIdentifier)
-    
-            if (!found) {
-                throw new NotFoundException("Report not found")
-            }
-    
-            if (found.processStatus !== ReportProcessStatus.Processing) {
-                throw new ConflictException("This report has already been resolved")
-            }
-    
-            await repository.update(reportIdentifier, { processStatus, processNote })
-    
-            await queryRunner.commitTransaction()
-    
-            return {
-                message: "Report resolved successfully.",
-            }
-        } catch (error) {
-            // Rollback transaction on error
-            await queryRunner.rollbackTransaction()
-            throw error
-        } finally {
-            // Release query runner
-            await queryRunner.release()
+        const { reportAccountId, processNote, processStatus } = data
+
+        const found = await this.reportAccountMySqlRepository.findOneBy({ reportAccountId })
+
+        if (!found) {
+            throw new NotFoundException("Report not found")
+        }
+
+        if (found.processStatus !== ReportProcessStatus.Processing) {
+            throw new ConflictException("This report has already been resolved")
+        }
+
+        await this.reportAccountMySqlRepository.update(reportAccountId, { processStatus, processNote })
+
+        return {
+            message: "Report successfully resolved and closed."
         }
     }
     

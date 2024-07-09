@@ -55,7 +55,8 @@ import {
     CreateCourseCategoriesInput,
     DeleteCourseCategoryInput,
     CreateCourseReportInput,
-    UpdateCourseReportInput
+    UpdateCourseReportInput,
+    ResolveCourseReportInput
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -92,6 +93,7 @@ import {
     FinishQuizAttemptOutput,
     GiftCourseOutput,
     MarkLessonAsCompletedOutput,
+    ResolveCourseReportOutput,
     UpdateCourseOutput,
     UpdateCourseReportOutput,
     UpdateCourseReviewOutput,
@@ -1702,6 +1704,27 @@ export class CoursesService {
             others: {
                 reportCourseId
             }
+        }
+    }
+
+    async resolveCourseReport(input: ResolveCourseReportInput): Promise<ResolveCourseReportOutput> {
+        const { data } = input
+        const { reportCourseId, processNote, processStatus } = data
+
+        const found = await this.reportCourseMySqlRepository.findOneBy({ reportCourseId })
+
+        if (!found) {
+            throw new NotFoundException("Report not found")
+        }
+
+        if (found.processStatus !== ReportProcessStatus.Processing) {
+            throw new ConflictException("This report has already been resolved")
+        }
+
+        await this.reportCourseMySqlRepository.update(reportCourseId, { processStatus, processNote })
+
+        return {
+            message: "Report successfully resolved and closed."
         }
     }
 }

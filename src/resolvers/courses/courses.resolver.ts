@@ -93,11 +93,6 @@ export class CoursesResolver {
     }
 
     @Query(() => [CategoryMySqlEntity])
-    async findManyRootCategories() {
-        return await this.coursesService.findManyRootCategories()
-    }
-
-    @Query(() => [CategoryMySqlEntity])
     async findManyLevelCategories(@Args("data") data: FindManyLevelCategoriesInputData) {
         return await this.coursesService.findManyLevelCategories({ data })
     }

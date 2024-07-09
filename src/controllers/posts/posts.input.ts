@@ -1,4 +1,4 @@
-import { AuthInput, MediaType } from "@common"
+import { AuthInput, MediaType, ReportProcessStatus } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsInt, IsUUID, MinLength } from "class-validator"
 
@@ -280,4 +280,36 @@ export class UpdatePostCommentReportInputData {
 export class UpdatePostCommentReportInput implements AuthInput<UpdatePostCommentReportInputData> {
     accountId: string
     data: UpdatePostCommentReportInputData
+}
+
+export class ResolvePostReportInputData {
+    @ApiProperty()
+    @IsUUID("4")
+        reportPostId : string
+    @ApiProperty()
+        processStatus : ReportProcessStatus
+    @ApiProperty()
+    @MinLength(20)
+        processNote : string
+}
+
+export class ResolvePostReportInput implements AuthInput<ResolvePostReportInputData> {
+    accountId: string
+    data: ResolvePostReportInputData
+}
+
+export class ResolvePostCommentReportInputData {
+    @ApiProperty()
+    @IsUUID("4")
+        reportPostCommentId : string
+    @ApiProperty()
+        processStatus : ReportProcessStatus
+    @ApiProperty()
+    @MinLength(20)
+        processNote : string
+}
+
+export class ResolvePostCommentReportInput implements AuthInput<ResolvePostCommentReportInputData> {
+    accountId: string
+    data: ResolvePostCommentReportInputData
 }

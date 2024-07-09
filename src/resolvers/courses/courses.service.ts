@@ -533,15 +533,6 @@ export class CoursesService {
         })
     }
 
-    async findManyRootCategories(
-    ): Promise<Array<CategoryMySqlEntity>> {
-        return await this.categoryMySqlRepository.find({
-            where: {
-                level: 0
-            }
-        })
-    }
-
     async findManyLevelCategories(
         input: FindManyLevelCategoriesInput,
     ): Promise<Array<CategoryMySqlEntity>> {

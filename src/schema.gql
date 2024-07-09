@@ -614,8 +614,11 @@ type FindManyPostCommentRepliesOutput {
 type ReportModel {
   reportId: ID
   type: String
-  reporterAccountId: ID
-  reportContentId: ID
+  reporterAccount: AccountEntity
+  reportedAccount: AccountEntity
+  reportedCourse: CourseEntity
+  reportedPost: PostEntity
+  reportedPostComment: PostCommentEntity
   description: String
   processStatus: String
   processNote: String
@@ -750,7 +753,6 @@ type Query {
   findManyCourseReviews(data: FindManyCourseReviewsInputData!): FindManyCourseReviewsOutputData!
   findManyCoursesTopic(data: FindManyCoursesTopicInputData!): FindManyCoursesTopicOutputData!
   findOneQuizAttempt(data: FindOneQuizAttemptInputData!): FindOneQuizAttemptOutput!
-  findManyRootCategories: [CategoryEntity!]!
   findManyLevelCategories(data: FindManyLevelCategoriesInputData!): [CategoryEntity!]!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!

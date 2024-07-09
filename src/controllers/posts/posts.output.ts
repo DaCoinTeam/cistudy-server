@@ -134,3 +134,11 @@ export class UpdatePostCommentReportOutput implements Output<UpdatePostCommentRe
     message: string
     others?: UpdatePostCommentReportOutputOthers
 }
+
+export class ResolvePostReportOutput implements Output {
+    message: string
+}
+
+export class ResolvePostCommentReportOutput implements Output {
+    message: string
+}

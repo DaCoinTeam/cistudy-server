@@ -172,81 +172,54 @@ export class AccountsService {
     }
 
     async findManyReports(input: FindManyReportsInput): Promise<FindManyReportsOutputData> {
-        const { data } = input
-        const { params, options } = data
-        const { filterReports } = params
-        const { skip, take } = options
-
-        let reports: ReportModel[] = []
-
-        if (!filterReports || filterReports.includes(ReportType.Account)) {
-            const accountReports = await this.reportAccountMySqlRepository.find({})
-            reports = reports.concat(accountReports.map(report => ({
-                reportId: report.reportAccountId,
-                type: ReportType.Account,
-                reporterAccountId: report.reporterAccountId,
-                reportContentId: report.reportedAccountId,
-                description: report.description,
-                processStatus: report.processStatus,
-                processNote: report.processNote,
-                createdAt: report.createdAt,
-                updatedAt: report.updatedAt
-            })))
+        const  {data} = input
+        const {params, options} = data
+        const {filterReports} = params
+        const {skip,take} = options
+        const reports: ReportModel[] = []
+    
+        const reportTypes = [
+            { type: ReportType.Account, repository: this.reportAccountMySqlRepository, additionalRelation: "reportedAccount", Id: "reportAccountId" },
+            { type: ReportType.Course, repository: this.reportCourseMySqlRepository, additionalRelation: "reportedCourse", Id: "reportCourseId" },
+            { type: ReportType.Post, repository: this.reportPostMySqlRepository, additionalRelation: "reportedPost", Id: "reportPostId" },
+            { type: ReportType.PostComment, repository: this.reportPostCommentMySqlRepository, additionalRelation: "reportedPostComment", Id: "reportPostCommentId" }
+        ]
+    
+        const fetchReports = async ({ type, repository, additionalRelation, Id }) => {
+            if (!filterReports || filterReports.includes(type)) {
+                const fetchedReports = await repository.find({
+                    relations: {
+                        reporterAccount: true,
+                        [additionalRelation]: true
+                    }
+                })
+    
+                reports.push(...fetchedReports.map(report => ({
+                    reportId: report[Id],
+                    type,
+                    reporterAccount: report.reporterAccount,
+                    reportedAccount: type === ReportType.Account ? report[additionalRelation] : null,
+                    reportedCourse: type === ReportType.Course ? report[additionalRelation] : null,
+                    reportedPost: type === ReportType.Post ? report[additionalRelation] : null,
+                    reportedPostComment: type === ReportType.PostComment ? report[additionalRelation] : null,
+                    description: report.description,
+                    processStatus: report.processStatus,
+                    processNote: report.processNote,
+                    createdAt: report.createdAt,
+                    updatedAt: report.updatedAt
+                })))
+            }
         }
-
-        if (!filterReports || filterReports.includes(ReportType.Course)) {
-            const courseReports = await this.reportCourseMySqlRepository.find({})
-            reports = reports.concat(courseReports.map(report => ({
-                reportId: report.reportCourseId,
-                type: ReportType.Course,
-                reporterAccountId: report.reporterAccountId,
-                reportContentId: report.reportedCourseId,
-                description: report.description,
-                processStatus: report.processStatus,
-                processNote: report.processNote,
-                createdAt: report.createdAt,
-                updatedAt: report.updatedAt
-            })))
-        }
-
-        if (!filterReports || filterReports.includes(ReportType.Post)) {
-            const postReports = await this.reportPostMySqlRepository.find({})
-            reports = reports.concat(postReports.map(report => ({
-                reportId: report.reportPostId,
-                type: ReportType.Post,
-                reporterAccountId: report.reporterAccountId,
-                reportContentId: report.reportedPostId,
-                description: report.description,
-                processStatus: report.processStatus,
-                processNote: report.processNote,
-                createdAt: report.createdAt,
-                updatedAt: report.updatedAt
-            })))
-        }
-
-        if (!filterReports || filterReports.includes(ReportType.PostComment)) {
-            const postCommentReports = await this.reportPostCommentMySqlRepository.find({})
-            reports = reports.concat(postCommentReports.map(report => ({
-                reportId: report.reportPostCommentId,
-                type: ReportType.PostComment,
-                reporterAccountId: report.reporterAccountId,
-                reportContentId: report.reportedPostCommentId,
-                description: report.description,
-                processStatus: report.processStatus,
-                processNote: report.processNote,
-                createdAt: report.createdAt,
-                updatedAt: report.updatedAt
-            })))
-        }
-
-        if (skip && take) {
-            reports = reports.slice(skip, take)
-        }
+    
+        await Promise.all(reportTypes.map(fetchReports))
+    
+        const slicedReports = (skip && take) ? reports.slice(skip, skip + take) : reports
+        slicedReports?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 
         return {
-            results: reports,
+            results: slicedReports,
             metadata: {
-                count: reports.length
+                count: slicedReports.length
             }
         }
     }
@@ -266,8 +239,8 @@ export class AccountsService {
             }
             const {
                 reportAccountId,
-                reporterAccountId,
-                reportedAccountId,
+                reporterAccount,
+                reportedAccount,
                 description,
                 processStatus,
                 processNote,
@@ -276,8 +249,8 @@ export class AccountsService {
             } = accountReport
 
             report.reportId = reportAccountId
-            report.reporterAccountId = reporterAccountId
-            report.reportContentId = reportedAccountId
+            report.reporterAccount = reporterAccount
+            report.reportedAccount = reportedAccount
             report.description = description
             report.processStatus = processStatus
             report.processNote = processNote
@@ -295,8 +268,8 @@ export class AccountsService {
             }
             const {
                 reportCourseId,
-                reporterAccountId,
-                reportedCourseId,
+                reporterAccount,
+                reportedCourse,
                 description,
                 processStatus,
                 processNote,
@@ -305,8 +278,8 @@ export class AccountsService {
             } = courseReport
 
             report.reportId = reportCourseId
-            report.reporterAccountId = reporterAccountId
-            report.reportContentId = reportedCourseId
+            report.reporterAccount = reporterAccount
+            report.reportedCourse = reportedCourse
             report.description = description
             report.processStatus = processStatus
             report.processNote = processNote
@@ -323,8 +296,8 @@ export class AccountsService {
             }
             const {
                 reportPostId,
-                reporterAccountId,
-                reportedPostId,
+                reporterAccount,
+                reportedPost,
                 description,
                 processStatus,
                 processNote,
@@ -333,8 +306,8 @@ export class AccountsService {
             } = postReport
 
             report.reportId = reportPostId
-            report.reporterAccountId = reporterAccountId
-            report.reportContentId = reportedPostId
+            report.reporterAccount = reporterAccount
+            report.reportedPost = reportedPost
             report.description = description
             report.processStatus = processStatus
             report.processNote = processNote
@@ -351,8 +324,8 @@ export class AccountsService {
             }
             const {
                 reportPostCommentId,
-                reporterAccountId,
-                reportedPostCommentId,
+                reporterAccount,
+                reportedPostComment,
                 description,
                 processStatus,
                 processNote,
@@ -361,8 +334,8 @@ export class AccountsService {
             } = postCommentReport
 
             report.reportId = reportPostCommentId
-            report.reporterAccountId = reporterAccountId
-            report.reportContentId = reportedPostCommentId
+            report.reporterAccount = reporterAccount
+            report.reportedPostComment = reportedPostComment
             report.description = description
             report.processStatus = processStatus
             report.processNote = processNote
