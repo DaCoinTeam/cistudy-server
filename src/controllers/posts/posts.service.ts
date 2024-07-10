@@ -672,10 +672,6 @@ export class PostsService {
             if(!postComment){
                 throw new NotFoundException("Post comment not found or has been deleted.")
             }
-
-            if(postComment.post.isCompleted){
-                throw new ConflictException("This post is closed.")
-            }
             
             const { postCommentReplyId } = await this.postCommentReplyMySqlRepository.save({
                 content,
