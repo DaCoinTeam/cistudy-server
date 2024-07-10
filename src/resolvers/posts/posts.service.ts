@@ -495,7 +495,7 @@ export class PostsService {
         }
     }
 
-    async findManyCourseReports(input: FindManyPostCommentReportsInput): Promise<FindManyPostCommentReportsOutputData> {
+    async findManyPostCommentReports(input: FindManyPostCommentReportsInput): Promise<FindManyPostCommentReportsOutputData> {
         const { data } = input
         const { options } = data
         const { skip, take } = options

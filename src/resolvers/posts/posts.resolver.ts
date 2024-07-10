@@ -87,6 +87,6 @@ export class PostsResolver {
   @UseInterceptors(AuthInterceptor)
   @Query(() => FindManyPostCommentReportsOutput)
   async findManyPostCommentReports(@Args("data") data: FindManyPostCommentReportsInputData, @AccountId() accountId: string) {
-      return await this.postsService.findManyPostReports({ accountId, data })
+      return await this.postsService.findManyPostCommentReports({ accountId, data })
   }
 }
