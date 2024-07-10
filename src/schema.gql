@@ -563,6 +563,20 @@ type FindOneQuizAttemptOutput {
   numberOfQuestions: Int
 }
 
+type FindManyCourseReportsOutputMetadata {
+  count: Int
+}
+
+type FindManyCourseReportsOutputData {
+  results: [ReportCourseEntity!]!
+  metadata: FindManyCourseReportsOutputMetadata
+}
+
+type FindManyCourseReportsOutput {
+  data: FindManyCourseReportsOutputData!
+  tokens: AuthTokens
+}
+
 type FindOnePostOutput {
   data: PostEntity!
   tokens: AuthTokens
@@ -611,19 +625,32 @@ type FindManyPostCommentRepliesOutput {
   tokens: AuthTokens
 }
 
-type ReportModel {
-  reportId: ID
-  type: String
-  reporterAccount: AccountEntity
-  reportedAccount: AccountEntity
-  reportedCourse: CourseEntity
-  reportedPost: PostEntity
-  reportedPostComment: PostCommentEntity
-  description: String
-  processStatus: String
-  processNote: String
-  createdAt: DateTime
-  updatedAt: DateTime
+type FindManyPostReportsOutputMetadata {
+  count: Int
+}
+
+type FindManyPostReportsOutputData {
+  results: [ReportPostEntity!]!
+  metadata: FindManyPostReportsOutputMetadata
+}
+
+type FindManyPostReportsOutput {
+  data: FindManyPostReportsOutputData!
+  tokens: AuthTokens
+}
+
+type FindManyPostCommentReportsOutputMetadata {
+  count: Int
+}
+
+type FindManyPostCommentReportsOutputData {
+  results: [ReportPostCommentEntity!]!
+  metadata: FindManyPostCommentReportsOutputMetadata
+}
+
+type FindManyPostCommentReportsOutput {
+  data: FindManyPostCommentReportsOutputData!
+  tokens: AuthTokens
 }
 
 type FindManyAccountsOutputMetadata {
@@ -649,17 +676,17 @@ type FindManyAccountReviewsOutputData {
   metadata: FindManyAccountReviewsOutputMetadata
 }
 
-type FindManyReportsOutputMetadata {
+type FindManyAccountReportsOutputMetadata {
   count: Int
 }
 
-type FindManyReportsOutputData {
-  results: [ReportModel!]!
-  metadata: FindManyReportsOutputMetadata
+type FindManyAccountReportsOutputData {
+  results: [ReportAccountEntity!]!
+  metadata: FindManyAccountReportsOutputMetadata
 }
 
-type FindManyReportsOutput {
-  data: FindManyReportsOutputData!
+type FindManyAccountReportsOutput {
+  data: FindManyAccountReportsOutputData!
   tokens: AuthTokens
 }
 
@@ -755,16 +782,19 @@ type Query {
   findOneQuizAttempt(data: FindOneQuizAttemptInputData!): FindOneQuizAttemptOutput!
   findManyLevelCategories(data: FindManyLevelCategoriesInputData!): [CategoryEntity!]!
   findManyCategories: [CategoryEntity!]!
+  findManyCourseReports(data: FindManyCourseReportsInputData!): FindManyCourseReportsOutput!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
   findManyPostComments(data: FindManyPostCommentsInputData!): FindManyPostCommentsOutput!
   findManyPostCommentReplies(data: FindManyPostCommentRepliesInputData!): FindManyPostCommentRepliesOutput!
+  findManyPostReports(data: FindManyPostReportsInputData!): FindManyPostReportsOutput!
+  findManyPostCommentReports(data: FindManyPostCommentReportsInputData!): FindManyPostCommentReportsOutput!
   findOneAccount(data: FindOneAccountInputData!): AccountEntity!
   findManyFollowers(data: FindManyFollowersInputData!): [AccountEntity!]!
   findManyAccounts(data: FindManyAccountsInputData!): FindManyAccountsOutput!
   findManyAccountReviews(data: FindManyAccountReviewsInputData!): FindManyAccountReviewsOutputData!
-  findManyReports(data: FindManyReportsInputData!): FindManyReportsOutput!
+  findManyAccountReports(data: FindManyAccountReportsInputData!): FindManyAccountReportsOutput!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
@@ -909,6 +939,15 @@ input FindManyLevelCategoriesInputData {
   categoryParentId: ID
 }
 
+input FindManyCourseReportsInputData {
+  options: FindManyCourseReportsInputOptions
+}
+
+input FindManyCourseReportsInputOptions {
+  take: Int
+  skip: Int
+}
+
 input FindOnePostInputData {
   params: FindOnePostInputParams!
 }
@@ -967,6 +1006,24 @@ input FindManyPostsCommentRepliesInputOptions {
   skip: Int
 }
 
+input FindManyPostReportsInputData {
+  options: FindManyPostReportsInputOptions
+}
+
+input FindManyPostReportsInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManyPostCommentReportsInputData {
+  options: FindManyPostCommentReportsInputOptions
+}
+
+input FindManyPostCommentReportsInputOptions {
+  take: Int
+  skip: Int
+}
+
 input FindOneAccountInputData {
   params: FindOneAccountInputParams!
   options: FindOneAccountInputOptions
@@ -1012,16 +1069,11 @@ input FindManyAccountReviewsInputOptions {
   skip: Int
 }
 
-input FindManyReportsInputData {
-  params: FindManyReportsInputParams
-  options: FindManyReportsInputOptions
+input FindManyAccountReportsInputData {
+  options: FindManyAccountReportsInputOptions
 }
 
-input FindManyReportsInputParams {
-  filterReports: String
-}
-
-input FindManyReportsInputOptions {
+input FindManyAccountReportsInputOptions {
   take: Int
   skip: Int
 }

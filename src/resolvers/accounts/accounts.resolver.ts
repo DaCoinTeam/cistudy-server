@@ -1,8 +1,8 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
 import { AccountsService } from "./accounts.service"
-import { FindManyFollowersInputData, FindManyAccountReviewsInputData, FindManyAccountsInputData, FindOneAccountInputData, FindManyReportsInputData } from "./accounts.input"
+import { FindManyFollowersInputData, FindManyAccountReviewsInputData, FindManyAccountsInputData, FindOneAccountInputData, FindManyAccountReportsInputData } from "./accounts.input"
 import { AccountMySqlEntity } from "@database"
-import { FindManyAccountReviewsOutputData, FindManyAccountsOutput, FindManyReportsOutput } from "./accounts.output"
+import { FindManyAccountReportsOutput, FindManyAccountReviewsOutputData, FindManyAccountsOutput } from "./accounts.output"
 import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 
@@ -34,9 +34,9 @@ export class AccountsResolver {
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    @Query(() => FindManyReportsOutput)
-    async findManyReports(@Args("data") data: FindManyReportsInputData, @AccountId() accountId: string) {
-        return await this.accountsService.findManyReports({ accountId, data })
+    @Query(() => FindManyAccountReportsOutput)
+    async findManyAccountReports(@Args("data") data: FindManyAccountReportsInputData, @AccountId() accountId: string) {
+        return await this.accountsService.findManyAccountReports({ accountId, data })
     }
 }
 

@@ -8,7 +8,9 @@ import {
     PostCommentLikeMySqlEntity,
     PostCommentReplyMySqlEntity,
     AccountMySqlEntity,
-    RoleMySqlEntity
+    RoleMySqlEntity,
+    ReportPostCommentMySqlEntity,
+    ReportPostMySqlEntity
 } from "@database"
 import { PostsService } from "./posts.service"
 
@@ -21,7 +23,9 @@ import { PostsService } from "./posts.service"
             PostCommentMySqlEntity,
             PostCommentLikeMySqlEntity,
             PostCommentReplyMySqlEntity,
-            RoleMySqlEntity
+            RoleMySqlEntity,
+            ReportPostMySqlEntity,
+            ReportPostCommentMySqlEntity
         ]),
     ],
     providers: [PostsResolver, PostsService],

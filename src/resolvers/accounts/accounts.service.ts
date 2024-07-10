@@ -1,11 +1,9 @@
-import { FollowMySqlEnitity, AccountMySqlEntity, AccountReviewMySqlEntity, ReportAccountMySqlEntity, ReportCourseMySqlEntity, ReportPostMySqlEntity, ReportPostCommentMySqlEntity } from "@database"
-import { Injectable, NotFoundException } from "@nestjs/common"
+import { FollowMySqlEnitity, AccountMySqlEntity, AccountReviewMySqlEntity, ReportAccountMySqlEntity } from "@database"
+import { Injectable } from "@nestjs/common"
 import { DataSource, Repository } from "typeorm"
-import { FindManyFollowersInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindOneAccountInput, FindManyReportsInput, FindOneReportInput } from "./accounts.input"
+import { FindManyFollowersInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindOneAccountInput, FindManyAccountReportsInput } from "./accounts.input"
 import { InjectRepository } from "@nestjs/typeorm"
-import { FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyReportsOutputData } from "./accounts.output"
-import { ReportModel } from "src/database/dto/report.dto"
-import { ReportType } from "@common"
+import { FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyAccountReportsOutputData } from "./accounts.output"
 
 @Injectable()
 export class AccountsService {
@@ -18,12 +16,6 @@ export class AccountsService {
         private readonly accountReviewMySqlRepository: Repository<AccountReviewMySqlEntity>,
         @InjectRepository(ReportAccountMySqlEntity)
         private readonly reportAccountMySqlRepository: Repository<ReportAccountMySqlEntity>,
-        @InjectRepository(ReportCourseMySqlEntity)
-        private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
-        @InjectRepository(ReportPostMySqlEntity)
-        private readonly reportPostMySqlRepository: Repository<ReportPostMySqlEntity>,
-        @InjectRepository(ReportPostCommentMySqlEntity)
-        private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
         private readonly dataSource: DataSource,
     ) { }
 
@@ -171,183 +163,43 @@ export class AccountsService {
         }
     }
 
-    async findManyReports(input: FindManyReportsInput): Promise<FindManyReportsOutputData> {
-        const  {data} = input
-        const {params, options} = data
-        const {filterReports} = params
-        const {skip,take} = options
-        const reports: ReportModel[] = []
-    
-        const reportTypes = [
-            { type: ReportType.Account, repository: this.reportAccountMySqlRepository, additionalRelation: "reportedAccount", Id: "reportAccountId" },
-            { type: ReportType.Course, repository: this.reportCourseMySqlRepository, additionalRelation: "reportedCourse", Id: "reportCourseId" },
-            { type: ReportType.Post, repository: this.reportPostMySqlRepository, additionalRelation: "reportedPost", Id: "reportPostId" },
-            { type: ReportType.PostComment, repository: this.reportPostCommentMySqlRepository, additionalRelation: "reportedPostComment", Id: "reportPostCommentId" }
-        ]
-    
-        const fetchReports = async ({ type, repository, additionalRelation, Id }) => {
-            if (!filterReports || filterReports.includes(type)) {
-                const fetchedReports = await repository.find({
-                    relations: {
-                        reporterAccount: true,
-                        [additionalRelation]: true
-                    }
-                })
-    
-                reports.push(...fetchedReports.map(report => ({
-                    reportId: report[Id],
-                    type,
-                    reporterAccount: report.reporterAccount,
-                    reportedAccount: type === ReportType.Account ? report[additionalRelation] : null,
-                    reportedCourse: type === ReportType.Course ? report[additionalRelation] : null,
-                    reportedPost: type === ReportType.Post ? report[additionalRelation] : null,
-                    reportedPostComment: type === ReportType.PostComment ? report[additionalRelation] : null,
-                    description: report.description,
-                    processStatus: report.processStatus,
-                    processNote: report.processNote,
-                    createdAt: report.createdAt,
-                    updatedAt: report.updatedAt
-                })))
-            }
-        }
-    
-        await Promise.all(reportTypes.map(fetchReports))
-    
-        const slicedReports = (skip && take) ? reports.slice(skip, skip + take) : reports
-        slicedReports?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-
-        return {
-            results: slicedReports,
-            metadata: {
-                count: slicedReports.length
-            }
-        }
-    }
-
-    async findOneReport(input: FindOneReportInput): Promise<ReportModel> {
+    async findManyAccountReports(input: FindManyAccountReportsInput): Promise<FindManyAccountReportsOutputData> {
         const { data } = input
-        const { reportId, reportType } = data
+        const { options } = data
+        const { skip, take } = options
 
-        const report: ReportModel = null
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
 
-        switch (reportType) {
-        case ReportType.Account: {
-            const accountReport = await this.reportAccountMySqlRepository.findOneBy({ reportAccountId: reportId })
+        try {
+            const results = await this.reportAccountMySqlRepository.find({
+                relations:{
+                    reporterAccount: true,
+                    reportedAccount: true,
+                },
+                skip,
+                take
+            })
 
-            if (!accountReport) {
-                throw new NotFoundException("Report not found")
+            const numberOfAccountReports = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(ReportAccountMySqlEntity, "report-account")
+                .getRawOne()
+
+            return {
+                results,
+                metadata: {
+                    count: numberOfAccountReports.count
+                }
             }
-            const {
-                reportAccountId,
-                reporterAccount,
-                reportedAccount,
-                description,
-                processStatus,
-                processNote,
-                createdAt,
-                updatedAt
-            } = accountReport
-
-            report.reportId = reportAccountId
-            report.reporterAccount = reporterAccount
-            report.reportedAccount = reportedAccount
-            report.description = description
-            report.processStatus = processStatus
-            report.processNote = processNote
-            report.createdAt = createdAt
-            report.updatedAt = updatedAt
-
-            break
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
         }
-
-        case ReportType.Course: {
-            const courseReport = await this.reportCourseMySqlRepository.findOneBy({ reportCourseId: reportId })
-
-            if (!courseReport) {
-                throw new NotFoundException("Report not found")
-            }
-            const {
-                reportCourseId,
-                reporterAccount,
-                reportedCourse,
-                description,
-                processStatus,
-                processNote,
-                createdAt,
-                updatedAt
-            } = courseReport
-
-            report.reportId = reportCourseId
-            report.reporterAccount = reporterAccount
-            report.reportedCourse = reportedCourse
-            report.description = description
-            report.processStatus = processStatus
-            report.processNote = processNote
-            report.createdAt = createdAt
-            report.updatedAt = updatedAt
-
-            break
-        }
-        case ReportType.Post: {
-            const postReport = await this.reportPostMySqlRepository.findOneBy({ reportPostId: reportId })
-
-            if (!postReport) {
-                throw new NotFoundException("Report not found")
-            }
-            const {
-                reportPostId,
-                reporterAccount,
-                reportedPost,
-                description,
-                processStatus,
-                processNote,
-                createdAt,
-                updatedAt
-            } = postReport
-
-            report.reportId = reportPostId
-            report.reporterAccount = reporterAccount
-            report.reportedPost = reportedPost
-            report.description = description
-            report.processStatus = processStatus
-            report.processNote = processNote
-            report.createdAt = createdAt
-            report.updatedAt = updatedAt
-
-            break
-        }
-        case ReportType.PostComment: {
-            const postCommentReport = await this.reportPostCommentMySqlRepository.findOneBy({ reportPostCommentId: reportId })
-
-            if (!postCommentReport) {
-                throw new NotFoundException("Report not found")
-            }
-            const {
-                reportPostCommentId,
-                reporterAccount,
-                reportedPostComment,
-                description,
-                processStatus,
-                processNote,
-                createdAt,
-                updatedAt
-            } = postCommentReport
-
-            report.reportId = reportPostCommentId
-            report.reporterAccount = reporterAccount
-            report.reportedPostComment = reportedPostComment
-            report.description = description
-            report.processStatus = processStatus
-            report.processNote = processNote
-            report.createdAt = createdAt
-            report.updatedAt = updatedAt
-
-            break
-        }
-        default: 
-            break
-        }
-
-        return report
     }
+
 }

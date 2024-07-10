@@ -6,6 +6,10 @@ import {
     FollowMySqlEnitity,
     AccountMySqlEntity,
     PostMySqlEntity,
+    ReportAccountMySqlEntity,
+    ReportCourseMySqlEntity,
+    ReportPostMySqlEntity,
+    ReportPostCommentMySqlEntity,
 } from "@database"
 import { ProfileService } from "./profile.service"
 
@@ -15,7 +19,11 @@ import { ProfileService } from "./profile.service"
             AccountMySqlEntity,
             FollowMySqlEnitity,
             CourseMySqlEntity,
-            PostMySqlEntity
+            PostMySqlEntity,
+            ReportAccountMySqlEntity,
+            ReportCourseMySqlEntity,
+            ReportPostMySqlEntity,
+            ReportPostCommentMySqlEntity
         ]),
     ],
     providers: [ProfileResolver, ProfileService ],

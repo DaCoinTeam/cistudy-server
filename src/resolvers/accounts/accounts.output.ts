@@ -1,7 +1,7 @@
 import { AuthTokens, AuthOutput, ResultsWithMetadata } from "@common"
-import { AccountMySqlEntity, AccountReviewMySqlEntity } from "@database"
+import { AccountMySqlEntity, AccountReviewMySqlEntity, ReportAccountMySqlEntity } from "@database"
 import { ObjectType, Int, Field } from "@nestjs/graphql"
-import { ReportModel } from "src/database/dto/report.dto"
+
 
 
 
@@ -55,25 +55,25 @@ export class FindManyAccountReviewsOutput implements AuthOutput<FindManyAccountR
 }
 
 @ObjectType()
-export class FindManyReportsOutputMetadata {
+export class FindManyAccountReportsOutputMetadata {
     @Field(() => Int, { nullable: true })
         count?: number
 }
 
 @ObjectType()
-export class FindManyReportsOutputData
-implements ResultsWithMetadata<ReportModel, FindManyReportsOutputMetadata>
+export class FindManyAccountReportsOutputData
+implements ResultsWithMetadata<ReportAccountMySqlEntity, FindManyAccountReportsOutputMetadata>
 {
-    @Field(() => [ReportModel])
-        results: Array<ReportModel>
-    @Field(() => FindManyReportsOutputMetadata, { nullable: true })
-        metadata: FindManyReportsOutputMetadata
+    @Field(() => [ReportAccountMySqlEntity])
+        results: Array<ReportAccountMySqlEntity>
+    @Field(() => FindManyAccountReportsOutputMetadata, { nullable: true })
+        metadata: FindManyAccountReportsOutputMetadata
 }
 
 @ObjectType()
-export class FindManyReportsOutput implements AuthOutput<FindManyReportsOutputData> {
-    @Field(() => FindManyReportsOutputData)
-        data: FindManyReportsOutputData
+export class FindManyAccountReportsOutput implements AuthOutput<FindManyAccountReportsOutputData> {
+    @Field(() => FindManyAccountReportsOutputData)
+        data: FindManyAccountReportsOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }

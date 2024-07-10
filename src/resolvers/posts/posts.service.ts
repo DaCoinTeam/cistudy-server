@@ -4,18 +4,22 @@ import {
     PostCommentReplyMySqlEntity,
     PostLikeMySqlEntity,
     PostMySqlEntity,
+    ReportPostCommentMySqlEntity,
+    ReportPostMySqlEntity,
 } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource } from "typeorm"
 import {
     FindManyPostCommentRepliesInput,
+    FindManyPostCommentReportsInput,
     FindManyPostCommentsInput,
+    FindManyPostReportsInput,
     FindManyPostsInput,
     FindOnePostCommentInput,
     FindOnePostInput,
 } from "./posts.input"
-import { FindManyPostCommentRepliesOutputData, FindManyPostCommentsOutputData, FindManyPostsOutputData, FindOnePostOutput } from "./posts.output"
+import { FindManyPostCommentRepliesOutputData, FindManyPostCommentReportsOutputData, FindManyPostCommentsOutputData, FindManyPostReportsOutputData, FindManyPostsOutputData, FindOnePostOutput } from "./posts.output"
 import { PostCommentReplyEntity } from "src/database/mysql/post-comment-reply.entity"
 
 
@@ -30,6 +34,10 @@ export class PostsService {
         private readonly postCommentReplyMySqlRepository: Repository<PostCommentReplyEntity>,
         @InjectRepository(PostLikeMySqlEntity)
         private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
+        @InjectRepository(ReportPostMySqlEntity)
+        private readonly reportPostMySqlRepository: Repository<ReportPostMySqlEntity>,
+        @InjectRepository(ReportPostCommentMySqlEntity)
+        private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
         private readonly dataSource: DataSource,
     ) { }
 
@@ -443,6 +451,84 @@ export class PostsService {
         } catch (ex) {
             console.log(ex)
             await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
+    }
+
+    async findManyPostReports(input: FindManyPostReportsInput): Promise<FindManyPostReportsOutputData> {
+        const { data } = input
+        const { options } = data
+        const { skip, take } = options
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const results = await this.reportPostMySqlRepository.find({
+                relations:{
+                    reporterAccount: true,
+                    reportedPost: true,
+                },
+                skip,
+                take
+            })
+
+            const numberOfPostReports = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(ReportPostMySqlEntity, "report-course")
+                .getRawOne()
+
+            return {
+                results,
+                metadata: {
+                    count: numberOfPostReports.count
+                }
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
+    }
+
+    async findManyCourseReports(input: FindManyPostCommentReportsInput): Promise<FindManyPostCommentReportsOutputData> {
+        const { data } = input
+        const { options } = data
+        const { skip, take } = options
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const results = await this.reportPostCommentMySqlRepository.find({
+                relations:{
+                    reporterAccount: true,
+                    reportedPostComment: true,
+                },
+                skip,
+                take
+            })
+
+            const numberOfPostCommentReports = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(ReportPostCommentMySqlEntity, "report-course")
+                .getRawOne()
+
+            return {
+                results,
+                metadata: {
+                    count: numberOfPostCommentReports.count
+                }
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
         } finally {
             await queryRunner.release()
         }

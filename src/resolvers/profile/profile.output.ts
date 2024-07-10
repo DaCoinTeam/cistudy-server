@@ -52,3 +52,27 @@ implements AuthOutput<FindManyEnrolledCoursesOutputData>
   @Field(() => AuthTokens, { nullable: true })
       tokens: AuthTokens
 }
+
+@ObjectType()
+export class FindManySubmittedReportsOutputMetadata {
+    @Field(() => Int, { nullable: true })
+        count?: number
+}
+
+// @ObjectType()
+// export class FindManySubmittedReportsOutputData
+// implements ResultsWithMetadata<ReportModel, FindManySubmittedReportsOutputMetadata>
+// {
+//     @Field(() => [ReportModel])
+//         results: Array<ReportModel>
+//     @Field(() => FindManySubmittedReportsOutputMetadata, { nullable: true })
+//         metadata: FindManySubmittedReportsOutputMetadata
+// }
+
+// @ObjectType()
+// export class FindManySubmittedReportsOutput implements AuthOutput<FindManySubmittedReportsOutputData> {
+//     @Field(() => FindManySubmittedReportsOutputData)
+//         data: FindManySubmittedReportsOutputData
+//     @Field(() => AuthTokens, { nullable: true })
+//         tokens?: AuthTokens
+// }

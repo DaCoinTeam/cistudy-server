@@ -1,5 +1,5 @@
 import { AuthTokens, AuthOutput, ResultsWithMetadata } from "@common"
-import { LessonMySqlEntity, ResourceMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity, QuizAttemptMySqlEntity, CategoryMySqlEntity } from "@database"
+import { LessonMySqlEntity, ResourceMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity, QuizAttemptMySqlEntity, CategoryMySqlEntity, ReportCourseMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 import { CategoryEntity } from "src/database/mysql/category.entity"
 import { CourseTargetEntity } from "src/database/mysql/course-target.entity"
@@ -149,4 +149,28 @@ export class FindOneCategoryOutput implements AuthOutput<CategoryMySqlEntity>{
     @Field(() => CategoryMySqlEntity)
         data: CategoryMySqlEntity
     tokens?: AuthTokens
+}
+
+@ObjectType()
+export class FindManyCourseReportsOutputMetadata {
+    @Field(() => Int, { nullable: true })
+        count?: number
+}
+
+@ObjectType()
+export class FindManyCourseReportsOutputData
+implements ResultsWithMetadata<ReportCourseMySqlEntity, FindManyCourseReportsOutputMetadata>
+{
+    @Field(() => [ReportCourseMySqlEntity])
+        results: Array<ReportCourseMySqlEntity>
+    @Field(() => FindManyCourseReportsOutputMetadata, { nullable: true })
+        metadata: FindManyCourseReportsOutputMetadata
+}
+
+@ObjectType()
+export class FindManyCourseReportsOutput implements AuthOutput<FindManyCourseReportsOutputData> {
+    @Field(() => FindManyCourseReportsOutputData)
+        data: FindManyCourseReportsOutputData
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
 }

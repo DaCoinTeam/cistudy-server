@@ -1,6 +1,6 @@
-import { AuthInput, ParamsOnly, ParamsWithOptions } from "@common"
+import { AuthInput, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@common"
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
-import { IsInt } from "class-validator"
+import { IsInt, IsOptional } from "class-validator"
 
 @InputType()
 export class FindOnePostInputParams {
@@ -142,4 +142,46 @@ implements AuthInput<FindManyPostCommentRepliesInputData>
 {
     accountId: string
     data: FindManyPostCommentRepliesInputData
+}
+
+//
+@InputType()
+export class FindManyPostReportsInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+}
+
+@InputType()
+export class FindManyPostReportsInputData implements OptionsOnly<FindManyPostReportsInputOptions>{
+    @Field(() => FindManyPostReportsInputOptions, { nullable: true })
+    @IsOptional()
+        options?: FindManyPostReportsInputOptions
+}
+
+export class FindManyPostReportsInput implements AuthInput<FindManyPostReportsInputData> {
+    accountId: string
+    data: FindManyPostReportsInputData
+}
+//
+
+@InputType()
+export class FindManyPostCommentReportsInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+}
+
+@InputType()
+export class FindManyPostCommentReportsInputData implements OptionsOnly<FindManyPostCommentReportsInputOptions>{
+    @Field(() => FindManyPostCommentReportsInputOptions, { nullable: true })
+    @IsOptional()
+        options?: FindManyPostCommentReportsInputOptions
+}
+
+export class FindManyPostCommentReportsInput implements AuthInput<FindManyPostCommentReportsInputData> {
+    accountId: string
+    data: FindManyPostCommentReportsInputData
 }

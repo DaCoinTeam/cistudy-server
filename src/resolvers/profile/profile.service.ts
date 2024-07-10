@@ -1,22 +1,33 @@
-import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, LessonMySqlEntity, ProgressMySqlEntity, SectionMySqlEntity, AccountMySqlEntity, PostMySqlEntity } from "@database"
+import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, LessonMySqlEntity, ProgressMySqlEntity, SectionMySqlEntity, AccountMySqlEntity, PostMySqlEntity, ReportAccountMySqlEntity, ReportCourseMySqlEntity, ReportPostCommentMySqlEntity, ReportPostMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { Repository, DataSource } from "typeorm"
 import {
     FindManyEnrolledCoursesInput,
-    FindManySelfCreatedCoursesInput
+    FindManySelfCreatedCoursesInput,
+
 } from "./profile.input"
 import { InjectRepository } from "@nestjs/typeorm"
 import { FindManyEnrolledCoursesOutputData, FindManySelfCreatedCoursesOutputData } from "./profile.output"
 
+
+
 @Injectable()
 export class ProfileService {
     constructor(
-    @InjectRepository(CourseMySqlEntity)
-    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-    @InjectRepository(PostMySqlEntity)
-    private readonly postMySqlRepository: Repository<PostMySqlEntity>,
-    private readonly dataSource: DataSource,
-    ) {}
+        @InjectRepository(CourseMySqlEntity)
+        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(PostMySqlEntity)
+        private readonly postMySqlRepository: Repository<PostMySqlEntity>,
+        @InjectRepository(ReportAccountMySqlEntity)
+        private readonly reportAccountMySqlRepository: Repository<ReportAccountMySqlEntity>,
+        @InjectRepository(ReportCourseMySqlEntity)
+        private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
+        @InjectRepository(ReportPostMySqlEntity)
+        private readonly reportPostMySqlRepository: Repository<ReportPostMySqlEntity>,
+        @InjectRepository(ReportPostCommentMySqlEntity)
+        private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
+        private readonly dataSource: DataSource,
+    ) { }
 
     async findManySelfCreatedCourses(
         input: FindManySelfCreatedCoursesInput,
@@ -24,20 +35,20 @@ export class ProfileService {
         const { data, accountId } = input
         const { options } = data
         const { take, skip } = { ...options }
-        
+
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
- 
+
         try {
-            const courses =  await this.courseMySqlRepository.find({
+            const courses = await this.courseMySqlRepository.find({
                 where: {
                     creatorId: accountId,
                 },
                 take,
                 skip,
             })
-            
+
             const numberOfCoursesResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
@@ -59,16 +70,16 @@ export class ProfileService {
             await queryRunner.release()
         }
     }
-    
+
     async findManyEnrolledCourses(input: FindManyEnrolledCoursesInput): Promise<FindManyEnrolledCoursesOutputData> {
         const { data, accountId } = input
         const { options } = data
         const { take, skip } = { ...options }
-    
+
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
-    
+
         try {
             const courses = await this.courseMySqlRepository.find({
                 relations: {
@@ -87,7 +98,7 @@ export class ProfileService {
                     }
                 }
             })
-    
+
             const numberOfFollowersResults = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(follow.followerId)", "count")
@@ -98,7 +109,7 @@ export class ProfileService {
                 .where("followed = :followed", { followed: true })
                 .groupBy("course.courseId")
                 .getRawMany()
-    
+
             const numberOfEnrolledCoursesResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
@@ -107,7 +118,7 @@ export class ProfileService {
                 .where("enrolledInfo.accountId = :accountId", { accountId })
                 .andWhere("enrolledInfo.enrolled = :enrolled", { enrolled: true })
                 .getRawOne()
-    
+
             const progressResults = await queryRunner.manager
                 .createQueryBuilder()
                 .select("course.courseId", "courseId")
@@ -124,10 +135,10 @@ export class ProfileService {
                 .getRawMany()
 
             const numberOfRewardedPosts = await this.postMySqlRepository.find({
-                where:{
+                where: {
                     creatorId: accountId
                 },
-                order:{
+                order: {
                     createdAt: "ASC"
                 }
             })
@@ -140,19 +151,19 @@ export class ProfileService {
                     const numberOfFollowers = numberOfFollowersResults.find(
                         result => result.courseId === course.courseId,
                     )?.count ?? 0
-    
+
                     const courseProgress = progressResults.find(
                         result => result.courseId === course.courseId
                     )
-    
+
                     const totalLessons = course.sections.reduce((acc, section) => acc + section.lessons.length, 0)
                     const completedLessons = courseProgress?.completedLessons ?? 0
                     const progress = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0
-    
+
                     course.creator.numberOfFollowers = numberOfFollowers
                     course.courseProgress = progress
                     course.numberOfRewardedPostsLeft = numberOfRewardedPostsLeft
-                    
+
                     return course
                 }),
                 metadata: {
@@ -167,9 +178,59 @@ export class ProfileService {
             await queryRunner.release()
         }
     }
-    
-    // async findManySentReports (input : FindManySentReportsInput) : Promise<FindManySentReportsOutput>{
 
+    // async findManySubmittedReports(input: FindManySubmittedReportsInput): Promise<FindManySubmittedReportsOutputData> {
+    //     const { accountId, data } = input
+    //     const { options } = data
+    //     const { skip, take } = options
+    //     const reports: ReportModel[] = []
+    
+    //     const reportTypes = [
+    //         { type: ReportType.Account, repository: this.reportAccountMySqlRepository, additionalRelation: "reportedAccount", Id: "reportAccountId" },
+    //         { type: ReportType.Course, repository: this.reportCourseMySqlRepository, additionalRelation: "reportedCourse", Id: "reportCourseId" },
+    //         { type: ReportType.Post, repository: this.reportPostMySqlRepository, additionalRelation: "reportedPost", Id: "reportPostId" },
+    //         { type: ReportType.PostComment, repository: this.reportPostCommentMySqlRepository, additionalRelation: "reportedPostComment", Id: "reportPostCommentId" }
+    //     ]
+    
+    //     const fetchReports = async ({ type, repository, additionalRelation, Id }) => {
+    //         const fetchedReports = await repository.find({
+    //             where:{
+    //                 reporterAccountId: accountId,
+    //             },
+    //             relations: {
+    //                 reporterAccount: true,
+    //                 [additionalRelation]: true
+    //             }
+    //         })
+    
+    //         reports.push(...fetchedReports.map(report => ({
+    //             reportId: report[Id],
+    //             type,
+    //             reporterAccount: report.reporterAccount,
+    //             reportedAccount: type === ReportType.Account ? report[additionalRelation] : null,
+    //             reportedCourse: type === ReportType.Course ? report[additionalRelation] : null,
+    //             reportedPost: type === ReportType.Post ? report[additionalRelation] : null,
+    //             reportedPostComment: type === ReportType.PostComment ? report[additionalRelation] : null,
+    //             description: report.description,
+    //             processStatus: report.processStatus,
+    //             processNote: report.processNote,
+    //             createdAt: report.createdAt,
+    //             updatedAt: report.updatedAt
+    //         })))
+            
+    //     }
+    
+    //     await Promise.all(reportTypes.map(fetchReports))
+    
+    //     const slicedReports = (skip && take) ? reports.slice(skip, skip + take) : reports
+    //     slicedReports?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+    //     return {
+    //         results: slicedReports,
+    //         metadata: {
+    //             count: slicedReports.length
+    //         }
+    //     }
     // }
 
 }

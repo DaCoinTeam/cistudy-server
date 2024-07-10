@@ -1,5 +1,5 @@
 import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
-import { PostCommentMySqlEntity, PostCommentReplyMySqlEntity, PostMySqlEntity } from "@database"
+import { PostCommentMySqlEntity, PostCommentReplyMySqlEntity, PostMySqlEntity, ReportPostCommentMySqlEntity, ReportPostMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
@@ -90,4 +90,52 @@ implements AuthOutput<FindManyPostCommentRepliesOutputData> {
         data: FindManyPostCommentRepliesOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens: AuthTokens
+}
+//
+@ObjectType()
+export class FindManyPostReportsOutputMetadata {
+    @Field(() => Int, { nullable: true })
+        count?: number
+}
+
+@ObjectType()
+export class FindManyPostReportsOutputData
+implements ResultsWithMetadata<ReportPostMySqlEntity, FindManyPostReportsOutputMetadata>
+{
+    @Field(() => [ReportPostMySqlEntity])
+        results: Array<ReportPostMySqlEntity>
+    @Field(() => FindManyPostReportsOutputMetadata, { nullable: true })
+        metadata: FindManyPostReportsOutputMetadata
+}
+
+@ObjectType()
+export class FindManyPostReportsOutput implements AuthOutput<FindManyPostReportsOutputData> {
+    @Field(() => FindManyPostReportsOutputData)
+        data: FindManyPostReportsOutputData
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
+}
+//
+@ObjectType()
+export class FindManyPostCommentReportsOutputMetadata {
+    @Field(() => Int, { nullable: true })
+        count?: number
+}
+
+@ObjectType()
+export class FindManyPostCommentReportsOutputData
+implements ResultsWithMetadata<ReportPostCommentMySqlEntity, FindManyPostCommentReportsOutputMetadata>
+{
+    @Field(() => [ReportPostCommentMySqlEntity])
+        results: Array<ReportPostCommentMySqlEntity>
+    @Field(() => FindManyPostCommentReportsOutputMetadata, { nullable: true })
+        metadata: FindManyPostCommentReportsOutputMetadata
+}
+
+@ObjectType()
+export class FindManyPostCommentReportsOutput implements AuthOutput<FindManyPostCommentReportsOutputData> {
+    @Field(() => FindManyPostCommentReportsOutputData)
+        data: FindManyPostCommentReportsOutputData
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
 }

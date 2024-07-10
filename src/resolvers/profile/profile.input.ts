@@ -52,3 +52,22 @@ implements AuthInput<FindManyEnrolledCoursesInputData>
 export class GenerateReportInput implements AuthEmptyDataInput {
     accountId: string  
 }
+
+@InputType()
+export class FindManySubmittedReportsInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+}
+
+@InputType()
+export class FindManySubmittedReportsInputData implements OptionsOnly<FindManySubmittedReportsInputOptions>{
+    @Field(() => FindManySubmittedReportsInputOptions, { nullable: true })
+        options?: FindManySubmittedReportsInputOptions
+}
+
+export class FindManySubmittedReportsInput implements AuthInput<FindManySubmittedReportsInputData> {
+    accountId: string
+    data : FindManySubmittedReportsInputData
+}

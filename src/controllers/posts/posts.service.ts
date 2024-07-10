@@ -715,10 +715,6 @@ export class PostsService {
             throw new NotFoundException("Comment's reply not found or has been deleted")
         }
 
-        if(commentReply.postComment.post.isCompleted){
-            throw new ConflictException("This post is closed.")
-        }
-
         await this.postCommentReplyMySqlRepository.update(postCommentReplyId, {
             content,
         })

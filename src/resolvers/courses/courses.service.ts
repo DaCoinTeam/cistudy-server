@@ -10,6 +10,7 @@ import {
     QuizAttemptMySqlEntity,
     QuizMySqlEntity,
     QuizQuestionMySqlEntity,
+    ReportCourseMySqlEntity,
     ResourceMySqlEntity
 } from "@database"
 import { Injectable, NotFoundException } from "@nestjs/common"
@@ -28,8 +29,9 @@ import {
     FindManyCoursesTopicInput,
     FindOneQuizAttemptInput,
     FindManyLevelCategoriesInput,
+    FindManyCourseReportsInput,
 } from "./courses.input"
-import { FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindOneQuizAttemptOutput } from "./courses.output"
+import { FindManyCourseReportsOutputData, FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindOneQuizAttemptOutput } from "./courses.output"
 
 @Injectable()
 export class CoursesService {
@@ -54,6 +56,8 @@ export class CoursesService {
         private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
         @InjectRepository(QuizQuestionMySqlEntity)
         private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
+        @InjectRepository(ReportCourseMySqlEntity)
+        private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
 
         private readonly dataSource: DataSource
     ) { }
@@ -703,6 +707,45 @@ export class CoursesService {
         return {
             data: found,
             numberOfQuestions: quizQuestions.length
+        }
+    }
+
+    async findManyCourseReports(input: FindManyCourseReportsInput): Promise<FindManyCourseReportsOutputData> {
+        const { data } = input
+        const { options } = data
+        const { skip, take } = options
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const results = await this.reportCourseMySqlRepository.find({
+                relations:{
+                    reporterAccount: true,
+                    reportedCourse: true,
+                },
+                skip,
+                take
+            })
+
+            const numberOfCourseReports = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(ReportCourseMySqlEntity, "report-course")
+                .getRawOne()
+
+            return {
+                results,
+                metadata: {
+                    count: numberOfCourseReports.count
+                }
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
         }
     }
 

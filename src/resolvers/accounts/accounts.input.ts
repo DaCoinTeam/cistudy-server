@@ -1,4 +1,4 @@
-import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions, ReportType } from "@common"
+import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@common"
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
 import { IsOptional, IsUUID } from "class-validator"
 
@@ -128,13 +128,7 @@ export class FindManyAccountReviewsInput implements Input<FindManyAccountReviews
 }
 
 @InputType()
-export class FindManyReportsInputParams {
-    @Field(() => String, { nullable: true })
-        filterReports? : string
-}
-
-@InputType()
-export class FindManyReportsInputOptions {
+export class FindManyAccountReportsInputOptions {
     @Field(() => Int, { nullable: true })
         take?: number
     @Field(() => Int, { nullable: true })
@@ -142,28 +136,14 @@ export class FindManyReportsInputOptions {
 }
 
 @InputType()
-export class FindManyReportsInputData implements ParamsWithOptions<FindManyReportsInputParams,FindManyReportsInputOptions>{
-    @Field(() => FindManyReportsInputParams, { nullable: true })
+export class FindManyAccountReportsInputData implements OptionsOnly<FindManyAccountReportsInputOptions>{
+    @Field(() => FindManyAccountReportsInputOptions, { nullable: true })
     @IsOptional()
-        params: FindManyReportsInputParams
-    @Field(() => FindManyReportsInputOptions, { nullable: true })
-    @IsOptional()
-        options?: FindManyReportsInputOptions
+        options?: FindManyAccountReportsInputOptions
 }
 
-export class FindManyReportsInput implements AuthInput<FindManyReportsInputData> {
+export class FindManyAccountReportsInput implements AuthInput<FindManyAccountReportsInputData> {
     accountId: string
-    data: FindManyReportsInputData
+    data: FindManyAccountReportsInputData
 }
 
-export class FindOneReportInputData {
-    @Field(() => String, { nullable: true })
-        reportType : ReportType
-    @Field(() => String, { nullable: true })
-        reportId : string
-}
-
-export class FindOneReportInput implements AuthInput<FindOneReportInputData> {
-    accountId: string
-    data: FindOneReportInputData
-}

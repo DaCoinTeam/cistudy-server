@@ -1,7 +1,9 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
 import {
     FindManyPostCommentRepliesInputData,
+    FindManyPostCommentReportsInputData,
     FindManyPostCommentsInputData,
+    FindManyPostReportsInputData,
     FindManyPostsInputData,
     FindOnePostCommentInputData,
     FindOnePostInputData,
@@ -11,7 +13,9 @@ import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import {
     FindManyPostCommentRepliesOutput,
+    FindManyPostCommentReportsOutput,
     FindManyPostCommentsOutput,
+    FindManyPostReportsOutput,
     FindManyPostsOutput,
     FindOnePostCommentOutput,
     FindOnePostOutput,
@@ -70,5 +74,19 @@ export class PostsResolver {
     @Args("data") data: FindManyPostCommentRepliesInputData,
   ) {
       return this.postsService.findManyPostCommentReplies({ accountId, data })
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  @Query(() => FindManyPostReportsOutput)
+  async findManyPostReports(@Args("data") data: FindManyPostReportsInputData, @AccountId() accountId: string) {
+      return await this.postsService.findManyPostReports({ accountId, data })
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  @Query(() => FindManyPostCommentReportsOutput)
+  async findManyPostCommentReports(@Args("data") data: FindManyPostCommentReportsInputData, @AccountId() accountId: string) {
+      return await this.postsService.findManyPostReports({ accountId, data })
   }
 }

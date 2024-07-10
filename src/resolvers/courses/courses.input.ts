@@ -247,31 +247,22 @@ export class FindManyLevelCategoriesInput implements Input<FindManyLevelCategori
     data: FindManyLevelCategoriesInputData
 }
 
-// @InputType()
-// export class FindOneQuizInputOptions{
-//     @Field(() => Int, { nullable: true })
-//     take?: number
-//     @Field(() => Int, { nullable: true })
-//     skip?: number
-// }
+@InputType()
+export class FindManyCourseReportsInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+}
 
-// @InputType()
-// export class FindOneQuizInputParams {
-//     @Field(() => ID)
-//     quizId: string
-// }
+@InputType()
+export class FindManyCourseReportsInputData implements OptionsOnly<FindManyCourseReportsInputOptions>{
+    @Field(() => FindManyCourseReportsInputOptions, { nullable: true })
+    @IsOptional()
+        options?: FindManyCourseReportsInputOptions
+}
 
-// @InputType()
-// export class FindOneQuizInputData implements ParamsWithOptions<FindOneQuizInputParams, FindOneQuizInputOptions>{
-//     @Field(() => FindOneQuizInputParams)
-//     params: FindOneQuizInputParams;
-
-//     @Field(() => FindOneQuizInputOptions, { nullable: true })
-//     @IsOptional()
-//     options?: FindOneQuizInputOptions;
-// }
-
-// export class FindOneQuizInput implements AuthInput<FindOneQuizInputData>{
-//     accountId: string
-//     data: FindOneQuizInputData
-// }
+export class FindManyCourseReportsInput implements AuthInput<FindManyCourseReportsInputData> {
+    accountId: string
+    data: FindManyCourseReportsInputData
+}
