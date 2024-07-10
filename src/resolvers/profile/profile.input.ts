@@ -61,13 +61,13 @@ export class FindManySubmittedReportsInputOptions {
         skip?: number
 }
 
-@InputType()
-export class FindManySubmittedReportsInputData implements OptionsOnly<FindManySubmittedReportsInputOptions>{
-    @Field(() => FindManySubmittedReportsInputOptions, { nullable: true })
-        options?: FindManySubmittedReportsInputOptions
-}
+// @InputType()
+// export class FindManySubmittedReportsInputData implements OptionsOnly<FindManySubmittedReportsInputOptions>{
+//     @Field(() => FindManySubmittedReportsInputOptions, { nullable: true })
+//         options?: FindManySubmittedReportsInputOptions
+// }
 
-export class FindManySubmittedReportsInput implements AuthInput<FindManySubmittedReportsInputData> {
-    accountId: string
-    data : FindManySubmittedReportsInputData
-}
+// export class FindManySubmittedReportsInput implements AuthInput<FindManySubmittedReportsInputData> {
+//     accountId: string
+//     data : FindManySubmittedReportsInputData
+// }

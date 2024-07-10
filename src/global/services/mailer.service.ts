@@ -1,8 +1,8 @@
-import { appConfig, jwtConfig, servicesConfig } from "@config";
-import { Injectable } from "@nestjs/common";
-import { createTransport } from "nodemailer";
-import { TokenType } from "@common";
-import { JwtService } from "@nestjs/jwt";
+import { appConfig, jwtConfig, servicesConfig } from "@config"
+import { Injectable } from "@nestjs/common"
+import { createTransport } from "nodemailer"
+import { TokenType } from "@common"
+import { JwtService } from "@nestjs/jwt"
 
 @Injectable()
 export class MailerService {
@@ -18,11 +18,11 @@ export class MailerService {
     })
 
     private mailOptions = (accountId: string, email: string, username: string) => {
-        const appUrl = appConfig().url;
+        const appUrl = appConfig().url
         const token = this.jwtService.sign(
             { accountId, type: TokenType.Verify },
             { secret: jwtConfig().secret },
-        );
+        )
 
         return {
             from: servicesConfig().mailer.user,
@@ -99,10 +99,10 @@ export class MailerService {
 </body>
 </html>
             `,
-        };
+        }
     }
 
     async sendMail(accountId: string, email: string, username: string) {
-        return await this.transporter.sendMail(this.mailOptions(accountId, email, username));
+        return await this.transporter.sendMail(this.mailOptions(accountId, email, username))
     }
 }

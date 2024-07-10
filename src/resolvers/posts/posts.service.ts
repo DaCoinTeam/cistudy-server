@@ -478,7 +478,7 @@ export class PostsService {
             const numberOfPostReports = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
-                .from(ReportPostMySqlEntity, "report-course")
+                .from(ReportPostMySqlEntity, "report-post")
                 .getRawOne()
 
             return {
@@ -517,7 +517,7 @@ export class PostsService {
             const numberOfPostCommentReports = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
-                .from(ReportPostCommentMySqlEntity, "report-course")
+                .from(ReportPostCommentMySqlEntity, "report-post-comment")
                 .getRawOne()
 
             return {

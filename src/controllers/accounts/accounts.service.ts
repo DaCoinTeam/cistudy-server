@@ -111,7 +111,7 @@ export class AccountsService {
         if (!course) {
             throw new ConflictException("Course not found or have been disabled")
         }
-
+        //if(veri)
         await this.courseMySqlRepository.update(courseId, { verifyStatus })
 
         return {

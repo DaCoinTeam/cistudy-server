@@ -689,6 +689,7 @@ export class PostsService {
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
+            throw ex
         } finally {
             await queryRunner.release()
         }
