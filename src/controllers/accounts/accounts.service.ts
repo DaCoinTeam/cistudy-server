@@ -21,9 +21,6 @@ import { AccountMySqlEntity,
     AccountReviewMySqlEntity, 
     RoleMySqlEntity, 
     ReportAccountMySqlEntity, 
-    ReportCourseMySqlEntity,
-    ReportPostMySqlEntity,
-    ReportPostCommentMySqlEntity
 } from "@database"
 import { CreateAccountReportOutput, 
     CreateAccountReviewOutput, 
@@ -35,7 +32,8 @@ import { CreateAccountReportOutput,
     VerifyCourseOuput 
 } from "./accounts.output"
 import { JwtService } from "@nestjs/jwt"
-import { ReportProcessStatus, SystemRoles } from "@common"
+import { CourseVerifyStatus, ReportProcessStatus, SystemRoles } from "@common"
+import { MailerService } from "@global"
 
 @Injectable()
 export class AccountsService {
@@ -52,12 +50,7 @@ export class AccountsService {
         private readonly roleMySqlRepository: Repository<RoleMySqlEntity>,
         @InjectRepository(ReportAccountMySqlEntity)
         private readonly reportAccountMySqlRepository: Repository<ReportAccountMySqlEntity>,
-        @InjectRepository(ReportCourseMySqlEntity)
-        private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
-        @InjectRepository(ReportPostMySqlEntity)
-        private readonly reportPostMySqlRepository: Repository<ReportPostMySqlEntity>,
-        @InjectRepository(ReportPostCommentMySqlEntity)
-        private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
+        private readonly mailerService: MailerService,
         private readonly dataSource: DataSource,
         private readonly jwtService: JwtService
     ) { }
@@ -99,7 +92,7 @@ export class AccountsService {
 
     async verifyCourse(input: VerifyCourseInput): Promise<VerifyCourseOuput> {
         const { data } = input
-        const { courseId, verifyStatus } = data
+        const { courseId, verifyStatus, note } = data
 
         const course = await this.courseMySqlRepository.findOne({
             where: {
@@ -111,7 +104,15 @@ export class AccountsService {
         if (!course) {
             throw new ConflictException("Course not found or have been disabled")
         }
-        //if(veri)
+
+        if(course.verifyStatus !== CourseVerifyStatus.Pending){
+            throw new ConflictException("Course is not submitted for verifying or it has been verified")
+        }
+
+        const creator = await this.accountMySqlRepository.findOneBy({accountId: course.creatorId})
+
+        await this.mailerService.sendVerifyCourseMail(creator.email, creator.username, course, note, verifyStatus)    
+
         await this.courseMySqlRepository.update(courseId, { verifyStatus })
 
         return {
@@ -392,7 +393,7 @@ export class AccountsService {
 
     async createAccountReport(input: CreateAccountReportInput): Promise<CreateAccountReportOutput> {
         const { data, accountId } = input
-        const { reportedAccountId, description } = data
+        const { reportedAccountId, title, description } = data
 
         if (accountId === reportedAccountId) {
             throw new ConflictException("You cannot report yourself.")
@@ -417,6 +418,7 @@ export class AccountsService {
         const { reportAccountId } = await this.reportAccountMySqlRepository.save({
             reporterAccountId: accountId,
             reportedAccountId,
+            title,
             description
         })
 
@@ -430,7 +432,7 @@ export class AccountsService {
 
     async updateAccountReport(input: UpdateAccountReportInput): Promise<UpdateAccountReportOutput> {
         const { data, accountId } = input
-        const { reportAccountId, description } = data
+        const { reportAccountId, title, description } = data
 
         const found = await this.reportAccountMySqlRepository.findOneBy({ reportAccountId })
 
@@ -446,7 +448,7 @@ export class AccountsService {
             throw new ConflictException("You isn't the owner of this report.")
         }
 
-        await this.reportAccountMySqlRepository.update(reportAccountId, { description })
+        await this.reportAccountMySqlRepository.update(reportAccountId, { title, description })
 
         return {
             message: "Your Report has been updated successfully",

@@ -107,7 +107,7 @@ export class CoursesController {
     @ApiBody({ schema: updateCourseSchema })
     @Put("update-course")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User, SystemRoles.Instructor)
+    @Roles(SystemRoles.User)
     @UseInterceptors(
         AuthInterceptor,
         FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),

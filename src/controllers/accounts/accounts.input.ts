@@ -1,4 +1,4 @@
-import { AuthInput, ReportProcessStatus, SystemRoles, VerifyStatus } from "@common"
+import { AuthInput, ReportProcessStatus, SystemRoles, CourseVerifyStatus } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID, Max, Min, MinLength } from "class-validator"
 
@@ -19,9 +19,10 @@ export class VerifyCourseInputData {
     @IsUUID("4")
     @ApiProperty()
         courseId: string
-
     @ApiProperty()
-        verifyStatus: VerifyStatus
+        note?: string
+    @ApiProperty()
+        verifyStatus: CourseVerifyStatus
 
 }
 
@@ -147,7 +148,7 @@ export class UpdateAccountRoleInputData {
         roles: Array<SystemRoles>
 
     @ApiProperty()
-        deleteRoleIds : Array<string>
+        deleteRoleIds: Array<string>
 }
 
 export class UpdateAccountRoleInput implements AuthInput<UpdateAccountRoleInputData> {
@@ -159,6 +160,10 @@ export class CreateAccountReportInputData {
     @IsUUID("4")
     @ApiProperty()
         reportedAccountId: string
+
+    @ApiProperty()
+    @MinLength(20)
+        title: string
     @ApiProperty()
     @MinLength(20)
         description: string
@@ -172,7 +177,10 @@ export class CreateAccountReportInput implements AuthInput<CreateAccountReportIn
 export class UpdateAccountReportInputData {
     @IsUUID("4")
     @ApiProperty()
-        reportAccountId : string
+        reportAccountId: string
+    @ApiProperty()
+    @MinLength(20)
+        title: string
     @ApiProperty()
     @MinLength(20)
         description: string
@@ -186,12 +194,12 @@ export class UpdateAccountReportInput implements AuthInput<UpdateAccountReportIn
 export class ResolveAccountReportInputData {
     @ApiProperty()
     @IsUUID("4")
-        reportAccountId : string
+        reportAccountId: string
     @ApiProperty()
-        processStatus : ReportProcessStatus
+        processStatus: ReportProcessStatus
     @ApiProperty()
     @MinLength(20)
-        processNote : string
+        processNote: string
 }
 
 export class ResolveAccountReportInput implements AuthInput<ResolveAccountReportInputData> {

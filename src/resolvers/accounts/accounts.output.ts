@@ -1,5 +1,5 @@
 import { AuthTokens, AuthOutput, ResultsWithMetadata } from "@common"
-import { AccountMySqlEntity, AccountReviewMySqlEntity, ReportAccountMySqlEntity } from "@database"
+import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, ReportAccountMySqlEntity } from "@database"
 import { ObjectType, Int, Field } from "@nestjs/graphql"
 
 
@@ -74,6 +74,28 @@ implements ResultsWithMetadata<ReportAccountMySqlEntity, FindManyAccountReportsO
 export class FindManyAccountReportsOutput implements AuthOutput<FindManyAccountReportsOutputData> {
     @Field(() => FindManyAccountReportsOutputData)
         data: FindManyAccountReportsOutputData
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
+}
+
+@ObjectType()
+export class FindManyUnverifiedCourseOutputMetadata {
+    @Field(() => Int, { nullable: true })
+        count?: number
+}
+
+@ObjectType()
+export class FindManyUnverifiedCourseOutputData implements ResultsWithMetadata<CourseMySqlEntity, FindManyUnverifiedCourseOutputMetadata>{
+    @Field(() => [CourseMySqlEntity])
+        results: Array<CourseMySqlEntity>
+    @Field(() => FindManyUnverifiedCourseOutputMetadata)
+        metadata?: FindManyUnverifiedCourseOutputMetadata
+}
+
+@ObjectType()
+export class FindManyUnverifiedCourseOutput implements AuthOutput<FindManyUnverifiedCourseOutputData> {
+    @Field(() => FindManyUnverifiedCourseOutputData)
+        data: FindManyUnverifiedCourseOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }

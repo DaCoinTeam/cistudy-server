@@ -1,9 +1,10 @@
-import { FollowMySqlEnitity, AccountMySqlEntity, AccountReviewMySqlEntity, ReportAccountMySqlEntity } from "@database"
+import { FollowMySqlEnitity, AccountMySqlEntity, AccountReviewMySqlEntity, ReportAccountMySqlEntity, CourseMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { DataSource, Repository } from "typeorm"
-import { FindManyFollowersInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindOneAccountInput, FindManyAccountReportsInput } from "./accounts.input"
+import { FindManyFollowersInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindOneAccountInput, FindManyAccountReportsInput, FindManyUnverifiedCourseInput } from "./accounts.input"
 import { InjectRepository } from "@nestjs/typeorm"
-import { FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyAccountReportsOutputData } from "./accounts.output"
+import { FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyAccountReportsOutputData, FindManyUnverifiedCourseOutputData } from "./accounts.output"
+import { CourseVerifyStatus } from "@common"
 
 @Injectable()
 export class AccountsService {
@@ -16,6 +17,8 @@ export class AccountsService {
         private readonly accountReviewMySqlRepository: Repository<AccountReviewMySqlEntity>,
         @InjectRepository(ReportAccountMySqlEntity)
         private readonly reportAccountMySqlRepository: Repository<ReportAccountMySqlEntity>,
+        @InjectRepository(CourseMySqlEntity)
+        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
         private readonly dataSource: DataSource,
     ) { }
 
@@ -31,10 +34,7 @@ export class AccountsService {
 
         try {
             const account = await queryRunner.manager.findOne(AccountMySqlEntity, {
-                where: { accountId },
-                relations: {
-                    //cart: true
-                }
+                where: { accountId }
             })
 
             const follow = await queryRunner.manager.findOne(
@@ -174,7 +174,7 @@ export class AccountsService {
 
         try {
             const results = await this.reportAccountMySqlRepository.find({
-                relations:{
+                relations: {
                     reporterAccount: true,
                     reportedAccount: true,
                 },
@@ -192,6 +192,47 @@ export class AccountsService {
                 results,
                 metadata: {
                     count: numberOfAccountReports.count
+                }
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+            throw ex
+        } finally {
+            await queryRunner.release()
+        }
+    }
+
+    async findManyUnverifiedCourse(input: FindManyUnverifiedCourseInput): Promise<FindManyUnverifiedCourseOutputData> {
+        const { data } = input
+        const { options } = data
+        const { skip, take } = options
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        try {
+            const results = await this.courseMySqlRepository.find({
+                where: {
+                    verifyStatus: CourseVerifyStatus.Pending
+                },
+                skip,
+                take,
+                relations:{
+                    creator : true
+                }
+            })
+
+            const numberOfUnverifiedCourse = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(CourseMySqlEntity, "course")
+                .getRawOne()
+
+            return {
+                results,
+                metadata: {
+                    count: numberOfUnverifiedCourse.count
                 }
             }
         } catch (ex) {

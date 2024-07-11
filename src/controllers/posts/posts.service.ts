@@ -797,7 +797,7 @@ export class PostsService {
 
     async createPostReport(input: CreatePostReportInput): Promise<CreatePostReportOutput> {
         const { data, accountId } = input
-        const { reportedPostId, description } = data
+        const { reportedPostId, title, description } = data
 
         const reportedPost = await this.postMySqlRepository.findOneBy({ postId: reportedPostId })
 
@@ -818,6 +818,7 @@ export class PostsService {
         const { reportPostId } = await this.reportPostMySqlRepository.save({
             reporterAccountId: accountId,
             reportedPostId,
+            title,
             description
         })
 
@@ -831,7 +832,7 @@ export class PostsService {
 
     async updatePostReport(input: UpdatePostReportInput): Promise<UpdatePostReportOutput> {
         const { data, accountId } = input
-        const { reportPostId, description } = data
+        const { reportPostId, title, description } = data
 
         const found = await this.reportPostMySqlRepository.findOneBy({ reportPostId })
 
@@ -847,7 +848,7 @@ export class PostsService {
             throw new ConflictException("You aren't the owner of this report.")
         }
 
-        await this.reportPostMySqlRepository.update(reportPostId, { description })
+        await this.reportPostMySqlRepository.update(reportPostId, { title, description })
 
         return {
             message: "Your Report has been updated successfully",
@@ -859,7 +860,7 @@ export class PostsService {
 
     async createPostCommentReport(input: CreatePostCommentReportInput): Promise<CreatePostCommentReportOutput> {
         const { data, accountId } = input
-        const { reportedPostCommentId, description } = data
+        const { reportedPostCommentId, title, description } = data
 
         const reportedPostComment = await this.postCommentMySqlRepository.findOneBy({ postCommentId: reportedPostCommentId })
 
@@ -880,6 +881,7 @@ export class PostsService {
         const { reportPostCommentId } = await this.reportPostCommentMySqlRepository.save({
             reporterAccountId: accountId,
             reportedPostCommentId,
+            title,
             description
         })
 
@@ -893,7 +895,7 @@ export class PostsService {
 
     async updatePostCommentReport(input: UpdatePostCommentReportInput): Promise<UpdatePostCommentReportOutput> {
         const { data, accountId } = input
-        const { reportPostCommentId, description } = data
+        const { reportPostCommentId, title, description } = data
 
         const found = await this.reportPostCommentMySqlRepository.findOneBy({ reportPostCommentId })
 
@@ -909,7 +911,7 @@ export class PostsService {
             throw new ConflictException("You aren't the owner of this report.")
         }
 
-        await this.reportPostCommentMySqlRepository.update(reportPostCommentId, { description })
+        await this.reportPostCommentMySqlRepository.update(reportPostCommentId, { title, description })
 
         return {
             message: "Your Report has been updated successfully",

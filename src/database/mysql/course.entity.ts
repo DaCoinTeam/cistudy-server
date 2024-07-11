@@ -9,7 +9,7 @@ import {
     UpdateDateColumn,
 } from "typeorm"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
-import { VerifyStatus } from "@common"
+import { CourseVerifyStatus } from "@common"
 import { PostEntity } from "./post.entity"
 import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { SectionEntity } from "./section.entity"
@@ -68,8 +68,8 @@ export class CourseEntity {
         enableDiscount: boolean
 
     @Field(() => String)
-    @Column({ type: "enum", enum: VerifyStatus, default: VerifyStatus.Pending })
-        verifyStatus: VerifyStatus
+    @Column({ type: "enum", enum: CourseVerifyStatus, default: CourseVerifyStatus.Not_Submitted })
+        verifyStatus: CourseVerifyStatus
 
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (account) => account.courses)

@@ -593,6 +593,9 @@ export class CreateCourseReportInputData {
         reportedCourseId: string
     @ApiProperty()
     @MinLength(20)
+        title: string
+    @ApiProperty()
+    @MinLength(20)
         description: string
 }
 
@@ -605,6 +608,9 @@ export class UpdateCourseReportInputData {
     @IsUUID("4")
     @ApiProperty()
         reportCourseId : string
+    @ApiProperty()
+    @MinLength(20)
+        title: string
     @ApiProperty()
     @MinLength(20)
         description: string

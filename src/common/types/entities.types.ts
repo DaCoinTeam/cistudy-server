@@ -21,7 +21,8 @@ registerEnumType(SystemRoles, {
     name: "SystemRoles",
 })
 
-export enum VerifyStatus {
+export enum CourseVerifyStatus {
+  Not_Submitted = "not submitted",
   Pending = "pending",
   Approved = "approved",
   Rejected = "rejected",
@@ -37,7 +38,7 @@ registerEnumType(OrderStatus, {
     name: "OrderStatus"
 })
 
-registerEnumType(VerifyStatus, {
+registerEnumType(CourseVerifyStatus, {
     name: "VerifyStatus",
 })
 

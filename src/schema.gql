@@ -239,6 +239,7 @@ type ReportCourseEntity {
   reportCourseId: ID!
   reporterAccountId: ID!
   reportedCourseId: ID!
+  title: String
   description: String
   processStatus: String!
   processNote: String
@@ -315,6 +316,7 @@ type ReportPostEntity {
   reportPostId: ID!
   reporterAccountId: ID!
   reportedPostId: ID!
+  title: String
   description: String
   processStatus: String!
   processNote: String
@@ -372,6 +374,7 @@ type ReportPostCommentEntity {
   reportPostCommentId: ID!
   reporterAccountId: ID!
   reportedPostCommentId: ID!
+  title: String
   description: String
   processStatus: String!
   processNote: String
@@ -446,6 +449,7 @@ type ReportAccountEntity {
   reportAccountId: ID!
   reporterAccountId: ID!
   reportedAccountId: ID!
+  title: String
   description: String
   processStatus: String!
   processNote: String
@@ -690,6 +694,20 @@ type FindManyAccountReportsOutput {
   tokens: AuthTokens
 }
 
+type FindManyUnverifiedCourseOutputMetadata {
+  count: Int
+}
+
+type FindManyUnverifiedCourseOutputData {
+  results: [CourseEntity!]!
+  metadata: FindManyUnverifiedCourseOutputMetadata!
+}
+
+type FindManyUnverifiedCourseOutput {
+  data: FindManyUnverifiedCourseOutputData!
+  tokens: AuthTokens
+}
+
 type FindManySelfCreatedCoursesOutputMetadata {
   count: Int
 }
@@ -795,6 +813,7 @@ type Query {
   findManyAccounts(data: FindManyAccountsInputData!): FindManyAccountsOutput!
   findManyAccountReviews(data: FindManyAccountReviewsInputData!): FindManyAccountReviewsOutputData!
   findManyAccountReports(data: FindManyAccountReportsInputData!): FindManyAccountReportsOutput!
+  findManyUnverifiedCourses(data: FindManyUnverifiedCourseInputData!): FindManyUnverifiedCourseOutput!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
@@ -1074,6 +1093,15 @@ input FindManyAccountReportsInputData {
 }
 
 input FindManyAccountReportsInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManyUnverifiedCourseInputData {
+  options: FindManyUnverifiedCourseInputOptions
+}
+
+input FindManyUnverifiedCourseInputOptions {
   take: Int
   skip: Int
 }

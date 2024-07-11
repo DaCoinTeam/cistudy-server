@@ -64,6 +64,7 @@ import {
     ProcessStatus,
     QuizAttemptStatus,
     ReportProcessStatus,
+    CourseVerifyStatus,
     VideoType,
     computeDenomination,
     computeRaw,
@@ -332,8 +333,10 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            if (existKeyNotUndefined(course))
+            if (existKeyNotUndefined(course)){
+                course.verifyStatus = CourseVerifyStatus.Pending
                 await this.courseMySqlRepository.save(course)
+            }
 
             await queryRunner.commitTransaction()
 
@@ -1647,7 +1650,7 @@ export class CoursesService {
 
     async createCourseReport(input: CreateCourseReportInput): Promise<CreateCourseReportOutput> {
         const { data, accountId } = input
-        const { reportedCourseId, description } = data
+        const { reportedCourseId, title, description } = data
 
         const reportedCourse = await this.courseMySqlRepository.findOneBy({ courseId: reportedCourseId })
 
@@ -1668,6 +1671,7 @@ export class CoursesService {
         const { reportCourseId } = await this.reportCourseMySqlRepository.save({
             reporterAccountId: accountId,
             reportedCourseId,
+            title,
             description
         })
 
@@ -1681,7 +1685,7 @@ export class CoursesService {
 
     async updateCourseReport(input: UpdateCourseReportInput): Promise<UpdateCourseReportOutput> {
         const { data, accountId } = input
-        const { reportCourseId, description } = data
+        const { reportCourseId, title, description } = data
 
         const found = await this.reportCourseMySqlRepository.findOneBy({ reportCourseId })
 
@@ -1697,7 +1701,7 @@ export class CoursesService {
             throw new ConflictException("You aren't the owner of this report.")
         }
 
-        await this.reportCourseMySqlRepository.update(reportCourseId, { description })
+        await this.reportCourseMySqlRepository.update(reportCourseId, { title, description })
 
         return {
             message: "Your Report has been updated successfully",

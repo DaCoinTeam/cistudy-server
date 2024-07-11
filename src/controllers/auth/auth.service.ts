@@ -52,7 +52,7 @@ export class AuthService {
         data.password = this.sha256Service.createHash(data.password)
         const created = await this.accountMySqlRepository.save(data)
 
-        await this.mailerService.sendMail(created.accountId, data.email, created.username)
+        await this.mailerService.sendVerifyRegistrationMail(created.accountId, data.email, created.username)
         return {
             message: "Your accoutn has been created successfully, please check your email to confirm registration"
         }

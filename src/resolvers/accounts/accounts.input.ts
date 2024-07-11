@@ -146,4 +146,22 @@ export class FindManyAccountReportsInput implements AuthInput<FindManyAccountRep
     accountId: string
     data: FindManyAccountReportsInputData
 }
+@InputType()
+export class FindManyUnverifiedCourseInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+}
+@InputType()
+export class FindManyUnverifiedCourseInputData implements OptionsOnly<FindManyUnverifiedCourseInputOptions>{
+    @Field(() => FindManyUnverifiedCourseInputOptions, { nullable: true })
+    @IsOptional()
+        options?: FindManyUnverifiedCourseInputOptions
+}
+
+export class FindManyUnverifiedCourseInput implements AuthInput<FindManyUnverifiedCourseInputData> {
+    accountId: string
+    data: FindManyUnverifiedCourseInputData
+}
 

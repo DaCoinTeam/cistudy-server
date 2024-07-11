@@ -1,8 +1,8 @@
 import { Resolver, Query, Args } from "@nestjs/graphql"
 import { AccountsService } from "./accounts.service"
-import { FindManyFollowersInputData, FindManyAccountReviewsInputData, FindManyAccountsInputData, FindOneAccountInputData, FindManyAccountReportsInputData } from "./accounts.input"
+import { FindManyFollowersInputData, FindManyAccountReviewsInputData, FindManyAccountsInputData, FindOneAccountInputData, FindManyAccountReportsInputData, FindManyUnverifiedCourseInputData } from "./accounts.input"
 import { AccountMySqlEntity } from "@database"
-import { FindManyAccountReportsOutput, FindManyAccountReviewsOutputData, FindManyAccountsOutput } from "./accounts.output"
+import { FindManyAccountReportsOutput, FindManyAccountReviewsOutputData, FindManyAccountsOutput, FindManyUnverifiedCourseOutput } from "./accounts.output"
 import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 
@@ -37,6 +37,13 @@ export class AccountsResolver {
     @Query(() => FindManyAccountReportsOutput)
     async findManyAccountReports(@Args("data") data: FindManyAccountReportsInputData, @AccountId() accountId: string) {
         return await this.accountsService.findManyAccountReports({ accountId, data })
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @Query(() => FindManyUnverifiedCourseOutput)
+    async findManyUnverifiedCourses(@Args("data") data: FindManyUnverifiedCourseInputData, @AccountId() accountId: string) {
+        return await this.accountsService.findManyUnverifiedCourse({ accountId, data })
     }
 }
 

@@ -233,6 +233,9 @@ export class CreatePostReportInputData {
         reportedPostId: string
     @ApiProperty()
     @MinLength(20)
+        title: string
+    @ApiProperty()
+    @MinLength(20)
         description: string
 }
 
@@ -245,6 +248,9 @@ export class UpdatePostReportInputData {
     @IsUUID("4")
     @ApiProperty()
         reportPostId : string
+    @ApiProperty()
+    @MinLength(20)
+        title: string
     @ApiProperty()
     @MinLength(20)
         description: string
@@ -260,6 +266,9 @@ export class CreatePostCommentReportInputData {
         reportedPostCommentId: string
     @ApiProperty()
     @MinLength(20)
+        title: string
+    @ApiProperty()
+    @MinLength(20)
         description: string
 }
 
@@ -272,6 +281,9 @@ export class UpdatePostCommentReportInputData {
     @IsUUID("4")
     @ApiProperty()
         reportPostCommentId : string
+    @ApiProperty()
+    @MinLength(20)
+        title: string
     @ApiProperty()
     @MinLength(20)
         description: string
