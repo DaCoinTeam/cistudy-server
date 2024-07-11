@@ -227,6 +227,7 @@ export class AccountsService {
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(CourseMySqlEntity, "course")
+                .where("course.verifyStatus = :verifyStatus", {verifyStatus : CourseVerifyStatus.Pending})
                 .getRawOne()
 
             return {

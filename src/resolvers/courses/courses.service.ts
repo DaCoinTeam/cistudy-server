@@ -32,6 +32,7 @@ import {
     FindManyCourseReportsInput,
 } from "./courses.input"
 import { FindManyCourseReportsOutputData, FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindOneQuizAttemptOutput } from "./courses.output"
+import { CourseVerifyStatus } from "@common"
 
 @Injectable()
 export class CoursesService {
@@ -343,6 +344,7 @@ export class CoursesService {
                 results = await this.courseMySqlRepository.find({
                     where: {
                         title: Like(`%${searchValue}%`),
+                        verifyStatus: CourseVerifyStatus.Approved
                     },
                     skip,
                     take,

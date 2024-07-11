@@ -164,7 +164,7 @@ export class MailerService {
         }
     }
 
-    private signUpMailOptions = (accountId: string, email: string, username: string) => {
+    private verifyAccountMailOptions = (accountId: string, email: string, username: string) => {
         const appUrl = appConfig().url
         const token = this.jwtService.sign(
             { accountId, type: TokenType.Verify },
@@ -249,7 +249,7 @@ export class MailerService {
     }
 
     async sendVerifyRegistrationMail(accountId: string, email: string, username: string) {
-        return await this.transporter.sendMail(this.signUpMailOptions(accountId, email, username))
+        return await this.transporter.sendMail(this.verifyAccountMailOptions(accountId, email, username))
     }
 
     async sendVerifyCourseMail(email: string, username: string, course : CourseMySqlEntity,note : string, verifyStatus: CourseVerifyStatus) {
