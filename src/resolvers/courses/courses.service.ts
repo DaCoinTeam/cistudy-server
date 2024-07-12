@@ -165,6 +165,12 @@ export class CoursesService {
                 .andWhere("courseId = :courseId", { courseId })
                 .getRawOne()
 
+            const courseReviews = await this.courseReviewMySqlRepository.findBy({courseId})
+            
+            const ratingCounts = [1, 2, 3, 4, 5].map(star => 
+                courseReviews.filter(review => review.rating === star).length
+            )
+
             await queryRunner.commitTransaction()
 
             course.creator.numberOfFollowers = numberOfFollowersResult.count
@@ -172,6 +178,18 @@ export class CoursesService {
 
             const enrolled = enrolledInfo?.enrolled
             course.enrolled = enrolled ?? false
+
+            const totalRating = courseReviews.reduce((sum, review) => sum + review.rating, 0)
+            const overallCourseRating = courseReviews.length ? totalRating / courseReviews.length : 0
+            
+            course.courseRatings = {
+                overallCourseRating,
+                numberOf1StarRatings: ratingCounts[0],
+                numberOf2StarRatings: ratingCounts[1],
+                numberOf3StarRatings: ratingCounts[2],
+                numberOf4StarRatings: ratingCounts[3],
+                numberOf5StarRatings: ratingCounts[4],
+            }
 
             return course
         } catch (ex) {
@@ -389,10 +407,10 @@ export class CoursesService {
                 const ratingCounts = [1, 2, 3, 4, 5].map(star => 
                     reviews.filter(review => review.rating === star).length
                 )
-                course.courseRate = reviews.length ? totalRating / reviews.length : 0
+                const overallCourseRating = reviews.length ? totalRating / reviews.length : 0
                 
                 course.courseRatings = {
-                    overallCourseRating: course.courseRate,
+                    overallCourseRating,
                     numberOf1StarRatings: ratingCounts[0],
                     numberOf2StarRatings: ratingCounts[1],
                     numberOf3StarRatings: ratingCounts[2],
@@ -401,8 +419,8 @@ export class CoursesService {
                 }
             })
 
-            const maxRate = Math.max(...results.map(course => course.courseRate))
-            const highRateCourses = results.filter(course => course.courseRate === maxRate)
+            const maxRate = Math.max(...results.map(course => course.courseRatings.overallCourseRating))
+            const highRateCourses = results.filter(course => course.courseRatings.overallCourseRating === maxRate)
 
             // const numberOfCoursesResult = await queryRunner.manager
             //     .createQueryBuilder()
