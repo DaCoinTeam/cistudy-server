@@ -40,7 +40,7 @@ export class SectionEntity {
     @JoinColumn({ name: "courseId" })
         course: CourseEntity
 
-    @Field(() => [LessonEntity])
+    @Field(() => [LessonEntity], {nullable : true})
     @OneToMany(() => LessonEntity, (video) => video.section, { cascade: true })
         lessons: Array<LessonEntity>
 

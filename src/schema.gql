@@ -10,7 +10,7 @@ type SectionEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   course: CourseEntity!
-  lessons: [LessonEntity!]!
+  lessons: [LessonEntity!]
 }
 
 """
@@ -278,8 +278,8 @@ type CourseEntity {
   updatedAt: DateTime!
   courseCategories: [CourseCategoryEntity!]
   courseTargets: [CourseTargetEntity!]
-  posts: [PostEntity!]!
-  sections: [SectionEntity!]!
+  posts: [PostEntity!]
+  sections: [SectionEntity!]
   cartCourses: [CartCourseEntity!]!
   certificate: [CertificateEntity!]!
   orderCourses: [OrderCourseEntity!]!

@@ -112,14 +112,14 @@ export class CourseEntity {
     @OneToMany(() => CourseTargetEntity, (courseTarget) => courseTarget.course)
         courseTargets: Array<CourseTargetEntity>
 
-    @Field(() => [PostEntity])
+    @Field(() => [PostEntity], {nullable: true})
     @OneToMany(() => PostEntity, (post) => post.course)
         posts: Array<PostEntity>
 
     @OneToMany(() => EnrolledInfoEntity, (enrolled) => enrolled.course)
         enrolledInfos: Array<EnrolledInfoEntity>
 
-    @Field(() => [SectionEntity])
+    @Field(() => [SectionEntity], {nullable: true})
     @OneToMany(() => SectionEntity, (section) => section.course, {
         onDelete: "CASCADE",
     })
