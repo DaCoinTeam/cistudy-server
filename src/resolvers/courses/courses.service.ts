@@ -128,11 +128,19 @@ export class CoursesService {
                     },
                     courseTargets: true,
                     creator: true,
+                    courseCategories:{
+                        category: true
+                    }
                 },
                 order: {
                     courseTargets: {
                         position: "ASC",
                     },
+                    courseCategories:{
+                        category:{
+                            level: "ASC"
+                        }
+                    }
                 },
             })
 
