@@ -361,6 +361,9 @@ export class CoursesService {
                         courseCategories: {
                             category: true,
                         },
+                        sections:{
+                            lessons: true
+                        }
                     },
                 })
             }
