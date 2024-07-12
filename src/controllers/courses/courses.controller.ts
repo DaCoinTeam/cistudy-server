@@ -172,7 +172,7 @@ export class CoursesController {
     @ApiBearerAuth()
     @Post("create-course-target")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User, SystemRoles.Instructor)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async createCourseTarget(
         @AccountId() accountId: string,
@@ -187,7 +187,7 @@ export class CoursesController {
     @ApiBearerAuth()
     @Put("update-course-target")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User, SystemRoles.Instructor)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async updateCourseTarget(
         @AccountId() accountId: string,
@@ -202,7 +202,7 @@ export class CoursesController {
     @ApiBearerAuth()
     @Delete("delete-course-target/:courseTargetId")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User, SystemRoles.Instructor)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async deleteCoureTarget(
         @AccountId() accountId: string,
@@ -217,7 +217,7 @@ export class CoursesController {
     @ApiBearerAuth()
     @Post("create-section")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User, SystemRoles.Instructor)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async createSection(
         @AccountId() accountId: string,
