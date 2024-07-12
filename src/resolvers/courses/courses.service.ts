@@ -401,18 +401,18 @@ export class CoursesService {
             const maxRate = Math.max(...results.map(course => course.courseRate))
             const highRateCourses = results.filter(course => course.courseRate === maxRate)
 
-            const numberOfCoursesResult = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(CourseMySqlEntity, "course")
-                .getRawOne()
+            // const numberOfCoursesResult = await queryRunner.manager
+            //     .createQueryBuilder()
+            //     .select("COUNT(*)", "count")
+            //     .from(CourseMySqlEntity, "course")
+            //     .getRawOne()
 
             await queryRunner.commitTransaction()
 
             return {
                 results,
                 metadata: {
-                    count: numberOfCoursesResult.count,
+                    count: results.length,
                     highRateCourses,
                     categories: topic,
                 },
