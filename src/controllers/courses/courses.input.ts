@@ -109,6 +109,9 @@ export class UpdateCourseInputData {
   @IsNumber()
   @ApiProperty({ nullable: true })
       previewVideoIndex?: number
+
+  @ApiProperty({ nullable: true })
+      updateCourseCategories : Array<string>
 }
 
 export class UpdateCourseInput implements AuthInput<UpdateCourseInputData> {

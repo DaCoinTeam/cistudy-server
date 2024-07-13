@@ -26,6 +26,12 @@ export const updateCourseSchema: SchemaObject = {
                     type: "number",
                     example: "1"
                 },
+                updateCourseCategories:{
+                    type: "array",
+                    items:{
+                        type: "string"
+                    }
+                }
             },
         },
         files: {

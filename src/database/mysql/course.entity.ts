@@ -160,4 +160,7 @@ export class CourseEntity {
 
     @Field(() => CourseRatingDTO, {nullable : true})
         courseRatings : CourseRatingDTO
+
+    @Field(() => CourseRatingDTO, {nullable : true})
+        courseCategoryLevels : CourseRatingDTO
 }

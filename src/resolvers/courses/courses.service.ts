@@ -1,6 +1,7 @@
 import {
     CategoryMySqlEntity,
     CategoryRelationMySqlEntity,
+    CourseCategoryMySqlEntity,
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
     CourseTargetMySqlEntity,
@@ -8,7 +9,6 @@ import {
     FollowMySqlEnitity,
     LessonMySqlEntity,
     QuizAttemptMySqlEntity,
-    QuizMySqlEntity,
     QuizQuestionMySqlEntity,
     ReportCourseMySqlEntity,
     ResourceMySqlEntity
@@ -53,8 +53,8 @@ export class CoursesService {
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         @InjectRepository(QuizAttemptMySqlEntity)
         private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
-        @InjectRepository(QuizMySqlEntity)
-        private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+        @InjectRepository(CourseCategoryMySqlEntity)
+        private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
         @InjectRepository(QuizQuestionMySqlEntity)
         private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
         @InjectRepository(ReportCourseMySqlEntity)
@@ -401,7 +401,7 @@ export class CoursesService {
                 },
             })
 
-            results.forEach(course => {
+            results.forEach(async course => {
                 const reviews = coursesReviews.filter(review => review.courseId === course.courseId)
                 const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0)
                 const ratingCounts = [1, 2, 3, 4, 5].map(star => 
@@ -417,16 +417,26 @@ export class CoursesService {
                     numberOf4StarRatings: ratingCounts[3],
                     numberOf5StarRatings: ratingCounts[4],
                 }
+
+                // const courseCategories = await this.courseCategoryMySqlRepository.find({
+                //     where:{
+                //         courseId : course.courseId
+                //     },
+                //     relations: {
+                //         category: true
+                //     }
+                // })
+
+                // const categoryLevels = courseCategories.map(category => 
+                //     category.category.level = 
+                // )
+                // course.courseCategoryLevels = {
+
+                // }
             })
 
             const maxRate = Math.max(...results.map(course => course.courseRatings.overallCourseRating))
             const highRateCourses = results.filter(course => course.courseRatings.overallCourseRating === maxRate)
-
-            // const numberOfCoursesResult = await queryRunner.manager
-            //     .createQueryBuilder()
-            //     .select("COUNT(*)", "count")
-            //     .from(CourseMySqlEntity, "course")
-            //     .getRawOne()
 
             await queryRunner.commitTransaction()
 
