@@ -23,10 +23,6 @@ export class SignUpData {
     @ApiProperty({ example: "starci@gmail.com", description: "Email" })
         email: string
 
-    @IsNotEmpty()
-    @ApiProperty({ example: "sample123", description: "Username" })
-        username: string
-
     @IsStrongPassword()
     @ApiProperty({ example: "Cuong123_A", description: "Password" })
         password: string
