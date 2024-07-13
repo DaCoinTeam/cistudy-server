@@ -50,5 +50,6 @@ jobs:
         REWARD_COMMENT_POST_EARN_COEFFICIENT: ${{ vars.REWARD_COMMENT_POST_EARN_COEFFICIENT }}
         SSL_CERT:  ${{ secrets.SSL_CERT }}
         SSL_KEY:  ${{ secrets.SSL_KEY }}
+        FRONTEND_URL: ${{ vars.FRONTEND_URL }}
       run: docker compose -f docker/github-compose.yaml -p cistudy-server up --build -d 
  

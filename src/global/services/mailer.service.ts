@@ -165,7 +165,7 @@ export class MailerService {
     }
 
     private verifyAccountMailOptions = (accountId: string, email: string, username: string) => {
-        const appUrl = appConfig().url
+        const frontendUrl = appConfig().frontendUrl
         const token = this.jwtService.sign(
             { accountId, type: TokenType.Verify },
             { secret: jwtConfig().secret },
@@ -229,7 +229,7 @@ export class MailerService {
             <p>Thank you for registering on the CiStudy online learning platform. You have taken the first step towards expanding your knowledge and skills.</p>
             <p>To complete your registration, please confirm your email by clicking the button below: </p>
             <p style="text-align: center;">
-                <a href="${appUrl}/api/auth/verify-registration-page?&token=${token}" class="button">Confirm Email</a>
+                <a href="${frontendUrl}/verify-registration?token=${token}" class="button">Confirm Email</a>
             </p>
             
             <p>After confirming, you can access your account and start exploring exciting courses on CiStudy.</p>
