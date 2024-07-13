@@ -1,4 +1,4 @@
-import { AuthInput, Input } from "@common"
+import { Input } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsDateString, IsEmail, IsNotEmpty, IsStrongPassword, Length } from "class-validator"
 
@@ -53,7 +53,6 @@ export class VerifyRegistrationInputData{
         token : string
 }
 
-export class VerifyRegistrationInput implements AuthInput<VerifyRegistrationInputData> {
-    accountId: string
+export class VerifyRegistrationInput implements Input<VerifyRegistrationInputData> {
     data: VerifyRegistrationInputData
 }
