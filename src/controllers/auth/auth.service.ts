@@ -2,11 +2,9 @@ import { ConflictException, Injectable, NotFoundException, UnauthorizedException
 import { AccountMySqlEntity, RoleMySqlEntity } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository } from "typeorm"
-import { MailerService, Sha256Service } from "@global"
+import { AuthManagerService, MailerService, Sha256Service } from "@global"
 import { SignInInput, SignUpInput, VerifyRegistrationInput } from "./auth.input"
 import { SignUpOutput, VerifyRegistrationOutput } from "./auth.output"
-import { JwtService } from "@nestjs/jwt"
-import { jwtConfig } from "@config"
 import { SystemRoles } from "@common"
 
 @Injectable()
@@ -18,7 +16,7 @@ export class AuthService {
         private readonly roleMySqlRepository: Repository<RoleMySqlEntity>,
         private readonly sha256Service: Sha256Service,
         private readonly mailerService: MailerService,
-        private readonly jwtService: JwtService,
+        private readonly authManagerService: AuthManagerService,
         private readonly dataSource: DataSource
     ) { }
 
@@ -60,7 +58,7 @@ export class AuthService {
 
     async verifyRegistration(input: VerifyRegistrationInput): Promise<VerifyRegistrationOutput> {
 
-        const { accountId, data } = input
+        const {  data } = input
         const { token } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -68,14 +66,7 @@ export class AuthService {
         await queryRunner.startTransaction()
 
         try {
-            const decoded = await this.jwtService.verifyAsync(token, {
-                ignoreExpiration: false,
-                secret: jwtConfig().secret,
-            })
-
-            if (!decoded || !decoded.accountId || accountId !== decoded.accountId) {
-                throw new NotFoundException("Invalid token")
-            }
+            const { accountId } = await this.authManagerService.verifyToken(token)
 
             const account = await this.accountMySqlRepository.findOne({
                 where: {

@@ -1,20 +1,14 @@
 import {
     Body,
     Controller,
-    Get,
     Patch,
     Post,
-    Query,
-    Res,
-    UseGuards,
     UseInterceptors,
 } from "@nestjs/common"
-import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger"
+import { ApiHeader, ApiTags } from "@nestjs/swagger"
 import { SignInInputData, SignUpData, VerifyRegistrationInputData } from "./auth.input"
 import { AuthService } from "./auth.service"
-import { AccountId, GenerateAuthTokensInterceptor } from "../shared"
-import { Response } from "express"
-import { JwtAuthGuard } from "@resolvers"
+import { GenerateAuthTokensInterceptor } from "../shared"
 
 @ApiTags("Auth")
 @ApiHeader({
@@ -36,19 +30,10 @@ export class AuthController {
         return this.authService.signUp({ data: body })
     }
 
-    @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
     @Patch("verify-registration")
     async verifyRegistration(
         @Body() data: VerifyRegistrationInputData,
-        @AccountId() accountId : string
     ){
-        return this.authService.verifyRegistration({accountId, data})
-    }
-
-    @Get("verify-registration-page")
-    async getAccountVerificationLink(@Query("token") token :string, @Res() res: Response) {
-        const verificationLink = `https://www.facebook.com/${token}`
-        return res.redirect(verificationLink)
+        return this.authService.verifyRegistration({ data})
     }
 }
