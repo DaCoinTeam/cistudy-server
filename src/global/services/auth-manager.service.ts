@@ -20,7 +20,9 @@ export class AuthManagerService {
 
     async verifyToken(token: string): Promise<Payload> {
         try {
-            return await this.jwtService.verifyAsync<Payload>(token)
+            return await this.jwtService.verifyAsync<Payload>(token, {
+                secret: jwtConfig().secret
+            })
         } catch (ex) {
             if (ex instanceof JsonWebTokenError) {
                 throw new UnauthorizedException("Invalid token.")
