@@ -290,6 +290,7 @@ type CourseEntity {
   courseProgress: Float
   numberOfRewardedPostsLeft: Int
   courseRatings: CourseRatingDTO
+  courseCategoryLevels: CourseRatingDTO
 }
 
 type PostLikeEntity {
