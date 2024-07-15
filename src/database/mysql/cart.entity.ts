@@ -37,7 +37,7 @@ export class CartEntity {
         updatedAt: Date
 
     @Field(() => AccountEntity)
-    @OneToOne(() => AccountEntity, (account) => account.cart)
+    @OneToOne(() => AccountEntity, (account) => account.cart, { cascade: true })
     @JoinColumn({ name: "cartId" })
         account: AccountEntity
 }

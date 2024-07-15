@@ -150,7 +150,7 @@ export class AccountEntity {
         courseReview: Array<CourseReviewEntity>
 
     @Field(() => CartEntity, { nullable: true })
-    @OneToOne(() => CartEntity, (cart) => cart.cartId, { nullable: true })
+    @OneToOne(() => CartEntity, (cart) => cart.cartId, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "cartId" })
         cart: CartEntity
 
