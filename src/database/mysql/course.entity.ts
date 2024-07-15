@@ -22,6 +22,7 @@ import { OrderCourseEntity } from "./order-course.entity"
 import { CourseCategoryEntity } from "./course-category.entity"
 import { ReportCourseEntity } from "./report-course.entity"
 import { CourseRatingDTO } from "../dto/course-rating.dto"
+import { CourseCategoryLevelDTO } from "../dto/course-category-level.dto"
 
 
 interface CourseIncludes {
@@ -68,7 +69,7 @@ export class CourseEntity {
         enableDiscount: boolean
 
     @Field(() => String)
-    @Column({ type: "enum", enum: CourseVerifyStatus, default: CourseVerifyStatus.Not_Submitted })
+    @Column({ type: "enum", enum: CourseVerifyStatus, default: CourseVerifyStatus.Draft })
         verifyStatus: CourseVerifyStatus
 
     @Field(() => AccountEntity)
@@ -161,6 +162,6 @@ export class CourseEntity {
     @Field(() => CourseRatingDTO, {nullable : true})
         courseRatings : CourseRatingDTO
 
-    @Field(() => CourseRatingDTO, {nullable : true})
-        courseCategoryLevels : CourseRatingDTO
+    @Field(() => CourseCategoryLevelDTO, {nullable : true})
+        courseCategoryLevels : CourseCategoryLevelDTO
 }

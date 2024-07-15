@@ -22,7 +22,7 @@ registerEnumType(SystemRoles, {
 })
 
 export enum CourseVerifyStatus {
-  Not_Submitted = "not submitted",
+  Draft = "draft",
   Pending = "pending",
   Approved = "approved",
   Rejected = "rejected",
@@ -106,3 +106,13 @@ export enum ReportType {
   Post = "post",
   PostComment = "postComment"
 }
+
+// export enum UpdatedField {
+//   Title = "title",
+//   PreviewVideo = "previewVideo",
+//   Section = "section",
+//   Lesson = "lesson",
+//   Quiz = "quiz",
+//   Resource = "resource",
+//   Target = "target",
+// }
