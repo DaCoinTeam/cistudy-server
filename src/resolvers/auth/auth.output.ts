@@ -41,6 +41,8 @@ export class InitLandingPageOutputOthers {
     @Field(() => Int, { nullable: true })
         totalNumberOfPosts? : number
     @Field(() => [CourseMySqlEntity], { nullable: true })
+        mostEnrolledCourses? : Array<CourseMySqlEntity>
+    @Field(() => [CourseMySqlEntity], { nullable: true })
         highRatedCourses? : Array<CourseMySqlEntity>
     @Field(() => [AccountMySqlEntity], { nullable: true })
         highRatedInstructors? : Array<AccountMySqlEntity>

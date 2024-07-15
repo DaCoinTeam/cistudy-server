@@ -770,6 +770,7 @@ type InitLandingPageOutputOthers {
   totalNumberOfVerifiedAccounts: Int
   totalNumberOfAvailableCourses: Int
   totalNumberOfPosts: Int
+  mostEnrolledCourses: [CourseEntity!]
   highRatedCourses: [CourseEntity!]
   highRatedInstructors: [AccountEntity!]
   recentlyAddedCourses: [CourseEntity!]

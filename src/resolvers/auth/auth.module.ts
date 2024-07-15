@@ -9,6 +9,7 @@ import {
     PostMySqlEntity,
     CourseReviewMySqlEntity,
     AccountReviewMySqlEntity,
+    EnrolledInfoMySqlEntity,
 } from "@database"
 import { AuthService } from "./auth.service"
 
@@ -21,7 +22,8 @@ import { AuthService } from "./auth.service"
             CourseMySqlEntity,
             PostMySqlEntity,
             CourseReviewMySqlEntity,
-            AccountReviewMySqlEntity
+            AccountReviewMySqlEntity,
+            EnrolledInfoMySqlEntity
         ]),
     ],
     providers: [AuthResolver, AuthService],

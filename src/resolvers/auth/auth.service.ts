@@ -1,4 +1,4 @@
-import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity, PostMySqlEntity, RoleMySqlEntity } from "@database"
+import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity, EnrolledInfoMySqlEntity, PostMySqlEntity, RoleMySqlEntity } from "@database"
 import {
     Injectable,
     NotFoundException,
@@ -29,6 +29,8 @@ export class AuthService {
         private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
         @InjectRepository(AccountReviewMySqlEntity)
         private readonly accountReviewMySqlRepository: Repository<AccountReviewMySqlEntity>,
+        @InjectRepository(EnrolledInfoMySqlEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         private readonly firebaseService: FirebaseService,
         private readonly dataSource: DataSource,
     ) { }
@@ -85,7 +87,7 @@ export class AuthService {
                 const ratingCounts = [1, 2, 3, 4, 5].map(star =>
                     reviews.filter(review => review.rating === star).length
                 )
-    
+                
                 instructor.accountRatings = {
                     overallAccountRating,
                     numberOf1StarRatings: ratingCounts[0],
@@ -104,6 +106,9 @@ export class AuthService {
             const totalNumberOfAvailableCourses = await this.courseMySqlRepository.find({
                 where: {
                     verifyStatus: CourseVerifyStatus.Approved
+                },
+                relations:{
+                    enrolledInfos: true
                 }
             })
     
@@ -113,7 +118,7 @@ export class AuthService {
                 },
             })
     
-            totalNumberOfAvailableCourses.forEach(course => {
+            await Promise.all(totalNumberOfAvailableCourses.map(async (course) => {
                 const reviews = coursesReviews.filter(review => review.courseId === course.courseId)
                 const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0)
                 const ratingCounts = [1, 2, 3, 4, 5].map(star =>
@@ -129,13 +134,19 @@ export class AuthService {
                     numberOf4StarRatings: ratingCounts[3],
                     numberOf5StarRatings: ratingCounts[4],
                 }
-            })
-    
+                course.numberOfEnrollments = course.enrolledInfos.length
+            }))
+
             const highRatedCourses = totalNumberOfAvailableCourses
                 .filter(course => course.courseRatings.overallCourseRating >= 4)
                 .sort((a, b) => b.courseRatings.overallCourseRating - a.courseRatings.overallCourseRating)
                 .slice(0, 10)
-    
+
+            const mostEnrolledCourses = totalNumberOfAvailableCourses
+                .filter((course) => course.numberOfEnrollments > 0)
+                .sort((a, b) => b.enrolledInfos.length - a.enrolledInfos.length)
+                .slice(0, 10)
+
             const recentlyAddedCourses = await this.courseMySqlRepository.find({
                 where: {
                     verifyStatus: CourseVerifyStatus.Approved
@@ -144,13 +155,14 @@ export class AuthService {
                     createdAt: "DESC"
                 }
             })
-    
+            
             await queryRunner.commitTransaction()
     
             return {
                 totalNumberOfVerifiedAccounts: totalNumberOfVerifiedAccounts.length,
                 totalNumberOfAvailableCourses: totalNumberOfAvailableCourses.length,
                 totalNumberOfPosts: totalNumberOfPosts.count,
+                mostEnrolledCourses,
                 highRatedCourses,
                 highRatedInstructors,
                 recentlyAddedCourses: recentlyAddedCourses.slice(0, 5)
