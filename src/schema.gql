@@ -251,6 +251,7 @@ type ReportCourseEntity {
 
 type CourseRatingDTO {
   overallCourseRating: Float
+  totalNumberOfRatings: Int
   numberOf1StarRatings: Int
   numberOf2StarRatings: Int
   numberOf3StarRatings: Int
@@ -467,6 +468,7 @@ type ReportAccountEntity {
 
 type AccountRatingDTO {
   overallAccountRating: Float
+  totalNumberOfRatings: Int
   numberOf1StarRatings: Int
   numberOf2StarRatings: Int
   numberOf3StarRatings: Int

@@ -36,7 +36,7 @@ export class SectionEntity {
         updatedAt: Date
 
     @Field(() => CourseEntity)
-    @ManyToOne(() => CourseEntity, (course) => course.sections)
+    @ManyToOne(() => CourseEntity, (course) => course.sections, {onDelete: "CASCADE"})
     @JoinColumn({ name: "courseId" })
         course: CourseEntity
 

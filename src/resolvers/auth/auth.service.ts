@@ -90,6 +90,7 @@ export class AuthService {
                 
                 instructor.accountRatings = {
                     overallAccountRating,
+                    totalNumberOfRatings: instructorReviews.length,
                     numberOf1StarRatings: ratingCounts[0],
                     numberOf2StarRatings: ratingCounts[1],
                     numberOf3StarRatings: ratingCounts[2],
@@ -128,6 +129,7 @@ export class AuthService {
     
                 course.courseRatings = {
                     overallCourseRating,
+                    totalNumberOfRatings: coursesReviews.length,
                     numberOf1StarRatings: ratingCounts[0],
                     numberOf2StarRatings: ratingCounts[1],
                     numberOf3StarRatings: ratingCounts[2],

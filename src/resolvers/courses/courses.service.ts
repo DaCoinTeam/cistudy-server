@@ -184,6 +184,7 @@ export class CoursesService {
             
             course.courseRatings = {
                 overallCourseRating,
+                totalNumberOfRatings: courseReviews.length,
                 numberOf1StarRatings: ratingCounts[0],
                 numberOf2StarRatings: ratingCounts[1],
                 numberOf3StarRatings: ratingCounts[2],

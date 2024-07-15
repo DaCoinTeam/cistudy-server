@@ -6,6 +6,8 @@ export class CourseRatingDTO {
     @Field(() => Float, { nullable: true, defaultValue: 0 })
         overallCourseRating: number
     @Field(() => Int, { nullable: true, defaultValue: 0 })
+        totalNumberOfRatings: number
+    @Field(() => Int, { nullable: true, defaultValue: 0 })
         numberOf1StarRatings: number
     @Field(() => Int, { nullable: true, defaultValue: 0 })
         numberOf2StarRatings: number
@@ -15,4 +17,5 @@ export class CourseRatingDTO {
         numberOf4StarRatings: number
     @Field(() => Int, { nullable: true, defaultValue: 0 })
         numberOf5StarRatings: number
+
 }
