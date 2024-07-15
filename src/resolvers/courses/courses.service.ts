@@ -404,11 +404,11 @@ export class CoursesService {
             results.forEach(async course => {
                 const reviews = coursesReviews.filter(review => review.courseId === course.courseId)
                 const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0)
-                const ratingCounts = [1, 2, 3, 4, 5].map(star => 
+                const ratingCounts = [1, 2, 3, 4, 5].map(star =>
                     reviews.filter(review => review.rating === star).length
                 )
                 const overallCourseRating = reviews.length ? totalRating / reviews.length : 0
-                
+            
                 course.courseRatings = {
                     overallCourseRating,
                     numberOf1StarRatings: ratingCounts[0],
@@ -417,29 +417,20 @@ export class CoursesService {
                     numberOf4StarRatings: ratingCounts[3],
                     numberOf5StarRatings: ratingCounts[4],
                 }
-
-                // const courseCategories = await this.courseCategoryMySqlRepository.find({
-                //     where:{
-                //         courseId : course.courseId
-                //     },
-                //     relations: {
-                //         category: true
-                //     }
-                // })
-
-                // const categoryLevels = courseCategories.map(category => 
-                //     category.category.level = 
-                // )
-                // course.courseCategoryLevels = {
-
-                // }
+            
+                const courseCategories = course.courseCategories
+        
+                course.courseCategoryLevels = {
+                    level0Categories: courseCategories.filter(cat => cat.category.level === 0).map(cat => cat.category),
+                    level1Categories: courseCategories.filter(cat => cat.category.level === 1).map(cat => cat.category),
+                    level2Categories: courseCategories.filter(cat => cat.category.level === 2).map(cat => cat.category),
+                }
             })
 
             const maxRate = Math.max(...results.map(course => course.courseRatings.overallCourseRating))
             const highRateCourses = results.filter(course => course.courseRatings.overallCourseRating === maxRate)
 
             await queryRunner.commitTransaction()
-
             return {
                 results,
                 metadata: {
