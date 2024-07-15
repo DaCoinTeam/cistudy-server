@@ -154,7 +154,7 @@ type CartEntity {
   isDeleted: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
-  account: AccountEntity!
+  account: AccountEntity
 }
 
 type CartCourseEntity {

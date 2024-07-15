@@ -29,7 +29,7 @@ export class QuizEntity {
         updatedAt: Date
 
     @Field(() => LessonEntity)
-    @OneToOne(() => LessonEntity, (lesson) => lesson.quiz, { onDelete: "CASCADE" })
+    @OneToOne(() => LessonEntity, (lesson) => lesson.quiz, { cascade: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "quizId" })
         lesson: LessonEntity
 
