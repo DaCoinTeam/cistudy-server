@@ -286,11 +286,7 @@ export class CoursesService {
             price,
             discountPrice,
             enableDiscount,
-            receivedWalletAddress,
-            courseCategories: categoryIds?.map(categoryId => ({
-                categoryId,
-                courseId
-            }))
+            receivedWalletAddress
         }
 
         const promises: Array<Promise<void>> = []
@@ -341,6 +337,11 @@ export class CoursesService {
 
             if (categoryIds?.length){
                 await this.courseCategoryMySqlRepository.delete({ courseId })
+                const newCategories = categoryIds?.map(categoryId => ({
+                    categoryId,
+                    courseId
+                }))
+                await this.courseCategoryMySqlRepository.save(newCategories)
             }
 
             if (existKeyNotUndefined(course)){
