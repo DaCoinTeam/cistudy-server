@@ -276,7 +276,7 @@ export class CoursesService {
             enableDiscount,
             title,
             receivedWalletAddress,
-            updateCourseCategories
+            categoryIds
         } = data
 
         const course: DeepPartial<CourseMySqlEntity> = {
@@ -286,7 +286,11 @@ export class CoursesService {
             price,
             discountPrice,
             enableDiscount,
-            receivedWalletAddress
+            receivedWalletAddress,
+            courseCategories: categoryIds?.map(categoryId => ({
+                categoryId,
+                courseId
+            }))
         }
 
         const promises: Array<Promise<void>> = []
@@ -339,13 +343,8 @@ export class CoursesService {
                 await this.courseMySqlRepository.save(course)
             }
 
-            if (updateCourseCategories?.length){
+            if (categoryIds?.length){
                 await this.courseCategoryMySqlRepository.delete({ courseId })
-                const newCategories = updateCourseCategories?.map(categoryId => ({
-                    categoryId,
-                    courseId
-                }))
-                await this.courseCategoryMySqlRepository.save(newCategories)
             }
 
             await queryRunner.commitTransaction()
