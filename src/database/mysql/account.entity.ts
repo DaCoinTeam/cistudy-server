@@ -181,7 +181,11 @@ export class AccountEntity {
     @Field(() => [ReportAccountEntity])
     @OneToMany(() => ReportAccountEntity, (accountReports) => accountReports.reporterAccount, { nullable: true })
         accountReports?: Array<ReportAccountEntity>
-    
+
+    // @Field(() => [ReportAccountEntity])
+    // @OneToMany(() => ReportAccountEntity, (accountReports) => accountReports.reporterAccount, { nullable: true })
+    //     viewedLessons?: Array<ReportAccountEntity>
+
     //graphql
     @Field(() => Boolean)
         followed?: boolean

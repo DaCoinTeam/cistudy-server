@@ -1,4 +1,4 @@
-import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
+import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn, UpdateDateColumn } from "typeorm"
 import { LessonEntity } from "./lesson.entity"
 import { QuizQuestionEntity } from "./quiz-question.entity"
@@ -36,4 +36,10 @@ export class QuizEntity {
     @Field(() => QuizAttemptEntity)
     @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.quiz, { onDelete: "CASCADE" })
         quizAttempts?: Array<QuizAttemptEntity>
+    
+    //graphql
+    @Field(() => Int, {nullable: true})
+        totalNumberOfAttempts?: number
+    @Field(() => Float, {nullable: true, defaultValue: 0})
+        highestScoreRecorded?: number
 }

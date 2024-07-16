@@ -504,10 +504,30 @@ export class CoursesService {
                 .andWhere("followed = :followed", { followed: true })
                 .getRawOne()
 
+            const totalNumberOfAttempts = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(QuizAttemptMySqlEntity, "quiz-attempt")
+                .where("quiz-attempt.accountId =: accountId", { accountId })
+                .getRawOne()
+
+            const accountAttempts = await this.quizAttemptMySqlRepository.find({
+                where:{
+                    accountId
+                },
+                order:{
+                    score: "DESC"
+                }
+            })
+
+            const highestScoreRecorded = accountAttempts[0].score
+
             await queryRunner.commitTransaction()
 
             lesson.section.course.creator.numberOfFollowers = numberOfFollowers.count
             lesson.section.course.creator.followed = follow ? follow.followed : false
+            lesson.quiz.totalNumberOfAttempts = totalNumberOfAttempts.count
+            lesson.quiz.highestScoreRecorded = highestScoreRecorded
 
             return lesson
         } catch (ex) {

@@ -1742,4 +1742,8 @@ export class CoursesService {
             message: "Report successfully resolved and closed."
         }
     }
+
+    // async updateLessonVideoView(input : UpdateLessonVideoViewInput) : Promise<void> {
+
+    // }
 }
