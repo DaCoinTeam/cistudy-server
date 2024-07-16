@@ -265,7 +265,6 @@ export class CoursesService {
     }
 
     async updateCourse(input: UpdateCourseInput): Promise<UpdateCourseOutput> {
-        console.log("Update Course Input: " + input)
         const { data, files } = input
         const {
             thumbnailIndex,
@@ -279,7 +278,7 @@ export class CoursesService {
             receivedWalletAddress,
             categoryIds
         } = data
-
+        console.log(data.categoryIds)
         const course: DeepPartial<CourseMySqlEntity> = {
             courseId,
             description,
@@ -339,13 +338,14 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            if (existKeyNotUndefined(course)){
-                course.verifyStatus = CourseVerifyStatus.Pending
-                await this.courseMySqlRepository.save(course)
-            }
 
             if (categoryIds?.length){
                 await this.courseCategoryMySqlRepository.delete({ courseId })
+            }
+
+            if (existKeyNotUndefined(course)){
+                course.verifyStatus = CourseVerifyStatus.Pending
+                await this.courseMySqlRepository.save(course)
             }
 
             await queryRunner.commitTransaction()
