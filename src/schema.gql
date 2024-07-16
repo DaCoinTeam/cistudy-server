@@ -83,6 +83,8 @@ type QuizEntity {
   updatedAt: DateTime!
   lesson: LessonEntity!
   quizAttempts: QuizAttemptEntity!
+  totalNumberOfAttempts: Int
+  highestScoreRecorded: Float
 }
 
 type LessonEntity {
