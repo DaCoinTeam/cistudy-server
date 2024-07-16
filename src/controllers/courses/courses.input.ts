@@ -91,16 +91,7 @@ export class UpdateCourseInputData {
       enableDiscount?: boolean
 
   @ApiProperty({ nullable: true })
-      categoryId?: string
-
-  @ApiProperty({ nullable: true })
       receivedWalletAddress?: string
-
-  @ApiProperty({ nullable: true })
-      subcategoryIds?: Array<string>
-
-  @ApiProperty({ nullable: true })
-      topicIds?: Array<string>
 
   @IsNumber()
   @ApiProperty({ nullable: true })
@@ -111,7 +102,7 @@ export class UpdateCourseInputData {
       previewVideoIndex?: number
 
   @ApiProperty({ nullable: true })
-      updateCourseCategories : Array<string>
+      updateCourseCategories? : Array<string>
 }
 
 export class UpdateCourseInput implements AuthInput<UpdateCourseInputData> {
