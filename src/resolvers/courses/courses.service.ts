@@ -469,7 +469,9 @@ export class CoursesService {
                         course: {
                             creator: true,
                             sections: {
-                                lessons: true
+                                lessons: {
+                                    quiz: true
+                                }
                             }
                         },
 
