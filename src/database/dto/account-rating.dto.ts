@@ -2,9 +2,9 @@ import { Field, Float, Int, ObjectType } from "@nestjs/graphql"
 
 
 @ObjectType()
-export class CourseRatingDTO {
+export class AccountRatingDTO {
     @Field(() => Float, { nullable: true, defaultValue: 0 })
-        overallCourseRating: number
+        overallAccountRating: number
     @Field(() => Int, { nullable: true, defaultValue: 0 })
         totalNumberOfRatings: number
     @Field(() => Int, { nullable: true, defaultValue: 0 })
@@ -17,5 +17,4 @@ export class CourseRatingDTO {
         numberOf4StarRatings: number
     @Field(() => Int, { nullable: true, defaultValue: 0 })
         numberOf5StarRatings: number
-
 }

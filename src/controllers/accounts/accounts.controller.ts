@@ -102,7 +102,7 @@ export class AccountsController {
     @ApiBearerAuth()
     @Post("create-account-role")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User, SystemRoles.Administrator)
+    //@Roles(SystemRoles.User, SystemRoles.Administrator)
     @UseInterceptors(AuthInterceptor)
     async createAccountRole(
         @AccountId() accountId: string,

@@ -26,7 +26,7 @@ export const updateCourseSchema: SchemaObject = {
                     type: "number",
                     example: "1"
                 },
-                updateCourseCategories:{
+                categoryIds:{
                     type: "array",
                     items:{
                         type: "string"

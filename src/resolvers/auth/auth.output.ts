@@ -1,6 +1,6 @@
-import { AuthOutput, AuthTokens } from "@common"
-import { AccountMySqlEntity } from "@database"
-import { Field, ObjectType } from "@nestjs/graphql"
+import { AuthOutput, AuthTokens, Output } from "@common"
+import { AccountMySqlEntity, CourseMySqlEntity } from "@database"
+import { Field, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
 export class InitOutput
@@ -30,4 +30,27 @@ implements AuthOutput<AccountMySqlEntity>
       data: AccountMySqlEntity
   @Field(() => AuthTokens, { nullable: true })
       tokens: AuthTokens
+}
+
+@ObjectType()
+export class InitLandingPageOutputOthers {
+    @Field(() => Int, { nullable: true })
+        totalNumberOfVerifiedAccounts? : number
+    @Field(() => Int, { nullable: true })
+        totalNumberOfAvailableCourses? : number
+    @Field(() => Int, { nullable: true })
+        totalNumberOfPosts? : number
+    @Field(() => [CourseMySqlEntity], { nullable: true })
+        mostEnrolledCourses? : Array<CourseMySqlEntity>
+    @Field(() => [CourseMySqlEntity], { nullable: true })
+        highRatedCourses? : Array<CourseMySqlEntity>
+    @Field(() => [AccountMySqlEntity], { nullable: true })
+        highRatedInstructors? : Array<AccountMySqlEntity>
+    @Field(() => [CourseMySqlEntity], { nullable: true })
+        recentlyAddedCourses? : Array<CourseMySqlEntity>
+}
+
+export class InitLandingPageOutput implements Output<InitLandingPageOutputOthers>{
+    message: string
+    others?: InitLandingPageOutputOthers
 }

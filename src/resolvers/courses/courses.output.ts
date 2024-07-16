@@ -4,6 +4,7 @@ import { Field, Int, ObjectType } from "@nestjs/graphql"
 import { CategoryEntity } from "src/database/mysql/category.entity"
 import { CourseTargetEntity } from "src/database/mysql/course-target.entity"
 import { QuizAttemptEntity } from "src/database/mysql/quiz-attempt.entity"
+
 @ObjectType()
 export class FindManyCoursesOutputMetadata {
     @Field(() => Int, { nullable: true })

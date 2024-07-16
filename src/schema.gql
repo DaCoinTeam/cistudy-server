@@ -154,7 +154,7 @@ type CartEntity {
   isDeleted: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
-  account: AccountEntity!
+  account: AccountEntity
 }
 
 type CartCourseEntity {
@@ -251,11 +251,18 @@ type ReportCourseEntity {
 
 type CourseRatingDTO {
   overallCourseRating: Float
+  totalNumberOfRatings: Int
   numberOf1StarRatings: Int
   numberOf2StarRatings: Int
   numberOf3StarRatings: Int
   numberOf4StarRatings: Int
   numberOf5StarRatings: Int
+}
+
+type CourseCategoryLevelDTO {
+  level0Categories: [CategoryEntity!]
+  level1Categories: [CategoryEntity!]
+  level2Categories: [CategoryEntity!]
 }
 
 type CourseEntity {
@@ -290,7 +297,7 @@ type CourseEntity {
   courseProgress: Float
   numberOfRewardedPostsLeft: Int
   courseRatings: CourseRatingDTO
-  courseCategoryLevels: CourseRatingDTO
+  courseCategoryLevels: CourseCategoryLevelDTO
 }
 
 type PostLikeEntity {
@@ -459,6 +466,16 @@ type ReportAccountEntity {
   reportedAccount: AccountEntity!
 }
 
+type AccountRatingDTO {
+  overallAccountRating: Float
+  totalNumberOfRatings: Int
+  numberOf1StarRatings: Int
+  numberOf2StarRatings: Int
+  numberOf3StarRatings: Int
+  numberOf4StarRatings: Int
+  numberOf5StarRatings: Int
+}
+
 type AccountEntity {
   accountId: ID!
   email: String!
@@ -495,6 +512,7 @@ type AccountEntity {
   accountReports: [ReportAccountEntity!]!
   followed: Boolean!
   numberOfFollowers: Int!
+  accountRatings: AccountRatingDTO
 }
 
 type TransactionMongoEntity {
@@ -750,6 +768,16 @@ type VerifyGoogleAccessTokenOutput {
   tokens: AuthTokens
 }
 
+type InitLandingPageOutputOthers {
+  totalNumberOfVerifiedAccounts: Int
+  totalNumberOfAvailableCourses: Int
+  totalNumberOfPosts: Int
+  mostEnrolledCourses: [CourseEntity!]
+  highRatedCourses: [CourseEntity!]
+  highRatedInstructors: [AccountEntity!]
+  recentlyAddedCourses: [CourseEntity!]
+}
+
 type FindManyTransactionsOutputMetadata {
   count: Int
 }
@@ -785,6 +813,7 @@ type FindManyAccountOrdersOutput {
 
 type Query {
   init: InitOutput!
+  initLandingPage: InitLandingPageOutputOthers!
   signIn(data: SignInInputData!): SignInOutput!
   verifyGoogleAccessToken(data: VerifyGoogleAccessTokenData!): VerifyGoogleAccessTokenOutput!
   findOneCourse(data: FindOneCourseInputData!): CourseEntity!

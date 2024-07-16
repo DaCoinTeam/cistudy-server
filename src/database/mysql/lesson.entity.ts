@@ -75,7 +75,7 @@ export class LessonEntity {
         resources: Array<ResourceEntity>
 
     @Field(() => QuizEntity, { nullable: true })
-    @OneToOne(() => QuizEntity, (quiz) => quiz.quizId, { nullable: true })
+    @OneToOne(() => QuizEntity, (quiz) => quiz.quizId, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn()
         quiz?: QuizEntity
 

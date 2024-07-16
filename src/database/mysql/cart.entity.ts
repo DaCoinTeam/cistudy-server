@@ -21,7 +21,7 @@ export class CartEntity {
         cartId: string
 
     @Field(() => [CartCourseEntity], { nullable: true })
-    @OneToMany(() => CartCourseEntity, (course) => course.cart)
+    @OneToMany(() => CartCourseEntity, (course) => course.cart, {cascade: true})
         cartCourses: Array<CartCourseEntity>
 
     @Field(() => Boolean, { defaultValue: false })
@@ -36,8 +36,8 @@ export class CartEntity {
     @UpdateDateColumn()
         updatedAt: Date
 
-    @Field(() => AccountEntity)
-    @OneToOne(() => AccountEntity, (account) => account.cart)
+    @Field(() => AccountEntity, {nullable: true})
+    @OneToOne(() => AccountEntity, (account) => account.cart, { cascade: true, onDelete: "CASCADE", nullable: true })
     @JoinColumn({ name: "cartId" })
         account: AccountEntity
 }

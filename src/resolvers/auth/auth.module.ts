@@ -5,6 +5,11 @@ import {
     CartMySqlEntity,
     AccountMySqlEntity,
     RoleMySqlEntity,
+    CourseMySqlEntity,
+    PostMySqlEntity,
+    CourseReviewMySqlEntity,
+    AccountReviewMySqlEntity,
+    EnrolledInfoMySqlEntity,
 } from "@database"
 import { AuthService } from "./auth.service"
 
@@ -13,7 +18,12 @@ import { AuthService } from "./auth.service"
         TypeOrmModule.forFeature([
             AccountMySqlEntity,
             CartMySqlEntity,
-            RoleMySqlEntity
+            RoleMySqlEntity,
+            CourseMySqlEntity,
+            PostMySqlEntity,
+            CourseReviewMySqlEntity,
+            AccountReviewMySqlEntity,
+            EnrolledInfoMySqlEntity
         ]),
     ],
     providers: [AuthResolver, AuthService],

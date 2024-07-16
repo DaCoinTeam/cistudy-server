@@ -111,9 +111,18 @@ export class AccountsService {
 
         const creator = await this.accountMySqlRepository.findOneBy({accountId: course.creatorId})
 
-        await this.mailerService.sendVerifyCourseMail(creator.email, creator.username, course, note, verifyStatus)    
+        await this.mailerService.sendVerifyCourseMail(creator.email, creator.username, course, note, verifyStatus)
 
         await this.courseMySqlRepository.update(courseId, { verifyStatus })
+
+        if (verifyStatus === CourseVerifyStatus.Approved) {
+            if (creator.courses && creator.courses.every(course => course.verifyStatus !== CourseVerifyStatus.Approved)) {
+                await this.roleMySqlRepository.save({
+                    accountId: creator.accountId,
+                    name: SystemRoles.Instructor
+                })
+            }
+        }
 
         return {
             message: "Course Verify Status Updated",

@@ -17,6 +17,7 @@ import { QuizAttemptEntity } from "./quiz-attempt.entity"
 import { AccountReviewEntity } from "./account-review.entity"
 import { RoleEntity } from "./role.entity"
 import { ReportAccountEntity } from "./report-account.entity"
+import { AccountRatingDTO } from "../dto/account-rating.dto"
 
 
 @ObjectType()
@@ -149,7 +150,7 @@ export class AccountEntity {
         courseReview: Array<CourseReviewEntity>
 
     @Field(() => CartEntity, { nullable: true })
-    @OneToOne(() => CartEntity, (cart) => cart.cartId, { nullable: true })
+    @OneToOne(() => CartEntity, (cart) => cart.cartId, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "cartId" })
         cart: CartEntity
 
@@ -186,4 +187,6 @@ export class AccountEntity {
         followed?: boolean
     @Field(() => Int)
         numberOfFollowers?: number
+    @Field(() => AccountRatingDTO, {nullable : true})
+        accountRatings : AccountRatingDTO
 }
