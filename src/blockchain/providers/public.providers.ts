@@ -17,15 +17,15 @@ export const getHttpProvider = (
 
 export const getWebSocketProvider = (chainId: ChainId): WebSocketProvider<EthExecutionAPI> => {
     return new WebSocketProvider((chainInfos[chainId].websocketRpcUrl), {
-        clientConfig: {
-            keepalive: true,
-            keepaliveInterval: 60000,
-        },
-        reconnect: {
-            auto: true,
-            delay: 5000,
-            maxAttempts: 5,
-            onTimeout: false,
-        },
+        // clientConfig: {
+        //     keepalive: true,
+        //     keepaliveInterval: 60000,
+        // },
+        // reconnect: {
+        //     auto: true,
+        //     delay: 5000,
+        //     maxAttempts: 5,
+        //     onTimeout: false,
+        // },
     })
 }
