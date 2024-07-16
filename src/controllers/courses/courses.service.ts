@@ -265,6 +265,7 @@ export class CoursesService {
     }
 
     async updateCourse(input: UpdateCourseInput): Promise<UpdateCourseOutput> {
+        console.log("Update Course Input: " + input)
         const { data, files } = input
         const {
             thumbnailIndex,
