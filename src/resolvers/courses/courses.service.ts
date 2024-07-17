@@ -519,6 +519,11 @@ export class CoursesService {
                     if (finishedAttempts && finishedAttempts.length > 0) {
                         lesson.quiz.totalNumberOfAttempts = finishedAttempts.length
                         lesson.quiz.highestScoreRecorded = finishedAttempts[0].score
+
+                        const latestAttempt = finishedAttempts.reduce((latest, current) => {
+                            return new Date(latest.createdAt) > new Date(current.createdAt) ? latest : current
+                        })
+                        lesson.quiz.lastAttemptScore = latestAttempt.score
                     }
                 }
             }

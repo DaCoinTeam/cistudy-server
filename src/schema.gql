@@ -95,6 +95,7 @@ type QuizEntity {
   quizAttempts: QuizAttemptEntity!
   totalNumberOfAttempts: Int
   highestScoreRecorded: Float
+  lastAttemptScore: Float
 }
 
 type LessonEntity {
