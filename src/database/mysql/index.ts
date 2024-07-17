@@ -29,6 +29,7 @@ import { QuizQuestionAnswerEntity as QuizQuestionAnswerMySqlEntity } from "./qui
 import { QuizQuestionMediaEntity as QuizQuestionMediaMySqlEntity } from "./quiz-question-media.entity"
 import { ProgressEntity as ProgressMySqlEntity } from "./progress.entity"
 import { QuizAttemptEntity as QuizAttemptMySqlEntity} from "./quiz-attempt.entity"
+import { QuizAttemptAnswerEntity as QuizAttemptAnswerMySqlEntity} from "./quiz-attempt-answer.entity"
 import { AccountReviewEntity as AccountReviewMySqlEntity } from "./account-review.entity"
 import { CourseCategoryEntity as CourseCategoryMySqlEntity} from "./course-category.entity"
 import { RoleEntity as RoleMySqlEntity } from "./role.entity"
@@ -71,9 +72,11 @@ export {
     QuizQuestionAnswerMySqlEntity,
     QuizQuestionMediaMySqlEntity,
     QuizAttemptMySqlEntity,
+    QuizAttemptAnswerMySqlEntity,
     ProgressMySqlEntity,
     ReportAccountMySqlEntity,
     ReportCourseMySqlEntity,
     ReportPostMySqlEntity,
-    ReportPostCommentMySqlEntity
+    ReportPostCommentMySqlEntity,
+    
 }

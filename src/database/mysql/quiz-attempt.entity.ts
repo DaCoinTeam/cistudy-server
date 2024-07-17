@@ -4,6 +4,7 @@ import { AccountEntity } from "./account.entity"
 import { QuizEntity } from "./quiz.entity"
 import { QuizAttemptStatus } from "@common"
 import { QuizQuestionAnswerEntity } from "./quiz-question-answer.entity"
+import { QuizAttemptAnswerEntity } from "./quiz-attempt-answer.entity"
 //import { QuizAttemptAnswerEntity } from "./quiz-attempt-answer.entity";
 
 @ObjectType()
@@ -51,4 +52,8 @@ export class QuizAttemptEntity {
     @Field(() => [QuizQuestionAnswerEntity])
     @OneToMany(() => QuizQuestionAnswerEntity, (quizQuestionAnswer) => quizQuestionAnswer.attempt, { onDelete: "CASCADE" ,nullable: true })
         questionAnswers: Array<QuizQuestionAnswerEntity>
+    
+    @Field(() => [QuizAttemptAnswerEntity])
+    @OneToMany(() => QuizAttemptAnswerEntity, (attemptAnswers) => attemptAnswers.quizAttempt, { onDelete: "CASCADE" ,nullable: true })
+        attemptAnswers: Array<QuizAttemptAnswerEntity>
 }

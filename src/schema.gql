@@ -28,6 +28,16 @@ type ResourceEntity {
   lesson: LessonEntity!
 }
 
+type QuizAttemptAnswerEntity {
+  quizAttemptAnswerId: ID!
+  quizAttemptId: ID!
+  quizQuestionAnswerId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  quizAttempt: QuizAttemptEntity!
+  quizQuestionAnswer: QuizQuestionAnswerEntity!
+}
+
 type QuizAttemptEntity {
   quizAttemptId: ID!
   quizId: ID!
@@ -39,6 +49,7 @@ type QuizAttemptEntity {
   account: AccountEntity!
   quiz: QuizEntity!
   questionAnswers: [QuizQuestionAnswerEntity!]!
+  attemptAnswers: [QuizAttemptAnswerEntity!]!
 }
 
 type QuizQuestionAnswerEntity {
@@ -47,6 +58,7 @@ type QuizQuestionAnswerEntity {
   content: String!
   isCorrect: Boolean!
   quizQuestion: [QuizQuestionEntity!]!
+  attemptAnswers: QuizAttemptAnswerEntity!
   createdAt: DateTime!
   updatedAt: DateTime!
   attempt: QuizAttemptEntity!
