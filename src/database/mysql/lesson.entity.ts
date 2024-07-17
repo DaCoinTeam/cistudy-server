@@ -55,6 +55,10 @@ export class LessonEntity {
     @Column({ type: "varchar", nullable: true })
         description: string
 
+    @Field(() => Int)
+    @Column({ type: "int", default: 0 })
+        position: number
+        
     @Field(() => Date)
     @CreateDateColumn()
         createdAt: Date
