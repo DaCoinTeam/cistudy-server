@@ -430,12 +430,13 @@ export class CoursesService {
 
             const maxRate = Math.max(...results.map(course => course.courseRatings.overallCourseRating))
             const highRateCourses = results.filter(course => course.courseRatings.overallCourseRating === maxRate)
+            const numberOfAvailableCourses = await this.courseMySqlRepository.findBy({verifyStatus: CourseVerifyStatus.Approved})
 
             await queryRunner.commitTransaction()
             return {
                 results,
                 metadata: {
-                    count: results.length,
+                    count: numberOfAvailableCourses.length,
                     highRateCourses,
                     categories: topic,
                 },
@@ -519,6 +520,11 @@ export class CoursesService {
                     if (finishedAttempts && finishedAttempts.length > 0) {
                         lesson.quiz.totalNumberOfAttempts = finishedAttempts.length
                         lesson.quiz.highestScoreRecorded = finishedAttempts[0].score
+
+                        const latestAttempt = finishedAttempts.reduce((latest, current) => {
+                            return new Date(latest.createdAt) > new Date(current.createdAt) ? latest : current
+                        })
+                        lesson.quiz.lastAttemptScore = latestAttempt.score
                     }
                 }
             }
@@ -734,7 +740,6 @@ export class CoursesService {
                 accountId, quizAttemptId
             },
             relations: {
-                questionAnswers: true,
                 quiz: {
                     questions: {
                         answers: true

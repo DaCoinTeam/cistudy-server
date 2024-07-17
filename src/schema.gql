@@ -38,7 +38,17 @@ type QuizAttemptEntity {
   updatedAt: DateTime!
   account: AccountEntity!
   quiz: QuizEntity!
-  questionAnswers: [QuizQuestionAnswerEntity!]!
+  attemptAnswers: [QuizAttemptAnswerEntity!]!
+}
+
+type QuizAttemptAnswerEntity {
+  quizAttemptAnswerId: ID!
+  quizAttemptId: ID!
+  quizQuestionAnswerId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  quizAttempt: QuizAttemptEntity!
+  quizQuestionAnswer: QuizQuestionAnswerEntity!
 }
 
 type QuizQuestionAnswerEntity {
@@ -47,9 +57,9 @@ type QuizQuestionAnswerEntity {
   content: String!
   isCorrect: Boolean!
   quizQuestion: [QuizQuestionEntity!]!
+  attemptAnswers: QuizAttemptAnswerEntity!
   createdAt: DateTime!
   updatedAt: DateTime!
-  attempt: QuizAttemptEntity!
 }
 
 type QuizQuestionMediaEntity {
@@ -85,6 +95,7 @@ type QuizEntity {
   quizAttempts: QuizAttemptEntity!
   totalNumberOfAttempts: Int
   highestScoreRecorded: Float
+  lastAttemptScore: Float
 }
 
 type LessonEntity {

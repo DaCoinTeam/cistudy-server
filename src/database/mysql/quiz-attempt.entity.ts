@@ -3,8 +3,8 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, Pri
 import { AccountEntity } from "./account.entity"
 import { QuizEntity } from "./quiz.entity"
 import { QuizAttemptStatus } from "@common"
-import { QuizQuestionAnswerEntity } from "./quiz-question-answer.entity"
-//import { QuizAttemptAnswerEntity } from "./quiz-attempt-answer.entity";
+import { QuizAttemptAnswerEntity } from "./quiz-attempt-answer.entity"
+
 
 @ObjectType()
 @Entity("quiz-attempt")
@@ -47,8 +47,8 @@ export class QuizAttemptEntity {
     @ManyToOne(() => QuizEntity, (quiz) => quiz.quizAttempts, { onDelete : "CASCADE" })
     @JoinColumn({ name: "quizId" })
         quiz: QuizEntity
-
-    @Field(() => [QuizQuestionAnswerEntity])
-    @OneToMany(() => QuizQuestionAnswerEntity, (quizQuestionAnswer) => quizQuestionAnswer.attempt, { onDelete: "CASCADE" ,nullable: true })
-        questionAnswers: Array<QuizQuestionAnswerEntity>
+    
+    @Field(() => [QuizAttemptAnswerEntity])
+    @OneToMany(() => QuizAttemptAnswerEntity, (attemptAnswers) => attemptAnswers.quizAttempt)
+        attemptAnswers: Array<QuizAttemptAnswerEntity>
 }

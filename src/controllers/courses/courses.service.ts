@@ -20,7 +20,8 @@ import {
     ProgressMySqlEntity,
     QuizAttemptMySqlEntity,
     AccountMySqlEntity, CourseCategoryMySqlEntity,
-    ReportCourseMySqlEntity
+    ReportCourseMySqlEntity,
+    QuizAttemptAnswerMySqlEntity
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, In } from "typeorm"
@@ -140,6 +141,8 @@ export class CoursesService {
         private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
         @InjectRepository(QuizAttemptMySqlEntity)
         private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
+        @InjectRepository(QuizAttemptAnswerMySqlEntity)
+        private readonly quizAttemptAnswerMySqlRepository: Repository<QuizAttemptAnswerMySqlEntity>,
         @InjectRepository(AccountMySqlEntity)
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
         @InjectRepository(ReportCourseMySqlEntity)
@@ -1537,13 +1540,20 @@ export class CoursesService {
             })
             const score = (totalPoints / maxPoints) * 10
 
-            //await this.quizAttemptMySqlRepository.update(quizAttemptId, { score, questionAnswers });
+            
             await this.quizAttemptMySqlRepository.save({
                 quizAttemptId,
                 score,
                 questionAnswers,
             })
 
+            const accountAnswers = quizQuestionAnswerIds.map(quizQuestionAnswerId => ({
+                quizAttemptId,
+                quizQuestionAnswerId
+            }))
+
+            await this.quizAttemptAnswerMySqlRepository.save(accountAnswers)
+            
             await queryRunner.commitTransaction()
 
             return {
