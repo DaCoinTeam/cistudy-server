@@ -457,7 +457,7 @@ export class CoursesService {
 
     async createSection(input: CreateSectionInput): Promise<CreateSectionOutput> {
         const { data } = input
-        const { courseId, title } = data
+        const { courseId, title, position } = data
 
 
         const course = await this.courseMySqlRepository.findOneBy({
@@ -467,6 +467,7 @@ export class CoursesService {
         const created = await this.sectionMySqlRepository.save({
             courseId,
             title,
+            position
         })
 
         return {
@@ -476,11 +477,12 @@ export class CoursesService {
     }
 
     async createLesson(input: CreateLessonInput): Promise<CreateLessonOutput> {
-        const { title, sectionId } = input.data
+        const { title, sectionId, position } = input.data
 
         const created = await this.lessonMySqlRepository.save({
             title,
             sectionId,
+            position
         })
         return {
             message: `A lesson with id ${created.lessonId} has been creeated successfully.`,
@@ -490,7 +492,7 @@ export class CoursesService {
 
     async updateLesson(input: UpdateLessonInput): Promise<UpdateLessonOutput> {
         const { data, files } = input
-        const { lessonId, title, description, lessonVideoIndex, thumbnailIndex } =
+        const { lessonId, title, description, lessonVideoIndex, thumbnailIndex, position } =
             data
 
         const { thumbnailId, lessonVideoId } =
@@ -498,7 +500,7 @@ export class CoursesService {
 
         const promises: Array<Promise<void>> = []
 
-        const lesson: DeepPartial<LessonMySqlEntity> = { title, description }
+        const lesson: DeepPartial<LessonMySqlEntity> = { title, description, position }
 
         if (Number.isInteger(lessonVideoIndex)) {
             const promise = async () => {
@@ -672,9 +674,10 @@ export class CoursesService {
 
     async updateSection(input: UpdateSectionInput): Promise<UpdateSectionOuput> {
         const { data } = input
-        const { sectionId, title } = data
+        const { sectionId, title, position } = data
         await this.sectionMySqlRepository.update(sectionId, {
             title,
+            position
         })
         return {
             message: `A section with id  ${sectionId} has been updated successfully.`,

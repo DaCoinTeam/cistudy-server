@@ -430,12 +430,13 @@ export class CoursesService {
 
             const maxRate = Math.max(...results.map(course => course.courseRatings.overallCourseRating))
             const highRateCourses = results.filter(course => course.courseRatings.overallCourseRating === maxRate)
+            const numberOfAvailableCourses = await this.courseMySqlRepository.findBy({verifyStatus: CourseVerifyStatus.Approved})
 
             await queryRunner.commitTransaction()
             return {
                 results,
                 metadata: {
-                    count: results.length,
+                    count: numberOfAvailableCourses.length,
                     highRateCourses,
                     categories: topic,
                 },
