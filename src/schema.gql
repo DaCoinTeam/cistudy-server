@@ -28,16 +28,6 @@ type ResourceEntity {
   lesson: LessonEntity!
 }
 
-type QuizAttemptAnswerEntity {
-  quizAttemptAnswerId: ID!
-  quizAttemptId: ID!
-  quizQuestionAnswerId: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  quizAttempt: QuizAttemptEntity!
-  quizQuestionAnswer: QuizQuestionAnswerEntity!
-}
-
 type QuizAttemptEntity {
   quizAttemptId: ID!
   quizId: ID!
@@ -48,8 +38,17 @@ type QuizAttemptEntity {
   updatedAt: DateTime!
   account: AccountEntity!
   quiz: QuizEntity!
-  questionAnswers: [QuizQuestionAnswerEntity!]!
   attemptAnswers: [QuizAttemptAnswerEntity!]!
+}
+
+type QuizAttemptAnswerEntity {
+  quizAttemptAnswerId: ID!
+  quizAttemptId: ID!
+  quizQuestionAnswerId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  quizAttempt: QuizAttemptEntity!
+  quizQuestionAnswer: QuizQuestionAnswerEntity!
 }
 
 type QuizQuestionAnswerEntity {
@@ -61,7 +60,6 @@ type QuizQuestionAnswerEntity {
   attemptAnswers: QuizAttemptAnswerEntity!
   createdAt: DateTime!
   updatedAt: DateTime!
-  attempt: QuizAttemptEntity!
 }
 
 type QuizQuestionMediaEntity {

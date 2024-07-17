@@ -1,7 +1,6 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql"
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 import { QuizQuestionEntity } from "./quiz-question.entity"
-import { QuizAttemptEntity } from "./quiz-attempt.entity"
 import { QuizAttemptAnswerEntity } from "./quiz-attempt-answer.entity"
 
 @ObjectType()
@@ -30,7 +29,7 @@ export class QuizQuestionAnswerEntity {
         quizQuestion: QuizQuestionEntity
     
     @Field(() => QuizAttemptAnswerEntity)
-    @ManyToOne(() => QuizAttemptAnswerEntity, (attemptAnswers) => attemptAnswers.quizQuestionAnswer)
+    @OneToMany(() => QuizAttemptAnswerEntity, (attemptAnswers) => attemptAnswers.quizQuestionAnswer, { onDelete: "CASCADE" })
         attemptAnswers : QuizAttemptAnswerEntity
 
     @Field(() => Date)
@@ -40,9 +39,5 @@ export class QuizQuestionAnswerEntity {
     @Field(() => Date)
     @UpdateDateColumn()
         updatedAt: Date
-
-    @Field(() => QuizAttemptEntity)
-    @ManyToOne(() => QuizAttemptEntity, (quizAttempt) => quizAttempt.questionAnswers)
-        attempt : QuizAttemptEntity
     
 }

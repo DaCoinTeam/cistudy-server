@@ -734,7 +734,6 @@ export class CoursesService {
                 accountId, quizAttemptId
             },
             relations: {
-                questionAnswers: true,
                 quiz: {
                     questions: {
                         answers: true
