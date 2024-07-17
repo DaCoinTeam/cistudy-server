@@ -41,6 +41,8 @@ services:
       SSL_CERT: ${SSL_CERT}
       SSL_KEY: ${SSL_KEY}
       FRONTEND_URL: ${FRONTEND_URL}
+      PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
+      PAYPAL_SECRET_KEY: ${PAYPAL_SECRET_KEY}
     ports:
       - 3001:3001
     volumes:

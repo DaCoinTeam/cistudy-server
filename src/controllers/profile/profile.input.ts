@@ -31,3 +31,19 @@ export class WithdrawInput implements AuthInput<WithdrawData> {
     	accountId: string
     data: WithdrawData
 }
+
+export class DepositData {
+    @ApiProperty()
+        transactionHash: string
+    @ApiProperty()
+        maxQueries?: number
+    @ApiProperty()
+        queryIntervalMs?: number
+    
+}
+export class DepositInput implements AuthInput<DepositData> {
+    @IsUUID("4")
+    	accountId: string
+    data: DepositData
+}
+

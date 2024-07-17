@@ -66,7 +66,7 @@ export class AccountEntity {
     @Column({
         type: "varchar",
         length: 100,
-        default: null,
+        default: null
     })
         walletAddress: string
 
