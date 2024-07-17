@@ -30,23 +30,23 @@ implements NestInterceptor<T, AuthOutput<T>>
         const request = gqlContext.req
         
         const { accountId, type } = request.user as Payload
-        let { accountRoles } = request.user as Payload
+        const { accountRoles } = request.user as Payload
 
         const clientId = getClientId(request.headers)
         const refresh = type === AuthTokenType.Refresh
 
         if (refresh) {
             await this.authManagerService.validateSession(accountId, clientId)
-            const account = await this.accountMySqlRepository.findOne({
-                where: {
-                  accountId
-                },
-                relations: {
-                //   accountRoles: {
-                //     role: true
-                //   }
-                }
-              })
+            // const account = await this.accountMySqlRepository.findOne({
+            //     where: {
+            //         accountId
+            //     },
+            //     relations: {
+            //     //   accountRoles: {
+            //     //     role: true
+            //     //   }
+            //     }
+            // })
             //   accountRoles = account.accountRoles.map(accRoles => accRoles.role.name)
         }
 

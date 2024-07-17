@@ -7,3 +7,12 @@ export class UpdateProfileOutput implements Output {
 export class WithdrawOutput implements Output {
     message: string
 }
+
+export class DepositOthers {
+    amount: number
+}
+
+export class DepositOutput implements Output<DepositOthers> {
+    message: string
+    others: DepositOthers
+}

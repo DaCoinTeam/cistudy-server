@@ -1,17 +1,38 @@
-import { ConflictException, Injectable } from "@nestjs/common"
+import {
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DeepPartial } from "typeorm"
 import { BlockchainService, StorageService } from "@global"
-import { UpdateProfileInput, WithdrawInput } from "./profile.input"
-import { AccountMySqlEntity } from "@database"
-import { computeRaw, existKeyNotUndefined } from "@common"
-import { UpdateProfileOutput, WithdrawOutput } from "./profile.output"
+import {
+    DepositInput,
+    UpdateProfileInput,
+    WithdrawInput,
+} from "./profile.input"
+import { AccountMySqlEntity, TransactionMongoEntity } from "@database"
+import {
+    computeDenomination,
+    computeRaw,
+    existKeyNotUndefined,
+    sleep,
+} from "@common"
+import {
+    DepositOutput,
+    UpdateProfileOutput,
+    WithdrawOutput,
+} from "./profile.output"
+import { Model } from "mongoose"
+import { InjectModel } from "@nestjs/mongoose"
 
 @Injectable()
 export class ProfileService {
     constructor(
     @InjectRepository(AccountMySqlEntity)
     private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+    @InjectModel(TransactionMongoEntity.name)
+    private readonly transactionMongoModel: Model<TransactionMongoEntity>,
     private readonly storageService: StorageService,
     private readonly blockchainService: BlockchainService,
     ) {}
@@ -95,5 +116,36 @@ export class ProfileService {
             computeRaw(withdrawAmount),
         )
         return { message: `Account ${accountId} has withdrawn successfully.` }
+    }
+
+    async deposit(input: DepositInput): Promise<DepositOutput> {
+        const { accountId, data } = input
+        const { transactionHash, maxQueries, queryIntervalMs } = data
+        //validate to ensure it is image
+
+        for (let curentQuerry = 0; curentQuerry < maxQueries; curentQuerry++) {
+            try {
+                const { isValidated, value } = await this.transactionMongoModel.findOne(
+                    {
+                        transactionHash,
+                    },
+                )
+                if (!isValidated)
+                    throw new ConflictException("Transaction has been validated.")
+
+                return {
+                    message: `Account ${accountId} has deposit successfully.`,
+                    others: {
+                        amount: computeDenomination(BigInt(value)),
+                    },
+                }
+            } catch (ex) {
+                if (curentQuerry < maxQueries) {
+                    await sleep(queryIntervalMs)
+                } else {
+                    throw new NotFoundException("Transaction not found")
+                }
+            }
+        }
     }
 }

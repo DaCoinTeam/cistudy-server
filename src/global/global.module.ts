@@ -22,6 +22,7 @@ import {
     FfmpegService,
     FirebaseService,
     MailerService,
+    PaypalService,
     Sha256Service,
     ShellService,
     StorageService
@@ -58,7 +59,8 @@ import { JwtStrategy } from "./strategies"
         ShellService,
         StorageService,
         JwtStrategy,
-        BlockchainService
+        BlockchainService,
+        PaypalService
     ],
     providers: [
         JwtService,
@@ -71,7 +73,8 @@ import { JwtStrategy } from "./strategies"
         ShellService,
         StorageService,
         JwtStrategy,
-        BlockchainService
+        BlockchainService,
+        PaypalService
     ],
 })
 export class GlobalModule { }

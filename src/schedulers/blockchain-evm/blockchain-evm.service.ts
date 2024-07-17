@@ -5,18 +5,15 @@ import {
     decodeTransferLog,
     getWebSocketProvider,
 } from "@blockchain"
-import { computeDenomination } from "@common"
 import { databaseConfig } from "@config"
-import { AccountMySqlEntity, TransactionMongoEntity } from "@database"
+import { TransactionMongoEntity } from "@database"
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Timeout } from "@nestjs/schedule"
-import { InjectRepository } from "@nestjs/typeorm"
 import { Model } from "mongoose"
 import { RedisClientType } from "redis"
 import { createClient } from "redis"
-import { Repository } from "typeorm"
-import Web3, { Address } from "web3"
+import Web3 from "web3"
 import { RegisteredSubscription } from "web3-eth"
 import { LogsSubscription } from "web3-eth-contract/lib/commonjs/log_subscription"
 
@@ -34,8 +31,6 @@ export class BlockchainEvmService implements OnModuleInit {
     constructor(
     @InjectModel(TransactionMongoEntity.name)
     private readonly transactionMongoModel: Model<TransactionMongoEntity>,
-    @InjectRepository(AccountMySqlEntity)
-    private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
     ) {
         const defaultValue = { [ChainId.KalytnTestnet]: undefined }
         this.web3s = { ...defaultValue }
@@ -183,23 +178,23 @@ export class BlockchainEvmService implements OnModuleInit {
                   from,
                   to,
                   value: value.toString(),
-                  log,
+                  log
               })
 
-              const { accountId, balance } =
-          await this.accountMySqlRepository.findOne({
-              where: {
-                  walletAddress: from as Address,
-              },
-          })
+              //       const { accountId, balance } =
+              //   await this.accountMySqlRepository.findOne({
+              //       where: {
+              //           walletAddress: from as Address,
+              //       },
+              //   })
 
-              console.log(accountId)
+              //       console.log(accountId)
 
-              const updatedBalance = balance + computeDenomination(value as bigint)
-              console.log(updatedBalance)
-              await this.accountMySqlRepository.update(accountId, {
-                  balance: updatedBalance,
-              })
+              //       const updatedBalance = balance + computeDenomination(value as bigint)
+              //       console.log(updatedBalance)
+              //       await this.accountMySqlRepository.update(accountId, {
+              //           balance: updatedBalance,
+              //       })
           } catch (ex) {
               this.logger.error(ex)
           }

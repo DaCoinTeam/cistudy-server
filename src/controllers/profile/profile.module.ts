@@ -14,8 +14,11 @@ import {
     PostLikeMySqlEntity,
     PostCommentLikeMySqlEntity,
     FollowMySqlEnitity,
+    TransactionMongoEntitySchema,
+    TransactionMongoEntity,
 } from "@database"
 import { ProfileService } from "./profile.service"
+import { MongooseModule } from "@nestjs/mongoose"
 
 @Module({
     imports: [
@@ -32,6 +35,12 @@ import { ProfileService } from "./profile.service"
             PostLikeMySqlEntity,
             PostCommentLikeMySqlEntity,
             FollowMySqlEnitity
+        ]),
+        MongooseModule.forFeature([
+            {
+                name: TransactionMongoEntity.name,
+                schema: TransactionMongoEntitySchema,
+            },
         ]),
     ],
     controllers: [ProfileController],

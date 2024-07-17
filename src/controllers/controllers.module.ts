@@ -7,6 +7,7 @@ import { PostsModule } from "./posts"
 import { ProfileModule } from "./profile"
 import { AccountsModule } from "./accounts"
 import { CartModule } from "./cart"
+import { PaymentModule } from "./payment"
 
 
 
@@ -18,7 +19,8 @@ import { CartModule } from "./cart"
         PostsModule,
         ProfileModule,
         AccountsModule,
-        CartModule
+        CartModule,
+        PaymentModule
     ],
     providers: []
 })
