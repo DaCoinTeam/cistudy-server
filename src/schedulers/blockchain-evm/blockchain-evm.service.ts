@@ -168,7 +168,6 @@ export class BlockchainEvmService implements OnModuleInit {
           try {
               const { from, to, value } = decodeTransferLog(log)
 
-              console.log(value)
               if (to !== chainInfos[ChainId.KalytnTestnet].serverAddress) return
 
               this.logger.verbose(`TRANSACTION VERIFIED: ${log.transactionHash}`)
@@ -180,21 +179,6 @@ export class BlockchainEvmService implements OnModuleInit {
                   value: value.toString(),
                   log
               })
-
-              //       const { accountId, balance } =
-              //   await this.accountMySqlRepository.findOne({
-              //       where: {
-              //           walletAddress: from as Address,
-              //       },
-              //   })
-
-              //       console.log(accountId)
-
-              //       const updatedBalance = balance + computeDenomination(value as bigint)
-              //       console.log(updatedBalance)
-              //       await this.accountMySqlRepository.update(accountId, {
-              //           balance: updatedBalance,
-              //       })
           } catch (ex) {
               this.logger.error(ex)
           }

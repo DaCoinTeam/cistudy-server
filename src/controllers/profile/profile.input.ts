@@ -38,9 +38,9 @@ export class DepositData {
     @ApiProperty()
         maxQueries?: number
     @ApiProperty()
-        queryIntervalMs?: number
-    
+        queryIntervalMs?: number  
 }
+
 export class DepositInput implements AuthInput<DepositData> {
     @IsUUID("4")
     	accountId: string
