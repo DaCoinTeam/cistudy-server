@@ -6,8 +6,6 @@ import { IsOptional, IsUUID } from "class-validator"
 export class FindOneCourseInputParams {
     @Field(() => ID)
         courseId: string
-    @Field(() => ID, { nullable: true })
-        accountId?: string
 }
 
 @InputType()
@@ -16,7 +14,8 @@ export class FindOneCourseInputData implements ParamsOnly<FindOneCourseInputPara
         params: FindOneCourseInputParams
 }
 
-export class FindOneCourseInput implements Input<FindOneCourseInputData> {
+export class FindOneCourseInput implements AuthInput<FindOneCourseInputData> {
+    accountId: string
     data: FindOneCourseInputData
 }
 
