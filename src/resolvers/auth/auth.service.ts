@@ -144,7 +144,7 @@ export class AuthService {
                 .filter(course => course.courseRatings.overallCourseRating >= 4)
                 .sort((a, b) => b.courseRatings.overallCourseRating - a.courseRatings.overallCourseRating)
                 .slice(0, 10)
-
+            console.log(highRatedCourses)
             const mostEnrolledCourses = totalNumberOfAvailableCourses
                 .filter((course) => course.numberOfEnrollments > 0)
                 .sort((a, b) => b.enrolledInfos.length - a.enrolledInfos.length)
@@ -154,6 +154,11 @@ export class AuthService {
                 where: {
                     verifyStatus: CourseVerifyStatus.Approved
                 },
+
+                relations:{
+                    creator: true
+                },
+                
                 order: {
                     createdAt: "DESC"
                 }

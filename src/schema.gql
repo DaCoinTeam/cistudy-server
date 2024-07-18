@@ -7,6 +7,7 @@ type SectionEntity {
   sectionId: ID!
   title: String!
   courseId: ID!
+  position: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
   course: CourseEntity!
@@ -108,6 +109,7 @@ type LessonEntity {
   videoType: String!
   numberOfViews: Int!
   description: String
+  position: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
   section: SectionEntity!
@@ -307,6 +309,7 @@ type CourseEntity {
   courseReports: [ReportCourseEntity!]
   numberOfEnrollments: Int
   enrolled: Boolean
+  isReviewed: Boolean
   courseProgress: Float
   numberOfRewardedPostsLeft: Int
   courseRatings: CourseRatingDTO
