@@ -176,8 +176,8 @@ export class CoursesService {
             course.creator.numberOfFollowers = numberOfFollowersResult.count
             course.numberOfEnrollments = numberOfEnrollmentsResult.count
 
-            const enrolled = enrolledInfo?.enrolled
-            course.enrolled = enrolled ?? false
+            const enrolled = enrolledInfo ? true : false
+            course.enrolled = enrolled
 
             const totalRating = courseReviews.reduce((sum, review) => sum + review.rating, 0)
             const overallCourseRating = courseReviews.length ? totalRating / courseReviews.length : 0
