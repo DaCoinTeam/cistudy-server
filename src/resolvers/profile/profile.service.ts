@@ -235,7 +235,7 @@ export class ProfileService {
     // } 
 
     async findManyTransactions(input: FindManyTransactionsInput): Promise<FindManyTransactionsOutputData> {
-        const { data,  } = input
+        const { data, accountId } = input
         const { options } = data
         const { take, skip } = { ...options }
 
@@ -247,10 +247,13 @@ export class ProfileService {
             relations: {
                 account: true,
             },
-            take,
-            skip,
-            order: {
-                createdAt: "DESC"
+            take, 
+            skip, 
+            where: {
+                accountId
+            },
+            order: { 
+                createdAt: "DESC" 
             }
         })
 
