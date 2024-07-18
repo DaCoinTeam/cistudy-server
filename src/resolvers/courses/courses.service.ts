@@ -109,9 +109,9 @@ export class CoursesService {
 
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
-        const { data, accountId } = input
+        const { data } = input
         const { params } = data
-        const { courseId } = params
+        const { courseId, accountId } = params
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
