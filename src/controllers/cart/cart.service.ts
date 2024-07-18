@@ -27,7 +27,7 @@ export class CartService {
     async addToCart(input: AddToCartInput): Promise<AddToCartOutput> {
         const { data, accountId } = input
         const { courseId } = data
-        console.log("accountId là : " + accountId)
+
         let accountCart = await this.cartMySqlRepository.findOne({ where: { cartId: accountId } })
 
         if (!accountCart) {

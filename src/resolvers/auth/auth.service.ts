@@ -76,12 +76,12 @@ export class AuthService {
 
             const instructorReviews = await this.accountReviewMySqlRepository.find({
                 where: {
-                    accountId: In(totalInstructorAccounts.map(account => account.accountId)),
+                    reviewedAccountId: In(totalInstructorAccounts.map(account => account.accountId)),
                 },
             })
 
             totalInstructorAccounts.forEach(instructor => {
-                const reviews = instructorReviews.filter(review => review.accountId === instructor.accountId)
+                const reviews = instructorReviews.filter(review => review.reviewedAccountId === instructor.accountId)
                 const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0)
                 const overallAccountRating = reviews.length ? totalRating / reviews.length : 0
                 const ratingCounts = [1, 2, 3, 4, 5].map(star =>
@@ -90,7 +90,7 @@ export class AuthService {
                 
                 instructor.accountRatings = {
                     overallAccountRating,
-                    totalNumberOfRatings: instructorReviews.length,
+                    totalNumberOfRatings: reviews.length,
                     numberOf1StarRatings: ratingCounts[0],
                     numberOf2StarRatings: ratingCounts[1],
                     numberOf3StarRatings: ratingCounts[2],
@@ -144,7 +144,7 @@ export class AuthService {
                 .filter(course => course.courseRatings.overallCourseRating >= 4)
                 .sort((a, b) => b.courseRatings.overallCourseRating - a.courseRatings.overallCourseRating)
                 .slice(0, 10)
-            console.log(highRatedCourses)
+
             const mostEnrolledCourses = totalNumberOfAvailableCourses
                 .filter((course) => course.numberOfEnrollments > 0)
                 .sort((a, b) => b.enrolledInfos.length - a.enrolledInfos.length)
@@ -158,7 +158,7 @@ export class AuthService {
                 relations:{
                     creator: true
                 },
-                
+
                 order: {
                     createdAt: "DESC"
                 }
