@@ -4,14 +4,16 @@ import { CaptureOrderInput, CreateOrderInput } from "./payment.input"
 import { CaptureOrderOutput, CreateOrderOutput } from "./payment.output"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
-import { AccountMySqlEntity } from "@database"
-import { computeRaw } from "@common"
+import { AccountMySqlEntity, TransactionMySqlEntity } from "@database"
+import { TransactionType } from "@common"
 
 @Injectable()
 export class PaymentService {
     constructor(
     @InjectRepository(AccountMySqlEntity)
     private readonly accountRepository: Repository<AccountMySqlEntity>,
+    @InjectRepository(TransactionMySqlEntity)
+    private readonly transactionRepository: Repository<TransactionMySqlEntity>,
     private readonly paypalService: PaypalService,
     private readonly blockchainService: BlockchainService
     ) {}
@@ -44,16 +46,26 @@ export class PaymentService {
         
         const amount = Number.parseFloat(captured.purchase_units.at(0).payments.captures.at(0).amount.value)
 
-        const { walletAddress } = await this.accountRepository.findOne({
+        const { balance } = await this.accountRepository.findOne({
             where: {
                 accountId
             }
         })
-        await this.blockchainService.transfer(walletAddress, computeRaw(amount))
+
+        await this.accountRepository.update(accountId, {
+            balance: balance + amount
+        })
+
+        await this.transactionRepository.save({
+            amountDepositedChange: amount,
+            payPalOrderId: captured.id,
+            type: TransactionType.Buy
+        })
+
         return {
-            message: "Capture Paypal order ${} has been created successfully.",
+            message: `Captured PayPal order ${orderId} successfully.`,
             others: {
-                amount: 5
+                amount
             }
         }
     }

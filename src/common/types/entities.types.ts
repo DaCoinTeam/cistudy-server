@@ -116,3 +116,9 @@ export enum ReportType {
 //   Resource = "resource",
 //   Target = "target",
 // }
+
+export enum TransactionType {
+  Buy = "buy",
+  Deposit = "deposit",
+  Withdraw = "withdraw"
+}

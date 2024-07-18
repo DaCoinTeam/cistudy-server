@@ -30,7 +30,7 @@ export class PaymentController{
         @AccountId() accountId: string,
         @Body() body: CreateOrderData
     ) {     
-    	return this.paymentService.createOrder({
+    	return await this.paymentService.createOrder({
             accountId,
             data: body,
         }) 
@@ -45,7 +45,7 @@ export class PaymentController{
         @AccountId() accountId: string,
         @Body() body: CaptureOrderData
     ) {     
-    	return this.paymentService.captureOrder({
+    	return await this.paymentService.captureOrder({
             accountId,
             data: body,
         }) 
