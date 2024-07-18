@@ -109,7 +109,8 @@ export class AuthService {
                     verifyStatus: CourseVerifyStatus.Approved
                 },
                 relations:{
-                    enrolledInfos: true
+                    enrolledInfos: true,
+                    creator : true
                 }
             })
     

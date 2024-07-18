@@ -150,6 +150,12 @@ export class CoursesService {
                     accountId
                 }) : undefined
 
+            const isReviewed = accountId
+                ? await this.courseReviewMySqlRepository.findOneBy({
+                    courseId,
+                    accountId
+                }) : undefined
+
             const numberOfFollowersResult = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
@@ -176,8 +182,9 @@ export class CoursesService {
             course.creator.numberOfFollowers = numberOfFollowersResult.count
             course.numberOfEnrollments = numberOfEnrollmentsResult.count
 
-            const enrolled = enrolledInfo ? true : false
-            course.enrolled = enrolled
+            
+            course.enrolled = enrolledInfo ? true : false
+            course.isReviewed = isReviewed ? true : false
 
             const totalRating = courseReviews.reduce((sum, review) => sum + review.rating, 0)
             const overallCourseRating = courseReviews.length ? totalRating / courseReviews.length : 0
@@ -412,6 +419,7 @@ export class CoursesService {
 
                 course.courseRatings = {
                     overallCourseRating,
+                    totalNumberOfRatings: reviews.length,
                     numberOf1StarRatings: ratingCounts[0],
                     numberOf2StarRatings: ratingCounts[1],
                     numberOf3StarRatings: ratingCounts[2],
