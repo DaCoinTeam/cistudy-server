@@ -133,6 +133,8 @@ export class CreateLessonInputData {
       sectionId: string
   @ApiProperty()
       title: string
+  @ApiProperty()
+      position: number
 }
 
 export class CreateLessonInput implements AuthInput<CreateLessonInputData> {
@@ -161,6 +163,9 @@ export class CreateSectionInputData {
 
   @ApiProperty()
       title: string
+
+  @ApiProperty()
+      position: number
 }
 
 export class CreateSectionInput implements AuthInput<CreateSectionInputData> {
@@ -195,6 +200,8 @@ export class UpdateLessonInputData {
       thumbnailIndex?: number
   @ApiProperty({ nullable: true })
       lessonVideoIndex?: number
+  @ApiProperty()
+      position: number
 }
 
 export class UpdateLessonInput implements AuthInput<UpdateLessonInputData> {
@@ -223,6 +230,8 @@ export class UpdateSectionInputData {
       sectionId: string
   @ApiProperty({ nullable: true })
       title?: string
+  @ApiProperty()
+      position: number
 }
 
 export class UpdateSectionInput implements AuthInput<UpdateSectionInputData> {
