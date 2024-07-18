@@ -1,14 +1,13 @@
-import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, LessonMySqlEntity, ProgressMySqlEntity, SectionMySqlEntity, AccountMySqlEntity, PostMySqlEntity, ReportAccountMySqlEntity, ReportCourseMySqlEntity, ReportPostCommentMySqlEntity, ReportPostMySqlEntity } from "@database"
+import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, LessonMySqlEntity, ProgressMySqlEntity, SectionMySqlEntity, AccountMySqlEntity, PostMySqlEntity, ReportAccountMySqlEntity, ReportCourseMySqlEntity, ReportPostCommentMySqlEntity, ReportPostMySqlEntity, TransactionMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { Repository, DataSource } from "typeorm"
 import {
     FindManyEnrolledCoursesInput,
     FindManySelfCreatedCoursesInput,
-
+    FindManyTransactionsInput,
 } from "./profile.input"
 import { InjectRepository } from "@nestjs/typeorm"
-import { FindManyEnrolledCoursesOutputData, FindManySelfCreatedCoursesOutputData } from "./profile.output"
-
+import { FindManyEnrolledCoursesOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData } from "./profile.output"
 
 
 @Injectable()
@@ -26,6 +25,8 @@ export class ProfileService {
         private readonly reportPostMySqlRepository: Repository<ReportPostMySqlEntity>,
         @InjectRepository(ReportPostCommentMySqlEntity)
         private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
+        @InjectRepository(TransactionMySqlEntity)
+        private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
         private readonly dataSource: DataSource,
     ) { }
 
@@ -231,6 +232,34 @@ export class ProfileService {
     //             count: slicedReports.length
     //         }
     //     }
-    // }
+    // } 
 
+    async findManyTransactions(input: FindManyTransactionsInput): Promise<FindManyTransactionsOutputData> {
+        const { data,  } = input
+        const { options } = data
+        const { take, skip } = { ...options }
+
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
+
+        const transactions = await this.transactionMySqlRepository.find({
+            relations: {
+                account: true,
+            },
+            take,
+            skip,
+            order: {
+                createdAt: "DESC"
+            }
+        })
+
+        const count = await this.transactionMySqlRepository.count()
+        return {
+            results: transactions,
+            metadata: {
+                count
+            }
+        }
+    }
 }

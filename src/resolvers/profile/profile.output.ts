@@ -1,5 +1,5 @@
 import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
-import { CourseMySqlEntity } from "@database"
+import { CourseMySqlEntity, TransactionMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
@@ -9,8 +9,7 @@ export class FindManySelfCreatedCoursesOutputMetadata {
 }
 
 @ObjectType()
-export class FindManySelfCreatedCoursesOutputData
-{
+export class FindManySelfCreatedCoursesOutputData {
   @Field(() => [CourseMySqlEntity])
       results: Array<CourseMySqlEntity>
   @Field(() => FindManySelfCreatedCoursesOutputMetadata, { nullable: true })
@@ -35,7 +34,11 @@ export class FindManyEnrolledCoursesOutputMetadata {
 
 @ObjectType()
 export class FindManyEnrolledCoursesOutputData
-implements ResultsWithMetadata<CourseMySqlEntity, FindManyEnrolledCoursesOutputMetadata>
+implements
+    ResultsWithMetadata<
+      CourseMySqlEntity,
+      FindManyEnrolledCoursesOutputMetadata
+    >
 {
   @Field(() => [CourseMySqlEntity])
       results: Array<CourseMySqlEntity>
@@ -55,8 +58,8 @@ implements AuthOutput<FindManyEnrolledCoursesOutputData>
 
 @ObjectType()
 export class FindManySubmittedReportsOutputMetadata {
-    @Field(() => Int, { nullable: true })
-        count?: number
+  @Field(() => Int, { nullable: true })
+      count?: number
 }
 
 // @ObjectType()
@@ -76,3 +79,30 @@ export class FindManySubmittedReportsOutputMetadata {
 //     @Field(() => AuthTokens, { nullable: true })
 //         tokens?: AuthTokens
 // }
+
+@ObjectType()
+export class FindManyTransactionsMetadata {
+  @Field(() => Int, { nullable: true })
+      count?: number
+}
+
+@ObjectType()
+export class FindManyTransactionsOutputData
+implements
+    ResultsWithMetadata<TransactionMySqlEntity, FindManyTransactionsMetadata>
+{
+  @Field(() => [TransactionMySqlEntity])
+      results: Array<TransactionMySqlEntity>
+  @Field(() => FindManyTransactionsMetadata, { nullable: true })
+      metadata: FindManyTransactionsMetadata
+}
+
+@ObjectType()
+export class FindManyTransactionsOutput
+implements AuthOutput<FindManyTransactionsOutputData>
+{
+  @Field(() => FindManyTransactionsOutputData)
+      data: FindManyTransactionsOutputData
+  @Field(() => AuthTokens, { nullable: true })
+      tokens: AuthTokens
+}

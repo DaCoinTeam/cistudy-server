@@ -57,6 +57,7 @@ export class PaymentService {
         })
 
         await this.transactionRepository.save({
+            accountId,
             amountDepositedChange: amount,
             payPalOrderId: captured.id,
             type: TransactionType.Buy

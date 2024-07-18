@@ -34,11 +34,11 @@ export class TransactionEntity {
   @Column({ type: "float", default: 0 })
       amountOnChainChange: number
 
-  @Field(() => String, { nullable: true})
+  @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 2000, nullable: true })
       transactionHash?: string
 
-  @Field(() => String, { nullable: true})
+  @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 2000, nullable: true })
       payPalOrderId?: string
 
@@ -48,10 +48,12 @@ export class TransactionEntity {
   })
   @JoinColumn({ name: "accountId" })
       account: AccountEntity
-
+ 
+  @Field(() => Date)
   @CreateDateColumn()
       createdAt: Date
 
-  @UpdateDateColumn()
+  @Field(() => Date)
+  @UpdateDateColumn() 
       updatedAt: Date
-}
+}  
