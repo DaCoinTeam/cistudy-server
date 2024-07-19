@@ -1456,7 +1456,7 @@ export class CoursesService {
         input: FinishQuizAttemptInput,
     ): Promise<FinishQuizAttemptOutput> {
         const { data } = input
-        const { quizAttemptId, quizQuestionAnswerIds } = data
+        const { quizAttemptId, quizQuestionAnswerIds, timeTaken } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -1548,6 +1548,7 @@ export class CoursesService {
                 quizAttemptId,
                 score,
                 questionAnswers,
+                timeTaken
             })
 
             const accountAnswers = quizQuestionAnswerIds.map(quizQuestionAnswerId => ({

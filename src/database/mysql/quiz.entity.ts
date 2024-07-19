@@ -44,4 +44,6 @@ export class QuizEntity {
         highestScoreRecorded?: number
     @Field(() => Float, { nullable: true })
         lastAttemptScore?: number
+    @Field(() => String, { nullable: true })
+        lastAttemptTimeTaken?: string
 }

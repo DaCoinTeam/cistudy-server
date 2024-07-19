@@ -1,4 +1,4 @@
-import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
+import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 import { AccountEntity } from "./account.entity"
 import { QuizEntity } from "./quiz.entity"
@@ -30,6 +30,10 @@ export class QuizAttemptEntity {
     @Column({ type: "enum", enum: QuizAttemptStatus, default: QuizAttemptStatus.Started })
         attemptStatus: QuizAttemptStatus
 
+    @Field(() => Int)
+    @Column({ type: "int", default: 0 })
+        timeTaken : number
+
     @Field(() => Date)
     @CreateDateColumn()
         createdAt: Date
@@ -51,4 +55,5 @@ export class QuizAttemptEntity {
     @Field(() => [QuizAttemptAnswerEntity])
     @OneToMany(() => QuizAttemptAnswerEntity, (attemptAnswers) => attemptAnswers.quizAttempt)
         attemptAnswers: Array<QuizAttemptAnswerEntity>
+
 }
