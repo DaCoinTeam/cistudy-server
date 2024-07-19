@@ -28,7 +28,7 @@ const generateSchema = async () => {
     const gqlSchemaFactory = app.get(GraphQLSchemaFactory)
     const schema = await gqlSchemaFactory.create([
         AuthResolver,
-        CoursesResolver,
+        CoursesResolver,   
         PostsResolver,
         AccountsResolver,
         ProfileResolver,
