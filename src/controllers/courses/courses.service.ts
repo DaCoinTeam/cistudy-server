@@ -240,7 +240,7 @@ export class CoursesService {
             await queryRunner.commitTransaction()
 
             return {
-                message: `Enrolled to course ${courseId} successfully`,
+                message: "Enrolled successfully",
                 others: { enrolledInfoId },
             }
         } catch (ex) {
