@@ -124,6 +124,7 @@ export class CoursesService {
                     sections: {
                         lessons: {
                             resources: true,
+                            quiz: true
                         },
                     },
                     courseTargets: true,
