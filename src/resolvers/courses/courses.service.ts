@@ -151,6 +151,8 @@ export class CoursesService {
                     accountId
                 }) : undefined
 
+            console.log(enrolledInfo)
+            
             const isReviewed = accountId
                 ? await this.courseReviewMySqlRepository.findOneBy({
                     courseId,
@@ -200,7 +202,7 @@ export class CoursesService {
                 numberOf5StarRatings: ratingCounts[4],
             }
             course.isCreator = accountId ? (accountId === course.creatorId) : false
-            
+
             return course
         } catch (ex) {
             await queryRunner.rollbackTransaction()

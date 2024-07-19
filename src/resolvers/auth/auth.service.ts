@@ -44,7 +44,9 @@ export class AuthService {
             relations: {
                 cart: {
                     cartCourses: {
-                        course: true
+                        course: {
+                            creator: true
+                        }
                     }
                 },
                 roles: true
