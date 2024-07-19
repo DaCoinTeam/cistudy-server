@@ -36,6 +36,7 @@ export class AuthService {
     ) { }
 
     async init(input: InitInput): Promise<AccountMySqlEntity> {
+        console.log("called")
         const account = await this.accountMySqlRepository.findOne({
             where: {
                 accountId: input.accountId,
@@ -49,6 +50,7 @@ export class AuthService {
                 roles: true
             }
         })
+        console.log("finished")
         return account
     }
 
