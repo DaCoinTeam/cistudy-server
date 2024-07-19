@@ -533,6 +533,15 @@ export class CoursesService {
                             return new Date(latest.createdAt) > new Date(current.createdAt) ? latest : current
                         })
                         lesson.quiz.lastAttemptScore = latestAttempt.score
+
+                        const milliseconds = latestAttempt.timeTaken
+                        const hours = Math.floor(milliseconds / (1000 * 60 * 60))
+                        const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60))
+                        const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000)
+
+                        const lastAttemptTimeTaken = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+
+                        lesson.quiz.lastAttemptTimeTaken = lastAttemptTimeTaken
                     }
                 }
             }

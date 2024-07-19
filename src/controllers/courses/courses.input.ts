@@ -566,6 +566,9 @@ export class FinishQuizAttemptInputData {
 
   @ApiProperty()
       quizQuestionAnswerIds: Array<string>
+
+  @ApiProperty()
+      timeTaken: number
 }
 
 export class FinishQuizAttemptInput

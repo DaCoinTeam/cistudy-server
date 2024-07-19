@@ -35,6 +35,7 @@ type QuizAttemptEntity {
   accountId: ID!
   score: Float
   attemptStatus: String!
+  timeTaken: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
   account: AccountEntity!
@@ -97,6 +98,7 @@ type QuizEntity {
   totalNumberOfAttempts: Int
   highestScoreRecorded: Float
   lastAttemptScore: Float
+  lastAttemptTimeTaken: String
 }
 
 type LessonEntity {
