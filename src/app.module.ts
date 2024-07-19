@@ -59,6 +59,7 @@ import { CacheModule } from "@nestjs/cache-manager"
             database: databaseConfig().mysql.schema,
             autoLoadEntities: true,
             synchronize: true,
+            poolSize: 10000,      
             timezone: "Z",
         }),
 
