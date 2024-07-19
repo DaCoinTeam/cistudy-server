@@ -37,6 +37,7 @@ import { ReportAccountEntity as ReportAccountMySqlEntity} from "./report-account
 import { ReportCourseEntity as  ReportCourseMySqlEntity} from "./report-course.entity"
 import { ReportPostEntity as ReportPostMySqlEntity } from "./report-post.entity"
 import { ReportPostCommentEntity as ReportPostCommentMySqlEntity } from "./report-post-comment.entity"
+import { TransactionEntity as TransactionMySqlEntity } from "./transaction.enity"
 
 export {
     AccountMySqlEntity,
@@ -78,5 +79,5 @@ export {
     ReportCourseMySqlEntity,
     ReportPostMySqlEntity,
     ReportPostCommentMySqlEntity,
-    
+    TransactionMySqlEntity
 }

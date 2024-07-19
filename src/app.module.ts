@@ -14,7 +14,7 @@ import { APP_PIPE } from "@nestjs/core"
 import { ScheduleModule } from "@nestjs/schedule"
 import { SchedulersModule } from "@schedulers"
 import { MongooseModule } from "@nestjs/mongoose"
-import { WebsocketsModule } from "@websockets"
+// import { WebsocketsModule } from "@websockets"
 import * as redisStore from "cache-manager-redis-store"
 import { CacheModule } from "@nestjs/cache-manager"
 
@@ -70,7 +70,7 @@ import { CacheModule } from "@nestjs/cache-manager"
             introspection: true,
         }),
 
-        WebsocketsModule,
+        //WebsocketsModule,
         SchedulersModule,
         ResolversModule,
         GlobalModule,

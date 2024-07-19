@@ -8,7 +8,6 @@ import {
     ProfileResolver,
     AccountsResolver,
     AuthResolver,
-    TransactionsResolver,
     CartResolver,
 } from "@resolvers"
 import { promises as fsPromises } from "fs"
@@ -33,7 +32,6 @@ const generateSchema = async () => {
         PostsResolver,
         AccountsResolver,
         ProfileResolver,
-        TransactionsResolver,
         CartResolver,
     ])
     await fsPromises.writeFile(

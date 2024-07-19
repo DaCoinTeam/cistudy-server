@@ -11,12 +11,16 @@ import {
     UpdateProfileInput,
     WithdrawInput,
 } from "./profile.input"
-import { AccountMySqlEntity, TransactionMongoEntity } from "@database"
 import {
+    AccountMySqlEntity,
+    TransactionMongoEntity,
+    TransactionMySqlEntity,
+} from "@database"
+import {
+    TransactionType,
     computeDenomination,
     computeRaw,
     existKeyNotUndefined,
-    sleep,
 } from "@common"
 import {
     DepositOutput,
@@ -25,12 +29,15 @@ import {
 } from "./profile.output"
 import { Model } from "mongoose"
 import { InjectModel } from "@nestjs/mongoose"
+import Web3 from "web3"
 
 @Injectable()
 export class ProfileService {
     constructor(
     @InjectRepository(AccountMySqlEntity)
     private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+    @InjectRepository(TransactionMySqlEntity)
+    private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
     @InjectModel(TransactionMongoEntity.name)
     private readonly transactionMongoModel: Model<TransactionMongoEntity>,
     private readonly storageService: StorageService,
@@ -111,41 +118,94 @@ export class ProfileService {
         if (existKeyNotUndefined(profile))
             await this.accountMySqlRepository.update(accountId, profile)
 
-        await this.blockchainService.transfer(
+        const { transactionHash } = await this.blockchainService.transfer(
             walletAddress,
             computeRaw(withdrawAmount),
         )
-        return { message: `Account ${accountId} has withdrawn successfully.` }
-    }
+
+        await this.transactionMySqlRepository.save({
+            accountId,
+            amountDepositedChange: -withdrawAmount,
+            amountOnChainChange: +withdrawAmount,
+            transactionHash: Web3.utils.bytesToHex(transactionHash),
+            type: TransactionType.Withdraw,
+        })
+
+        return { message: "Withdraw successfully." }
+    } 
 
     async deposit(input: DepositInput): Promise<DepositOutput> {
         const { accountId, data } = input
-        const { transactionHash, maxQueries, queryIntervalMs } = data
-        //validate to ensure it is image
+        const { transactionHash } = data
+        let { maxQueries, queryIntervalMs } = data
+
+        if (!maxQueries) maxQueries = 10
+        if (!queryIntervalMs) queryIntervalMs = 500
+
+        let isValidated: boolean = false
+        let value: string = ""
+        let hasFound: boolean = false
 
         for (let curentQuerry = 0; curentQuerry < maxQueries; curentQuerry++) {
             try {
-                const { isValidated, value } = await this.transactionMongoModel.findOne(
-                    {
-                        transactionHash,
-                    },
-                )
-                if (!isValidated)
-                    throw new ConflictException("Transaction has been validated.")
+                const transaction = await this.transactionMongoModel.findOne({
+                    transactionHash,
+                })
 
-                return {
-                    message: `Account ${accountId} has deposit successfully.`,
-                    others: {
-                        amount: computeDenomination(BigInt(value)),
-                    },
+                if (transaction) {
+                    isValidated = transaction.isValidated
+                    value = transaction.value
+                    break
+                }
+
+                if (curentQuerry === maxQueries - 1) {
+                    hasFound = true
                 }
             } catch (ex) {
-                if (curentQuerry < maxQueries) {
-                    await sleep(queryIntervalMs)
-                } else {
-                    throw new NotFoundException("Transaction not found")
-                }
+                //continue
             }
+        }
+
+        if (hasFound) throw new NotFoundException("Transaction not found.")
+        if (isValidated)
+            throw new ConflictException("Transaction has been validated")
+
+        const { balance } = await this.accountMySqlRepository.findOne({
+            where: {
+                accountId,
+            },
+        })
+
+        const amount = computeDenomination(BigInt(value))
+
+        await this.accountMySqlRepository.update(accountId, {
+            balance: balance + amount,
+        })
+
+        await this.transactionMongoModel.updateOne(
+            {
+                transactionHash,
+            },
+            {
+                $set: {
+                    isValidated: true,
+                },
+            },
+        )
+
+        await this.transactionMySqlRepository.save({
+            accountId,
+            amountDepositedChange: amount,
+            amountOnChainChange: -amount,
+            transactionHash,
+            type: TransactionType.Deposit,
+        })
+
+        return {
+            message: "Deposit successfully.",
+            others: {
+                amount,
+            },
         }
     }
 }

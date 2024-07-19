@@ -533,12 +533,15 @@ type AccountEntity {
   accountRatings: AccountRatingDTO
 }
 
-type TransactionMongoEntity {
-  transactionHash: String!
-  from: String!
-  to: String!
-  value: String!
-  isValidated: Boolean
+type TransactionEntity {
+  transactionId: ID!
+  type: String!
+  accountId: ID!
+  amountDepositedChange: Float!
+  amountOnChainChange: Float!
+  transactionHash: String
+  payPalOrderId: String
+  account: AccountEntity!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -772,6 +775,20 @@ type FindManyEnrolledCoursesOutput {
   tokens: AuthTokens
 }
 
+type FindManyTransactionsMetadata {
+  count: Int
+}
+
+type FindManyTransactionsOutputData {
+  results: [TransactionEntity!]!
+  metadata: FindManyTransactionsMetadata
+}
+
+type FindManyTransactionsOutput {
+  data: FindManyTransactionsOutputData!
+  tokens: AuthTokens
+}
+
 type InitOutput {
   data: AccountEntity!
   tokens: AuthTokens
@@ -794,15 +811,6 @@ type InitLandingPageOutputOthers {
   highRatedCourses: [CourseEntity!]
   highRatedInstructors: [AccountEntity!]
   recentlyAddedCourses: [CourseEntity!]
-}
-
-type FindManyTransactionsOutputMetadata {
-  count: Int
-}
-
-type FindManyTransactionsOutput {
-  results: [TransactionMongoEntity!]!
-  metadata: FindManyTransactionsOutputMetadata
 }
 
 type FindOneCartOutput {

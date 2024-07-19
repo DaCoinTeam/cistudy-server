@@ -71,3 +71,24 @@ export class FindManySubmittedReportsInputOptions {
 //     accountId: string
 //     data : FindManySubmittedReportsInputData
 // }
+
+@InputType()
+export class FindManyTransactionsInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+}
+
+@InputType()
+export class FindManyTransactionsInputData implements OptionsOnly<FindManyTransactionsInputOptions> {
+    @Field(() => FindManyTransactionsInputOptions, { nullable: true })
+        options?: FindManyTransactionsInputOptions
+}
+
+export class FindManyTransactionsInput
+implements AuthInput<FindManyTransactionsInputData>
+{
+    accountId: string
+    data: FindManyTransactionsInputData
+}

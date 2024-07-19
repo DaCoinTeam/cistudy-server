@@ -2,11 +2,11 @@ import { Module } from "@nestjs/common"
 import { PaymentController } from "./payment.controller"
 import { PaymentService } from "./payment.service"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { AccountMySqlEntity, RoleMySqlEntity } from "@database"
+import { AccountMySqlEntity, RoleMySqlEntity, TransactionMySqlEntity } from "@database"
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([AccountMySqlEntity, RoleMySqlEntity])
+        TypeOrmModule.forFeature([AccountMySqlEntity, RoleMySqlEntity, TransactionMySqlEntity])
     ],
     controllers: [PaymentController],
     providers: [PaymentService],

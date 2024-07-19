@@ -12,7 +12,7 @@ import { AccountId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../share
 import { Files } from "@common"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { ProfileService } from "./profile.service"
-import { UpdateProfileData, WithdrawData } from "./profile.input"
+import { DepositData, UpdateProfileData, WithdrawData } from "./profile.input"
 import { updateProfileSchema } from "./profile.schema"
 
 @ApiTags("Profile")
@@ -62,4 +62,22 @@ export class ProfileController{
             data
     	}) 
     }
+
+    @ApiBearerAuth()
+    @Patch("deposit")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+        AuthInterceptor
+    )
+    async deposit(
+        @AccountId() accountId: string,
+        @Body() data: DepositData,
+    ) {     
+    	return this.profileService.deposit({
+    		accountId,
+            data
+    	}) 
+    }
+
+
 }
