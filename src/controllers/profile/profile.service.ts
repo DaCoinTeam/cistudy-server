@@ -90,7 +90,7 @@ export class ProfileService {
             await this.accountMySqlRepository.update(accountId, profile)
 
         return {
-            message: `A profile with id ${accountId} has updated successfully.`,
+            message: "Profile Updated Successfully",
         }
     }
 
