@@ -93,7 +93,10 @@ export class AuthService {
             await queryRunner.commitTransaction()
 
             return {
-                message: "Account successfully verified"
+                data: {
+                    message: "Account verified successfully!"
+                }
+               
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
