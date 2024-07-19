@@ -162,6 +162,34 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
+            const course = await this.courseMySqlRepository.findOne({
+                where: {
+                    courseId,
+                },
+                relations: {
+                    sections: {
+                        lessons: true,
+                    },
+                },
+            })
+
+            if(!course || course.isDeleted){
+                throw new NotFoundException("Course not found or has been deleted")
+            }
+
+            const {
+                enableDiscount,
+                discountPrice,
+                price: coursePrice,
+                duration,
+                sections,
+                creatorId
+            } = course
+
+            if(accountId === creatorId){
+                throw new ConflictException("You cannot enroll to your created course.")
+            }
+
             const enrollments = await this.enrolledInfoMySqlRepository.find({
                 where: {
                     accountId,
@@ -181,23 +209,7 @@ export class CoursesService {
                 )
             }
 
-            const {
-                enableDiscount,
-                discountPrice,
-                price: coursePrice,
-                duration,
-                sections,
-                creatorId
-            } = await this.courseMySqlRepository.findOne({
-                where: {
-                    courseId,
-                },
-                relations: {
-                    sections: {
-                        lessons: true,
-                    },
-                },
-            })
+            
 
             const price = computeRaw(enableDiscount ? discountPrice : coursePrice)
             const minimumBalanceRequired = computeDenomination(price)
@@ -374,7 +386,7 @@ export class CoursesService {
         if(!course){
             throw new NotFoundException("Course not found")
         }
-        
+
         if(accountId === course.creatorId){
             throw new ConflictException("You cannot write a review on your created course.")
         }
