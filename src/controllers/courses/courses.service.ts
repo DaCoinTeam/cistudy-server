@@ -369,6 +369,16 @@ export class CoursesService {
         const { data, accountId } = input
         const { courseId, content, rating } = data
 
+        const course = await this.courseMySqlRepository.findOneBy({courseId})
+
+        if(!course){
+            throw new NotFoundException("Course not found")
+        }
+        
+        if(accountId === course.creatorId){
+            throw new ConflictException("You cannot write a review on your created course.")
+        }
+
         const enrolled = await this.enrolledInfoMySqlRepository.findOneBy({
             accountId,
         })

@@ -156,6 +156,9 @@ export class CourseEntity {
     @Field(() => Boolean, { nullable: true })
         isReviewed?: boolean
 
+    @Field(() => Boolean, { nullable: true })
+        isCreator?: boolean
+
     @Field(() => Float, {nullable: true})
         courseProgress? : number
 

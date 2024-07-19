@@ -199,7 +199,8 @@ export class CoursesService {
                 numberOf4StarRatings: ratingCounts[3],
                 numberOf5StarRatings: ratingCounts[4],
             }
-
+            course.isCreator = accountId ? (accountId === course.creatorId) : false
+            
             return course
         } catch (ex) {
             await queryRunner.rollbackTransaction()

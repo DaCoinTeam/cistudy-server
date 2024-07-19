@@ -312,6 +312,7 @@ type CourseEntity {
   numberOfEnrollments: Int
   enrolled: Boolean
   isReviewed: Boolean
+  isCreator: Boolean
   courseProgress: Float
   numberOfRewardedPostsLeft: Int
   courseRatings: CourseRatingDTO
