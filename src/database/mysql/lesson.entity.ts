@@ -47,9 +47,9 @@ export class LessonEntity {
         numberOfViews: number
 
     @Field(() => Int)
-    @Column({ type: "int", default: 0 })
-        durationInSections: number
-        
+    @Column({ type: "int", default: 0 , nullable: true })
+        durationInSeconds: number
+
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", nullable: true })
         description: string

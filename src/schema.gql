@@ -107,6 +107,7 @@ type QuizEntity {
 type SectionContentEntity {
   sectionContentId: ID!
   sectionId: String!
+  title: String!
   lessonId: ID!
   quizId: ID!
   type: String!
@@ -126,7 +127,7 @@ type LessonEntity {
   processStatus: String!
   videoType: String!
   numberOfViews: Int!
-  durationInSections: Int!
+  durationInSeconds: Int!
   description: String
   createdAt: DateTime!
   updatedAt: DateTime!
