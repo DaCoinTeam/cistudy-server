@@ -528,6 +528,7 @@ type AccountEntity {
   avatarUrl: String
   coverPhotoId: ID
   phoneNumber: String
+  job: String
   username: String
   balance: Float
   walletAddress: String

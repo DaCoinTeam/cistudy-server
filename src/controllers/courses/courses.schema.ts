@@ -161,6 +161,9 @@ export const createQuizSchema: SchemaObject = {
                 sectionId: {
                     type: "string",
                 },
+                title: {
+                    type: "string",
+                },
                 timeLimit: {
                     type: "number",
                     minimum: 5

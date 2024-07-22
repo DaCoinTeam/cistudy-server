@@ -53,6 +53,10 @@ export class AccountEntity {
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 60, default: null })
+        job: string
+
+    @Field(() => String, { nullable: true })
+    @Column({ type: "varchar", length: 60, default: null })
         username: string
 
     @Field(() => Float, { nullable: true })
