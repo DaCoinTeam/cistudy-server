@@ -39,7 +39,7 @@ import {
     DeleteCourseCategoryInputData,
     EnrollCourseInputData,
     FinishQuizAttemptInputData,
-    GiftCourseInputData,
+    //GiftCourseInputData,
     MarkLessonAsCompletedInputData,
     ResolveCourseReportInputData,
     UpdateCourseInputData,
@@ -245,17 +245,17 @@ export class CoursesController {
     }
 
     @ApiBearerAuth()
-    @Delete("delete-lesson/:lessonId")
+    @Delete("delete-sectionContent/:sectionContentId")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async deleteLesson(
         @AccountId() accountId: string,
-        @Param("lessonId") lessonId: string,
+        @Param("sectionContentId") sectionContentId: string,
     ) {
-        return this.coursesService.deleteLesson({
+        return this.coursesService.deleteSectionContent({
             accountId,
-            data: { lessonId },
+            data: { sectionContentId },
         })
     }
 
@@ -501,17 +501,17 @@ export class CoursesController {
         return await this.coursesService.finishQuizAttempt({ accountId, data })
     }
 
-    @ApiBearerAuth()
-    @Post("gift-course")
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User)
-    @UseInterceptors(AuthInterceptor)
-    async giftCourse(
-        @AccountId() accountId: string,
-        @Body() data: GiftCourseInputData,
-    ) {
-        return await this.coursesService.giftCourse({ accountId, data })
-    }
+    // @ApiBearerAuth()
+    // @Post("gift-course")
+    // @UseGuards(JwtAuthGuard, RolesGuard)
+    // @Roles(SystemRoles.User)
+    // @UseInterceptors(AuthInterceptor)
+    // async giftCourse(
+    //     @AccountId() accountId: string,
+    //     @Body() data: GiftCourseInputData,
+    // ) {
+    //     return await this.coursesService.giftCourse({ accountId, data })
+    // }
 
     @ApiBearerAuth()
     @Post("create-course-report")

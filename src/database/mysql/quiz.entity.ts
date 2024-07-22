@@ -1,8 +1,8 @@
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn, UpdateDateColumn } from "typeorm"
-import { LessonEntity } from "./lesson.entity"
 import { QuizQuestionEntity } from "./quiz-question.entity"
 import { QuizAttemptEntity } from "./quiz-attempt.entity"
+import { SectionContentEntity } from "./section_content.entity"
 
 @ObjectType()
 @Entity("quiz")
@@ -12,6 +12,10 @@ export class QuizEntity {
     @PrimaryColumn("uuid")
         quizId: string
 
+    @Field(() => String)
+    @Column({ type: "varchar", length: 150 })
+        title: string
+        
     @Field(() => [QuizQuestionEntity])
     @OneToMany(() => QuizQuestionEntity, (quizQuestion) => quizQuestion.quiz, { onDelete: "CASCADE", onUpdate: "CASCADE" })
         questions: Array<QuizQuestionEntity>
@@ -28,19 +32,19 @@ export class QuizEntity {
     @UpdateDateColumn()
         updatedAt: Date
 
-    @Field(() => LessonEntity)
-    @OneToOne(() => LessonEntity, (lesson) => lesson.quiz, { cascade: true, onDelete: "CASCADE" })
+    @Field(() => SectionContentEntity)
+    @OneToOne(() => SectionContentEntity, (sectionContent) => sectionContent.quiz, { cascade: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "quizId" })
-        lesson: LessonEntity
+        sectionContent: SectionContentEntity
 
     @Field(() => QuizAttemptEntity)
     @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.quiz, { onDelete: "CASCADE" })
         quizAttempts?: Array<QuizAttemptEntity>
-    
+
     //graphql
-    @Field(() => Int, {nullable: true})
+    @Field(() => Int, { nullable: true })
         totalNumberOfAttempts?: number
-    @Field(() => Float, {nullable: true, defaultValue: 0})
+    @Field(() => Float, { nullable: true, defaultValue: 0 })
         highestScoreRecorded?: number
     @Field(() => Float, { nullable: true })
         lastAttemptScore?: number

@@ -38,7 +38,7 @@ import { ReportCourseEntity as  ReportCourseMySqlEntity} from "./report-course.e
 import { ReportPostEntity as ReportPostMySqlEntity } from "./report-post.entity"
 import { ReportPostCommentEntity as ReportPostCommentMySqlEntity } from "./report-post-comment.entity"
 import { TransactionEntity as TransactionMySqlEntity } from "./transaction.enity"
-
+import { SectionContentEntity as SectionContentMySqlEntity } from "./section_content.entity"
 export {
     AccountMySqlEntity,
     RoleMySqlEntity,
@@ -79,5 +79,6 @@ export {
     ReportCourseMySqlEntity,
     ReportPostMySqlEntity,
     ReportPostCommentMySqlEntity,
-    TransactionMySqlEntity
+    TransactionMySqlEntity,
+    SectionContentMySqlEntity
 }

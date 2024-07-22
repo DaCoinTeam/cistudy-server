@@ -148,7 +148,7 @@ export class UpdateLessonOutput implements Output {
     message: string
 }
 //
-export class DeleteLessonOutput implements Output {
+export class DeleteSectionContentOutput implements Output {
     message: string
 }
 

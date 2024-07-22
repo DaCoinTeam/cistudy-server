@@ -122,3 +122,12 @@ export enum TransactionType {
   Deposit = "deposit",
   Withdraw = "withdraw"
 }
+
+export enum SectionContentType {
+  Lesson = "lesson",
+  Quiz = "quiz"
+}
+
+registerEnumType(SectionContentType,{
+    name: "SectionContentType"
+})

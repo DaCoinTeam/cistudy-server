@@ -143,17 +143,17 @@ export class CreateLessonInput implements AuthInput<CreateLessonInputData> {
   data: CreateLessonInputData
 }
 
-export class DeleteLessonInputData {
+export class DeleteSectionContentInputData {
   @IsUUID()
   @ApiProperty()
-      lessonId: string
+      sectionContentId: string
 }
 
-export class DeleteLessonInput implements AuthInput<DeleteLessonInputData> {
+export class DeleteSectionContentInput implements AuthInput<DeleteSectionContentInputData> {
   @IsUUID("4")
       accountId: string
   @ApiProperty()
-      data: DeleteLessonInputData
+      data: DeleteSectionContentInputData
 }
 
 export class CreateSectionInputData {
@@ -200,8 +200,6 @@ export class UpdateLessonInputData {
       thumbnailIndex?: number
   @ApiProperty({ nullable: true })
       lessonVideoIndex?: number
-  @ApiProperty()
-      position: number
 }
 
 export class UpdateLessonInput implements AuthInput<UpdateLessonInputData> {
@@ -421,7 +419,10 @@ export class QuizQuestionInputData {
 export class CreateQuizInputData {
   @IsUUID("4")
   @ApiProperty()
-      lessonId: string
+      sectionId: string
+
+  @ApiProperty()
+      title: string
 
   @ApiProperty()
       quizQuestions: Array<QuizQuestionInputData>

@@ -8,9 +8,10 @@ import {
     CreateDateColumn,
     UpdateDateColumn
 } from "typeorm"
-import { LessonEntity } from "./lesson.entity"
+
 import { CourseEntity } from "./course.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
+import { SectionContentEntity } from "./section_content.entity"
 
 @ObjectType()
 @Entity("section")
@@ -30,6 +31,10 @@ export class SectionEntity {
     @Field(() => Int)
     @Column({ type: "int", default: 0 })
         position: number
+    
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: true })
+        isLocked: boolean
         
     @Field(() => Date)
     @CreateDateColumn()
@@ -40,12 +45,12 @@ export class SectionEntity {
         updatedAt: Date
 
     @Field(() => CourseEntity)
-    @ManyToOne(() => CourseEntity, (course) => course.sections, {onDelete: "CASCADE"})
+    @ManyToOne(() => CourseEntity, (course) => course.sections, { onDelete: "CASCADE" })
     @JoinColumn({ name: "courseId" })
         course: CourseEntity
 
-    @Field(() => [LessonEntity], {nullable : true})
-    @OneToMany(() => LessonEntity, (video) => video.section, { cascade: true })
-        lessons: Array<LessonEntity>
+    @Field(() => [SectionContentEntity], {nullable : true})
+    @OneToMany(() => SectionContentEntity, (content) => content.section, { cascade: true })
+        contents: Array<SectionContentEntity>
 
 }

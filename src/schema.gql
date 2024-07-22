@@ -3,22 +3,6 @@ type AuthTokens {
   refreshToken: String!
 }
 
-type SectionEntity {
-  sectionId: ID!
-  title: String!
-  courseId: ID!
-  position: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  course: CourseEntity!
-  lessons: [LessonEntity!]
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 type ResourceEntity {
   resourceId: ID!
   name: String!
@@ -27,6 +11,22 @@ type ResourceEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   lesson: LessonEntity!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type SectionEntity {
+  sectionId: ID!
+  title: String!
+  courseId: ID!
+  position: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  course: CourseEntity!
+  contents: [SectionContentEntity!]
 }
 
 type QuizAttemptEntity {
@@ -89,11 +89,12 @@ type QuizQuestionEntity {
 
 type QuizEntity {
   quizId: ID!
+  title: String!
   questions: [QuizQuestionEntity!]!
   timeLimit: Int
   createdAt: DateTime!
   updatedAt: DateTime!
-  lesson: LessonEntity!
+  sectionContent: SectionContentEntity!
   quizAttempts: QuizAttemptEntity!
   totalNumberOfAttempts: Int
   highestScoreRecorded: Float
@@ -101,22 +102,33 @@ type QuizEntity {
   lastAttemptTimeTaken: String
 }
 
+type SectionContentEntity {
+  sectionContentId: ID!
+  sectionId: String!
+  lessonId: ID!
+  quizId: ID!
+  type: String!
+  position: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  section: SectionEntity!
+  lesson: LessonEntity
+  quiz: QuizEntity
+}
+
 type LessonEntity {
   lessonId: ID!
   title: String!
   thumbnailId: ID
   lessonVideoId: ID
-  sectionId: ID!
   processStatus: String!
   videoType: String!
   numberOfViews: Int!
   description: String
-  position: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
-  section: SectionEntity!
+  sectionContent: SectionContentEntity!
   resources: [ResourceEntity!]!
-  quiz: QuizEntity
   accountProgresses: [ProgressEntity!]!
 }
 
@@ -558,11 +570,6 @@ type FindManyCoursesOutputData {
   metadata: FindManyCoursesOutputMetadata
 }
 
-type FindOneCourseAuthOutput {
-  data: CourseEntity!
-  tokens: AuthTokens
-}
-
 type FindOneLessonOutput {
   data: LessonEntity!
   tokens: AuthTokens
@@ -844,7 +851,6 @@ type Query {
   signIn(data: SignInInputData!): SignInOutput!
   verifyGoogleAccessToken(data: VerifyGoogleAccessTokenData!): VerifyGoogleAccessTokenOutput!
   findOneCourse(data: FindOneCourseInputData!): CourseEntity!
-  findOneCourseAuth(data: FindOneCourseAuthInputData!): FindOneCourseAuthOutput!
   findManyCourses(data: FindManyCoursesInputData!): FindManyCoursesOutputData!
   findOneLesson(data: FindOneLessonInputData!): FindOneLessonOutput!
   findManyLessons(data: FindManyLessonsInputData!): FindManyLessonsOutput!
@@ -902,14 +908,6 @@ input FindOneCourseInputData {
 input FindOneCourseInputParams {
   courseId: ID!
   accountId: ID
-}
-
-input FindOneCourseAuthInputData {
-  params: FindOneCourseAuthInputParams!
-}
-
-input FindOneCourseAuthInputParams {
-  courseId: ID!
 }
 
 input FindManyCoursesInputData {

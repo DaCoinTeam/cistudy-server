@@ -87,7 +87,9 @@ export class ProfileService {
                     creator: true,
                     enrolledInfos: true,
                     sections: {
-                        lessons: true
+                        contents:{
+                            lesson: true
+                        }
                     }
                 },
                 take,
@@ -157,7 +159,7 @@ export class ProfileService {
                         result => result.courseId === course.courseId
                     )
 
-                    const totalLessons = course.sections.reduce((acc, section) => acc + section.lessons.length, 0)
+                    const totalLessons = course.sections.reduce((acc, section) => acc + section.contents.map(content => content.lesson).length, 0)
                     const completedLessons = courseProgress?.completedLessons ?? 0
                     const progress = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0
 
