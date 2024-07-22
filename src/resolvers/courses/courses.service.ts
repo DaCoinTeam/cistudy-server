@@ -126,7 +126,9 @@ export class CoursesService {
                 relations: {
                     sections: {
                         contents:{
-                            quiz: true
+                            lesson: true,
+                            quiz: true,
+                            resource: true
                         }
                     },
                     courseTargets: true,
