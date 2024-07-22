@@ -184,7 +184,7 @@ export class CoursesService {
                 discountPrice,
                 price: coursePrice,
                 duration,
-                //sections,
+                sections,
                 creatorId
             } = course
 
@@ -238,18 +238,27 @@ export class CoursesService {
                 endDate,
             })
 
-            // const progresses = sections.reduce((acc, section) => {
-            //     section.lessons.forEach((lesson) => {
-            //         acc.push({
-            //             enrolledInfoId,
-            //             lessonId: lesson.lessonId,
-            //             isCompleted: false,
-            //         })
-            //     })
-            //     return acc
-            // }, [])
+            const progresses = await sections.reduce(async (accPromise, section) => {
+                const acc = await accPromise
+                const sectionLessons = section.contents
+                    .filter(content => content.type === SectionContentType.Lesson)
+                    .map(content => content.sectionContentId)
 
-            // await this.progressMySqlRepository.save(progresses)
+                if (sectionLessons.length > 0) {
+                    const lessons = await this.lessonMySqlRepository.findBy({ lessonId: In(sectionLessons) })
+                    lessons.forEach(lesson => {
+                        acc.push({
+                            enrolledInfoId,
+                            lessonId: lesson.lessonId,
+                            isCompleted: false,
+                        })
+                    })
+                }
+                return acc
+            }, Promise.resolve([]))
+            
+
+            await this.progressMySqlRepository.save(progresses)
 
             await queryRunner.commitTransaction()
 

@@ -126,6 +126,7 @@ type LessonEntity {
   processStatus: String!
   videoType: String!
   numberOfViews: Int!
+  durationInSections: Int!
   description: String
   createdAt: DateTime!
   updatedAt: DateTime!
