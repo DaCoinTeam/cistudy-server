@@ -130,8 +130,12 @@ export class CoursesService {
                     sections: {
                         contents: {
                             lesson: true,
-                            quiz: true,
-                            resource: true
+                            quiz: {
+                                questions: true
+                            },
+                            resource: {
+                                attachments: true
+                            }
                         }
                     },
                     courseTargets: true,
