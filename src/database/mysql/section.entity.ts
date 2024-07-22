@@ -35,6 +35,10 @@ export class SectionEntity {
     @Field(() => Boolean)
     @Column({ type: "boolean", default: true })
         isLocked: boolean
+
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: false })
+        isCompleted: boolean
         
     @Field(() => Date)
     @CreateDateColumn()
