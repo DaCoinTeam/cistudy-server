@@ -1523,8 +1523,12 @@ export class CoursesService {
                 }
             })
             const enrollments = await this.enrolledInfoMySqlRepository.findBy({ courseId })
+            const now = new Date()
+            const activeEnrollment = enrollments.filter(date => new Date(date.endDate) < now)
 
-
+            if(!activeEnrollment){
+                throw new ConflictException("Your enrollment(s) in this course have been expired")
+            }
             
 
             const doing = await this.quizAttemptMySqlRepository.findOne({

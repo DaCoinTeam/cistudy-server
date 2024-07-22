@@ -83,6 +83,7 @@ type QuizEntity {
   quizId: ID!
   questions: [QuizQuestionEntity!]
   timeLimit: Int
+  passingPercentage: Int
   createdAt: DateTime!
   updatedAt: DateTime!
   sectionContent: SectionContentEntity!
@@ -91,6 +92,7 @@ type QuizEntity {
   highestScoreRecorded: Float
   lastAttemptScore: Float
   lastAttemptTimeTaken: String
+  isPassed: Boolean
 }
 
 type ResourceAttachmentEntity {

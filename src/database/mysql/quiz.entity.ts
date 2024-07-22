@@ -20,6 +20,10 @@ export class QuizEntity {
     @Column({ type: "int", nullable: true })
         timeLimit: number
 
+    @Field(() => Int, { nullable: true })
+    @Column({ type: "int", nullable: true })
+        passingPercentage: number
+
     @Field(() => Date)
     @CreateDateColumn()
         createdAt: Date
@@ -46,4 +50,6 @@ export class QuizEntity {
         lastAttemptScore?: number
     @Field(() => String, { nullable: true })
         lastAttemptTimeTaken?: string
+    @Field(() => Boolean, { nullable: true })
+        isPassed?: boolean
 }

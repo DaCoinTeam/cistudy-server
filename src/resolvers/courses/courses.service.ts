@@ -618,7 +618,12 @@ export class CoursesService {
                     resource: {
                         attachments: true
                     },
-                    lesson: true
+                    lesson: true,
+                    section: {
+                        course: {
+                            creator: true, 
+                        },
+                    }
                 }
             })
 
