@@ -1,13 +1,17 @@
 import { servicesConfig } from "@config"
-import { Injectable } from "@nestjs/common"
+import { Injectable, OnModuleInit } from "@nestjs/common"
 import * as admin from "firebase-admin"
 import firebase, { ServiceAccount } from "firebase-admin"
 import { Auth } from "firebase-admin/lib/auth/auth"
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier"
+import { Messaging } from "firebase-admin/lib/messaging/messaging"
+import { MessagingPayload } from "firebase-admin/lib/messaging/messaging-api"
 
 @Injectable()
-export class FirebaseService {
+export class FirebaseService implements OnModuleInit {
     auth: Auth
+    messaging: Messaging
+
     constructor() {
         const adminConfig: ServiceAccount = {
             projectId: servicesConfig().firebase.projectId,
@@ -26,7 +30,15 @@ export class FirebaseService {
         }
 
         this.auth = firebase.auth(app)
+        this.messaging = firebase.messaging()
     }
+    onModuleInit() {
+        console.log("x")
+    }
+
+    async sendMessageToAccount(accountId, payload: MessagingPayload) {
+        return this.messaging.sendToTopic(accountId, payload)
+    } 
 
     async verifyGoogleAccessToken(token: string): Promise<DecodedIdToken> {
         return await this.auth.verifyIdToken(token)

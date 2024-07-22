@@ -763,7 +763,7 @@ export class PostsService {
                     postId: postComment.postId
                 }
             })
-            console.log(hasRewardedComment)
+
             if (hasRewardedComment.some(accountComment => accountComment.isSolution === true)) {
                 throw new ConflictException("There's already exist a solution comment")
             }
@@ -785,7 +785,7 @@ export class PostsService {
             await this.postMySqlRepository.update(postId, { isCompleted: true })
 
             return {
-                message: `Comment of user ${postComment.creatorId} has been marked as a solution and no more comments are allowed to this post`
+                message: "Comment has been marked as a solution and no more comments are allowed to this post"
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
