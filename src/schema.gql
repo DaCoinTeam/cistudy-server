@@ -81,7 +81,6 @@ type QuizQuestionEntity {
 
 type QuizEntity {
   quizId: ID!
-  title: String!
   questions: [QuizQuestionEntity!]!
   timeLimit: Int
   createdAt: DateTime!

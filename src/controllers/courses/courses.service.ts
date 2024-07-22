@@ -1088,17 +1088,17 @@ export class CoursesService {
 
     async createQuiz(input: CreateQuizInput): Promise<CreateQuizOutput> {
         const { data, files } = input
-        const { sectionId, title, quizQuestions, timeLimit } = data
+        const { sectionId, quizQuestions, title, timeLimit } = data
         //Tìm quiz trong db, nếu chưa có thì tạo mới, nếu có thì chỉ thêm question và answer
-
+        console.log(data)
         const { sectionContentId } = await this.sectionContentMySqlRepository.save({
             sectionId,
+            title,
             type: SectionContentType.Quiz,
         })
 
         const { quizId } = await this.quizMySqlRepository.save({
             quizId: sectionContentId,
-            title,
             timeLimit
         })
 

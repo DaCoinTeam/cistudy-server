@@ -12,10 +12,6 @@ export class QuizEntity {
     @PrimaryColumn("uuid")
         quizId: string
 
-    @Field(() => String)
-    @Column({ type: "varchar", length: 150 })
-        title: string
-        
     @Field(() => [QuizQuestionEntity])
     @OneToMany(() => QuizQuestionEntity, (quizQuestion) => quizQuestion.quiz, { onDelete: "CASCADE", onUpdate: "CASCADE" })
         questions: Array<QuizQuestionEntity>
