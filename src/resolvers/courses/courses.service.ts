@@ -21,19 +21,18 @@ import {
     FindOneCourseInput,
     FindManyCoursesInput,
     FindManyLessonsInput,
-    //FindManyResourcesInput,
-    FindOneLessonInput,
     FindManyCourseTargetsInput,
-    //FindOneCourseAuthInput,
     FindOneCourseReviewInput,
     FindManyCourseReviewsInput,
     FindManyCoursesTopicInput,
     FindOneQuizAttemptInput,
     FindManyLevelCategoriesInput,
     FindManyCourseReportsInput,
+    FindOneCourseAuthInput,
+    FindOneContentInput,
 } from "./courses.input"
 import { FindManyCourseReportsOutputData, FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindOneQuizAttemptOutput } from "./courses.output"
-import { CourseVerifyStatus, QuizAttemptStatus, SectionContentType } from "@common"
+import { CourseVerifyStatus, SectionContentType } from "@common"
 import { SectionContentEntity } from "src/database/mysql/section_content.entity"
 
 @Injectable()
@@ -129,7 +128,7 @@ export class CoursesService {
                 where: { courseId },
                 relations: {
                     sections: {
-                        contents:{
+                        contents: {
                             lesson: true,
                             quiz: true,
                             resource: true
@@ -160,7 +159,7 @@ export class CoursesService {
                 }) : undefined
 
             console.log(enrolledInfo)
-            
+
             const isReviewed = accountId
                 ? await this.courseReviewMySqlRepository.findOneBy({
                     courseId,
@@ -193,7 +192,7 @@ export class CoursesService {
             course.creator.numberOfFollowers = numberOfFollowersResult.count
             course.numberOfEnrollments = numberOfEnrollmentsResult.count
 
-            
+
             course.enrolled = enrolledInfo ? true : false
             course.isReviewed = isReviewed ? true : false
 
@@ -249,7 +248,7 @@ export class CoursesService {
             course.numberOfLessons = numberOfLessons
             course.numberOfResources = numberOfResources
             course.numberOfQuizzes = numberOfQuizzes
-            
+
             return course
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -258,70 +257,148 @@ export class CoursesService {
         }
     }
 
-    // async findOneCourseAuth(input: FindOneCourseAuthInput): Promise<CourseMySqlEntity> {
-    //     const { data, accountId } = input
-    //     const { params } = data
-    //     const { courseId } = params
-    //     //console.log(data, accountId)
-    //     const queryRunner = this.dataSource.createQueryRunner()
-    //     await queryRunner.connect()
-    //     await queryRunner.startTransaction()
+    async findOneCourseAuth(input: FindOneCourseAuthInput): Promise<CourseMySqlEntity> {
+        const { data } = input
+        const { params } = data
+        const { courseId, accountId } = params
 
-    //     try {
-    //         const course = await this.courseMySqlRepository.findOne({
-    //             where: { courseId },
-    //             relations: {
-    //                 sections: {
-    //                     lessons: {
-    //                         resources: true,
-    //                     },
-    //                 },
-    //                 courseTargets: true,
-    //                 creator: true,
-    //             },
-    //             order: {
-    //                 courseTargets: {
-    //                     position: "ASC",
-    //                 },
-    //             },
-    //         })
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
 
-    //         const enrolledInfo = accountId
-    //             ? await this.enrolledInfoMySqlRepository.findOneBy({
-    //                 courseId,
-    //                 accountId
-    //             }) : undefined
+        try {
+            const course = await this.courseMySqlRepository.findOne({
+                where: { courseId },
+                relations: {
+                    sections: {
+                        contents: {
+                            lesson: true,
+                            quiz: true,
+                            resource: true
+                        }
+                    },
+                    courseTargets: true,
+                    creator: true,
+                    courseCategories: {
+                        category: true
+                    }
+                },
+                order: {
+                    courseTargets: {
+                        position: "ASC",
+                    },
+                    courseCategories: {
+                        category: {
+                            level: "ASC"
+                        }
+                    }
+                },
+            })
 
-    //         const numberOfFollowersResult = await queryRunner.manager
-    //             .createQueryBuilder()
-    //             .select("COUNT(*)", "count")
-    //             .from(FollowMySqlEnitity, "follow")
-    //             .where("followedAccountId = :accountId", { accountId: course.creator.accountId })
-    //             .andWhere("followed = :followed", { followed: true })
-    //             .getRawOne()
+            const enrolledInfo = accountId
+                ? await this.enrolledInfoMySqlRepository.findOneBy({
+                    courseId,
+                    accountId
+                }) : undefined
 
-    //         const numberOfEnrollmentsResult = await queryRunner.manager
-    //             .createQueryBuilder()
-    //             .select("COUNT(*)", "count")
-    //             .from(EnrolledInfoMySqlEntity, "enrolled_info")
-    //             .andWhere("courseId = :courseId", { courseId })
-    //             .getRawOne()
+            console.log(enrolledInfo)
 
-    //         await queryRunner.commitTransaction()
+            const isReviewed = accountId
+                ? await this.courseReviewMySqlRepository.findOneBy({
+                    courseId,
+                    accountId
+                }) : undefined
 
-    //         course.creator.numberOfFollowers = numberOfFollowersResult.count
-    //         course.numberOfEnrollments = numberOfEnrollmentsResult.count
+            const numberOfFollowersResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(FollowMySqlEnitity, "follow")
+                .where("followedAccountId = :accountId", { accountId: course.creator.accountId })
+                .andWhere("followed = :followed", { followed: true })
+                .getRawOne()
 
-    //         const enrolled = enrolledInfo?.enrolled
-    //         course.enrolled = enrolled ?? false
+            const numberOfEnrollmentsResult = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(EnrolledInfoMySqlEntity, "enrolled_info")
+                .andWhere("courseId = :courseId", { courseId })
+                .getRawOne()
 
-    //         return course
-    //     } catch (ex) {
-    //         await queryRunner.rollbackTransaction()
-    //     } finally {
-    //         await queryRunner.release()
-    //     }
-    // }
+            const courseReviews = await this.courseReviewMySqlRepository.findBy({ courseId })
+
+            const ratingCounts = [1, 2, 3, 4, 5].map(star =>
+                courseReviews.filter(review => review.rating === star).length
+            )
+
+            await queryRunner.commitTransaction()
+
+            course.creator.numberOfFollowers = numberOfFollowersResult.count
+            course.numberOfEnrollments = numberOfEnrollmentsResult.count
+
+
+            course.enrolled = enrolledInfo ? true : false
+            course.isReviewed = isReviewed ? true : false
+
+            const totalRating = courseReviews.reduce((sum, review) => sum + review.rating, 0)
+            const overallCourseRating = courseReviews.length ? totalRating / courseReviews.length : 0
+
+            course.courseRatings = {
+                overallCourseRating,
+                totalNumberOfRatings: courseReviews.length,
+                numberOf1StarRatings: ratingCounts[0],
+                numberOf2StarRatings: ratingCounts[1],
+                numberOf3StarRatings: ratingCounts[2],
+                numberOf4StarRatings: ratingCounts[3],
+                numberOf5StarRatings: ratingCounts[4],
+            }
+            course.isCreator = accountId ? (accountId === course.creatorId) : false
+
+            const numberOfLessons = await this.lessonMySqlRepository.count({
+                where: {
+                    sectionContent: {
+                        section: {
+                            course: {
+                                courseId
+                            }
+                        }
+                    }
+                }
+            })
+
+            const numberOfQuizzes = await this.quizMySqlRepository.count({
+                where: {
+                    sectionContent: {
+                        section: {
+                            course: {
+                                courseId
+                            }
+                        }
+                    }
+                }
+            })
+
+            const numberOfResources = await this.resourceMySqlRepository.count({
+                where: {
+                    sectionContent: {
+                        section: {
+                            course: {
+                                courseId
+                            }
+                        }
+                    }
+                }
+            })
+            course.numberOfLessons = numberOfLessons
+            course.numberOfResources = numberOfResources
+            course.numberOfQuizzes = numberOfQuizzes
+
+            return course
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
+        }
+    }
 
     async findManyCourses(
         input: FindManyCoursesInput,
@@ -439,11 +516,11 @@ export class CoursesService {
                             category: true,
                         },
                         sections: {
-                            contents:{
+                            contents: {
                                 lesson: true
                             }
                         },
-                        courseTargets:{
+                        courseTargets: {
 
                         }
                     },
@@ -494,7 +571,7 @@ export class CoursesService {
 
             const maxRate = Math.max(...results.map(course => course.courseRatings.overallCourseRating))
             const highRateCourses = results.filter(course => course.courseRatings.overallCourseRating === maxRate)
-            const numberOfAvailableCourses = await this.courseMySqlRepository.findBy({verifyStatus: CourseVerifyStatus.Approved})
+            const numberOfAvailableCourses = await this.courseMySqlRepository.findBy({ verifyStatus: CourseVerifyStatus.Approved })
 
             await queryRunner.commitTransaction()
             return {
@@ -514,100 +591,92 @@ export class CoursesService {
     }
 
 
-    async findOneLesson(
-        input: FindOneLessonInput,
-    ): Promise<LessonMySqlEntity> {
-        const { data, accountId } = input
+    async findOneContent(
+        input: FindOneContentInput,
+    ): Promise<SectionContentEntity> {
+        const { data} = input
         const { params } = data
-        const { lessonId } = params
+        const { sectionContentId } = params
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
 
         try {
-            const lesson = await this.lessonMySqlRepository.findOne({
-                where: { lessonId },
-                relations: {
-                    sectionContent: {
-                        section:{           
-                            course: {
-                                creator: true,
-                                sections: {
-                                    contents:{
-                                        lesson: true,
-                                        quiz:{
-                                            questions:{
-                                                answers : true
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                        }      
-                    },
 
+            const sectionContent = await this.sectionContentMySqlRepository.findOne({
+                where: { sectionContentId },
+                relations: {
+                    quiz: {
+                        questions: {
+                            answers: true
+                        }
+                    },
+                    resource: {
+                        attachments: true
+                    },
+                    lesson: true
                 }
             })
+            console.log(sectionContent)
+            // const follow = await queryRunner.manager.findOne(
+            //     FollowMySqlEnitity,
+            //     {
+            //         where: {
+            //             followerId: accountId,
+            //             followedAccountId: lesson.sectionContent.section.course.creator.accountId,
+            //             followed: true,
+            //         }
+            //     }
+            // )
 
-            const follow = await queryRunner.manager.findOne(
-                FollowMySqlEnitity,
-                {
-                    where: {
-                        followerId: accountId,
-                        followedAccountId: lesson.sectionContent.section.course.creator.accountId,
-                        followed: true,
-                    }
-                }
-            )
+            // const numberOfFollowers = await queryRunner.manager
+            //     .createQueryBuilder()
+            //     .select("COUNT(*)", "count")
+            //     .from(FollowMySqlEnitity, "follow")
+            //     .where("followedAccountId = :accountId", { accountId: lesson.sectionContent.section.course.creator.accountId })
+            //     .andWhere("followed = :followed", { followed: true })
+            //     .getRawOne()
 
-            const numberOfFollowers = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(FollowMySqlEnitity, "follow")
-                .where("followedAccountId = :accountId", { accountId: lesson.sectionContent.section.course.creator.accountId })
-                .andWhere("followed = :followed", { followed: true })
-                .getRawOne()
+            // if (lesson.sectionContent.quiz) {
+            //     const accountAttempts = await this.quizAttemptMySqlRepository.find({
+            //         where: {
+            //             accountId
+            //         },
+            //         order: {
+            //             score: "DESC"
+            //         }
+            //     })
 
-            if (lesson.sectionContent.quiz) {
-                const accountAttempts = await this.quizAttemptMySqlRepository.find({
-                    where: {
-                        accountId
-                    },
-                    order: {
-                        score: "DESC"
-                    }
-                })
+            //     if (accountAttempts) {
+            //         const finishedAttempts = accountAttempts.filter((attempt) => attempt.attemptStatus === QuizAttemptStatus.Ended)
+            //         if (finishedAttempts && finishedAttempts.length > 0) {
+            //             lesson.sectionContent.quiz.totalNumberOfAttempts = finishedAttempts.length
+            //             lesson.sectionContent.quiz.highestScoreRecorded = finishedAttempts[0].score
 
-                if (accountAttempts) {
-                    const finishedAttempts = accountAttempts.filter((attempt) => attempt.attemptStatus === QuizAttemptStatus.Ended)
-                    if (finishedAttempts && finishedAttempts.length > 0) {
-                        lesson.sectionContent.quiz.totalNumberOfAttempts = finishedAttempts.length
-                        lesson.sectionContent.quiz.highestScoreRecorded = finishedAttempts[0].score
+            //             const latestAttempt = finishedAttempts.reduce((latest, current) => {
+            //                 return new Date(latest.createdAt) > new Date(current.createdAt) ? latest : current
+            //             })
+            //             lesson.sectionContent.quiz.lastAttemptScore = latestAttempt.score
 
-                        const latestAttempt = finishedAttempts.reduce((latest, current) => {
-                            return new Date(latest.createdAt) > new Date(current.createdAt) ? latest : current
-                        })
-                        lesson.sectionContent.quiz.lastAttemptScore = latestAttempt.score
+            //             const milliseconds = latestAttempt.timeTaken
+            //             const hours = Math.floor(milliseconds / (1000 * 60 * 60))
+            //             const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60))
+            //             const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000)
 
-                        const milliseconds = latestAttempt.timeTaken
-                        const hours = Math.floor(milliseconds / (1000 * 60 * 60))
-                        const minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60))
-                        const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000)
+            //             const lastAttemptTimeTaken = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
 
-                        const lastAttemptTimeTaken = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+            //             lesson.sectionContent.quiz.lastAttemptTimeTaken = lastAttemptTimeTaken
+            //         }
+            //     }
+            // }
 
-                        lesson.sectionContent.quiz.lastAttemptTimeTaken = lastAttemptTimeTaken
-                    }
-                }
-            }
-
-            lesson.sectionContent.section.course.creator.numberOfFollowers = numberOfFollowers.count
-            lesson.sectionContent.section.course.creator.followed = follow ? follow.followed : false
+            // lesson.sectionContent.section.course.creator.numberOfFollowers = numberOfFollowers.count
+            // lesson.sectionContent.section.course.creator.followed = follow ? follow.followed : false
 
             await queryRunner.commitTransaction()
 
-            return lesson
+            return sectionContent
         } catch (ex) {
             await queryRunner.rollbackTransaction()
             throw ex
@@ -624,7 +693,7 @@ export class CoursesService {
         const { sectionId } = params
 
         const contents = await this.sectionContentMySqlRepository.find({
-            where:{
+            where: {
                 sectionId,
                 type: SectionContentType.Lesson
             }
@@ -739,7 +808,7 @@ export class CoursesService {
             relations: {
                 creator: true,
                 sections: {
-                    contents:{
+                    contents: {
                         lesson: true
                     }
                 },

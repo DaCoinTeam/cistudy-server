@@ -31,7 +31,7 @@ export class QuizQuestionEntity {
     })
         questionMedias: Array<QuizQuestionMediaEntity>
 
-    @Field(() => [QuizQuestionAnswerEntity])
+    @Field(() => [QuizQuestionAnswerEntity], {nullable: true})
     @OneToMany(() => QuizQuestionAnswerEntity, (quizAnswer) => quizAnswer.quizQuestion, { onDelete: "CASCADE", onUpdate: "CASCADE", nullable: true })
         answers: Array<QuizQuestionAnswerEntity>
 

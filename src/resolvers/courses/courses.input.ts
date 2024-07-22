@@ -1,5 +1,5 @@
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
-import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@common"
+import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions} from "@common"
 import { IsOptional, IsUUID } from "class-validator"
 
 @InputType()
@@ -24,6 +24,8 @@ export class FindOneCourseInput implements Input<FindOneCourseInputData> {
 export class FindOneCourseAuthInputParams {
     @Field(() => ID)
         courseId: string
+    @Field(() => ID)
+        accountId: string
 }
 
 @InputType()
@@ -39,28 +41,20 @@ export class FindOneCourseAuthInput implements AuthInput<FindOneCourseAuthInputD
 
 
 @InputType()
-export class FindOneLessonInputParams {
+export class FindOneContentInputParams {
     @Field(() => ID)
-        lessonId: string
+        sectionContentId: string
 }
 
 @InputType()
-export class FindOneLessonInputOptions {
-    @Field(() => ID, { nullable: true })
-        followerId?: string
+export class FindOneContentInputData implements ParamsOnly<FindOneContentInputParams> {
+    @Field(() => FindOneContentInputParams)
+        params: FindOneContentInputParams
 }
 
-@InputType()
-export class FindOneLessonInputData implements ParamsWithOptions<FindOneLessonInputParams, FindOneLessonInputOptions> {
-    @Field(() => FindOneLessonInputParams)
-        params: FindOneLessonInputParams
-    @Field(() => FindOneLessonInputOptions, { nullable: true })
-        options?: FindOneLessonInputOptions
-}
-
-export class FindOneLessonInput implements AuthInput<FindOneLessonInputData> {
+export class FindOneContentInput implements AuthInput<FindOneContentInputData> {
     accountId: string
-    data: FindOneLessonInputData
+    data: FindOneContentInputData
 }
 
 @InputType()

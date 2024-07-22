@@ -12,7 +12,7 @@ export class QuizEntity {
     @PrimaryColumn("uuid")
         quizId: string
 
-    @Field(() => [QuizQuestionEntity])
+    @Field(() => [QuizQuestionEntity], {nullable: true})
     @OneToMany(() => QuizQuestionEntity, (quizQuestion) => quizQuestion.quiz, { onDelete: "CASCADE", onUpdate: "CASCADE" })
         questions: Array<QuizQuestionEntity>
 
@@ -33,7 +33,7 @@ export class QuizEntity {
     @JoinColumn({ name: "quizId" })
         sectionContent: SectionContentEntity
 
-    @Field(() => QuizAttemptEntity)
+    @Field(() => QuizAttemptEntity, {nullable: true})
     @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.quiz, { onDelete: "CASCADE" })
         quizAttempts?: Array<QuizAttemptEntity>
 
