@@ -28,8 +28,7 @@ import {
     FindOneQuizAttemptInput,
     FindManyLevelCategoriesInput,
     FindManyCourseReportsInput,
-    FindOneCourseAuthInput,
-    FindOneContentInput,
+    FindOneCourseAuthInput, FindOneSectionContentInput
 } from "./courses.input"
 import { FindManyCourseReportsOutputData, FindManyCourseReviewsOutputData, FindManyCoursesOutputData, FindManyCoursesTopicOutputData, FindOneQuizAttemptOutput } from "./courses.output"
 import { CourseVerifyStatus, SectionContentType } from "@common"
@@ -595,8 +594,8 @@ export class CoursesService {
     }
 
 
-    async findOneContent(
-        input: FindOneContentInput,
+    async findOneSectionContent(
+        input: FindOneSectionContentInput,
     ): Promise<SectionContentEntity> {
         const { data} = input
         const { params } = data
@@ -622,7 +621,7 @@ export class CoursesService {
                     lesson: true
                 }
             })
-            console.log(sectionContent)
+
             // const follow = await queryRunner.manager.findOne(
             //     FollowMySqlEnitity,
             //     {

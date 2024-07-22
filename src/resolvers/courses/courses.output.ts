@@ -45,7 +45,7 @@ implements AuthOutput<CourseMySqlEntity>
 }
 
 @ObjectType()
-export class FindOneContentOutput
+export class FindOneSectionContentOutput
 implements AuthOutput<SectionContentEntity>
 {
     @Field(() => SectionContentEntity)

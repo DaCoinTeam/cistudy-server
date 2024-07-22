@@ -41,20 +41,20 @@ export class FindOneCourseAuthInput implements AuthInput<FindOneCourseAuthInputD
 
 
 @InputType()
-export class FindOneContentInputParams {
+export class FindOneSectionContentInputParams {
     @Field(() => ID)
         sectionContentId: string
 }
 
 @InputType()
-export class FindOneContentInputData implements ParamsOnly<FindOneContentInputParams> {
-    @Field(() => FindOneContentInputParams)
-        params: FindOneContentInputParams
+export class FindOneSectionContentInputData implements ParamsOnly<FindOneSectionContentInputParams> {
+    @Field(() => FindOneSectionContentInputParams)
+        params: FindOneSectionContentInputParams
 }
 
-export class FindOneContentInput implements AuthInput<FindOneContentInputData> {
+export class FindOneSectionContentInput implements AuthInput<FindOneSectionContentInputData> {
     accountId: string
-    data: FindOneContentInputData
+    data: FindOneSectionContentInputData
 }
 
 @InputType()

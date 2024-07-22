@@ -592,7 +592,7 @@ type FindOneCourseAuthOutput {
   tokens: AuthTokens
 }
 
-type FindOneContentOutput {
+type FindOneSectionContentOutput {
   data: SectionContentEntity!
   tokens: AuthTokens
 }
@@ -870,7 +870,7 @@ type Query {
   findOneCourse(data: FindOneCourseInputData!): CourseEntity!
   findOneCourseAuth(data: FindOneCourseAuthInputData!): FindOneCourseAuthOutput!
   findManyCourses(data: FindManyCoursesInputData!): FindManyCoursesOutputData!
-  findOneContent(data: FindOneContentInputData!): FindOneContentOutput!
+  findOneSectionContent(data: FindOneSectionContentInputData!): FindOneSectionContentOutput!
   findManyLessons(data: FindManyLessonsInputData!): FindManyLessonsOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
@@ -947,11 +947,11 @@ input FindManyCoursesInputOptions {
   categoryId: String
 }
 
-input FindOneContentInputData {
-  params: FindOneContentInputParams!
+input FindOneSectionContentInputData {
+  params: FindOneSectionContentInputParams!
 }
 
-input FindOneContentInputParams {
+input FindOneSectionContentInputParams {
   sectionContentId: ID!
 }
 

@@ -1,37 +1,35 @@
-import { Resolver, Query, Args } from "@nestjs/graphql"
-import {
-    FindOneCourseInputData,
-    FindManyCoursesInputData,
-    FindManyLessonsInputData,
-    FindManyCourseTargetsInputData,
-    FindOneCourseReviewInputData,
-    FindManyCourseReviewsInputData,
-    FindManyCoursesTopicInputData,
-    FindOneQuizAttemptInputData,
-    FindManyLevelCategoriesInputData,
-    FindManyCourseReportsInputData,
-    FindOneCourseAuthInputData,
-    FindOneContentInputData,
-} from "./courses.input"
-import { CoursesService } from "./courses.service"
 import {
     CategoryMySqlEntity,
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
 } from "@database"
+import { UseGuards, UseInterceptors } from "@nestjs/common"
+import { Args, Query, Resolver } from "@nestjs/graphql"
+import { AccountId, AuthInterceptor, JwtAuthGuard } from "../shared"
+import {
+    FindManyCourseReportsInputData,
+    FindManyCourseReviewsInputData,
+    FindManyCourseTargetsInputData,
+    FindManyCoursesInputData,
+    FindManyCoursesTopicInputData,
+    FindManyLessonsInputData,
+    FindManyLevelCategoriesInputData, FindOneCourseAuthInputData,
+    FindOneCourseInputData,
+    FindOneCourseReviewInputData,
+    FindOneQuizAttemptInputData,
+    FindOneSectionContentInputData
+} from "./courses.input"
 import {
     FindManyCourseReportsOutput,
     FindManyCourseReviewsOutputData,
     FindManyCourseTargetsOutput,
     FindManyCoursesOutputData,
     FindManyCoursesTopicOutputData,
-    FindManyLessonsOutput,
-    FindOneContentOutput,
-    FindOneCourseAuthOutput,
+    FindManyLessonsOutput, FindOneCourseAuthOutput,
     FindOneQuizAttemptOutput,
+    FindOneSectionContentOutput
 } from "./courses.output"
-import { UseGuards, UseInterceptors } from "@nestjs/common"
-import { JwtAuthGuard, AuthInterceptor, AccountId } from "../shared"
+import { CoursesService } from "./courses.service"
 
 @Resolver()
 export class CoursesResolver {
@@ -59,12 +57,12 @@ export class CoursesResolver {
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
-  @Query(() => FindOneContentOutput)
-  async findOneContent(
+  @Query(() => FindOneSectionContentOutput)
+  async findOneSectionContent(
     @AccountId() accountId: string,
-    @Args("data") data: FindOneContentInputData,
+    @Args("data") data: FindOneSectionContentInputData,
   ) {
-      return await this.coursesService.findOneContent({ accountId, data })
+      return await this.coursesService.findOneSectionContent({ accountId, data })
   }
 
   @UseGuards(JwtAuthGuard)
