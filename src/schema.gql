@@ -23,6 +23,8 @@ type SectionEntity {
   title: String!
   courseId: ID!
   position: Int!
+  isLocked: Boolean!
+  isCompleted: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   course: CourseEntity!
@@ -124,6 +126,7 @@ type LessonEntity {
   processStatus: String!
   videoType: String!
   numberOfViews: Int!
+  durationInSections: Int!
   description: String
   createdAt: DateTime!
   updatedAt: DateTime!
