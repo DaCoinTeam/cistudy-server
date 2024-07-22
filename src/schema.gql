@@ -341,6 +341,9 @@ type CourseEntity {
   numberOfRewardedPostsLeft: Int
   courseRatings: CourseRatingDTO
   courseCategoryLevels: CourseCategoryLevelDTO
+  numberOfQuizzes: Int
+  numberOfLessons: Int
+  numberOfResources: Int
 }
 
 type PostLikeEntity {

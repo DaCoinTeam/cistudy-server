@@ -1,4 +1,4 @@
-import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, LessonMySqlEntity, ProgressMySqlEntity, SectionMySqlEntity, AccountMySqlEntity, PostMySqlEntity, ReportAccountMySqlEntity, ReportCourseMySqlEntity, ReportPostCommentMySqlEntity, ReportPostMySqlEntity, TransactionMySqlEntity } from "@database"
+import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, LessonMySqlEntity, ProgressMySqlEntity, SectionMySqlEntity, AccountMySqlEntity, PostMySqlEntity, ReportAccountMySqlEntity, ReportCourseMySqlEntity, ReportPostCommentMySqlEntity, ReportPostMySqlEntity, TransactionMySqlEntity, SectionContentMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { Repository, DataSource } from "typeorm"
 import {
@@ -129,7 +129,8 @@ export class ProfileService {
                 .addSelect("COUNT(DISTINCT lesson.lessonId)", "totalLessons")
                 .from(ProgressMySqlEntity, "progress")
                 .innerJoin(LessonMySqlEntity, "lesson", "progress.lessonId = lesson.lessonId")
-                .innerJoin(SectionMySqlEntity, "section", "lesson.sectionId = section.sectionId")
+                .innerJoin(SectionContentMySqlEntity,"section_content", "lesson.lessonId = section_content.lessonId")
+                .innerJoin(SectionMySqlEntity, "section", "section_content.sectionId = section.sectionId")
                 .innerJoin(CourseMySqlEntity, "course", "section.courseId = course.courseId")
                 .innerJoin(EnrolledInfoMySqlEntity, "enrolledInfo", "progress.enrolledInfoId = enrolledInfo.enrolledInfoId")
                 .where("enrolledInfo.accountId = :accountId", { accountId })

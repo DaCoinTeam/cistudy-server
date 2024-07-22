@@ -9,6 +9,7 @@ import {
     FollowMySqlEnitity,
     LessonMySqlEntity,
     QuizAttemptMySqlEntity,
+    QuizMySqlEntity,
     QuizQuestionMySqlEntity,
     ReportCourseMySqlEntity,
     ResourceMySqlEntity
@@ -62,6 +63,9 @@ export class CoursesService {
         private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
         @InjectRepository(ReportCourseMySqlEntity)
         private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
+        @InjectRepository(QuizMySqlEntity)
+        private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+
 
         private readonly dataSource: DataSource
     ) { }
@@ -211,6 +215,45 @@ export class CoursesService {
             }
             course.isCreator = accountId ? (accountId === course.creatorId) : false
 
+            const numberOfLessons = await this.lessonMySqlRepository.count({
+                where: {
+                    sectionContent: {
+                        section: {
+                            course: {
+                                courseId
+                            }
+                        }
+                    }
+                }
+            })
+
+            const numberOfQuizzes = await this.quizMySqlRepository.count({
+                where: {
+                    sectionContent: {
+                        section: {
+                            course: {
+                                courseId
+                            }
+                        }
+                    }
+                }
+            })
+
+            const numberOfResources = await this.resourceMySqlRepository.count({
+                where: {
+                    sectionContent: {
+                        section: {
+                            course: {
+                                courseId
+                            }
+                        }
+                    }
+                }
+            })
+            course.numberOfLessons = numberOfLessons
+            course.numberOfResources = numberOfResources
+            course.numberOfQuizzes = numberOfQuizzes
+            
             return course
         } catch (ex) {
             await queryRunner.rollbackTransaction()

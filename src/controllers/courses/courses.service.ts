@@ -735,11 +735,15 @@ export class CoursesService {
         const { data } = input
         const { sectionId, title } = data
 
-        await this.sectionContentMySqlRepository.save({
+        const {sectionContentId} = await this.sectionContentMySqlRepository.save({
             type: SectionContentType.Resource,
             sectionId,
             title
         })
+
+        const { resourceId } = await this.resourceMySqlRepository.save({resourceId: sectionContentId})
+
+        await this.sectionContentMySqlRepository.update(sectionContentId, { resourceId })
 
         return {
             message: "Resource has been created sucessfully"
