@@ -25,6 +25,10 @@ export class SectionContentEntity {
     @Column({ type: "varchar", length: 200 })
         sectionId: string
 
+    @Field(() => String)
+    @Column({ type: "varchar", length: 200 })
+        title: string
+        
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 , nullable: true})
         lessonId: string
