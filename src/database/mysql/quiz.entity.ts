@@ -12,13 +12,17 @@ export class QuizEntity {
     @PrimaryColumn("uuid")
         quizId: string
 
-    @Field(() => [QuizQuestionEntity])
+    @Field(() => [QuizQuestionEntity], {nullable: true})
     @OneToMany(() => QuizQuestionEntity, (quizQuestion) => quizQuestion.quiz, { onDelete: "CASCADE", onUpdate: "CASCADE" })
         questions: Array<QuizQuestionEntity>
 
     @Field(() => Int, { nullable: true })
     @Column({ type: "int", nullable: true })
         timeLimit: number
+
+    @Field(() => Int, { nullable: true })
+    @Column({ type: "int", nullable: true })
+        passingPercentage: number
 
     @Field(() => Date)
     @CreateDateColumn()
@@ -33,7 +37,7 @@ export class QuizEntity {
     @JoinColumn({ name: "quizId" })
         sectionContent: SectionContentEntity
 
-    @Field(() => QuizAttemptEntity)
+    @Field(() => QuizAttemptEntity, {nullable: true})
     @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.quiz, { onDelete: "CASCADE" })
         quizAttempts?: Array<QuizAttemptEntity>
 
@@ -46,4 +50,6 @@ export class QuizEntity {
         lastAttemptScore?: number
     @Field(() => String, { nullable: true })
         lastAttemptTimeTaken?: string
+    @Field(() => Boolean, { nullable: true })
+        isPassed?: boolean
 }

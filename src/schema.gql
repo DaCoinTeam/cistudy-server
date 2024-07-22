@@ -73,7 +73,7 @@ type QuizQuestionEntity {
   point: Float
   question: String!
   questionMedias: [QuizQuestionMediaEntity!]
-  answers: [QuizQuestionAnswerEntity!]!
+  answers: [QuizQuestionAnswerEntity!]
   createdAt: DateTime!
   updatedAt: DateTime!
   quiz: QuizEntity!
@@ -81,16 +81,18 @@ type QuizQuestionEntity {
 
 type QuizEntity {
   quizId: ID!
-  questions: [QuizQuestionEntity!]!
+  questions: [QuizQuestionEntity!]
   timeLimit: Int
+  passingPercentage: Int
   createdAt: DateTime!
   updatedAt: DateTime!
   sectionContent: SectionContentEntity!
-  quizAttempts: QuizAttemptEntity!
+  quizAttempts: QuizAttemptEntity
   totalNumberOfAttempts: Int
   highestScoreRecorded: Float
   lastAttemptScore: Float
   lastAttemptTimeTaken: String
+  isPassed: Boolean
 }
 
 type ResourceAttachmentEntity {
@@ -141,7 +143,7 @@ type LessonEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   sectionContent: SectionContentEntity!
-  accountProgresses: [ProgressEntity!]!
+  accountProgresses: [ProgressEntity!]
 }
 
 type ProgressEntity {
@@ -587,8 +589,13 @@ type FindManyCoursesOutputData {
   metadata: FindManyCoursesOutputMetadata
 }
 
-type FindOneLessonOutput {
-  data: LessonEntity!
+type FindOneCourseAuthOutput {
+  data: CourseEntity!
+  tokens: AuthTokens
+}
+
+type FindOneSectionContentOutput {
+  data: SectionContentEntity!
   tokens: AuthTokens
 }
 
@@ -863,8 +870,9 @@ type Query {
   signIn(data: SignInInputData!): SignInOutput!
   verifyGoogleAccessToken(data: VerifyGoogleAccessTokenData!): VerifyGoogleAccessTokenOutput!
   findOneCourse(data: FindOneCourseInputData!): CourseEntity!
+  findOneCourseAuth(data: FindOneCourseAuthInputData!): FindOneCourseAuthOutput!
   findManyCourses(data: FindManyCoursesInputData!): FindManyCoursesOutputData!
-  findOneLesson(data: FindOneLessonInputData!): FindOneLessonOutput!
+  findOneSectionContent(data: FindOneSectionContentInputData!): FindOneSectionContentOutput!
   findManyLessons(data: FindManyLessonsInputData!): FindManyLessonsOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
@@ -921,6 +929,15 @@ input FindOneCourseInputParams {
   accountId: ID
 }
 
+input FindOneCourseAuthInputData {
+  params: FindOneCourseAuthInputParams!
+}
+
+input FindOneCourseAuthInputParams {
+  courseId: ID!
+  accountId: ID!
+}
+
 input FindManyCoursesInputData {
   options: FindManyCoursesInputOptions
 }
@@ -932,17 +949,12 @@ input FindManyCoursesInputOptions {
   categoryId: String
 }
 
-input FindOneLessonInputData {
-  params: FindOneLessonInputParams!
-  options: FindOneLessonInputOptions
+input FindOneSectionContentInputData {
+  params: FindOneSectionContentInputParams!
 }
 
-input FindOneLessonInputParams {
-  lessonId: ID!
-}
-
-input FindOneLessonInputOptions {
-  followerId: ID
+input FindOneSectionContentInputParams {
+  sectionContentId: ID!
 }
 
 input FindManyLessonsInputData {

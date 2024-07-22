@@ -1512,29 +1512,24 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            // const { section } = await this.lessonMySqlRepository.findOne({
-            //     where: {
-            //         lessonId: quizId,
-            //     },
-            //     relations: {
-            //         section: {
-            //             course: true,
-            //         },
-            //     },
-            // })
+            const { courseId } = await this.courseMySqlRepository.findOne({
+                where:{
+                    sections:{
+                        contents:{
+                            type: SectionContentType.Quiz,
+                            quizId
+                        }
+                    }
+                }
+            })
+            const enrollments = await this.enrolledInfoMySqlRepository.findBy({ courseId })
+            const now = new Date()
+            const activeEnrollment = enrollments.filter(date => new Date(date.endDate) < now)
 
-            // const { endDate } = await this.enrolledInfoMySqlRepository.findOne({
-            //     where: {
-            //         courseId: section.courseId,
-            //     },
-            // })
-
-            // const now = new Date()
-            // const endDateTime = new Date(endDate)
-
-            // if (now > endDateTime) {
-            //     throw new ConflictException("Course has expired")
-            // }
+            if(!activeEnrollment){
+                throw new ConflictException("Your enrollment(s) in this course have been expired")
+            }
+            
 
             const doing = await this.quizAttemptMySqlRepository.findOne({
                 where: {
@@ -1548,10 +1543,6 @@ export class CoursesService {
                 throw new ConflictException("You havent completed the last attempt.")
             }
 
-            // await queryRunner.manager.save(QuizAttemptMySqlEntity, {
-            //     quizId,
-            //     accountId,
-            // })
             const { quizAttemptId } = await this.quizAttemptMySqlRepository.save({
                 accountId,
                 quizId,

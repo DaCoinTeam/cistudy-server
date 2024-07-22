@@ -69,7 +69,7 @@ export class LessonEntity {
     @JoinColumn({ name: "lessonId" })
         sectionContent: SectionContentEntity
 
-    @Field(() => [ProgressEntity])
+    @Field(() => [ProgressEntity], {nullable: true})
     @OneToMany(() => ProgressEntity, (accountProgress) => accountProgress.lesson)
         accountProgresses? : Array<ProgressEntity>
 }

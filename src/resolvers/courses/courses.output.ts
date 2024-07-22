@@ -4,6 +4,7 @@ import { Field, Int, ObjectType } from "@nestjs/graphql"
 import { CategoryEntity } from "src/database/mysql/category.entity"
 import { CourseTargetEntity } from "src/database/mysql/course-target.entity"
 import { QuizAttemptEntity } from "src/database/mysql/quiz-attempt.entity"
+import { SectionContentEntity } from "src/database/mysql/section_content.entity"
 
 @ObjectType()
 export class FindManyCoursesOutputMetadata {
@@ -43,13 +44,12 @@ implements AuthOutput<CourseMySqlEntity>
         tokens: AuthTokens
 }
 
-
 @ObjectType()
-export class FindOneLessonOutput
-implements AuthOutput<LessonMySqlEntity>
+export class FindOneSectionContentOutput
+implements AuthOutput<SectionContentEntity>
 {
-    @Field(() => LessonMySqlEntity)
-        data: LessonMySqlEntity
+    @Field(() => SectionContentEntity)
+        data: SectionContentEntity
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }
