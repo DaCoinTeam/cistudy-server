@@ -56,5 +56,5 @@ export class SectionEntity {
     @Field(() => [SectionContentEntity], {nullable : true})
     @OneToMany(() => SectionContentEntity, (content) => content.section, { cascade: true })
         contents: Array<SectionContentEntity>
-
+ 
 }
