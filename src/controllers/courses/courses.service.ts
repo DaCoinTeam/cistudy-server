@@ -741,8 +741,8 @@ export class CoursesService {
             title
         })
 
-        const { resourceId } = await this.resourceMySqlRepository.save({})
-        
+        const { resourceId } = await this.resourceMySqlRepository.save({resourceId: sectionContentId})
+
         await this.sectionContentMySqlRepository.update(sectionContentId, { resourceId })
 
         return {
