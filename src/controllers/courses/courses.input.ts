@@ -230,6 +230,8 @@ export class UpdateSectionInputData {
       title?: string
   @ApiProperty()
       position: number
+  @ApiProperty()
+      isLocked: boolean
 }
 
 export class UpdateSectionInput implements AuthInput<UpdateSectionInputData> {
