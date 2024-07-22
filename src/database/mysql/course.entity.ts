@@ -170,4 +170,13 @@ export class CourseEntity {
 
     @Field(() => CourseCategoryLevelDTO, {nullable : true})
         courseCategoryLevels : CourseCategoryLevelDTO
+
+    @Field(() => Int, { nullable: true })
+        numberOfQuizzes?: number
+
+    @Field(() => Int, { nullable: true })
+        numberOfLessons?: number
+
+    @Field(() => Int, { nullable: true })
+        numberOfResources?: number
 }
