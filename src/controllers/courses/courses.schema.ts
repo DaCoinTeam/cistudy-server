@@ -104,13 +104,13 @@ export const createCategorySchema: SchemaObject = {
     }
 }
 
-export const createResourcesSchema: SchemaObject = {
+export const CreateResourceAttachmentsSchema: SchemaObject = {
     type: "object",
     properties: {
         data: {
             type: "object",
             properties: {
-                lessonId: {
+                resourceId: {
                     type: "string",
                 },
             },
@@ -158,7 +158,7 @@ export const createQuizSchema: SchemaObject = {
         data: {
             type: "object",
             properties: {
-                lessonId: {
+                sectionId: {
                     type: "string",
                 },
                 timeLimit: {

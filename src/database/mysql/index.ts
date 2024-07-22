@@ -8,6 +8,7 @@ import { EnrolledInfoEntity as EnrolledInfoMySqlEntity } from "./enrolled-info.e
 import { SectionEntity as SectionMySqlEntity } from "./section.entity"
 import { LessonEntity as LessonMySqlEntity } from "./lesson.entity"
 import { ResourceEntity as ResourceMySqlEntity } from "./resource.entity"
+import { ResourceAttachmentEntity as ResourceAttachmentMySqlEntity } from "./resource-attachment.entity"
 import { CourseTargetEntity as CourseTargetMySqlEntity } from "./course-target.entity"
 import { PostMediaEntity as PostMediaMySqlEntity } from "./post-media.entity"
 import { PostCommentMediaEntity as PostCommentMediaMySqlEntity } from "./post-comment-media.entity"
@@ -39,6 +40,7 @@ import { ReportPostEntity as ReportPostMySqlEntity } from "./report-post.entity"
 import { ReportPostCommentEntity as ReportPostCommentMySqlEntity } from "./report-post-comment.entity"
 import { TransactionEntity as TransactionMySqlEntity } from "./transaction.enity"
 import { SectionContentEntity as SectionContentMySqlEntity } from "./section_content.entity"
+
 export {
     AccountMySqlEntity,
     RoleMySqlEntity,
@@ -54,6 +56,7 @@ export {
     SectionMySqlEntity,
     LessonMySqlEntity,
     ResourceMySqlEntity,
+    ResourceAttachmentMySqlEntity,
     CourseTargetMySqlEntity,
     FollowMySqlEnitity,
     PostLikeMySqlEntity,

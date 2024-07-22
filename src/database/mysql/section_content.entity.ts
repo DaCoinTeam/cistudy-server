@@ -74,7 +74,7 @@ export class SectionContentEntity {
         quiz: QuizEntity
 
     @Field(() => ResourceEntity, { nullable: true })
-    @OneToOne(() => ResourceEntity, (resource) => resource.sectionContent, { nullable: true, onDelete: "CASCADE" })
+    @OneToOne(() => ResourceEntity, (resource) => resource.sectionContent, { onDelete: "CASCADE" })
     @JoinColumn({ name: "resourceId" })
         resource: ResourceEntity
 

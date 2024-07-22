@@ -173,19 +173,35 @@ export class CreateSectionInput implements AuthInput<CreateSectionInputData> {
       accountId: string
   data: CreateSectionInputData
 }
+//
+export class CreateResourceAttachmentsInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        resourceId: string
+}
+export class CreateResourceAttachmentsInput
+implements AuthInput<CreateResourceAttachmentsInputData>
+{
+    @IsUUID("4")
+        accountId: string
+    data: CreateResourceAttachmentsInputData
+    files: Express.Multer.File[]
 
-export class CreateResourcesInputData {
+}
+//
+export class CreateResourceInputData {
   @IsUUID("4")
   @ApiProperty()
       sectionId: string
+  @ApiProperty()
+      title: string
 }
-export class CreateResourcesInput
-implements AuthInput<CreateResourcesInputData>
+export class CreateResourceInput
+implements AuthInput<CreateResourceInputData>
 {
   @IsUUID("4")
       accountId: string
-  data: CreateResourcesInputData
-  files: Express.Multer.File[]
+  data: CreateResourceInputData
 }
 
 export class UpdateLessonInputData {
@@ -243,7 +259,7 @@ export class UpdateSectionInput implements AuthInput<UpdateSectionInputData> {
 export class DeleteResourceInputData {
   @IsUUID()
   @ApiProperty()
-      resourceId: string
+      resourceAttachmentId: string
 }
 
 export class DeleteResourceInput implements AuthInput<DeleteResourceInputData> {

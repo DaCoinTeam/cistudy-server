@@ -22,7 +22,8 @@ import {
     AccountMySqlEntity, CourseCategoryMySqlEntity,
     ReportCourseMySqlEntity,
     QuizAttemptAnswerMySqlEntity,
-    SectionContentMySqlEntity
+    SectionContentMySqlEntity,
+    ResourceAttachmentMySqlEntity
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, In } from "typeorm"
@@ -35,7 +36,6 @@ import {
     CreateCourseTargetInput,
     UpdateCourseTargetInput,
     DeleteCourseTargetInput,
-    CreateResourcesInput,
     UpdateLessonInput,
     DeleteSectionInput,
     UpdateSectionInput,
@@ -57,7 +57,9 @@ import {
     CreateCourseReportInput,
     UpdateCourseReportInput,
     ResolveCourseReportInput,
-    DeleteSectionContentInput
+    DeleteSectionContentInput,
+    CreateResourceAttachmentsInput,
+    CreateResourceInput
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -83,6 +85,7 @@ import {
     CreateLessonOutput,
     CreateQuizAttemptOutput,
     CreateQuizOutput,
+    CreateResourceAttachmentsOutput,
     CreateResourcesOuput,
     CreateSectionOutput,
     DeleteCategoryOutput,
@@ -121,6 +124,8 @@ export class CoursesService {
         private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
         @InjectRepository(ResourceMySqlEntity)
         private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+        @InjectRepository(ResourceAttachmentMySqlEntity)
+        private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
         @InjectRepository(EnrolledInfoEntity)
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoEntity>,
         @InjectRepository(CategoryMySqlEntity)
@@ -726,20 +731,31 @@ export class CoursesService {
         }
     }
 
-    async createResources(
-        input: CreateResourcesInput,
-    ): Promise<CreateResourcesOuput> {
+    async createResource(input: CreateResourceInput) : Promise<CreateResourcesOuput> {
+        const { data } = input
+        const { sectionId, title } = data
+
+        await this.sectionContentMySqlRepository.save({
+            type: SectionContentType.Resource,
+            sectionId,
+            title
+        })
+
+        return {
+            message: "Resource has been created sucessfully"
+        }
+    }
+
+    async createResourceAttachments(
+        input: CreateResourceAttachmentsInput,
+    ): Promise<CreateResourceAttachmentsOutput> {
         const { files, data } = input
-        const { sectionId } = data
+        const { resourceId } = data
 
         const promises: Array<Promise<void>> = []
-        const resources: Array<DeepPartial<ResourceMySqlEntity>> = []
+        const resources: Array<DeepPartial<ResourceAttachmentMySqlEntity>> = []
 
         for (const file of files) {
-            const { resourceId } = await this.sectionContentMySqlRepository.save({
-                type: SectionContentType.Resource,
-                sectionId,
-            })
             const promise = async () => {
                 const { assetId } = await this.storageService.upload({
                     rootFile: file,
@@ -756,7 +772,7 @@ export class CoursesService {
 
         await this.resourceMySqlRepository.save(resources)
         return {
-            message: `Resources with ids ${resources.map((resource) => resource.resourceId)} has been created successfully.`,
+            message: "Attachment added sucessfully",
         }
     }
 
@@ -781,20 +797,23 @@ export class CoursesService {
         }
     }
 
-    async deleteResource(
+    async deleteResourceAttachment(
         input: DeleteResourceInput,
     ): Promise<DeleteResourceOuput> {
         const { data } = input
-        const { resourceId } = data
-        const file = await this.resourceMySqlRepository.findOneBy({resourceId})
+        const { resourceAttachmentId } = data
 
-        if (!file) {
+        const attachment = await this.resourceAttachmentMySqlRepository.findOneBy({ resourceAttachmentId })
+
+        if (!attachment) {
             throw new NotFoundException("Resource not found")
         }
-        await this.storageService.delete(file.fileId)
-        await this.resourceMySqlRepository.delete({ resourceId })
+
+        await this.storageService.delete(attachment.fileId)
+        await this.resourceAttachmentMySqlRepository.delete({ resourceAttachmentId })
+
         return {
-            message: `A resource with id ${resourceId} has been deleted successfully.`,
+            message: "Attachment has been deleted successfully.",
         }
     }
 

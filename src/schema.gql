@@ -94,12 +94,21 @@ type QuizEntity {
   lastAttemptTimeTaken: String
 }
 
-type ResourceEntity {
+type ResourceAttachmentEntity {
+  resourceAttachmentId: ID!
   resourceId: ID!
   name: String!
   fileId: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  resource: ResourceEntity!
+}
+
+type ResourceEntity {
+  resourceId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  attachments: [ResourceAttachmentEntity!]
   sectionContent: SectionContentEntity!
 }
 

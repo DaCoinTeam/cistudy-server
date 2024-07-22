@@ -34,8 +34,7 @@ import {
     CreateLessonInputData,
     CreateQuizAttemptInputData,
     CreateQuizInputData,
-    CreateResourcesInputData,
-    CreateSectionInputData,
+    CreateResourceAttachmentsInputData, CreateResourceInputData, CreateSectionInputData,
     DeleteCourseCategoryInputData,
     EnrollCourseInputData,
     FinishQuizAttemptInputData,
@@ -49,15 +48,15 @@ import {
     UpdateLessonInputData,
     UpdateQuizInputData,
     //UpdateQuizInputData,
-    UpdateSectionInputData,
+    UpdateSectionInputData
 } from "./courses.input"
 
 import {
     createCategorySchema,
     createQuizSchema,
-    createResourcesSchema,
+    CreateResourceAttachmentsSchema,
     updateCourseSchema,
-    updateQuizSchema,
+    updateQuizSchema
 } from "./courses.schema"
 
 import { Files, SystemRoles } from "@common"
@@ -260,21 +259,35 @@ export class CoursesController {
     }
 
     @ApiBearerAuth()
+    @Put("create-resource")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async createResource(
+        @AccountId() accountId: string,
+        @Body() body: CreateResourceInputData,
+    ) {
+        return this.coursesService.createResource({
+            accountId,
+            data: body,
+        })
+    }
+    @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
-    @ApiBody({ schema: createResourcesSchema })
-    @Post("create-resources")
+    @ApiBody({ schema: CreateResourceAttachmentsSchema })
+    @Post("create-resource-attachment")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(
         AuthInterceptor,
         FileFieldsInterceptor([{ name: "files", maxCount: 10 }]),
     )
-    async createResoures(
+    async createResourceAttachments(
         @AccountId() accountId: string,
-        @DataFromBody() data: CreateResourcesInputData,
+        @DataFromBody() data: CreateResourceAttachmentsInputData,
         @UploadedFiles() { files }: Files,
     ) {
-        return this.coursesService.createResources({
+        return this.coursesService.createResourceAttachments({
             accountId,
             data,
             files,
@@ -283,7 +296,7 @@ export class CoursesController {
 
     @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
-    @ApiBody({ schema: createResourcesSchema })
+    @ApiBody({ schema: CreateResourceAttachmentsSchema })
     @Put("update-lesson")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
@@ -334,17 +347,17 @@ export class CoursesController {
     }
 
     @ApiBearerAuth()
-    @Delete("delete-resource/:resourceId")
+    @Delete("delete-resource-attachment/:resourceAttachmentId")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async deleteResource(
         @AccountId() accountId: string,
-        @Param("resourceId") resourceId: string,
+        @Param("resourceAttachmentId") resourceAttachmentId: string,
     ) {
-        return this.coursesService.deleteResource({
+        return this.coursesService.deleteResourceAttachment({
             accountId,
-            data: { resourceId },
+            data: { resourceAttachmentId },
         })
     }
 
