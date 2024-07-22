@@ -177,7 +177,7 @@ export class CreateSectionInput implements AuthInput<CreateSectionInputData> {
 export class CreateResourcesInputData {
   @IsUUID("4")
   @ApiProperty()
-      lessonId: string
+      sectionId: string
 }
 export class CreateResourcesInput
 implements AuthInput<CreateResourcesInputData>

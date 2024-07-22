@@ -1,44 +1,44 @@
 import {
     Column,
     Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
     CreateDateColumn,
-    UpdateDateColumn
+    UpdateDateColumn,
+    PrimaryColumn,
+    JoinColumn,
+    OneToOne
 } from "typeorm"
-import { LessonEntity } from "./lesson.entity"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
+import { SectionContentEntity } from "./section_content.entity"
 
 @ObjectType()
 @Entity("resource")
 export class ResourceEntity {
-  @Field(() => ID)
-  @PrimaryGeneratedColumn("uuid")
-      resourceId: string
+    @Field(() => ID)
+    @PrimaryColumn("uuid")
+        resourceId: string
 
-  @Field(() => String)
-  @Column({ type: "varchar", length: 200 })
-      name: string
+    @Field(() => String)
+    @Column({ type: "varchar", length: 200 })
+        name: string
 
-  @Field(() => String)
-  @Column({ type: "varchar", length: 200 })
-      fileId: string
+    @Field(() => String)
+    @Column({ type: "varchar", length: 200 })
+        fileId: string
 
-  @Field(() => ID)
-  @Column({ name: "lessonId", type: "uuid", length: 36 })
-      lessonId: string
+    @Field(() => Date)
+    @CreateDateColumn()
+        createdAt: Date
 
-  @Field(() => Date)
-  @CreateDateColumn()
-      createdAt: Date
+    @Field(() => Date)
+    @UpdateDateColumn()
+        updatedAt: Date
 
-  @Field(() => Date)
-  @UpdateDateColumn()
-      updatedAt: Date
+    @Field(() => SectionContentEntity)
+    @OneToOne(() => SectionContentEntity, (sectionContent) => sectionContent.resource, {
+        cascade: true,
+        onDelete: "CASCADE",
+    })
+    @JoinColumn({ name: "resourceId" })
+        sectionContent: SectionContentEntity
 
-  @Field(() => LessonEntity)
-  @ManyToOne(() => LessonEntity, (lesson) => lesson.resources, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "lessonId" })
-      lesson: LessonEntity
 }

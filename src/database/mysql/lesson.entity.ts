@@ -9,7 +9,6 @@ import {
     PrimaryColumn,
 } from "typeorm"
 
-import { ResourceEntity } from "./resource.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { ProcessStatus, VideoType } from "@common"
 import { ProgressEntity } from "./progress.entity"
@@ -69,10 +68,6 @@ export class LessonEntity {
     })
     @JoinColumn({ name: "lessonId" })
         sectionContent: SectionContentEntity
-
-    @Field(() => [ResourceEntity])
-    @OneToMany(() => ResourceEntity, (resource) => resource.lesson)
-        resources: Array<ResourceEntity>
 
     @Field(() => [ProgressEntity])
     @OneToMany(() => ProgressEntity, (accountProgress) => accountProgress.lesson)

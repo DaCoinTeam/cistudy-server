@@ -256,7 +256,7 @@ export class CoursesService {
                 }
                 return acc
             }, Promise.resolve([]))
-            
+
 
             await this.progressMySqlRepository.save(progresses)
 
@@ -630,14 +630,14 @@ export class CoursesService {
         const { data } = input
         const { sectionContentId } = data
 
-        const sectionContent = await this.sectionContentMySqlRepository.findOneBy({sectionContentId})
+        const sectionContent = await this.sectionContentMySqlRepository.findOneBy({ sectionContentId })
 
         if (!sectionContent) {
             throw new NotFoundException("Content not found")
         }
 
-        switch(sectionContent.type){
-        case SectionContentType.Lesson:{
+        switch (sectionContent.type) {
+        case SectionContentType.Lesson: {
             const lesson = await this.lessonMySqlRepository.findOneBy({ lessonId: sectionContentId })
             if (lesson) {
                 const lessonMedia = [lesson.thumbnailId, lesson.lessonVideoId]
@@ -645,16 +645,16 @@ export class CoursesService {
             }
             break
         }
-        case SectionContentType.Quiz:{
+        case SectionContentType.Quiz: {
             const quiz = await this.quizMySqlRepository.findOne({
-                where:{
-                    quizId : sectionContentId
+                where: {
+                    quizId: sectionContentId
                 },
-                relations:{
+                relations: {
                     questions: true
                 }
             })
-            if(quiz) {
+            if (quiz) {
                 const questionIds = quiz.questions.map(({ quizQuestionId }) => quizQuestionId)
 
                 const quizQuestionMedia = await this.quizQuestionMediaMySqlRepository.find({
@@ -674,7 +674,7 @@ export class CoursesService {
         default: break
         }
 
-        await this.sectionContentMySqlRepository.delete({sectionContentId})
+        await this.sectionContentMySqlRepository.delete({ sectionContentId })
         return {
             message: "Content has been deleted successfully.",
         }
@@ -730,12 +730,16 @@ export class CoursesService {
         input: CreateResourcesInput,
     ): Promise<CreateResourcesOuput> {
         const { files, data } = input
-        const { lessonId } = data
+        const { sectionId } = data
 
         const promises: Array<Promise<void>> = []
         const resources: Array<DeepPartial<ResourceMySqlEntity>> = []
 
         for (const file of files) {
+            const { resourceId } = await this.sectionContentMySqlRepository.save({
+                type: SectionContentType.Resource,
+                sectionId,
+            })
             const promise = async () => {
                 const { assetId } = await this.storageService.upload({
                     rootFile: file,
@@ -743,7 +747,7 @@ export class CoursesService {
                 resources.push({
                     name: file.originalname,
                     fileId: assetId,
-                    lessonId,
+                    resourceId,
                 })
             }
             promises.push(promise())
@@ -782,6 +786,12 @@ export class CoursesService {
     ): Promise<DeleteResourceOuput> {
         const { data } = input
         const { resourceId } = data
+        const file = await this.resourceMySqlRepository.findOneBy({resourceId})
+
+        if (!file) {
+            throw new NotFoundException("Resource not found")
+        }
+        await this.storageService.delete(file.fileId)
         await this.resourceMySqlRepository.delete({ resourceId })
         return {
             message: `A resource with id ${resourceId} has been deleted successfully.`,

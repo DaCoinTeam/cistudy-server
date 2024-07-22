@@ -71,6 +71,10 @@ export class AccountEntity {
         walletAddress: string
 
     @Field(() => String, { nullable: true })
+    @Column({ type: "varchar", length: 200, default: null })
+        bio: string
+
+    @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 50, default: null })
         firstName: string
 

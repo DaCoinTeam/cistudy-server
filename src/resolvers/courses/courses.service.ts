@@ -20,7 +20,7 @@ import {
     FindOneCourseInput,
     FindManyCoursesInput,
     FindManyLessonsInput,
-    FindManyResourcesInput,
+    //FindManyResourcesInput,
     FindOneLessonInput,
     FindManyCourseTargetsInput,
     //FindOneCourseAuthInput,
@@ -126,9 +126,6 @@ export class CoursesService {
                 relations: {
                     sections: {
                         contents:{
-                            lesson: {
-                                resources: true
-                            },
                             quiz: true
                         }
                     },
@@ -400,6 +397,9 @@ export class CoursesService {
                             contents:{
                                 lesson: true
                             }
+                        },
+                        courseTargets:{
+
                         }
                     },
                 })
@@ -484,7 +484,6 @@ export class CoursesService {
             const lesson = await this.lessonMySqlRepository.findOne({
                 where: { lessonId },
                 relations: {
-                    resources: true,
                     sectionContent: {
                         section:{           
                             course: {
@@ -589,19 +588,19 @@ export class CoursesService {
         return contents.map(contents => contents.lesson)
     }
 
-    async findManyResources(
-        input: FindManyResourcesInput,
-    ): Promise<Array<ResourceMySqlEntity>> {
-        const { data } = input
-        const { params } = data
-        const { lessonId } = params
+    // async findManyResources(
+    //     input: FindManyResourcesInput,
+    // ): Promise<Array<ResourceMySqlEntity>> {
+    //     const { data } = input
+    //     const { params } = data
+    //     const { lessonId } = params
 
-        return await this.resourceMySqlRepository.find({
-            where: {
-                lessonId
-            },
-        })
-    }
+    //     return await this.resourceMySqlRepository.find({
+    //         where: {
+    //             lessonId
+    //         },
+    //     })
+    // }
 
     async findManyCourseTargets(
         input: FindManyCourseTargetsInput,
@@ -696,9 +695,7 @@ export class CoursesService {
                 creator: true,
                 sections: {
                     contents:{
-                        lesson: {
-                            resources: true
-                        }
+                        lesson: true
                     }
                 },
                 posts: {

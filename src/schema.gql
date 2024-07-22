@@ -3,21 +3,6 @@ type AuthTokens {
   refreshToken: String!
 }
 
-type ResourceEntity {
-  resourceId: ID!
-  name: String!
-  fileId: String!
-  lessonId: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  lesson: LessonEntity!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 type SectionEntity {
   sectionId: ID!
   title: String!
@@ -30,6 +15,11 @@ type SectionEntity {
   course: CourseEntity!
   contents: [SectionContentEntity!]
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type QuizAttemptEntity {
   quizAttemptId: ID!
@@ -104,12 +94,22 @@ type QuizEntity {
   lastAttemptTimeTaken: String
 }
 
+type ResourceEntity {
+  resourceId: ID!
+  name: String!
+  fileId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  sectionContent: SectionContentEntity!
+}
+
 type SectionContentEntity {
   sectionContentId: ID!
   sectionId: String!
   title: String!
   lessonId: ID!
   quizId: ID!
+  resourceId: ID!
   type: String!
   position: Int!
   createdAt: DateTime!
@@ -117,6 +117,7 @@ type SectionContentEntity {
   section: SectionEntity!
   lesson: LessonEntity
   quiz: QuizEntity
+  resource: ResourceEntity
 }
 
 type LessonEntity {
@@ -132,7 +133,6 @@ type LessonEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   sectionContent: SectionContentEntity!
-  resources: [ResourceEntity!]!
   accountProgresses: [ProgressEntity!]!
 }
 
@@ -522,6 +522,7 @@ type AccountEntity {
   username: String
   balance: Float
   walletAddress: String
+  bio: String
   firstName: String
   lastName: String
   birthdate: DateTime
@@ -581,11 +582,6 @@ type FindOneLessonOutput {
 
 type FindManyLessonsOutput {
   data: [LessonEntity!]!
-  tokens: AuthTokens
-}
-
-type FindManyResourcesOutput {
-  data: [ResourceEntity!]!
   tokens: AuthTokens
 }
 
@@ -858,7 +854,6 @@ type Query {
   findManyCourses(data: FindManyCoursesInputData!): FindManyCoursesOutputData!
   findOneLesson(data: FindOneLessonInputData!): FindOneLessonOutput!
   findManyLessons(data: FindManyLessonsInputData!): FindManyLessonsOutput!
-  findManyResources(data: FindManyResourcesInputData!): FindManyResourcesOutput!
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
   findManyCourseReviews(data: FindManyCourseReviewsInputData!): FindManyCourseReviewsOutputData!
@@ -944,14 +939,6 @@ input FindManyLessonsInputData {
 
 input FindManyLessonsInputParams {
   sectionId: ID!
-}
-
-input FindManyResourcesInputData {
-  params: FindManyResourcesInputParams!
-}
-
-input FindManyResourcesInputParams {
-  lessonId: ID!
 }
 
 input FindManyCourseTargetsInputData {

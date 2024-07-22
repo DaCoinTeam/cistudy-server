@@ -125,7 +125,8 @@ export enum TransactionType {
 
 export enum SectionContentType {
   Lesson = "lesson",
-  Quiz = "quiz"
+  Quiz = "quiz",
+  Resource = "resource"
 }
 
 registerEnumType(SectionContentType,{

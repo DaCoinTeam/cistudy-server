@@ -13,6 +13,7 @@ import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { SectionContentType } from "@common"
 import { SectionEntity } from "./section.entity"
 import { QuizEntity } from "./quiz.entity"
+import { ResourceEntity } from "./resource.entity"
 
 @ObjectType()
 @Entity("section_content")
@@ -28,7 +29,7 @@ export class SectionContentEntity {
     @Field(() => String)
     @Column({ type: "varchar", length: 200 })
         title: string
-        
+
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 , nullable: true})
         lessonId: string
@@ -36,6 +37,10 @@ export class SectionContentEntity {
     @Field(() => ID)
     @Column({ type: "uuid", length: 36, nullable: true })
         quizId: string
+
+    @Field(() => ID)
+    @Column({ type: "uuid", length: 36, nullable: true })
+        resourceId: string
 
     @Field(() => String)
     @Column({ type: "enum", enum: SectionContentType })
@@ -67,5 +72,10 @@ export class SectionContentEntity {
     @OneToOne(() => QuizEntity, (quiz) => quiz.sectionContent, {onDelete: "CASCADE"})
     @JoinColumn({ name: "quizId" })
         quiz: QuizEntity
+
+    @Field(() => ResourceEntity, { nullable: true })
+    @OneToOne(() => ResourceEntity, (resource) => resource.sectionContent, { nullable: true, onDelete: "CASCADE" })
+    @JoinColumn({ name: "resourceId" })
+        resource: ResourceEntity
 
 }
