@@ -107,6 +107,7 @@ type QuizEntity {
 type SectionContentEntity {
   sectionContentId: ID!
   sectionId: String!
+  title: String!
   lessonId: ID!
   quizId: ID!
   type: String!
