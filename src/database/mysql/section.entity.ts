@@ -32,10 +32,6 @@ export class SectionEntity {
     @Field(() => Int)
     @Column({ type: "int", default: 0 })
         position: number
-    
-    @Field(() => Boolean)
-    @Column({ type: "boolean", default: true })
-        isLocked: boolean
         
     @Field(() => Date)
     @CreateDateColumn()
@@ -61,6 +57,6 @@ export class SectionEntity {
     //graphQL
     @Field(() => Boolean)
         isCompleted?: boolean
-    @Field(() => Boolean)
-        locked?: boolean
+    @Field(() => Boolean, { nullable : true })
+        unlocked?: boolean
 }

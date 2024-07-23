@@ -648,15 +648,18 @@ export class CoursesService {
             const highRateCourses = results.filter(
                 (course) => course.courseRatings.overallCourseRating === maxRate,
             )
-            // const numberOfAvailableCourses = await this.courseMySqlRepository.findBy({
-            //     verifyStatus: CourseVerifyStatus.Approved,
-            // })
+            const numberOfSearchedCourses = await this.courseMySqlRepository.find({
+                where:{
+                    title: Like(`%${searchValue}%`),
+                    verifyStatus: CourseVerifyStatus.Approved,
+                }
+            })
 
             await queryRunner.commitTransaction()
             return {
                 results,
                 metadata: {
-                    count: results.length,
+                    count: numberOfSearchedCourses.length,
                     highRateCourses,
                     categories: topic,
                 },
@@ -794,7 +797,26 @@ export class CoursesService {
                     content.isCompleted = progress.isCompleted
                 }
             }
-                
+
+            const sections = Object.assign(sectionContent.section.course.sections, [])
+            sections.sort((prev, next) => prev.position - next.position)
+            sections.at(0).unlocked = true
+
+            if (sections.length > 1) {
+                for (let i = 1; i < sections.length; i++) {
+                    let allCompleted = true
+                    for (const content of sections[i-1].contents) {
+                        if (!content.isCompleted) {
+                            allCompleted = false
+                            break
+                        }                       
+                    }
+                    sections.at(i).unlocked = allCompleted
+                }
+            }
+
+            sectionContent.section.course.sections = sections
+
             await queryRunner.commitTransaction()
 
             return sectionContent

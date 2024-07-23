@@ -39,14 +39,13 @@ type SectionEntity {
   title: String!
   courseId: ID!
   position: Int!
-  isLocked: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   course: CourseEntity!
   contents: [SectionContentEntity!]
   accountGrade: [AccountGradeEntity!]
   isCompleted: Boolean!
-  locked: Boolean!
+  unlocked: Boolean
 }
 
 type QuizAttemptEntity {
