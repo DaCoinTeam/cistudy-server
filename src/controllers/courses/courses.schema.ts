@@ -50,6 +50,9 @@ export const updateLessonSchema: SchemaObject = {
         data: {
             type: "object",
             properties: {
+                lessonId: {
+                    type: "string",
+                },
                 title: {
                     type: "string",
                 },
