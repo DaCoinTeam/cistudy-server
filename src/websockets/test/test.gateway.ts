@@ -1,14 +1,12 @@
 import { Inject, Logger, UseGuards, UseInterceptors } from "@nestjs/common"
 
 import {
-    ConnectedSocket,
     MessageBody,
     OnGatewayConnection,
     OnGatewayDisconnect,
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
-    WsResponse,
 } from "@nestjs/websockets"
 import { Server, Socket } from "socket.io"
 import { JwtAuthGuard } from "../shared"
@@ -16,7 +14,7 @@ import { AccountId } from "../shared"
 import { AuthInterceptor } from "../shared"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { Cache } from "cache-manager"
-import { REAL_TIME_CHAT, TEST_CALL, TEST_CALL2, TEST_NO_AUTH } from "./test.events"
+import { REAL_TIME_CHAT, TEST_CALL, TEST_NO_AUTH } from "./test.events"
 import { InjectRepository } from "@nestjs/typeorm"
 import { AccountMySqlEntity } from "@database"
 import { Repository } from "typeorm"
@@ -66,14 +64,14 @@ export class TestGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @UseInterceptors(AuthInterceptor)
     @SubscribeMessage(TEST_CALL)
     async testCall(@MessageBody() body: string, @AccountId() accountId: string): Promise<TestOutput> {
-        console.log("dadas: "+ accountId)
+
         const userData = await this.accountMySqlRepository.findOne({ where: { accountId } })
-        const time = new Date();
+        const time = new Date()
 
-        const hours = time.getHours().toString().padStart(2, '0');
-        const minutes = time.getMinutes().toString().padStart(2, '0');
+        const hours = time.getHours().toString().padStart(2, "0")
+        const minutes = time.getMinutes().toString().padStart(2, "0")
 
-        const formattedTime = `${hours}:${minutes}`;
+        const formattedTime = `${hours}:${minutes}`
         return {
             event: "testcall", data: {
                 data: {
@@ -90,11 +88,11 @@ export class TestGateway implements OnGatewayConnection, OnGatewayDisconnect {
     async realTimeChat(@MessageBody() body: string, @AccountId() accountId : string) : Promise<RealTimeChatOutput>{
         const userData = await this.accountMySqlRepository.findOne({ where: { accountId } })
 
-        const time = new Date();
-        const hours = time.getHours().toString().padStart(2, '0');
-        const minutes = time.getMinutes().toString().padStart(2, '0');
+        const time = new Date()
+        const hours = time.getHours().toString().padStart(2, "0")
+        const minutes = time.getMinutes().toString().padStart(2, "0")
 
-        const formattedTime = `${hours}:${minutes}`;
+        const formattedTime = `${hours}:${minutes}`
         this.server.emit(REAL_TIME_CHAT, "[" + formattedTime + "] " + userData.username + ": " + body)
         
         return{

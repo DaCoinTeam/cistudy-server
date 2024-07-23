@@ -301,7 +301,6 @@ export class CoursesService {
             receivedWalletAddress,
             categoryIds
         } = data
-        console.log(data.categoryIds)
         const course: DeepPartial<CourseMySqlEntity> = {
             courseId,
             description,
@@ -1545,7 +1544,7 @@ export class CoursesService {
                 { sectionContentId },
                 { isCompleted: true },
             )
-
+            
             await queryRunner.commitTransaction()
 
             return { message: "You have completed this content" }

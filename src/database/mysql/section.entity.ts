@@ -36,10 +36,6 @@ export class SectionEntity {
     @Field(() => Boolean)
     @Column({ type: "boolean", default: true })
         isLocked: boolean
-
-    @Field(() => Boolean)
-    @Column({ type: "boolean", default: false })
-        isCompleted: boolean
         
     @Field(() => Date)
     @CreateDateColumn()
@@ -61,5 +57,7 @@ export class SectionEntity {
     @Field(() => [AccountGradeEntity], {nullable : true})
     @OneToMany(() => AccountGradeEntity, (grade) => grade.section, { cascade: true })
         accountGrade: Array<AccountGradeEntity>
- 
+    //graphQL
+    @Field(() => Boolean)
+        isCompleted?: boolean
 }

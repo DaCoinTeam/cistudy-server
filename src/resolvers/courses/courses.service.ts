@@ -178,7 +178,7 @@ export class CoursesService {
                 })
                 : undefined
 
-            console.log(enrolledInfo)
+
 
             const isReviewed = accountId
                 ? await this.courseReviewMySqlRepository.findOneBy({
@@ -335,8 +335,6 @@ export class CoursesService {
                     accountId,
                 })
                 : undefined
-
-            console.log(enrolledInfo)
 
             const isReviewed = accountId
                 ? await this.courseReviewMySqlRepository.findOneBy({

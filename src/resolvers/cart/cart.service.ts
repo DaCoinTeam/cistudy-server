@@ -65,7 +65,7 @@ export class CartService {
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
-        console.log(orderStatus)
+
         try {
             const results = await this.orderMySqlEntity.find(
                 {

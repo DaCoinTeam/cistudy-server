@@ -90,7 +90,6 @@ export class PostsService {
     ) { }
 
     async createPost(input: CreatePostInput): Promise<CreatePostOutput> {
-        console.log(input)
         const { data, files, accountId } = input
         const { postMedias, title, courseId, html } = data
 

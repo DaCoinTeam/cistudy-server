@@ -33,7 +33,7 @@ export class FirebaseService implements OnModuleInit {
         this.messaging = firebase.messaging()
     }
     onModuleInit() {
-        console.log("x")
+        
     }
 
     async sendMessageToAccount(accountId, payload: MessagingPayload) {

@@ -66,7 +66,7 @@ export class PostsService {
                     postMedias: true,
                 },
             })
-            console.log(post)
+
             const numberOfLikes = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
@@ -181,7 +181,6 @@ export class PostsService {
                     },
                 }
             })
-            console.log(posts)
             const numberOfLikesResults = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(post_like.postId)", "count")
@@ -267,7 +266,6 @@ export class PostsService {
                 }
             })
         } catch (ex) {
-            console.log(ex)
             await queryRunner.rollbackTransaction()
         } finally {
             await queryRunner.release()

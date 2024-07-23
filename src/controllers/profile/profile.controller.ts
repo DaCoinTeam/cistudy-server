@@ -38,8 +38,6 @@ export class ProfileController{
         @DataFromBody() data: UpdateProfileData,
         @UploadedFiles() { files }: Files,
     ) {     
-        console.log(accountId)
-        console.log(data)
     	return this.profileService.updateProfile({
     		accountId,
             data,

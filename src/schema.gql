@@ -40,12 +40,12 @@ type SectionEntity {
   courseId: ID!
   position: Int!
   isLocked: Boolean!
-  isCompleted: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   course: CourseEntity!
   contents: [SectionContentEntity!]
   accountGrade: [AccountGradeEntity!]
+  isCompleted: Boolean!
 }
 
 type QuizAttemptEntity {
