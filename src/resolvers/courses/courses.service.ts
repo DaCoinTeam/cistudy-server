@@ -686,10 +686,10 @@ export class CoursesService {
                 }
             })
 
-
             const sectionContent = await this.sectionContentMySqlRepository.findOne({
                 where: { sectionContentId },
                 relations: {
+                    accountProgresses:true,
                     quiz: {
                         questions: {
                             answers: true,
