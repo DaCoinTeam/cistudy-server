@@ -3,9 +3,9 @@ import {
     Entity,
     CreateDateColumn,
     UpdateDateColumn,
-    PrimaryColumn,
     JoinColumn,
-    ManyToOne
+    ManyToOne,
+    PrimaryGeneratedColumn
 } from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { ResourceEntity } from "./resource.entity"
@@ -14,7 +14,7 @@ import { ResourceEntity } from "./resource.entity"
 @Entity("resource-attachment")
 export class ResourceAttachmentEntity {
     @Field(() => ID)
-    @PrimaryColumn("uuid")
+    @PrimaryGeneratedColumn("uuid")
         resourceAttachmentId: string
 
     @Field(() => ID)
