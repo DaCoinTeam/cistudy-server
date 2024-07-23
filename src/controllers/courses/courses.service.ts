@@ -1108,10 +1108,19 @@ export class CoursesService {
     }
 
     async createQuiz(input: CreateQuizInput): Promise<CreateQuizOutput> {
-        const { data, files } = input
+        const { data, files, accountId } = input
         const { sectionId, quizQuestions, title, timeLimit } = data
         //Tìm quiz trong db, nếu chưa có thì tạo mới, nếu có thì chỉ thêm question và answer
-        console.log(data)
+        const course = await this.courseMySqlRepository.findOne({
+            where:{
+                creatorId: accountId
+            }
+        })
+
+        if(accountId !== course.creatorId){
+            throw new ConflictException("You are not the creator of the course")
+        }
+
         const { sectionContentId } = await this.sectionContentMySqlRepository.save({
             sectionId,
             title,
@@ -1198,7 +1207,30 @@ export class CoursesService {
                 questionPromises.push()
             }
             await Promise.all(questionPromises)
+            
+            const enrollments = await this.enrolledInfoMySqlRepository.findBy({ courseId: course.courseId })
+            const now = new Date()
 
+            const activeEnrollmentIds = enrollments
+                .filter(enrollment => new Date(enrollment.endDate) > now)
+                .map(enrollment => enrollment.enrolledInfoId)
+
+            const existingGradedSections = await this.accountGradeMySqlRepository.findBy({
+                sectionId,
+                enrolledInfoId: In(activeEnrollmentIds)
+            })
+
+            const existingEnrollmentIds = new Set(existingGradedSections.map(gradedSection => gradedSection.enrolledInfoId))
+
+            const newAccountGradedSections = activeEnrollmentIds
+                .filter(enrolledInfoId => !existingEnrollmentIds.has(enrolledInfoId))
+                .map(enrolledInfoId => ({
+                    enrolledInfoId,
+                    sectionId
+                }))
+
+            await this.accountGradeMySqlRepository.save(newAccountGradedSections)
+            await queryRunner.commitTransaction()
             return {
                 message: `A quiz with id ${quizId} has been created successfully.`,
             }

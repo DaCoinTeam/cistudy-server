@@ -38,7 +38,7 @@ export class AccountGradeEntity {
         updatedAt: Date
 
     @Field(() => EnrolledInfoEntity)
-    @ManyToOne(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.courseProgress, { onDelete: "CASCADE" } )
+    @ManyToOne(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.accountGrade, { onDelete: "CASCADE" } )
     @JoinColumn({ name: "enrolledInfoId" })
         enrolledInfo: EnrolledInfoEntity
 
