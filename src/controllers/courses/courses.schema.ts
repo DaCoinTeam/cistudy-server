@@ -55,7 +55,13 @@ export const updateLessonSchema: SchemaObject = {
                 },
                 description: {
                     type: "string"
-                }
+                },
+                thumbnailIndex: {
+                    type: "number"
+                },
+                lessonVideoIndex: {
+                    type: "number"
+                },
             },
         },
         files: {
