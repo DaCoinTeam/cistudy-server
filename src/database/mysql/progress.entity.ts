@@ -8,8 +8,9 @@ import {
     UpdateDateColumn,
     JoinColumn
 } from "typeorm"
-import { LessonEntity } from "./lesson.entity"
+
 import { EnrolledInfoEntity } from "./enrolled-info.entity"
+import { SectionContentEntity } from "./section_content.entity"
 
 @ObjectType()
 @Entity("progress")
@@ -25,16 +26,16 @@ export class ProgressEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        lessonId: string
+        sectionContentId: string
 
     @Field(() => Boolean, { defaultValue: false })
     @Column({ type: "boolean", default: false })
         isCompleted: boolean
 
-    @Field(() => LessonEntity)
-    @ManyToOne(() => LessonEntity, (lesson) => lesson.accountProgresses, {onDelete: "CASCADE"} )
-    @JoinColumn({ name: "lessonId" })
-        lesson: LessonEntity
+    @Field(() => SectionContentEntity)
+    @ManyToOne(() => SectionContentEntity, (content) => content.accountProgresses, {onDelete: "CASCADE"} )
+    @JoinColumn({ name: "sectionContentId" })
+        content: SectionContentEntity
 
     @Field(() => EnrolledInfoEntity)
     @ManyToOne(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.courseProgress, {onDelete: "CASCADE"} )

@@ -2,7 +2,6 @@ import {
     Column,
     Entity,
     JoinColumn,
-    OneToMany,
     CreateDateColumn,
     UpdateDateColumn,
     OneToOne,
@@ -11,7 +10,6 @@ import {
 
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { ProcessStatus, VideoType } from "@common"
-import { ProgressEntity } from "./progress.entity"
 import { SectionContentEntity } from "./section_content.entity"
 
 @ObjectType()
@@ -69,7 +67,4 @@ export class LessonEntity {
     @JoinColumn({ name: "lessonId" })
         sectionContent: SectionContentEntity
 
-    @Field(() => [ProgressEntity], {nullable: true})
-    @OneToMany(() => ProgressEntity, (accountProgress) => accountProgress.lesson)
-        accountProgresses? : Array<ProgressEntity>
 }
