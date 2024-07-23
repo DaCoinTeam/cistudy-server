@@ -75,6 +75,7 @@ ENV PATH=$PATH:/usr/src/app/tools/Bento4-Docker/bin
 
 #Make mp4dash executable
 
+RUN chmod +x /usr/src/app/tools/Bento4-Docker/bin/mp4dump
 RUN chmod +x /usr/src/app/tools/Bento4-Docker/bin/mp4info
 RUN chmod +x /usr/src/app/tools/Bento4-Docker/bin/mp4fragment
 RUN chmod +x /usr/src/app/tools/Bento4-Docker/bin/mp4dash
