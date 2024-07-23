@@ -157,6 +157,7 @@ type SectionContentEntity {
   quiz: QuizEntity
   resource: ResourceEntity
   accountProgresses: [ProgressEntity!]
+  isCompleted: Boolean!
 }
 
 type ProgressEntity {

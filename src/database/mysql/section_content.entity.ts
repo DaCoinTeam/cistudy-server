@@ -76,11 +76,15 @@ export class SectionContentEntity {
         quiz: QuizEntity
 
     @Field(() => ResourceEntity, { nullable: true })
-    @OneToOne(() => ResourceEntity, (resource) => resource.sectionContent, { onDelete: "CASCADE" })
+    @OneToOne(() => ResourceEntity, (resource) => resource.sectionContent, {cascade: true})
     @JoinColumn({ name: "resourceId" })
         resource: ResourceEntity
 
     @Field(() => [ProgressEntity], {nullable: true})
     @OneToMany(() => ProgressEntity, (accountProgress) => accountProgress.content)
         accountProgresses? : Array<ProgressEntity>
+
+    //graphqh
+    @Field(() => Boolean)
+        isCompleted?: boolean
 }

@@ -8,6 +8,7 @@ import {
     EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
     LessonMySqlEntity,
+    ProgressMySqlEntity,
     QuizAttemptMySqlEntity,
     QuizMySqlEntity,
     QuizQuestionMySqlEntity,
@@ -77,6 +78,8 @@ export class CoursesService {
     private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
     @InjectRepository(QuizMySqlEntity)
     private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+    @InjectRepository(ProgressMySqlEntity)
+    private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
 
     private readonly dataSource: DataSource,
     ) {}
@@ -679,6 +682,13 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
+            const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.findOne({
+                where: {
+                    accountId
+                }
+            })
+
+
             const sectionContent = await this.sectionContentMySqlRepository.findOne({
                 where: { sectionContentId },
                 relations: {
@@ -700,6 +710,7 @@ export class CoursesService {
                                     quiz: true,
                                     lesson: true,
                                     resource: true,
+                                    accountProgresses: true,
                                 },
                             },
                         },
@@ -771,7 +782,22 @@ export class CoursesService {
             sectionContent.section.course.creator.followed = follow
                 ? follow.followed
                 : false
-
+            
+            for (const section of sectionContent.section.course.sections) {
+                for (const content of section.contents) {
+                    let progress = content.accountProgresses.find((progress) => enrolledInfoId === progress.enrolledInfoId && 
+                        content.sectionContentId === progress.sectionContentId
+                    )
+                    if (!progress) {
+                        progress = await this.progressMySqlRepository.save({
+                            sectionContentId: content.sectionContentId,
+                            enrolledInfoId
+                        })
+                    }
+                    content.isCompleted = progress.isCompleted
+                }
+            }
+                
             await queryRunner.commitTransaction()
 
             return sectionContent

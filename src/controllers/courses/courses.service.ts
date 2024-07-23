@@ -27,7 +27,7 @@ import {
     AccountGradeMySqlEntity
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, DataSource, In } from "typeorm"
+import { Repository, DataSource, In, MoreThan } from "typeorm"
 import { StorageService } from "@global"
 import {
     CreateCourseInput,
@@ -243,8 +243,6 @@ export class CoursesService {
                 priceAtEnrolled: minimumBalanceRequired,
                 endDate,
             })
-
-            const contents = sections.flatMap(section => section.contents).map(content => content.sectionContentId)
             
             const gradedSectionIds = sections
                 .flatMap(section => section.contents.some(content => content.type === SectionContentType.Quiz) ? [section.sectionId] : [])
@@ -255,13 +253,8 @@ export class CoursesService {
                 sectionId
             }))
 
-            const accountProgress = contents.map(sectionContentId => ({
-                enrolledInfoId,
-                sectionContentId
-            }))
-
             await this.accountGradeMySqlRepository.save(accountGrades)
-            await this.progressMySqlRepository.save(accountProgress)
+
 
             await queryRunner.commitTransaction()
 
@@ -526,6 +519,19 @@ export class CoursesService {
             lessonId: newLesson.sectionContentId,
             position
         })
+        const now = new Date()
+
+        const {enrolledInfoId} = await this.enrolledInfoMySqlRepository.findOne({
+            where:{
+                endDate: MoreThan(now)
+            }
+        })
+
+        await this.progressMySqlRepository.save({
+            enrolledInfoId,
+            sectionContentId: newLesson.sectionContentId
+        })
+        
         await this.sectionContentMySqlRepository.update({ sectionContentId: newLesson.sectionContentId }, { lessonId: created.lessonId })
         return {
             message: `A lesson with id ${created.lessonId} has been creeated successfully.`,
@@ -749,10 +755,20 @@ export class CoursesService {
             sectionId,
             title
         })
+        await this.sectionContentMySqlRepository.update(sectionContentId, { sectionContentId })
 
-        const { resourceId } = await this.resourceMySqlRepository.save({resourceId: sectionContentId})
+        const now = new Date()
 
-        await this.sectionContentMySqlRepository.update(sectionContentId, { resourceId })
+        const {enrolledInfoId} = await this.enrolledInfoMySqlRepository.findOne({
+            where:{
+                endDate: MoreThan(now)
+            }
+        })
+
+        await this.progressMySqlRepository.save({
+            enrolledInfoId,
+            sectionContentId
+        })
 
         return {
             message: "Resource has been created sucessfully"
@@ -1199,29 +1215,20 @@ export class CoursesService {
                 questionPromises.push()
             }
             await Promise.all(questionPromises)
-            
-            const enrollments = await this.enrolledInfoMySqlRepository.findBy({ courseId: course.courseId })
+
             const now = new Date()
 
-            const activeEnrollmentIds = enrollments
-                .filter(enrollment => new Date(enrollment.endDate) > now)
-                .map(enrollment => enrollment.enrolledInfoId)
-
-            const existingGradedSections = await this.accountGradeMySqlRepository.findBy({
-                sectionId,
-                enrolledInfoId: In(activeEnrollmentIds)
+            const {enrolledInfoId} = await this.enrolledInfoMySqlRepository.findOne({
+                where:{
+                    endDate: MoreThan(now)
+                }
+            })
+            
+            await this.accountGradeMySqlRepository.save({
+                enrolledInfoId,
+                sectionId
             })
 
-            const existingEnrollmentIds = new Set(existingGradedSections.map(gradedSection => gradedSection.enrolledInfoId))
-
-            const newAccountGradedSections = activeEnrollmentIds
-                .filter(enrolledInfoId => !existingEnrollmentIds.has(enrolledInfoId))
-                .map(enrolledInfoId => ({
-                    enrolledInfoId,
-                    sectionId
-                }))
-
-            await this.accountGradeMySqlRepository.save(newAccountGradedSections)
             await queryRunner.commitTransaction()
             return {
                 message: `A quiz with id ${quizId} has been created successfully.`,

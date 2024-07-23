@@ -36,10 +36,7 @@ export class ResourceEntity {
         attachments: Array<ResourceAttachmentEntity>
 
     @Field(() => SectionContentEntity)
-    @OneToOne(() => SectionContentEntity, (sectionContent) => sectionContent.resource, {
-        cascade: true,
-        onDelete: "CASCADE",
-    })
+    @OneToOne(() => SectionContentEntity, (sectionContent) => sectionContent.resource, {onDelete: "CASCADE"})
     @JoinColumn({ name: "resourceId" })
         sectionContent: SectionContentEntity
 }

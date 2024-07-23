@@ -18,6 +18,7 @@ import {
     ReportCourseMySqlEntity,
     CourseCategoryMySqlEntity,
     SectionContentMySqlEntity,
+    ProgressMySqlEntity,
 } from "@database"
 import { CoursesResolver } from "./courses.resolver"
 import { TypeOrmModule } from "@nestjs/typeorm"
@@ -45,7 +46,8 @@ import { ResourceAttachmentEntity } from "src/database/mysql/resource-attachment
             ReportCourseMySqlEntity,
             CourseCategoryMySqlEntity,
             SectionContentMySqlEntity,
-            ResourceAttachmentEntity
+            ResourceAttachmentEntity,
+            ProgressMySqlEntity
         ]),
     ],
     providers: [CoursesResolver, CoursesService],
