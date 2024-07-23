@@ -107,6 +107,7 @@ import {
     UpdateSectionOuput
 } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
+import { getVideoDurationInSeconds } from "get-video-duration"
 
 @Injectable()
 export class CoursesService {
@@ -598,6 +599,13 @@ export class CoursesService {
                     lesson.lessonVideoId = createdAssetId
                     assetId = createdAssetId
                 }
+
+                const readStream = await this.storageService.createReadStream(assetId)
+                const durationInSeconds = await getVideoDurationInSeconds(readStream)
+
+                await this.lessonMySqlRepository.update(lessonId, {
+                    durationInSeconds
+                })
 
                 await this.mpegDashProcessorProducer.add({
                     assetId,
