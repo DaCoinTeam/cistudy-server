@@ -1,4 +1,4 @@
-import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, LessonMySqlEntity, ProgressMySqlEntity, SectionMySqlEntity, AccountMySqlEntity, PostMySqlEntity, ReportAccountMySqlEntity, ReportCourseMySqlEntity, ReportPostCommentMySqlEntity, ReportPostMySqlEntity, TransactionMySqlEntity, SectionContentMySqlEntity } from "@database"
+import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, ProgressMySqlEntity, SectionMySqlEntity, AccountMySqlEntity, PostMySqlEntity, ReportAccountMySqlEntity, ReportCourseMySqlEntity, ReportPostCommentMySqlEntity, ReportPostMySqlEntity, TransactionMySqlEntity, SectionContentMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { Repository, DataSource } from "typeorm"
 import {
@@ -125,11 +125,10 @@ export class ProfileService {
             const progressResults = await queryRunner.manager
                 .createQueryBuilder()
                 .select("course.courseId", "courseId")
-                .addSelect("COUNT(progress.lessonId)", "completedLessons")
-                .addSelect("COUNT(DISTINCT lesson.lessonId)", "totalLessons")
+                .addSelect("COUNT(progress.sectionContentId)", "completedContents")
+                .addSelect("COUNT(DISTINCT progress.sectionContentId)", "totalContents")
                 .from(ProgressMySqlEntity, "progress")
-                .innerJoin(LessonMySqlEntity, "lesson", "progress.lessonId = lesson.lessonId")
-                .innerJoin(SectionContentMySqlEntity,"section_content", "lesson.lessonId = section_content.lessonId")
+                .innerJoin(SectionContentMySqlEntity,"section_content", "progress.sectionContentId = section_content.sectionContentId")
                 .innerJoin(SectionMySqlEntity, "section", "section_content.sectionId = section.sectionId")
                 .innerJoin(CourseMySqlEntity, "course", "section.courseId = course.courseId")
                 .innerJoin(EnrolledInfoMySqlEntity, "enrolledInfo", "progress.enrolledInfoId = enrolledInfo.enrolledInfoId")
@@ -137,7 +136,7 @@ export class ProfileService {
                 .andWhere("progress.isCompleted = :isCompleted", { isCompleted: true })
                 .groupBy("course.courseId")
                 .getRawMany()
-
+  
             const numberOfRewardedPosts = await this.postMySqlRepository.find({
                 where: {
                     creatorId: accountId
@@ -161,7 +160,7 @@ export class ProfileService {
                     )
 
                     const totalLessons = course.sections.reduce((acc, section) => acc + section.contents.map(content => content.lesson).length, 0)
-                    const completedLessons = courseProgress?.completedLessons ?? 0
+                    const completedLessons = courseProgress?.completedContents ?? 0
                     const progress = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0
 
                     course.creator.numberOfFollowers = numberOfFollowers

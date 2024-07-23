@@ -696,6 +696,7 @@ export class CoursesService {
                             creator: true,
                             sections: {
                                 contents: {
+                                    section: true,
                                     quiz: true,
                                     lesson: true,
                                     resource: true,

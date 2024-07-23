@@ -12,6 +12,7 @@ import { AccountEntity } from "./account.entity"
 import { CourseEntity } from "./course.entity"
 import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
 import { ProgressEntity } from "./progress.entity"
+import { AccountGradeEntity } from "./account-grade.entity"
 
 @ObjectType()
 @Entity("enrolled_info")
@@ -62,6 +63,10 @@ export class EnrolledInfoEntity {
     @ManyToOne(() => AccountEntity, (account) => account.enrolledInfos)
     @JoinColumn({ name: "accountId" })
         account: AccountEntity
+
+    @Field(() => AccountGradeEntity)
+    @OneToMany(() => AccountGradeEntity, (accountGrade) => accountGrade.enrolledInfo)
+        accountGrade: AccountGradeEntity
 
     @Field(() => [ProgressEntity])
     @OneToMany(() => ProgressEntity, (courseProgress) => courseProgress.enrolledInfo)

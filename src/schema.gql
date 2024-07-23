@@ -179,6 +179,7 @@ type EnrolledInfoEntity {
   priceAtEnrolled: Float
   course: CourseEntity!
   account: AccountEntity!
+  accountGrade: AccountGradeEntity!
   courseProgress: [ProgressEntity!]!
 }
 
