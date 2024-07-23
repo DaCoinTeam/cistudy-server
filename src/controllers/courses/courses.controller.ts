@@ -56,6 +56,7 @@ import {
     createQuizSchema,
     CreateResourceAttachmentsSchema,
     updateCourseSchema,
+    updateLessonSchema,
     updateQuizSchema
 } from "./courses.schema"
 
@@ -296,7 +297,7 @@ export class CoursesController {
 
     @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
-    @ApiBody({ schema: CreateResourceAttachmentsSchema })
+    @ApiBody({ schema: updateLessonSchema })
     @Put("update-lesson")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)

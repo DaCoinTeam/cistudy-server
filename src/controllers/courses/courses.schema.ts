@@ -44,7 +44,7 @@ export const updateCourseSchema: SchemaObject = {
     }
 }
 
-export const createLessonSchema: SchemaObject = {
+export const updateLessonSchema: SchemaObject = {
     type: "object",
     properties: {
         data: {
@@ -53,7 +53,7 @@ export const createLessonSchema: SchemaObject = {
                 title: {
                     type: "string",
                 },
-                sectionId: {
+                description: {
                     type: "string"
                 }
             },
