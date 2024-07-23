@@ -74,7 +74,8 @@ RUN rm /usr/src/app/tools/Bento4-Docker.zip
 ENV PATH=$PATH:/usr/src/app/tools/Bento4-Docker/bin
 
 #Make mp4dash executable
-RUN chmod +x /usr/src/app/tools/Bento4-Docker/bin/mp4dash
+
+RUN chmod +x -R /usr/src/app/tools/Bento4-Docker/bin
 
 # Copy package.json so that package manager commands can be used.
 COPY package.json .
