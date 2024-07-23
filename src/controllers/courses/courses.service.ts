@@ -568,6 +568,7 @@ export class CoursesService {
                     .update()
                     .set({
                         processStatus: ProcessStatus.Processing,
+                        videoType: VideoType.MP4,
                     })
                     .where({
                         lessonId,
@@ -604,7 +605,7 @@ export class CoursesService {
                 const durationInSeconds = await getVideoDurationInSeconds(readStream)
 
                 await this.lessonMySqlRepository.update(lessonId, {
-                    durationInSeconds
+                    durationInSeconds,
                 })
 
                 await this.mpegDashProcessorProducer.add({
