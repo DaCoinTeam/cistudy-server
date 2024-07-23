@@ -553,19 +553,19 @@ implements AuthInput<CeateAccountProgressInputData>
   data: CeateAccountProgressInputData
 }
 
-export class MarkLessonAsCompletedInputData {
+export class MarkContentAsCompletedInputData {
   @IsUUID("4")
   @ApiProperty()
-      lessonId: string
+      sectionContentId: string
 }
 
-export class MarkLessonAsCompletedInput
-implements AuthInput<MarkLessonAsCompletedInputData>
+export class MarkContentAsCompletedInput
+implements AuthInput<MarkContentAsCompletedInputData>
 {
   @IsUUID("4")
   @ApiProperty()
       accountId: string
-  data: MarkLessonAsCompletedInputData
+  data: MarkContentAsCompletedInputData
 }
 
 export class CreateQuizAttemptInputData {

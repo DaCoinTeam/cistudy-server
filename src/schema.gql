@@ -3,6 +3,26 @@ type AuthTokens {
   refreshToken: String!
 }
 
+type LessonEntity {
+  lessonId: ID!
+  title: String!
+  thumbnailId: ID
+  lessonVideoId: ID
+  processStatus: String!
+  videoType: String!
+  numberOfViews: Int!
+  durationInSeconds: Int!
+  description: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  sectionContent: SectionContentEntity!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type AccountGradeEntity {
   accountGradeId: ID!
   enrolledInfoId: ID!
@@ -13,11 +33,6 @@ type AccountGradeEntity {
   enrolledInfo: EnrolledInfoEntity!
   section: SectionEntity!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type SectionEntity {
   sectionId: ID!
@@ -141,30 +156,15 @@ type SectionContentEntity {
   lesson: LessonEntity
   quiz: QuizEntity
   resource: ResourceEntity
-}
-
-type LessonEntity {
-  lessonId: ID!
-  title: String!
-  thumbnailId: ID
-  lessonVideoId: ID
-  processStatus: String!
-  videoType: String!
-  numberOfViews: Int!
-  durationInSeconds: Int!
-  description: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  sectionContent: SectionContentEntity!
   accountProgresses: [ProgressEntity!]
 }
 
 type ProgressEntity {
   progressId: ID!
   enrolledInfoId: ID!
-  lessonId: ID!
+  sectionContentId: ID!
   isCompleted: Boolean!
-  lesson: LessonEntity!
+  content: SectionContentEntity!
   enrolledInfo: EnrolledInfoEntity!
 }
 

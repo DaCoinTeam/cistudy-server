@@ -48,9 +48,7 @@ import {
     DeleteCourseReviewInput,
     CreateCertificateInput,
     CreateQuizInput,
-    UpdateQuizInput,
-    MarkLessonAsCompletedInput,
-    CreateQuizAttemptInput,
+    UpdateQuizInput, CreateQuizAttemptInput,
     FinishQuizAttemptInput,
     DeleteCategoryInput,
     CreateCourseCategoriesInput,
@@ -60,7 +58,8 @@ import {
     ResolveCourseReportInput,
     DeleteSectionContentInput,
     CreateResourceAttachmentsInput,
-    CreateResourceInput
+    CreateResourceInput,
+    MarkContentAsCompletedInput
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -98,8 +97,7 @@ import {
     DeleteSectionOuput,
     EnrollCourseOutput,
     FinishQuizAttemptOutput,
-    MarkLessonAsCompletedOutput,
-    ResolveCourseReportOutput,
+    MarkContentAsCompletedOutput, ResolveCourseReportOutput,
     UpdateCourseOutput,
     UpdateCourseReportOutput,
     UpdateCourseReviewOutput,
@@ -246,10 +244,8 @@ export class CoursesService {
                 endDate,
             })
 
-            const lessons = sections
-                .flatMap(section => section.contents.filter(content => content.type === SectionContentType.Lesson))
-                .map(({ lessonId }) => lessonId)
-
+            const contents = sections.flatMap(section => section.contents).map(content => content.sectionContentId)
+            
             const gradedSectionIds = sections
                 .flatMap(section => section.contents.some(content => content.type === SectionContentType.Quiz) ? [section.sectionId] : [])
                 .filter(sectionId => sectionId !== undefined)
@@ -259,13 +255,13 @@ export class CoursesService {
                 sectionId
             }))
 
-            const lessonProgress = lessons.map(lessonId => ({
+            const accountProgress = contents.map(sectionContentId => ({
                 enrolledInfoId,
-                lessonId
+                sectionContentId
             }))
 
             await this.accountGradeMySqlRepository.save(accountGrades)
-            await this.progressMySqlRepository.save(lessonProgress)
+            await this.progressMySqlRepository.save(accountProgress)
 
             await queryRunner.commitTransaction()
 
@@ -1465,11 +1461,11 @@ export class CoursesService {
         }
     }
 
-    async markLessonAsCompleted(
-        input: MarkLessonAsCompletedInput,
-    ): Promise<MarkLessonAsCompletedOutput> {
+    async markContentAsCompleted(
+        input: MarkContentAsCompletedInput,
+    ): Promise<MarkContentAsCompletedOutput> {
         const { data, accountId } = input
-        const { lessonId } = data
+        const { sectionContentId } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -1477,19 +1473,19 @@ export class CoursesService {
 
         try {
             const progress = await this.progressMySqlRepository.findOne({
-                where: { lessonId },
+                where: { sectionContentId },
                 relations: { enrolledInfo: true },
             })
 
             if (!progress) {
-                throw new NotFoundException("Lesson not found")
+                throw new NotFoundException("Content not found")
             }
 
             const { enrolledInfo } = progress
 
             if (!enrolledInfo || enrolledInfo.accountId !== accountId) {
                 throw new NotFoundException(
-                    "You haven't enrolled to course that has this lesson",
+                    "You haven't enrolled to course that has this content",
                 )
             }
 
@@ -1499,13 +1495,13 @@ export class CoursesService {
                 throw new ConflictException("This Course has expired")
 
             await this.progressMySqlRepository.update(
-                { lessonId },
+                { sectionContentId },
                 { isCompleted: true },
             )
 
             await queryRunner.commitTransaction()
 
-            return { message: "You have completed this lesson" }
+            return { message: "You have completed this content" }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
             throw ex

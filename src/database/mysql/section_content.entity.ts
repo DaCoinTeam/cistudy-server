@@ -6,7 +6,8 @@ import {
     PrimaryGeneratedColumn,
     CreateDateColumn,
     UpdateDateColumn,
-    OneToOne
+    OneToOne,
+    OneToMany
 } from "typeorm"
 import { LessonEntity } from "./lesson.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
@@ -14,6 +15,7 @@ import { SectionContentType } from "@common"
 import { SectionEntity } from "./section.entity"
 import { QuizEntity } from "./quiz.entity"
 import { ResourceEntity } from "./resource.entity"
+import { ProgressEntity } from "./progress.entity"
 
 @ObjectType()
 @Entity("section_content")
@@ -78,4 +80,7 @@ export class SectionContentEntity {
     @JoinColumn({ name: "resourceId" })
         resource: ResourceEntity
 
+    @Field(() => [ProgressEntity], {nullable: true})
+    @OneToMany(() => ProgressEntity, (accountProgress) => accountProgress.content)
+        accountProgresses? : Array<ProgressEntity>
 }

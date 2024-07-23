@@ -38,8 +38,7 @@ import {
     DeleteCourseCategoryInputData,
     EnrollCourseInputData,
     FinishQuizAttemptInputData,
-    //GiftCourseInputData,
-    MarkLessonAsCompletedInputData,
+    MarkContentAsCompletedInputData,
     ResolveCourseReportInputData,
     UpdateCourseInputData,
     UpdateCourseReportInputData,
@@ -56,6 +55,7 @@ import {
     createQuizSchema,
     CreateResourceAttachmentsSchema,
     updateCourseSchema,
+    updateLessonSchema,
     updateQuizSchema
 } from "./courses.schema"
 
@@ -296,7 +296,7 @@ export class CoursesController {
 
     @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
-    @ApiBody({ schema: CreateResourceAttachmentsSchema })
+    @ApiBody({ schema: updateLessonSchema })
     @Put("update-lesson")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
@@ -476,15 +476,15 @@ export class CoursesController {
     }
 
     @ApiBearerAuth()
-    @Post("mark-lesson-complete")
+    @Post("mark-content-complete")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
-    async markLessonComplete(
+    async markContentComplete(
         @AccountId() accountId: string,
-        @Body() data: MarkLessonAsCompletedInputData,
+        @Body() data: MarkContentAsCompletedInputData,
     ) {
-        return await this.coursesService.markLessonAsCompleted({
+        return await this.coursesService.markContentAsCompleted({
             accountId,
             data,
         })

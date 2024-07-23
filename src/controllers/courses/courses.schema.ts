@@ -44,18 +44,27 @@ export const updateCourseSchema: SchemaObject = {
     }
 }
 
-export const createLessonSchema: SchemaObject = {
+export const updateLessonSchema: SchemaObject = {
     type: "object",
     properties: {
         data: {
             type: "object",
             properties: {
+                lessonId: {
+                    type: "string",
+                },
                 title: {
                     type: "string",
                 },
-                sectionId: {
+                description: {
                     type: "string"
-                }
+                },
+                thumbnailIndex: {
+                    type: "number"
+                },
+                lessonVideoIndex: {
+                    type: "number"
+                },
             },
         },
         files: {
