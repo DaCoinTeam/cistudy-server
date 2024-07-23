@@ -80,7 +80,8 @@ export class CoursesService {
     private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
     @InjectRepository(ProgressMySqlEntity)
     private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
-
+    @InjectRepository(FollowMySqlEnitity)
+    private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
     private readonly dataSource: DataSource,
     ) {}
 
@@ -727,23 +728,12 @@ export class CoursesService {
             }
             sectionContent.isCompleted = progress.isCompleted
 
-            const follow = await queryRunner.manager.findOne(FollowMySqlEnitity, {
+            const creatorFollow = await this.followMySqlRepository.find({
                 where: {
-                    followerId: accountId,
                     followedAccountId: sectionContent.section.course.creator.accountId,
                     followed: true,
                 },
             })
-
-            const numberOfFollowers = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(FollowMySqlEnitity, "follow")
-                .where("followedAccountId = :accountId", {
-                    accountId: sectionContent.section.course.creator.accountId,
-                })
-                .andWhere("followed = :followed", { followed: true })
-                .getRawOne()
 
             if (sectionContent.quiz) {
                 const { passingScore } = sectionContent.quiz
@@ -786,11 +776,9 @@ export class CoursesService {
                 }
             }
 
-            sectionContent.section.course.creator.numberOfFollowers =
-            numberOfFollowers.count
-            sectionContent.section.course.creator.followed = follow
-                ? follow.followed
-                : false
+            sectionContent.section.course.creator.numberOfFollowers = creatorFollow.length
+
+            sectionContent.section.course.creator.followed = creatorFollow.some(followed => followed.followerId === accountId)
             
             for (const section of sectionContent.section.course.sections) {
                 for (const content of section.contents) {
