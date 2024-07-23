@@ -716,6 +716,17 @@ export class CoursesService {
                 },
             })
 
+            let progress = sectionContent.accountProgresses.find((progress) => enrolledInfoId === progress.enrolledInfoId && 
+                sectionContent.sectionContentId === progress.sectionContentId
+            )
+            if (!progress) {
+                progress = await this.progressMySqlRepository.save({
+                    sectionContentId: sectionContent.sectionContentId,
+                    enrolledInfoId
+                })
+            }
+            sectionContent.isCompleted = progress.isCompleted
+
             const follow = await queryRunner.manager.findOne(FollowMySqlEnitity, {
                 where: {
                     followerId: accountId,

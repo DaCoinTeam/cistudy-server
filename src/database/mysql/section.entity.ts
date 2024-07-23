@@ -57,7 +57,10 @@ export class SectionEntity {
     @Field(() => [AccountGradeEntity], {nullable : true})
     @OneToMany(() => AccountGradeEntity, (grade) => grade.section, { cascade: true })
         accountGrade: Array<AccountGradeEntity>
+
     //graphQL
     @Field(() => Boolean)
         isCompleted?: boolean
+    @Field(() => Boolean)
+        locked?: boolean
 }

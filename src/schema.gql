@@ -46,6 +46,7 @@ type SectionEntity {
   contents: [SectionContentEntity!]
   accountGrade: [AccountGradeEntity!]
   isCompleted: Boolean!
+  locked: Boolean!
 }
 
 type QuizAttemptEntity {
@@ -158,6 +159,7 @@ type SectionContentEntity {
   resource: ResourceEntity
   accountProgresses: [ProgressEntity!]
   isCompleted: Boolean!
+  isUserCompleted: Boolean!
 }
 
 type ProgressEntity {

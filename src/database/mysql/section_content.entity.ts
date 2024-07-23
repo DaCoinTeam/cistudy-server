@@ -87,4 +87,6 @@ export class SectionContentEntity {
     //graphqh
     @Field(() => Boolean)
         isCompleted?: boolean
+    @Field(() => Boolean)
+        isUserCompleted?: boolean
 }
