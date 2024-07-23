@@ -32,7 +32,8 @@ import {
     CourseCategoryMySqlEntity,
     QuizAttemptAnswerMySqlEntity,
     SectionContentMySqlEntity,
-    ResourceAttachmentMySqlEntity
+    ResourceAttachmentMySqlEntity,
+    AccountGradeMySqlEntity
 } from "@database"
 import { CoursesService } from "./courses.service"
 import { MongooseModule } from "@nestjs/mongoose"
@@ -74,7 +75,8 @@ import { CourseCategoryEntity } from "src/database/mysql/course-category.entity"
             ReportCourseMySqlEntity,
             CourseCategoryMySqlEntity,
             SectionContentMySqlEntity,
-            ResourceAttachmentMySqlEntity
+            ResourceAttachmentMySqlEntity,
+            AccountGradeMySqlEntity
         ]),
     ],
     controllers: [CoursesController],

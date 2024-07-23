@@ -5,7 +5,8 @@ import {
     PrimaryColumn,
     JoinColumn,
     OneToOne,
-    OneToMany
+    OneToMany,
+    Column
 } from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { SectionContentEntity } from "./section_content.entity"
@@ -17,7 +18,11 @@ export class ResourceEntity {
     @Field(() => ID)
     @PrimaryColumn("uuid")
         resourceId: string
-  
+
+    @Field(() => String, { nullable: true })
+    @Column({ type: "varchar", nullable: true })
+        description: string
+        
     @Field(() => Date)
     @CreateDateColumn()
         createdAt: Date

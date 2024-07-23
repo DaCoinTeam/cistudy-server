@@ -12,6 +12,7 @@ import {
 import { CourseEntity } from "./course.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { SectionContentEntity } from "./section_content.entity"
+import { AccountGradeEntity } from "./account-grade.entity"
 
 @ObjectType()
 @Entity("section")
@@ -56,5 +57,9 @@ export class SectionEntity {
     @Field(() => [SectionContentEntity], {nullable : true})
     @OneToMany(() => SectionContentEntity, (content) => content.section, { cascade: true })
         contents: Array<SectionContentEntity>
+
+    @Field(() => [AccountGradeEntity], {nullable : true})
+    @OneToMany(() => AccountGradeEntity, (grade) => grade.section, { cascade: true })
+        accountGrade: Array<AccountGradeEntity>
  
 }

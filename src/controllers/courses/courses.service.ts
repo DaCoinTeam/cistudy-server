@@ -23,7 +23,8 @@ import {
     ReportCourseMySqlEntity,
     QuizAttemptAnswerMySqlEntity,
     SectionContentMySqlEntity,
-    ResourceAttachmentMySqlEntity
+    ResourceAttachmentMySqlEntity,
+    AccountGradeMySqlEntity
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, In } from "typeorm"
@@ -152,6 +153,8 @@ export class CoursesService {
         private readonly quizAttemptAnswerMySqlRepository: Repository<QuizAttemptAnswerMySqlEntity>,
         @InjectRepository(AccountMySqlEntity)
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+        @InjectRepository(AccountGradeMySqlEntity)
+        private readonly accountGradeMySqlRepository: Repository<AccountGradeMySqlEntity>,
         @InjectRepository(ReportCourseMySqlEntity)
         private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
         private readonly storageService: StorageService,
@@ -243,27 +246,26 @@ export class CoursesService {
                 endDate,
             })
 
-            const progresses = await sections.reduce(async (accPromise, section) => {
-                const acc = await accPromise
-                const sectionLessons = section.contents
-                    .filter(content => content.type === SectionContentType.Lesson)
-                    .map(content => content.sectionContentId)
+            const lessons = sections
+                .flatMap(section => section.contents.filter(content => content.type === SectionContentType.Lesson))
+                .map(({ lessonId }) => lessonId)
 
-                if (sectionLessons.length > 0) {
-                    const lessons = await this.lessonMySqlRepository.findBy({ lessonId: In(sectionLessons) })
-                    lessons.forEach(lesson => {
-                        acc.push({
-                            enrolledInfoId,
-                            lessonId: lesson.lessonId,
-                            isCompleted: false,
-                        })
-                    })
-                }
-                return acc
-            }, Promise.resolve([]))
+            const gradedSectionIds = sections
+                .flatMap(section => section.contents.some(content => content.type === SectionContentType.Quiz) ? [section.sectionId] : [])
+                .filter(sectionId => sectionId !== undefined)
 
+            const accountGrades = gradedSectionIds.map(sectionId => ({
+                enrolledInfoId,
+                sectionId
+            }))
 
-            await this.progressMySqlRepository.save(progresses)
+            const lessonProgress = lessons.map(lessonId => ({
+                enrolledInfoId,
+                lessonId
+            }))
+
+            await this.accountGradeMySqlRepository.save(accountGrades)
+            await this.progressMySqlRepository.save(lessonProgress)
 
             await queryRunner.commitTransaction()
 
@@ -495,7 +497,7 @@ export class CoursesService {
 
     async createSection(input: CreateSectionInput): Promise<CreateSectionOutput> {
         const { data } = input
-        const { courseId, title, position } = data
+        const { courseId, title, position, isLocked } = data
 
 
         const course = await this.courseMySqlRepository.findOneBy({
@@ -505,7 +507,8 @@ export class CoursesService {
         const created = await this.sectionMySqlRepository.save({
             courseId,
             title,
-            position
+            position,
+            isLocked: (position === 0) ? false : isLocked
         })
 
         return {
@@ -645,8 +648,10 @@ export class CoursesService {
         case SectionContentType.Lesson: {
             const lesson = await this.lessonMySqlRepository.findOneBy({ lessonId: sectionContentId })
             if (lesson) {
-                const lessonMedia = [lesson.thumbnailId, lesson.lessonVideoId]
-                await this.storageService.delete(...lessonMedia)
+                if(lesson.thumbnailId || lesson.lessonVideoId){
+                    const lessonMedia = [lesson.thumbnailId, lesson.lessonVideoId]
+                    await this.storageService.delete(...lessonMedia)
+                }
             }
             break
         }
@@ -673,6 +678,14 @@ export class CoursesService {
                         this.quizQuestionMediaMySqlRepository.delete({ quizQuestionId: In(questionIds) })
                     ])
                 }
+            }
+            break
+        }
+        case SectionContentType.Resource:{
+            const attachments = await this.resourceAttachmentMySqlRepository.findBy({resourceId: sectionContentId})
+            if(attachments){
+                const mediaIds = attachments.map(({ fileId }) => fileId)
+                await this.storageService.delete(...mediaIds)
             }
             break
         }
@@ -774,7 +787,7 @@ export class CoursesService {
         }
         await Promise.all(promises)
 
-        await this.resourceMySqlRepository.save(resources)
+        await this.resourceAttachmentMySqlRepository.save(resources)
         return {
             message: "Attachment added sucessfully",
         }

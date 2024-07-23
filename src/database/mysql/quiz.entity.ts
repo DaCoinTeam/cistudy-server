@@ -20,9 +20,9 @@ export class QuizEntity {
     @Column({ type: "int", nullable: true })
         timeLimit: number
 
-    @Field(() => Int, { nullable: true })
-    @Column({ type: "int", nullable: true })
-        passingPercentage: number
+    @Field(() => Float, { nullable: true })
+    @Column({ type: "float", nullable: true })
+        passingScore: number
 
     @Field(() => Date)
     @CreateDateColumn()

@@ -3,6 +3,22 @@ type AuthTokens {
   refreshToken: String!
 }
 
+type AccountGradeEntity {
+  accountGradeId: ID!
+  enrolledInfoId: ID!
+  sectionId: ID!
+  grade: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  enrolledInfo: EnrolledInfoEntity!
+  section: SectionEntity!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type SectionEntity {
   sectionId: ID!
   title: String!
@@ -14,12 +30,8 @@ type SectionEntity {
   updatedAt: DateTime!
   course: CourseEntity!
   contents: [SectionContentEntity!]
+  accountGrade: [AccountGradeEntity!]
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type QuizAttemptEntity {
   quizAttemptId: ID!
@@ -83,7 +95,7 @@ type QuizEntity {
   quizId: ID!
   questions: [QuizQuestionEntity!]
   timeLimit: Int
-  passingPercentage: Int
+  passingScore: Float
   createdAt: DateTime!
   updatedAt: DateTime!
   sectionContent: SectionContentEntity!
@@ -107,6 +119,7 @@ type ResourceAttachmentEntity {
 
 type ResourceEntity {
   resourceId: ID!
+  description: String
   createdAt: DateTime!
   updatedAt: DateTime!
   attachments: [ResourceAttachmentEntity!]

@@ -12,6 +12,7 @@ import {
     QuizMySqlEntity,
     QuizQuestionMySqlEntity,
     ReportCourseMySqlEntity,
+    ResourceAttachmentMySqlEntity,
     ResourceMySqlEntity,
 } from "@database"
 import { Injectable, NotFoundException } from "@nestjs/common"
@@ -56,6 +57,8 @@ export class CoursesService {
     private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
     @InjectRepository(ResourceMySqlEntity)
     private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+    @InjectRepository(ResourceAttachmentMySqlEntity)
+    private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
     @InjectRepository(CourseTargetMySqlEntity)
     private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
     @InjectRepository(CategoryMySqlEntity)
@@ -258,15 +261,17 @@ export class CoursesService {
                 },
             })
 
-            const numberOfResources = await this.resourceMySqlRepository.count({
+            const numberOfResources = await this.resourceAttachmentMySqlRepository.count({
                 where: {
-                    sectionContent: {
-                        section: {
-                            course: {
-                                courseId,
+                    resource:{
+                        sectionContent: {
+                            section: {
+                                course: {
+                                    courseId,
+                                },
                             },
                         },
-                    },
+                    } 
                 },
             })
             course.numberOfLessons = numberOfLessons
@@ -641,15 +646,15 @@ export class CoursesService {
             const highRateCourses = results.filter(
                 (course) => course.courseRatings.overallCourseRating === maxRate,
             )
-            const numberOfAvailableCourses = await this.courseMySqlRepository.findBy({
-                verifyStatus: CourseVerifyStatus.Approved,
-            })
+            // const numberOfAvailableCourses = await this.courseMySqlRepository.findBy({
+            //     verifyStatus: CourseVerifyStatus.Approved,
+            // })
 
             await queryRunner.commitTransaction()
             return {
                 results,
                 metadata: {
-                    count: numberOfAvailableCourses.length,
+                    count: results.length,
                     highRateCourses,
                     categories: topic,
                 },
@@ -720,6 +725,7 @@ export class CoursesService {
                 .getRawOne()
 
             if (sectionContent.quiz) {
+                const { passingScore } = sectionContent.quiz
                 const accountAttempts = await this.quizAttemptMySqlRepository.find({
                     where: {
                         accountId,
@@ -754,12 +760,13 @@ export class CoursesService {
                         const lastAttemptTimeTaken = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
 
                         sectionContent.quiz.lastAttemptTimeTaken = lastAttemptTimeTaken
+                        sectionContent.quiz.isPassed = (finishedAttempts[0].score >= passingScore)
                     }
                 }
             }
 
             sectionContent.section.course.creator.numberOfFollowers =
-        numberOfFollowers.count
+            numberOfFollowers.count
             sectionContent.section.course.creator.followed = follow
                 ? follow.followed
                 : false

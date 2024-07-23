@@ -22,6 +22,7 @@ import {
 import { CoursesResolver } from "./courses.resolver"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { CoursesService } from "./courses.service"
+import { ResourceAttachmentEntity } from "src/database/mysql/resource-attachment.entity"
 
 @Module({
     imports: [
@@ -43,7 +44,8 @@ import { CoursesService } from "./courses.service"
             RoleMySqlEntity,
             ReportCourseMySqlEntity,
             CourseCategoryMySqlEntity,
-            SectionContentMySqlEntity
+            SectionContentMySqlEntity,
+            ResourceAttachmentEntity
         ]),
     ],
     providers: [CoursesResolver, CoursesService],
