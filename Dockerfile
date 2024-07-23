@@ -85,12 +85,12 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
 
 ## allow node to read write ./dist
-RUN chown -R node:node ./dist
-RUN chown -R node:node ./tasks/process-mpeg-dash
-RUN chown -R node:node ./storage
+# RUN chown -R node:node ./dist
+# RUN chown -R node:node ./tasks/process-mpeg-dash
+# RUN chown -R node:node ./storage
 
 # Run the application as a non-root user.
-USER node
+# USER node
  
 # Expose the port that the application listens on.
 EXPOSE 3002
