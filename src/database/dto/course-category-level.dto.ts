@@ -4,7 +4,7 @@ import { CategoryEntity } from "../mysql/category.entity"
 
 
 @ObjectType()
-export class CourseCategoryLevelDTO {
+export class CourseCategoryLevel {
     @Field(() => [CategoryEntity], { nullable: true })
         level0Categories: Array<CategoryEntity>
     @Field(() => [CategoryEntity], { nullable: true })

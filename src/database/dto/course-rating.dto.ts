@@ -2,7 +2,7 @@ import { Field, Float, Int, ObjectType } from "@nestjs/graphql"
 
 
 @ObjectType()
-export class CourseRatingDTO {
+export class CourseRating {
     @Field(() => Float, { nullable: true, defaultValue: 0 })
         overallCourseRating: number
     @Field(() => Int, { nullable: true, defaultValue: 0 })

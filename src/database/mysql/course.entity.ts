@@ -21,8 +21,7 @@ import { CertificateEntity } from "./certificate"
 import { OrderCourseEntity } from "./order-course.entity"
 import { CourseCategoryEntity } from "./course-category.entity"
 import { ReportCourseEntity } from "./report-course.entity"
-import { CourseRatingDTO } from "../dto/course-rating.dto"
-import { CourseCategoryLevelDTO } from "../dto/course-category-level.dto"
+import { CourseCategoryLevel, CourseRating } from "../dto"
 
 
 interface CourseIncludes {
@@ -165,11 +164,11 @@ export class CourseEntity {
     @Field(() => Int, { nullable: true })
         numberOfRewardedPostsLeft?: number
 
-    @Field(() => CourseRatingDTO, {nullable : true})
-        courseRatings : CourseRatingDTO
+    @Field(() => CourseRating, {nullable : true})
+        courseRatings : CourseRating
 
-    @Field(() => CourseCategoryLevelDTO, {nullable : true})
-        courseCategoryLevels : CourseCategoryLevelDTO
+    @Field(() => CourseCategoryLevel, {nullable : true})
+        courseCategoryLevels : CourseCategoryLevel
 
     @Field(() => Int, { nullable: true })
         numberOfQuizzes?: number

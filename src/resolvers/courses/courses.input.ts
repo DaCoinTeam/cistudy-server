@@ -83,8 +83,8 @@ export class FindManyCoursesInputOptions {
     @Field(() => String, { nullable: true })
         searchValue?: string
     @IsUUID("4")
-    @Field(() => String, { nullable: true })
-        categoryId?: string
+    @Field(() => [String], { nullable: true })
+        categoryIds?: Array<string>
 }
 
 @InputType()

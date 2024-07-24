@@ -305,8 +305,8 @@ type ReportCourseEntity {
   reportedCourse: CourseEntity!
 }
 
-type CourseRatingDTO {
-  overallCourseRating: Float
+type AccountRating {
+  overallAccountRating: Float
   totalNumberOfRatings: Int
   numberOf1StarRatings: Int
   numberOf2StarRatings: Int
@@ -315,10 +315,20 @@ type CourseRatingDTO {
   numberOf5StarRatings: Int
 }
 
-type CourseCategoryLevelDTO {
+type CourseCategoryLevel {
   level0Categories: [CategoryEntity!]
   level1Categories: [CategoryEntity!]
   level2Categories: [CategoryEntity!]
+}
+
+type CourseRating {
+  overallCourseRating: Float
+  totalNumberOfRatings: Int
+  numberOf1StarRatings: Int
+  numberOf2StarRatings: Int
+  numberOf3StarRatings: Int
+  numberOf4StarRatings: Int
+  numberOf5StarRatings: Int
 }
 
 type CourseEntity {
@@ -354,8 +364,8 @@ type CourseEntity {
   isCreator: Boolean
   courseProgress: Float
   numberOfRewardedPostsLeft: Int
-  courseRatings: CourseRatingDTO
-  courseCategoryLevels: CourseCategoryLevelDTO
+  courseRatings: CourseRating
+  courseCategoryLevels: CourseCategoryLevel
   numberOfQuizzes: Int
   numberOfLessons: Int
   numberOfResources: Int
@@ -527,16 +537,6 @@ type ReportAccountEntity {
   reportedAccount: AccountEntity!
 }
 
-type AccountRatingDTO {
-  overallAccountRating: Float
-  totalNumberOfRatings: Int
-  numberOf1StarRatings: Int
-  numberOf2StarRatings: Int
-  numberOf3StarRatings: Int
-  numberOf4StarRatings: Int
-  numberOf5StarRatings: Int
-}
-
 type AccountEntity {
   accountId: ID!
   email: String!
@@ -575,7 +575,7 @@ type AccountEntity {
   accountReports: [ReportAccountEntity!]!
   followed: Boolean!
   numberOfFollowers: Int!
-  accountRatings: AccountRatingDTO
+  accountRatings: AccountRating
 }
 
 type TransactionEntity {
@@ -593,8 +593,7 @@ type TransactionEntity {
 
 type FindManyCoursesOutputMetadata {
   count: Int
-  categories: [CategoryEntity!]
-  highRateCourses: [CourseEntity!]
+  relativeTopics: [CategoryEntity!]
 }
 
 type FindManyCoursesOutputData {
@@ -959,7 +958,7 @@ input FindManyCoursesInputOptions {
   take: Int
   skip: Int
   searchValue: String
-  categoryId: String
+  categoryIds: [String!]
 }
 
 input FindOneSectionContentInputData {

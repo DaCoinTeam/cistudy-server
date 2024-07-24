@@ -15,10 +15,12 @@ import {
     ReportCourseMySqlEntity,
     ResourceAttachmentMySqlEntity,
     ResourceMySqlEntity,
+    SectionContentMySqlEntity,
+    CourseRating
 } from "@database"
 import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, DataSource, Like, In } from "typeorm"
+import { Repository, DataSource, Like } from "typeorm"
 import {
     FindOneCourseInput,
     FindManyCoursesInput,
@@ -47,15 +49,14 @@ import {
     QuizAttemptStatus,
     SectionContentType,
 } from "@common"
-import { SectionContentEntity } from "src/database/mysql/section_content.entity"
 
 @Injectable()
 export class CoursesService {
     constructor(
     @InjectRepository(CourseMySqlEntity)
     private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-    @InjectRepository(SectionContentEntity)
-    private readonly sectionContentMySqlRepository: Repository<SectionContentEntity>,
+    @InjectRepository(SectionContentMySqlEntity)
+    private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
     @InjectRepository(LessonMySqlEntity)
     private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
     @InjectRepository(ResourceMySqlEntity)
@@ -451,219 +452,108 @@ export class CoursesService {
     ): Promise<FindManyCoursesOutputData> {
         const { data } = input
         const { options } = data
-        const { skip, take, searchValue, categoryId } = { ...options }
+        const { skip, take, searchValue, categoryIds } = { ...options }
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
 
         try {
-            let results = []
-
-            if (categoryId) {
-                const category = await this.categoryMySqlRepository.findOne({
-                    where: { categoryId },
-                })
-
-                if (!category) {
-                    throw new NotFoundException("Category not found")
-                }
-
-                const currentcategoryLevel = category.level
-
-                switch (currentcategoryLevel) {
-                case 0: {
-                    const { categoryId } = category
-                    const level0Category = await this.categoryMySqlRepository.findOne({
-                        where: { categoryId },
-                        relations: {
-                            categoryParentRelations: {
-                                category: {
-                                    //lv1
-                                    categoryParentRelations: {
-                                        category: {
-                                            //lv2
-                                            courseCategories: {
-                                                course: true,
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    })
-                    const level2Categories =
-              level0Category?.categoryParentRelations?.flatMap(
-                  (lv1) =>
-                      lv1.category?.categoryParentRelations?.map(
-                          (lv2) => lv2.category,
-                      ) || [],
-              ) || []
-
-                    results = level2Categories
-                        .flatMap((cat) =>
-                            cat.courseCategories
-                                .filter((cc) =>
-                                    cc.course?.title
-                                        ?.toLowerCase()
-                                        .includes(searchValue.toLowerCase()),
-                                )
-                                .map((cc) => cc.course),
-                        )
-                        .slice(skip, take)
-                    break
-                }
-                case 1: {
-                    const { categoryId } = category
-
-                    const level1Categories = await this.categoryMySqlRepository.findOne(
-                        {
-                            where: {
-                                categoryId,
-                            },
-                            relations: {
-                                categoryParentRelations: {
-                                    category: {
-                                        courseCategories: {
-                                            course: true,
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    )
-
-                    results = level1Categories.categoryParentRelations
-                        .flatMap((cat) =>
-                            cat.category?.courseCategories
-                                ?.filter((cc) =>
-                                    cc.course?.title
-                                        ?.toLowerCase()
-                                        .includes(searchValue.toLowerCase()),
-                                )
-                                .map((cc) => cc.course),
-                        )
-                        .slice(skip, take)
-                    break
-                }
-                case 2: {
-                    results = await this.courseMySqlRepository.find({
-                        where: {
-                            courseCategories: {
-                                categoryId: categoryId,
-                            },
-                            title: Like(`%${searchValue}%`),
-                        },
-                        relations: {
-                            creator: true,
-                            courseCategories: {
-                                category: true,
-                            },
-                        },
-                        skip,
-                        take,
-                    })
-                    break
-                }
-                default:
-                    break
-                }
-            } else {
-                results = await this.courseMySqlRepository.find({
-                    where: {
-                        title: Like(`%${searchValue}%`),
-                        verifyStatus: CourseVerifyStatus.Approved,
+            let results = await this.courseMySqlRepository.find({
+                where: {
+                    title: searchValue ? Like(`%${searchValue}%`) : undefined,
+                    verifyStatus: CourseVerifyStatus.Approved,
+                },
+                relations: {
+                    creator: true,
+                    courseCategories: {
+                        category: true,
                     },
-                    skip,
-                    take,
-                    relations: {
-                        creator: true,
-                        courseCategories: {
-                            category: true,
+                    sections: {
+                        contents: {
+                            lesson: true,
                         },
-                        sections: {
-                            contents: {
-                                lesson: true,
-                            },
-                        },
-                        courseTargets: {},
                     },
-                })
+                    courseTargets: true
+                },
+            })
+
+            if (categoryIds?.length) {
+                results = results.filter(({courseCategories}) => {
+                    let found = false
+                    for (const { categoryId } of courseCategories) {
+                        if (categoryIds.includes(categoryId)) {
+                            found = true
+                        }
+                    }
+                    return found
+                })    
             }
 
-            const topic = await this.categoryMySqlRepository.find({
+            const count = results.length
+
+            results = results.slice(skip, skip + take)
+            
+            for (const course of results) {
+                const courseReviews = await this.courseReviewMySqlRepository.find({
+                    where: {
+                        courseId: course.courseId
+                    }
+                })
+                const countWithNumStars = (numStars: number) => {
+                    let count = 0
+                    for (const {rating} of courseReviews) {
+                        if (rating === numStars) {
+                            count++
+                        }
+                    }
+
+                    return count
+                }
+
+                const numberOf1StarRatings = countWithNumStars(1)
+                const numberOf2StarRatings = countWithNumStars(2)
+                const numberOf3StarRatings = countWithNumStars(3)
+                const numberOf4StarRatings = countWithNumStars(4)
+                const numberOf5StarRatings = countWithNumStars(5)
+                const totalNumberOfRatings = courseReviews.length
+
+                const totalNumStars = () => {
+                    let total = 0
+                    for (let index = 1; index <= 5; index++) {
+                        total += countWithNumStars(index) * index
+                    }
+                    return total
+                } 
+
+                const overallCourseRating = totalNumStars() / totalNumberOfRatings
+
+                const courseRatings : CourseRating = {
+                    numberOf1StarRatings,
+                    numberOf2StarRatings,
+                    numberOf3StarRatings,
+                    numberOf4StarRatings,
+                    numberOf5StarRatings,
+                    overallCourseRating,
+                    totalNumberOfRatings
+                }
+
+                course.courseRatings = courseRatings
+            }
+
+            const relativeTopics = searchValue ? await this.categoryMySqlRepository.find({
                 where: {
                     level: 2,
-                    name: Like(`%${searchValue}%`),
-                },
-            })
-
-            const coursesReviews = await this.courseReviewMySqlRepository.find({
-                where: {
-                    courseId: In(results.map((course) => course.courseId)),
-                },
-            })
-
-            results.forEach(async (course) => {
-                const reviews = coursesReviews.filter(
-                    (review) => review.courseId === course.courseId,
-                )
-                const totalRating = reviews.reduce(
-                    (sum, review) => sum + review.rating,
-                    0,
-                )
-                const ratingCounts = [1, 2, 3, 4, 5].map(
-                    (star) => reviews.filter((review) => review.rating === star).length,
-                )
-                const overallCourseRating = reviews.length
-                    ? totalRating / reviews.length
-                    : 0
-
-                course.courseRatings = {
-                    overallCourseRating,
-                    totalNumberOfRatings: reviews.length,
-                    numberOf1StarRatings: ratingCounts[0],
-                    numberOf2StarRatings: ratingCounts[1],
-                    numberOf3StarRatings: ratingCounts[2],
-                    numberOf4StarRatings: ratingCounts[3],
-                    numberOf5StarRatings: ratingCounts[4],
+                    name: searchValue ? Like(`%${searchValue}%`) : undefined
                 }
-
-                const courseCategories = course.courseCategories
-
-                course.courseCategoryLevels = {
-                    level0Categories: courseCategories
-                        .filter((cat) => cat.category.level === 0)
-                        .map((cat) => cat.category),
-                    level1Categories: courseCategories
-                        .filter((cat) => cat.category.level === 1)
-                        .map((cat) => cat.category),
-                    level2Categories: courseCategories
-                        .filter((cat) => cat.category.level === 2)
-                        .map((cat) => cat.category),
-                }
-            })
-
-            const maxRate = Math.max(
-                ...results.map((course) => course.courseRatings.overallCourseRating),
-            )
-            const highRateCourses = results.filter(
-                (course) => course.courseRatings.overallCourseRating === maxRate,
-            )
-            const numberOfSearchedCourses = await this.courseMySqlRepository.find({
-                where:{
-                    title: Like(`%${searchValue}%`),
-                    verifyStatus: CourseVerifyStatus.Approved,
-                }
-            })
+            }) : undefined
 
             await queryRunner.commitTransaction()
             return {
                 results,
                 metadata: {
-                    count: numberOfSearchedCourses.length,
-                    highRateCourses,
-                    categories: topic,
+                    count,
+                    relativeTopics,
                 },
             }
         } catch (ex) {
@@ -676,7 +566,7 @@ export class CoursesService {
  
     async findOneSectionContent(
         input: FindOneSectionContentInput,
-    ): Promise<SectionContentEntity> {
+    ): Promise<SectionContentMySqlEntity> {
         const { data, accountId } = input
         const { params } = data
         const { sectionContentId } = params

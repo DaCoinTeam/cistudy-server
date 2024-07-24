@@ -11,9 +11,7 @@ export class FindManyCoursesOutputMetadata {
     @Field(() => Int, { nullable: true })
         count?: number
     @Field(() => [CategoryEntity], { nullable: true })
-        categories?: Array<CategoryEntity>
-    @Field(() => [CourseMySqlEntity], {nullable: true})
-        highRateCourses? : Array<CourseMySqlEntity>
+        relativeTopics?: Array<CategoryEntity>
 }
 
 @ObjectType()
