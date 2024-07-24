@@ -523,47 +523,58 @@ export class CoursesService {
         const { sectionContentId } = await this.sectionContentMySqlRepository.save({
             type,
             sectionId,
+            title: "Untitled",
             position: position + 1
         })
 
         switch (type) {
         case SectionContentType.Lesson: {
-            await this.lessonMySqlRepository.save({
+            const lesson = await this.lessonMySqlRepository.save({
                 lessonId: sectionContentId,
-                position
+                description: "Write some description here."
+            })
+            await this.sectionContentMySqlRepository.update({
+                sectionContentId,
+            }, {
+                lessonId: lesson.lessonId,
+                lesson
             })
             break
         }
         case SectionContentType.Quiz: {
-            await this.quizMySqlRepository.save({
+            const quiz = await this.quizMySqlRepository.save({
                 quizId: sectionContentId,
-                position
+            })
+            await this.sectionContentMySqlRepository.update({
+                sectionContentId,
+            }, {
+                quizId: quiz.quizId,
+                quiz
             })
             break
         }
         case SectionContentType.Resource: {
-            await this.resourceMySqlRepository.save({
-                resourceId: sectionContentId,
-                position
+            const resource = await this.resourceMySqlRepository.save({
+                resourceId: sectionContentId
+            })
+            await this.sectionContentMySqlRepository.update({
+                sectionContentId,
+            }, {
+                resourceId: resource.resourceId,
+                resource
             })
             break
         }
         }
 
-        // const now = new Date()
+        await this.sectionContentMySqlRepository.save({
+            sectionContentId,
+            type,
+            sectionId,
+            title: "Untitled",
+            position: position + 1
+        })
 
-        // const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.findOne({
-        //     where:{
-        //         endDate: MoreThan(now)
-        //     }
-        // })
-
-        // await this.progressMySqlRepository.save({
-        //     enrolledInfoId,
-        //     sectionContentId: newLesson.sectionContentId
-        // })
-        
-        // await this.sectionContentMySqlRepository.update({ sectionContentId: newLesson.sectionContentId }, { lessonId: created.lessonId })
         return {
             message: "Content creeated successfully.",
         }
