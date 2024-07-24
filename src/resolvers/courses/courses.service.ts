@@ -20,7 +20,7 @@ import {
 } from "@database"
 import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, DataSource, Like } from "typeorm"
+import { Repository, DataSource, Like, Between } from "typeorm"
 import {
     FindOneCourseInput,
     FindManyCoursesInput,
@@ -696,12 +696,42 @@ export class CoursesService {
                                 (milliseconds % (1000 * 60 * 60)) / (1000 * 60),
                             )
                             const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000)
-                            return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}` 
+                            return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
                         }
 
                         const lastAttemptTimeTaken = millisecondsToTime(milliseconds)
                         sectionContent.quiz.lastAttemptTimeTaken = lastAttemptTimeTaken
                         sectionContent.quiz.isPassed = (finishedAttempts[0].score >= passingScore)
+                        const now = new Date()
+                        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0)
+                        const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59)
+
+                        const currentDateAttempts = await this.quizAttemptMySqlRepository.find({
+                            where: {
+                                accountId,
+                                quizId: sectionContent.quiz.quizId,
+                                createdAt: Between(startOfDay, endOfDay)
+                            },
+                            order: {
+                                createdAt: "ASC"
+                            }
+                        })
+
+                        if (currentDateAttempts.length >= 3) {
+                            const thirdAttemptTimestamps = currentDateAttempts
+                                .filter((_, index) => (index + 1) % 3 === 0)
+                                .map(attempt => attempt.createdAt)
+
+                            if (thirdAttemptTimestamps.length > 0) {
+                                const latestThirdAttemptTimestamp = thirdAttemptTimestamps[thirdAttemptTimestamps.length - 1]
+                                const unlockTime = new Date(latestThirdAttemptTimestamp)
+                                unlockTime.setHours(unlockTime.getHours() + 8)
+                                
+                                if (now < unlockTime) {
+                                    sectionContent.quiz.isLocked = true
+                                }
+                            }
+                        }
                     }
                 }
             }

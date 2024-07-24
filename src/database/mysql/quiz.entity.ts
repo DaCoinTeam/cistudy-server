@@ -37,7 +37,7 @@ export class QuizEntity {
     @JoinColumn({ name: "quizId" })
         sectionContent: SectionContentEntity
 
-    @Field(() => QuizAttemptEntity, {nullable: true})
+    @Field(() => [QuizAttemptEntity], {nullable: true})
     @OneToMany(() => QuizAttemptEntity, (quizAttempts) => quizAttempts.quiz, { onDelete: "CASCADE" })
         quizAttempts?: Array<QuizAttemptEntity>
 
@@ -52,4 +52,6 @@ export class QuizEntity {
         lastAttemptTimeTaken?: string
     @Field(() => Boolean, { nullable: true })
         isPassed?: boolean
+    @Field(() => Boolean, { defaultValue: false })
+        isLocked?: boolean
 }

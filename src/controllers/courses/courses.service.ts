@@ -27,7 +27,7 @@ import {
     AccountGradeMySqlEntity
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, DataSource, In, MoreThan } from "typeorm"
+import { Repository, DataSource, In, MoreThan, Between } from "typeorm"
 import { StorageService } from "@global"
 import {
     CreateCourseInput,
@@ -243,7 +243,7 @@ export class CoursesService {
                 priceAtEnrolled: minimumBalanceRequired,
                 endDate,
             })
-            
+
             const gradedSectionIds = sections
                 .flatMap(section => section.contents.some(content => content.type === SectionContentType.Quiz) ? [section.sectionId] : [])
                 .filter(sectionId => sectionId !== undefined)
@@ -560,7 +560,7 @@ export class CoursesService {
         //     enrolledInfoId,
         //     sectionContentId: newLesson.sectionContentId
         // })
-        
+
         // await this.sectionContentMySqlRepository.update({ sectionContentId: newLesson.sectionContentId }, { lessonId: created.lessonId })
         return {
             message: "Content creeated successfully.",
@@ -687,7 +687,7 @@ export class CoursesService {
         case SectionContentType.Lesson: {
             const lesson = await this.lessonMySqlRepository.findOneBy({ lessonId: sectionContentId })
             if (lesson) {
-                if(lesson.thumbnailId || lesson.lessonVideoId){
+                if (lesson.thumbnailId || lesson.lessonVideoId) {
                     const lessonMedia = [lesson.thumbnailId, lesson.lessonVideoId]
                     await this.storageService.delete(...lessonMedia)
                 }
@@ -720,9 +720,9 @@ export class CoursesService {
             }
             break
         }
-        case SectionContentType.Resource:{
-            const attachments = await this.resourceAttachmentMySqlRepository.findBy({resourceId: sectionContentId})
-            if(attachments){
+        case SectionContentType.Resource: {
+            const attachments = await this.resourceAttachmentMySqlRepository.findBy({ resourceId: sectionContentId })
+            if (attachments) {
                 const mediaIds = attachments.map(({ fileId }) => fileId)
                 await this.storageService.delete(...mediaIds)
             }
@@ -783,11 +783,11 @@ export class CoursesService {
         }
     }
 
-    async createResource(input: CreateResourceInput) : Promise<CreateResourcesOuput> {
+    async createResource(input: CreateResourceInput): Promise<CreateResourcesOuput> {
         const { data } = input
         const { sectionId, title } = data
 
-        const {sectionContentId} = await this.sectionContentMySqlRepository.save({
+        const { sectionContentId } = await this.sectionContentMySqlRepository.save({
             type: SectionContentType.Resource,
             sectionId,
             title
@@ -796,8 +796,8 @@ export class CoursesService {
 
         const now = new Date()
 
-        const {enrolledInfoId} = await this.enrolledInfoMySqlRepository.findOne({
-            where:{
+        const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.findOne({
+            where: {
                 endDate: MoreThan(now)
             }
         })
@@ -1157,12 +1157,12 @@ export class CoursesService {
         const { sectionId, quizQuestions, title, timeLimit } = data
         //Tìm quiz trong db, nếu chưa có thì tạo mới, nếu có thì chỉ thêm question và answer
         const course = await this.courseMySqlRepository.findOne({
-            where:{
+            where: {
                 creatorId: accountId
             }
         })
 
-        if(accountId !== course.creatorId){
+        if (accountId !== course.creatorId) {
             throw new ConflictException("You are not the creator of the course")
         }
 
@@ -1255,12 +1255,12 @@ export class CoursesService {
 
             const now = new Date()
 
-            const {enrolledInfoId} = await this.enrolledInfoMySqlRepository.findOne({
-                where:{
+            const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.findOne({
+                where: {
                     endDate: MoreThan(now)
                 }
             })
-            
+
             await this.accountGradeMySqlRepository.save({
                 enrolledInfoId,
                 sectionId
@@ -1574,7 +1574,7 @@ export class CoursesService {
                 { sectionContentId },
                 { completeState: CompleteState.Completed },
             )
-            
+
             await queryRunner.commitTransaction()
 
             return { message: "You have completed this content" }
@@ -1597,24 +1597,25 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            const { courseId } = await this.courseMySqlRepository.findOne({
-                where:{
-                    sections:{
-                        contents:{
+            const course = await this.courseMySqlRepository.findOne({
+                where: {
+                    sections: {
+                        contents: {
                             type: SectionContentType.Quiz,
                             quizId
                         }
                     }
                 }
             })
-            const enrollments = await this.enrolledInfoMySqlRepository.findBy({ courseId })
+
+            const enrollments = await this.enrolledInfoMySqlRepository.findBy({ courseId: course.courseId })
             const now = new Date()
             const activeEnrollment = enrollments.filter(date => new Date(date.endDate) < now)
 
-            if(!activeEnrollment){
+            if (!activeEnrollment) {
                 throw new ConflictException("Your enrollment(s) in this course have been expired")
             }
-            
+
 
             const doing = await this.quizAttemptMySqlRepository.findOne({
                 where: {
@@ -1628,10 +1629,41 @@ export class CoursesService {
                 throw new ConflictException("You havent completed the last attempt.")
             }
 
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0)
+            const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59)
+
+            const currentDateAttempts = await this.quizAttemptMySqlRepository.find({
+                where: {
+                    accountId,
+                    quizId,
+                    createdAt: Between(startOfDay, endOfDay)
+                },
+                order: {
+                    createdAt: "ASC"
+                }
+            })
+
+            if (currentDateAttempts.length >= 3) {
+                const thirdAttemptTimestamps = currentDateAttempts
+                    .filter((_, index) => (index + 1) % 3 === 0)
+                    .map(attempt => attempt.createdAt)
+                
+                if (thirdAttemptTimestamps.length > 0) {
+                    const latestThirdAttemptTimestamp = thirdAttemptTimestamps[thirdAttemptTimestamps.length - 1]
+                    const unlockTime = new Date(latestThirdAttemptTimestamp)
+                    unlockTime.setHours(unlockTime.getHours() + 8)
+          
+                    if (now < unlockTime) {
+                        throw new ConflictException("You can only create a new attempt 8 hours after your last 3rd attempt.")
+                    }
+                }
+            }
+
             const { quizAttemptId } = await this.quizAttemptMySqlRepository.save({
                 accountId,
                 quizId,
             })
+
             return {
                 message: "Attempt Started Successfully!",
                 others: {

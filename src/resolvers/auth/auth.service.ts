@@ -180,7 +180,8 @@ export class AuthService {
                 },
 
                 relations:{
-                    creator: true
+                    creator: true,
+                    courseTargets: true
                 },
 
                 order: {

@@ -112,12 +112,13 @@ type QuizEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   sectionContent: SectionContentEntity!
-  quizAttempts: QuizAttemptEntity
+  quizAttempts: [QuizAttemptEntity!]
   totalNumberOfAttempts: Int
   highestScoreRecorded: Float
   lastAttemptScore: Float
   lastAttemptTimeTaken: String
   isPassed: Boolean
+  isLocked: Boolean!
 }
 
 type ResourceAttachmentEntity {
