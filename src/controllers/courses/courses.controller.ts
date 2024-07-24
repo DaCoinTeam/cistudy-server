@@ -451,13 +451,12 @@ export class CoursesController {
     @Post("create-quiz")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
-    @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
+    @UseInterceptors(AuthInterceptor)
     async createQuiz(
         @AccountId() accountId: string,
         @DataFromBody() data: CreateQuizInputData,
-        @UploadedFiles() { files }: Files,
     ) {
-        return await this.coursesService.createQuiz({ accountId, data, files })
+        return await this.coursesService.createQuiz({ accountId, data })
     }
 
     @ApiBearerAuth()
@@ -466,13 +465,12 @@ export class CoursesController {
     @Put("update-quiz")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
-    @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
+    @UseInterceptors(AuthInterceptor)
     async updateQuiz(
         @AccountId() accountId: string,
         @DataFromBody() data: UpdateQuizInputData,
-        @UploadedFiles() { files }: Files,
     ) {
-        return await this.coursesService.updateQuiz({ accountId, data, files })
+        return await this.coursesService.updateQuiz({ accountId, data})
     }
 
     @ApiBearerAuth()

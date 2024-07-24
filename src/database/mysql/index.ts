@@ -27,7 +27,6 @@ import { OrderCourseEntity as OrderCourseMySqlEntity } from "./order-course.enti
 import { QuizEntity as QuizMySqlEntity } from "./quiz.entity"
 import { QuizQuestionEntity as QuizQuestionMySqlEntity } from "./quiz-question.entity"
 import { QuizQuestionAnswerEntity as QuizQuestionAnswerMySqlEntity } from "./quiz-question-answer.entity"   
-import { QuizQuestionMediaEntity as QuizQuestionMediaMySqlEntity } from "./quiz-question-media.entity"
 import { ProgressEntity as ProgressMySqlEntity } from "./progress.entity"
 import { QuizAttemptEntity as QuizAttemptMySqlEntity} from "./quiz-attempt.entity"
 import { QuizAttemptAnswerEntity as QuizAttemptAnswerMySqlEntity} from "./quiz-attempt-answer.entity"
@@ -74,7 +73,6 @@ export {
     QuizMySqlEntity,
     QuizQuestionMySqlEntity,
     QuizQuestionAnswerMySqlEntity,
-    QuizQuestionMediaMySqlEntity,
     QuizAttemptMySqlEntity,
     QuizAttemptAnswerMySqlEntity,
     ProgressMySqlEntity,

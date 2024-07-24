@@ -81,23 +81,11 @@ type QuizQuestionAnswerEntity {
   updatedAt: DateTime!
 }
 
-type QuizQuestionMediaEntity {
-  quizQuestionMediaId: ID!
-  position: Int!
-  mediaId: ID!
-  quizQuestionId: ID!
-  mediaType: String!
-  quiz: QuizQuestionEntity!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
 type QuizQuestionEntity {
   quizQuestionId: ID!
   quizId: ID!
   point: Float
   question: String!
-  questionMedias: [QuizQuestionMediaEntity!]
   answers: [QuizQuestionAnswerEntity!]
   createdAt: DateTime!
   updatedAt: DateTime!

@@ -20,7 +20,7 @@ import {
 } from "@database"
 import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, DataSource, Like, Between } from "typeorm"
+import { Repository, DataSource, Like } from "typeorm"
 import {
     FindOneCourseInput,
     FindManyCoursesInput,
@@ -621,6 +621,7 @@ export class CoursesService {
                 relations: {
                     accountProgresses: true,
                     quiz: {
+                        quizAttempts:true,
                         questions: {
                             answers: true,
                         },
@@ -667,20 +668,14 @@ export class CoursesService {
             })
 
             if (sectionContent.quiz) {
-                const { passingScore } = sectionContent.quiz
-                const accountAttempts = await this.quizAttemptMySqlRepository.find({
-                    where: {
-                        accountId,
-                    },
-                    order: {
-                        score: "DESC",
-                    },
-                })
+                const { passingScore, quizAttempts } = sectionContent.quiz
 
-                if (accountAttempts) {
-                    const finishedAttempts = accountAttempts.filter(
+                if (quizAttempts) {
+                    const finishedAttempts = quizAttempts.filter(
                         (attempt) => attempt.attemptStatus === QuizAttemptStatus.Ended,
                     )
+                        .sort((prev, next) => next.score - prev.score)
+
                     if (finishedAttempts && finishedAttempts.length > 0) {
                         sectionContent.quiz.totalNumberOfAttempts = finishedAttempts.length
                         sectionContent.quiz.highestScoreRecorded = finishedAttempts[0].score
@@ -702,20 +697,14 @@ export class CoursesService {
                         const lastAttemptTimeTaken = millisecondsToTime(milliseconds)
                         sectionContent.quiz.lastAttemptTimeTaken = lastAttemptTimeTaken
                         sectionContent.quiz.isPassed = (finishedAttempts[0].score >= passingScore)
+                        
                         const now = new Date()
                         const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0)
                         const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59)
 
-                        const currentDateAttempts = await this.quizAttemptMySqlRepository.find({
-                            where: {
-                                accountId,
-                                quizId: sectionContent.quiz.quizId,
-                                createdAt: Between(startOfDay, endOfDay)
-                            },
-                            order: {
-                                createdAt: "ASC"
-                            }
-                        })
+                        const currentDateAttempts = sectionContent.quiz.quizAttempts
+                            .sort((prev, next) => prev.createdAt.getTime() - next.createdAt.getTime())
+                            .filter((attempt) => attempt.createdAt > startOfDay && attempt.createdAt < endOfDay)
 
                         if (currentDateAttempts.length >= 3) {
                             const thirdAttemptTimestamps = currentDateAttempts

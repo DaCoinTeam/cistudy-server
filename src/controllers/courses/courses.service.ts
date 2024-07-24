@@ -16,7 +16,6 @@ import {
     ResourceMySqlEntity,
     SectionMySqlEntity,
     QuizQuestionMySqlEntity,
-    QuizQuestionMediaMySqlEntity,
     ProgressMySqlEntity,
     QuizAttemptMySqlEntity,
     AccountMySqlEntity, CourseCategoryMySqlEntity,
@@ -143,8 +142,6 @@ export class CoursesService {
         private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
         @InjectRepository(QuizQuestionAnswerMySqlEntity)
         private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
-        @InjectRepository(QuizQuestionMediaMySqlEntity)
-        private readonly quizQuestionMediaMySqlRepository: Repository<QuizQuestionMediaMySqlEntity>,
         @InjectRepository(ProgressMySqlEntity)
         private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
         @InjectRepository(QuizAttemptMySqlEntity)
@@ -695,29 +692,6 @@ export class CoursesService {
             break
         }
         case SectionContentType.Quiz: {
-            const quiz = await this.quizMySqlRepository.findOne({
-                where: {
-                    quizId: sectionContentId
-                },
-                relations: {
-                    questions: true
-                }
-            })
-            if (quiz) {
-                const questionIds = quiz.questions.map(({ quizQuestionId }) => quizQuestionId)
-
-                const quizQuestionMedia = await this.quizQuestionMediaMySqlRepository.find({
-                    where: { quizQuestionId: In(questionIds) }
-                })
-
-                if (quizQuestionMedia.length > 0) {
-                    const mediaIds = quizQuestionMedia.map(({ mediaId }) => mediaId)
-                    await Promise.all([
-                        this.storageService.delete(...mediaIds),
-                        this.quizQuestionMediaMySqlRepository.delete({ quizQuestionId: In(questionIds) })
-                    ])
-                }
-            }
             break
         }
         case SectionContentType.Resource: {
@@ -1153,7 +1127,7 @@ export class CoursesService {
     }
 
     async createQuiz(input: CreateQuizInput): Promise<CreateQuizOutput> {
-        const { data, files, accountId } = input
+        const { data, accountId } = input
         const { sectionId, quizQuestions, title, timeLimit } = data
         //Tìm quiz trong db, nếu chưa có thì tạo mới, nếu có thì chỉ thêm question và answer
         const course = await this.courseMySqlRepository.findOne({
@@ -1193,37 +1167,14 @@ export class CoursesService {
 
         try {
             for (const questions of quizQuestions) {
-                const { questionMedias, answers, question, point } = questions
+                const { answers, question, point } = questions
 
                 const quizQuestion: DeepPartial<QuizQuestionMySqlEntity> = {
                     quizId,
                     question,
                     point,
-                    questionMedias: [],
                 }
-                if (files) {
-                    const mediaPromises: Array<Promise<void>> = []
-                    let mediaPosition = 0
-                    for (const questionMedia of questionMedias) {
-                        const { mediaIndex, mediaType } = questionMedia
 
-                        const position = mediaPosition
-                        const promise = async () => {
-                            const file = files.at(mediaIndex)
-                            const { assetId } = await this.storageService.upload({
-                                rootFile: file,
-                            })
-                            quizQuestion.questionMedias.push({
-                                position,
-                                mediaId: assetId,
-                                mediaType,
-                            } as QuizQuestionMediaMySqlEntity)
-                        }
-                        mediaPosition++
-                        mediaPromises.push(promise())
-                    }
-                    await Promise.all(mediaPromises)
-                }
                 const { quizQuestionId } =
                     await this.quizQuestionMySqlRepository.save(quizQuestion)
 
@@ -1279,7 +1230,7 @@ export class CoursesService {
     }
 
     async updateQuiz(input: UpdateQuizInput): Promise<UpdateQuizOutput> {
-        const { data, files } = input
+        const { data } = input
         const {
             quizId,
             timeLimit,
@@ -1298,31 +1249,11 @@ export class CoursesService {
 
             if (newQuestions) {
                 for (const questions of newQuestions) {
-                    const { questionMedias, answers, question, point } = questions
+                    const { answers, question, point } = questions
                     const quizQuestion: DeepPartial<QuizQuestionMySqlEntity> = {
                         quizId,
                         question,
                         point,
-                        questionMedias: [],
-                    }
-
-                    if (files) {
-                        let mediaPosition = 0
-                        for (const questionMedia of questionMedias) {
-                            const { mediaIndex, mediaType } = questionMedia
-                            const position = mediaPosition
-
-                            const file = files.at(mediaIndex)
-                            const { assetId } = await this.storageService.upload({
-                                rootFile: file,
-                            })
-                            quizQuestion.questionMedias.push({
-                                position,
-                                mediaId: assetId,
-                                mediaType,
-                            } as QuizQuestionMediaMySqlEntity)
-                            mediaPosition++
-                        }
                     }
 
                     const savedQuizQuestion = await queryRunner.manager.save(
@@ -1368,24 +1299,9 @@ export class CoursesService {
                     throw new ConflictException("Quiz must have at least 1 question")
                 }
 
-                const deletedQuizQuestionMedias =
-                    await this.quizQuestionMediaMySqlRepository.findBy({
-                        quizQuestionId: In(quizQuestionIdsToDelete),
-                    })
-
-                const mediaIds = deletedQuizQuestionMedias.map(
-                    (quizQuestionMediaIdsToDelete) =>
-                        quizQuestionMediaIdsToDelete.mediaId,
-                )
-                await this.storageService.delete(...mediaIds)
-                await queryRunner.manager.delete(QuizQuestionMediaMySqlEntity, {
-                    mediaId: In(mediaIds),
-                })
-                //await this.quizQuestionMediaMySqlRepository.delete({ mediaId: In(mediaIds) })
                 await queryRunner.manager.delete(QuizQuestionMySqlEntity, {
                     quizQuestionId: In(quizQuestionIdsToDelete),
                 })
-                //await this.quizQuestionMySqlRepository.delete({ quizQuestionId: In(quizQuestionIdsToDelete) })
             }
 
             if (quizQuestionIdsToUpdate) {
@@ -1394,11 +1310,9 @@ export class CoursesService {
                         quizQuestionId,
                         question,
                         point,
-                        questionMedias,
                         quizAnswerIdsToUpdate,
                         quizAnswerIdsToDelete,
                         newQuizQuestionAnswer,
-                        mediaIdsToDelete,
                     } = updateQuestion
 
                     const found = await this.quizQuestionMySqlRepository.findOne({
@@ -1420,37 +1334,6 @@ export class CoursesService {
                         point,
                     }
 
-                    if (files) {
-                        const promises: Array<Promise<void>> = []
-                        let mediaPosition = 0
-                        for (const media of questionMedias) {
-                            const { mediaIndex, mediaType } = media
-
-                            const position = mediaPosition
-                            const promise = async () => {
-                                const file = files.at(mediaIndex)
-                                const { assetId } = await this.storageService.upload({
-                                    rootFile: file,
-                                })
-                                await queryRunner.manager.save(QuizQuestionMediaMySqlEntity, {
-                                    quizQuestionId,
-                                    mediaId: assetId,
-                                    position,
-                                    mediaType,
-                                })
-                                // await this.quizQuestionMediaMySqlRepository.save({
-                                //     quizQuestionId,
-                                //     mediaId: assetId,
-                                //     position,
-                                //     mediaType
-                                // })
-                            }
-                            mediaPosition++
-                            promises.push(promise())
-                        }
-                        await Promise.all(promises)
-                    }
-
                     if (newQuizQuestionAnswer) {
                         const newQuizAnswers = newQuizQuestionAnswer.map(
                             ({ content, isCorrect }) => ({
@@ -1460,7 +1343,6 @@ export class CoursesService {
                             }),
                         )
 
-                        //await queryRunner.manager.save(QuizQuestionAnswerMySqlEntity, newQuizAnswers)
                         await this.quizQuestionAnswerMySqlRepository.save(newQuizAnswers)
                     }
 
@@ -1515,13 +1397,6 @@ export class CoursesService {
                         throw new ConflictException(
                             "Quiz must have at least 1 correct answer",
                         )
-                    }
-
-                    if (mediaIdsToDelete) {
-                        await this.storageService.delete(...mediaIdsToDelete)
-                        await queryRunner.manager.delete(QuizQuestionMediaMySqlEntity, {
-                            mediaId: In(mediaIdsToDelete),
-                        })
                     }
 
                     await this.quizQuestionMySqlRepository.save(currentQuestion)

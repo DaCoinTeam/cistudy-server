@@ -1,6 +1,6 @@
-import { AuthEmptyDataInput, AuthInput, MediaType, ReportProcessStatus, SectionContentType } from "@common"
+import { AuthEmptyDataInput, AuthInput, ReportProcessStatus, SectionContentType } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsInt, IsNumber, IsOptional, IsUUID, Length, Max, Min, MinLength } from "class-validator"
+import { IsNumber, IsOptional, IsUUID, Length, Max, Min, MinLength } from "class-validator"
 
 export class CreateCourseInput implements AuthEmptyDataInput {
   @IsUUID("4")
@@ -411,15 +411,6 @@ export class QuizQuestionAnswerInputData {
       isCorrect: boolean
 }
 
-export class QuizQuestionMediaInputData {
-  @IsInt()
-  @ApiProperty()
-      mediaIndex: number
-
-  @ApiProperty()
-      mediaType: MediaType
-}
-
 export class QuizQuestionInputData {
   @ApiProperty()
       question: string
@@ -431,8 +422,6 @@ export class QuizQuestionInputData {
   @ApiProperty()
       answers: Array<QuizQuestionAnswerInputData>
 
-  @ApiProperty({ nullable: true })
-      questionMedias?: Array<QuizQuestionMediaInputData>
 }
 
 export class CreateQuizInputData {
@@ -455,7 +444,6 @@ export class CreateQuizInput implements AuthInput<CreateQuizInputData> {
   @IsUUID("4")
       accountId: string
   data: CreateQuizInputData
-  files?: Array<Express.Multer.File>
 }
 
 export class UpdateQuizQuestionAnswerInputData {
@@ -483,16 +471,10 @@ export class UpdateQuizQuestionInputData {
       point?: number
 
   @ApiProperty({ nullable: true })
-      questionMedias?: Array<QuizQuestionMediaInputData>
-
-  @ApiProperty({ nullable: true })
       quizAnswerIdsToUpdate?: Array<UpdateQuizQuestionAnswerInputData>
 
   @ApiProperty({ nullable: true })
       quizAnswerIdsToDelete?: Array<string>
-
-  @ApiProperty({ nullable: true })
-      mediaIdsToDelete?: Array<string>
 
   @ApiProperty({ nullable: true })
       newQuizQuestionAnswer?: Array<QuizQuestionAnswerInputData>

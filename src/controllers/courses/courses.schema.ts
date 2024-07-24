@@ -219,14 +219,7 @@ export const createQuizSchema: SchemaObject = {
                     }
                 }
             },
-        },
-        files: {
-            type: "array",
-            items: {
-                type: "string",
-                format: "binary",
-            },
-        },
+        }
     },
 }
 
@@ -268,17 +261,6 @@ export const updateQuizSchema: SchemaObject = {
                                         }
                                     }
                                 }
-                            },
-                            questionMedias: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        mediaIndex: {
-                                            type: "number",
-                                        },
-                                    }
-                                }
                             }
                         }
                     }
@@ -297,17 +279,6 @@ export const updateQuizSchema: SchemaObject = {
                             point:{
                                 type: "number",
                                 minimum: 10
-                            },
-                            questionMedias: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        mediaIndex: {
-                                            type: "number",
-                                        },
-                                    }
-                                }
                             },
                             quizAnswerIdsToUpdate: {
                                 type: "array",
@@ -350,18 +321,7 @@ export const updateQuizSchema: SchemaObject = {
                                         }
                                     }
                                 }
-                            },
-                            mediaIdsToDelete: {
-                                type: "array",
-                                items: {
-                                    type: "string",
-                                    properties: {
-                                        mediaId: {
-                                            type: "string",
-                                        }
-                                    }
-                                }
-                            },
+                            }
                         }
                     }
                 },
@@ -371,14 +331,6 @@ export const updateQuizSchema: SchemaObject = {
                         type: "string",
                     }
                 }
-            },
-        },
-
-        files: {
-            type: "array",
-            items: {
-                type: "string",
-                format: "binary",
             },
         },
     },
