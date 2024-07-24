@@ -113,7 +113,6 @@ type QuizEntity {
 
 type ResourceAttachmentEntity {
   resourceAttachmentId: ID!
-  position: Int!
   resourceId: ID!
   name: String!
   fileId: String!
@@ -1028,6 +1027,10 @@ input FindOneQuizAttemptInputOptions {
 }
 
 input FindManyLevelCategoriesInputData {
+  params: FindManyLevelCategoriesInputParams
+}
+
+input FindManyLevelCategoriesInputParams {
   level: Int
 }
 

@@ -816,11 +816,8 @@ export class CoursesService {
 
         if (files) {
             const promises: Array<Promise<void>> = []
-            let filePosition = 0
             for (const attachment of resourceAttachments) {
                 const { fileIndex } = attachment
-
-                const position = filePosition
                 const promise = async () => {
                     const file = files.at(fileIndex)
                     const { assetId } = await this.storageService.upload({
@@ -828,12 +825,10 @@ export class CoursesService {
                     })
                     resource.attachments.push({
                         resourceId,
-                        position,
                         name: file.originalname,
                         fileId: assetId,
                     } as ResourceAttachmentMySqlEntity)
                 }
-                filePosition++
                 promises.push(promise())
             }
             await Promise.all(promises)

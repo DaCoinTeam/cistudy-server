@@ -232,9 +232,15 @@ export class FindOneQuizAttemptInput implements AuthInput<FindOneQuizAttemptInpu
 }
 
 @InputType()
-export class FindManyLevelCategoriesInputData{
-    @Field(() => Int, {nullable: true})
+export class FindManyLevelCategoriesInputParams {
+    @Field(() => Int, { nullable: true })
         level?: number
+}
+
+@InputType()
+export class FindManyLevelCategoriesInputData implements ParamsOnly<FindManyLevelCategoriesInputParams>{
+    @Field(() => FindManyLevelCategoriesInputParams, {nullable: true})
+        params: FindManyLevelCategoriesInputParams
 }
 
 export class FindManyLevelCategoriesInput implements Input<FindManyLevelCategoriesInputData> {
