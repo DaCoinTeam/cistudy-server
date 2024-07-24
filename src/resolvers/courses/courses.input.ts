@@ -240,7 +240,7 @@ export class FindManyLevelCategoriesInputParams {
 @InputType()
 export class FindManyLevelCategoriesInputData implements ParamsOnly<FindManyLevelCategoriesInputParams>{
     @Field(() => FindManyLevelCategoriesInputParams, {nullable: true})
-        params?: FindManyLevelCategoriesInputParams
+        params: FindManyLevelCategoriesInputParams
 }
 
 export class FindManyLevelCategoriesInput implements Input<FindManyLevelCategoriesInputData> {
