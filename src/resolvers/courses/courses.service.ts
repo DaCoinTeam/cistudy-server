@@ -673,7 +673,7 @@ export class CoursesService {
             await queryRunner.release()
         }
     }
-
+ 
     async findOneSectionContent(
         input: FindOneSectionContentInput,
     ): Promise<SectionContentEntity> {
