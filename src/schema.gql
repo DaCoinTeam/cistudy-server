@@ -5,7 +5,6 @@ type AuthTokens {
 
 type LessonEntity {
   lessonId: ID!
-  title: String!
   thumbnailId: ID
   lessonVideoId: ID
   processStatus: String!
@@ -143,7 +142,7 @@ type ResourceEntity {
 type SectionContentEntity {
   sectionContentId: ID!
   sectionId: String!
-  title: String!
+  title: String
   lessonId: ID!
   quizId: ID!
   resourceId: ID!

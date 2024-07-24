@@ -31,7 +31,7 @@ import {
     CreateCourseReportInputData,
     CreateCourseReviewInputData,
     CreateCourseTargetInputData,
-    CreateLessonInputData,
+    CreateSectionContentInputData,
     CreateQuizAttemptInputData,
     CreateQuizInputData,
     CreateResourceAttachmentsInputData, CreateResourceInputData, CreateSectionInputData,
@@ -229,15 +229,15 @@ export class CoursesController {
     }
 
     @ApiBearerAuth()
-    @Post("create-lesson")
+    @Post("create-section-content")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
-    async createLesson(
+    async createSectionContent(
         @AccountId() accountId: string,
-        @Body() data: CreateLessonInputData,
+        @Body() data: CreateSectionContentInputData,
     ) {
-        return this.coursesService.createLesson({
+        return this.coursesService.createSectionContent({
             accountId,
             data,
         })

@@ -48,5 +48,4 @@ export class ProgressEntity {
 
     @UpdateDateColumn()
         updatedAt: Date
-
 }

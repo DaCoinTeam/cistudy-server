@@ -28,9 +28,9 @@ export class SectionContentEntity {
     @Column({ type: "varchar", length: 200 })
         sectionId: string
 
-    @Field(() => String)
-    @Column({ type: "varchar", length: 200 })
-        title: string
+    @Field(() => String, { nullable: true })
+    @Column({ type: "varchar", length: 200, nullable: true })
+        title?: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 , nullable: true})

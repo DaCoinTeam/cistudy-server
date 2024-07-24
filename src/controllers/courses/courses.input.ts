@@ -1,4 +1,4 @@
-import { AuthEmptyDataInput, AuthInput, MediaType, ReportProcessStatus } from "@common"
+import { AuthEmptyDataInput, AuthInput, MediaType, ReportProcessStatus, SectionContentType } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsInt, IsNumber, IsOptional, IsUUID, Length, Max, Min, MinLength } from "class-validator"
 
@@ -127,20 +127,18 @@ implements AuthInput<DeleteCourseTargetInputData>
       data: DeleteCourseTargetInputData
 }
 
-export class CreateLessonInputData {
+export class CreateSectionContentInputData {
   @IsUUID("4")
   @ApiProperty()
       sectionId: string
   @ApiProperty()
-      title: string
-  @ApiProperty()
-      position: number
+      type: SectionContentType
 }
 
-export class CreateLessonInput implements AuthInput<CreateLessonInputData> {
+export class CreateSectionContentInput implements AuthInput<CreateSectionContentInputData> {
   @IsUUID("4")
       accountId: string
-  data: CreateLessonInputData
+  data: CreateSectionContentInputData
 }
 
 export class DeleteSectionContentInputData {

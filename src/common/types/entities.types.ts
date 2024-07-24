@@ -106,16 +106,6 @@ export enum ReportType {
   PostComment = "postComment",
 }
 
-// export enum UpdatedField {
-//   Title = "title",
-//   PreviewVideo = "previewVideo",
-//   Section = "section",
-//   Lesson = "lesson",
-//   Quiz = "quiz",
-//   Resource = "resource",
-//   Target = "target",
-// }
-
 export enum TransactionType {
   Buy = "buy",
   Deposit = "deposit",
@@ -130,4 +120,24 @@ export enum SectionContentType {
 
 registerEnumType(SectionContentType,{
     name: "SectionContentType"
+})
+
+export enum LockState {
+  Completed = "completed",
+  InProgress = "inProgress",
+  Locked = "locked"
+}
+
+registerEnumType(LockState,{
+    name: "LockState"
+})
+
+export enum CompleteState {
+  Completed = "completed",
+  Failed = "failed",
+  Undone = "undone"
+}
+
+registerEnumType(CompleteState,{
+    name: "CompleteState"
 })

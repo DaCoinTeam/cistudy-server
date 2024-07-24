@@ -32,7 +32,7 @@ import { StorageService } from "@global"
 import {
     CreateCourseInput,
     CreateSectionInput,
-    CreateLessonInput,
+    CreateSectionContentInput,
     UpdateCourseInput,
     CreateCourseTargetInput,
     UpdateCourseTargetInput,
@@ -83,11 +83,11 @@ import {
     CreateCourseReportOutput,
     CreateCourseReviewOutput,
     CreateCourseTargetOuput,
-    CreateLessonOutput,
     CreateQuizAttemptOutput,
     CreateQuizOutput,
     CreateResourceAttachmentsOutput,
     CreateResourcesOuput,
+    CreateSectionContentOutput,
     CreateSectionOutput,
     DeleteCategoryOutput,
     DeleteCourseCategoryOutput,
@@ -507,42 +507,72 @@ export class CoursesService {
 
     }
 
-    async createLesson(input: CreateLessonInput): Promise<CreateLessonOutput> {
-        const { title, sectionId, position } = input.data
+    async createSectionContent(input: CreateSectionContentInput): Promise<CreateSectionContentOutput> {
+        const { sectionId, type } = input.data
 
-        const newLesson = await this.sectionContentMySqlRepository.save({
-            type: SectionContentType.Lesson,
-            sectionId,
-        })
-
-        const created = await this.lessonMySqlRepository.save({
-            title,
-            lessonId: newLesson.sectionContentId,
-            position
-        })
-        const now = new Date()
-
-        const {enrolledInfoId} = await this.enrolledInfoMySqlRepository.findOne({
-            where:{
-                endDate: MoreThan(now)
+        const sectionContents = await this.sectionContentMySqlRepository.find({
+            where: {
+                sectionId
             }
         })
 
-        await this.progressMySqlRepository.save({
-            enrolledInfoId,
-            sectionContentId: newLesson.sectionContentId
+        const position = sectionContents.reduce((max, current) => {
+            return current.position > max ? current.position : max
+        }, 0)
+
+        const { sectionContentId } = await this.sectionContentMySqlRepository.save({
+            type,
+            sectionId,
+            position: position + 1
         })
+
+        switch (type) {
+        case SectionContentType.Lesson: {
+            await this.lessonMySqlRepository.save({
+                lessonId: sectionContentId,
+                position
+            })
+            break
+        }
+        case SectionContentType.Quiz: {
+            await this.quizMySqlRepository.save({
+                quizId: sectionContentId,
+                position
+            })
+            break
+        }
+        case SectionContentType.Resource: {
+            await this.resourceMySqlRepository.save({
+                resourceId: sectionContentId,
+                position
+            })
+            break
+        }
+        }
+
+        // const now = new Date()
+
+        // const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.findOne({
+        //     where:{
+        //         endDate: MoreThan(now)
+        //     }
+        // })
+
+        // await this.progressMySqlRepository.save({
+        //     enrolledInfoId,
+        //     sectionContentId: newLesson.sectionContentId
+        // })
         
-        await this.sectionContentMySqlRepository.update({ sectionContentId: newLesson.sectionContentId }, { lessonId: created.lessonId })
+        // await this.sectionContentMySqlRepository.update({ sectionContentId: newLesson.sectionContentId }, { lessonId: created.lessonId })
         return {
-            message: `A lesson with id ${created.lessonId} has been creeated successfully.`,
+            message: "Content creeated successfully.",
         }
 
     }
 
     async updateLesson(input: UpdateLessonInput): Promise<UpdateLessonOutput> {
         const { data, files } = input
-        const { lessonId, title, description, lessonVideoIndex, thumbnailIndex } =
+        const { lessonId, description, lessonVideoIndex, thumbnailIndex } =
             data
 
         const { thumbnailId, lessonVideoId } =
@@ -550,7 +580,7 @@ export class CoursesService {
 
         const promises: Array<Promise<void>> = []
 
-        const lesson: DeepPartial<LessonMySqlEntity> = { title, description }
+        const lesson: DeepPartial<LessonMySqlEntity> = { description }
 
         if (Number.isInteger(lessonVideoIndex)) {
             const promise = async () => {

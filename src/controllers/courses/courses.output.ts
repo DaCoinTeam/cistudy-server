@@ -184,7 +184,7 @@ export class CreateQuizOutput implements Output {
     message: string
 }
 
-export class CreateLessonOutput implements Output {
+export class CreateSectionContentOutput implements Output {
     message: string
 }
 

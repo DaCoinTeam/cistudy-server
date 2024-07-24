@@ -18,11 +18,7 @@ export class LessonEntity {
     @Field(() => ID)
     @PrimaryColumn("uuid")
         lessonId: string
-
-    @Field(() => String)
-    @Column({ type: "varchar", length: 150 })
-        title: string
-
+        
     @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36, nullable: true })
         thumbnailId?: string
