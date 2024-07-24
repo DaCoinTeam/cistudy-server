@@ -1,6 +1,5 @@
 import {
     CategoryMySqlEntity,
-    CourseCategoryMySqlEntity,
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
     CourseTargetMySqlEntity,
@@ -72,8 +71,6 @@ export class CoursesService {
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         @InjectRepository(QuizAttemptMySqlEntity)
         private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
-        @InjectRepository(CourseCategoryMySqlEntity)
-        private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
         @InjectRepository(QuizQuestionMySqlEntity)
         private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
         @InjectRepository(ReportCourseMySqlEntity)
