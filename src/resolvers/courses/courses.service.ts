@@ -1,6 +1,5 @@
 import {
     CategoryMySqlEntity,
-    CategoryRelationMySqlEntity,
     CourseCategoryMySqlEntity,
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
@@ -851,54 +850,10 @@ export class CoursesService {
     async findManyLevelCategories(
         input: FindManyLevelCategoriesInput,
     ): Promise<Array<CategoryMySqlEntity>> {
-        const { data } = input
-        const { categoryParentId } = data
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            let childCategories = []
-
-            if (categoryParentId) {
-                const parentCategory = await this.categoryMySqlRepository.findOne({
-                    where: { categoryId: categoryParentId },
-                })
-
-                if (!parentCategory) {
-                    throw new NotFoundException("Parent category not found")
-                }
-
-                childCategories = await queryRunner.manager
-                    .createQueryBuilder()
-                    .select("category")
-                    .from(CategoryMySqlEntity, "category")
-                    .innerJoin(
-                        CategoryRelationMySqlEntity,
-                        "categoryRelation",
-                        "category.categoryId = categoryRelation.categoryId",
-                    )
-                    .where("categoryRelation.categoryParentId = :categoryParentId", {
-                        categoryParentId,
-                    })
-                    .getMany()
-            } else {
-                childCategories = await this.categoryMySqlRepository.find({
-                    where: {
-                        level: 0,
-                    },
-                })
-            }
-
-            await queryRunner.commitTransaction()
-            return childCategories
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
-        }
+        const {level} = input.data
+        return await this.categoryMySqlRepository.findBy({level})
     }
+    
 
     async findOneCourseReview(input: FindOneCourseReviewInput) {
         const { data } = input
