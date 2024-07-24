@@ -41,7 +41,9 @@ import {
     FindOneQuizAttemptOutput,
 } from "./courses.output"
 import {
+    CompleteState,
     CourseVerifyStatus,
+    LockState,
     QuizAttemptStatus,
     SectionContentType,
 } from "@common"
@@ -729,7 +731,7 @@ export class CoursesService {
                     enrolledInfoId
                 })
             }
-            sectionContent.isCompleted = progress.isCompleted
+            sectionContent.completeState = progress.completeState
 
             const creatorFollow = await this.followMySqlRepository.find({
                 where: {
@@ -794,26 +796,39 @@ export class CoursesService {
                             enrolledInfoId
                         })
                     }
-                    content.isCompleted = progress.isCompleted
+                    content.completeState = progress.completeState
                 }
             }
 
             const sections = Object.assign(sectionContent.section.course.sections, [])
             sections.sort((prev, next) => prev.position - next.position)
-            sections.at(0).unlocked = true
+            sections.at(0).lockState = LockState.InProgress
 
             if (sections.length > 1) {
                 for (let i = 1; i < sections.length; i++) {
+                    //const isLocked = LockState.Locked
                     let allCompleted = true
-                    for (const content of sections[i-1].contents) {
-                        if (!content.isCompleted) {
+                    let hasCompletedOrFailed = false
+            
+                    for (const content of sections[i - 1].contents) {
+                        if (content.completeState === CompleteState.Completed || content.completeState === CompleteState.Failed) {
+                            hasCompletedOrFailed = true
+                        }
+                        if (content.completeState !== CompleteState.Completed) {
                             allCompleted = false
-                            break
-                        }                       
+                        }
                     }
-                    sections.at(i).unlocked = allCompleted
+            
+                    if (allCompleted) {
+                        sections[i].lockState = LockState.Completed
+                    } else if (hasCompletedOrFailed) {
+                        sections[i].lockState = LockState.InProgress
+                    } else {
+                        sections[i].lockState = LockState.Locked
+                    }
                 }
             }
+            
 
             sectionContent.section.course.sections = sections
 

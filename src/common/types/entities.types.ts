@@ -132,3 +132,15 @@ export enum SectionContentType {
 registerEnumType(SectionContentType,{
     name: "SectionContentType"
 })
+
+export enum LockState {
+  Completed = "completed",
+  InProgress = "inProgress",
+  Locked = "locked"
+}
+
+export enum CompleteState {
+  Completed = "completed",
+  Failed = "failed",
+  Undone = "undone"
+}

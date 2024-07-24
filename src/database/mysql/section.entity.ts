@@ -13,6 +13,7 @@ import { CourseEntity } from "./course.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { SectionContentEntity } from "./section_content.entity"
 import { AccountGradeEntity } from "./account-grade.entity"
+import { LockState } from "@common"
 
 @ObjectType()
 @Entity("section")
@@ -55,8 +56,6 @@ export class SectionEntity {
         accountGrade: Array<AccountGradeEntity>
 
     //graphQL
-    @Field(() => Boolean)
-        isCompleted?: boolean
-    @Field(() => Boolean, { nullable : true })
-        unlocked?: boolean
+    @Field(() => String, { defaultValue:LockState.Locked })
+        lockState?: LockState
 }
