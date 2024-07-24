@@ -847,7 +847,9 @@ export class CoursesService {
     async findManyLevelCategories(
         input: FindManyLevelCategoriesInput,
     ): Promise<Array<CategoryMySqlEntity>> {
-        const {level} = input.data
+        const { data } = input
+        const  { params }= data
+        const {level} = params
         return await this.categoryMySqlRepository.findBy({level})
     }
     
