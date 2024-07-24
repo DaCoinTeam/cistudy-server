@@ -8,6 +8,7 @@ import {
 } from "./profile.input"
 import { InjectRepository } from "@nestjs/typeorm"
 import { FindManyEnrolledCoursesOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData } from "./profile.output"
+import { CompleteState } from "@common"
 
 
 @Injectable()
@@ -133,7 +134,7 @@ export class ProfileService {
                 .innerJoin(CourseMySqlEntity, "course", "section.courseId = course.courseId")
                 .innerJoin(EnrolledInfoMySqlEntity, "enrolledInfo", "progress.enrolledInfoId = enrolledInfo.enrolledInfoId")
                 .where("enrolledInfo.accountId = :accountId", { accountId })
-                .andWhere("progress.isCompleted = :isCompleted", { isCompleted: true })
+                .andWhere("progress.completeState = :completeState", { completeState: CompleteState.Completed })
                 .groupBy("course.courseId")
                 .getRawMany()
   
