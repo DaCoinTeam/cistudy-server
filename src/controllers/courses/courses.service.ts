@@ -2,7 +2,7 @@ import {
     ConflictException,
     Injectable,
     NotFoundException,
-    InternalServerErrorException
+    InternalServerErrorException,
 } from "@nestjs/common"
 import {
     CategoryMySqlEntity,
@@ -18,12 +18,13 @@ import {
     QuizQuestionMySqlEntity,
     ProgressMySqlEntity,
     QuizAttemptMySqlEntity,
-    AccountMySqlEntity, CourseCategoryMySqlEntity,
+    AccountMySqlEntity,
+    CourseCategoryMySqlEntity,
     ReportCourseMySqlEntity,
     QuizAttemptAnswerMySqlEntity,
     SectionContentMySqlEntity,
     ResourceAttachmentMySqlEntity,
-    AccountGradeMySqlEntity
+    AccountGradeMySqlEntity,
 } from "@database"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, In, MoreThan, Between } from "typeorm"
@@ -47,7 +48,8 @@ import {
     DeleteCourseReviewInput,
     CreateCertificateInput,
     CreateQuizInput,
-    UpdateQuizInput, CreateQuizAttemptInput,
+    UpdateQuizInput,
+    CreateQuizAttemptInput,
     FinishQuizAttemptInput,
     DeleteCategoryInput,
     CreateCourseCategoriesInput,
@@ -55,8 +57,9 @@ import {
     CreateCourseReportInput,
     UpdateCourseReportInput,
     ResolveCourseReportInput,
-    DeleteSectionContentInput, MarkContentAsCompletedInput,
-    UpdateResourceInput
+    DeleteSectionContentInput,
+    MarkContentAsCompletedInput,
+    UpdateResourceInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -81,7 +84,8 @@ import {
     CreateCourseReviewOutput,
     CreateCourseTargetOuput,
     CreateQuizAttemptOutput,
-    CreateQuizOutput, CreateSectionContentOutput,
+    CreateQuizOutput,
+    CreateSectionContentOutput,
     CreateSectionOutput,
     DeleteCategoryOutput,
     DeleteCourseCategoryOutput,
@@ -92,7 +96,8 @@ import {
     DeleteSectionOuput,
     EnrollCourseOutput,
     FinishQuizAttemptOutput,
-    MarkContentAsCompletedOutput, ResolveCourseReportOutput,
+    MarkContentAsCompletedOutput,
+    ResolveCourseReportOutput,
     UpdateCourseOutput,
     UpdateCourseReportOutput,
     UpdateCourseReviewOutput,
@@ -100,7 +105,7 @@ import {
     UpdateLessonOutput,
     UpdateQuizOutput,
     UpdateResourceOutput,
-    UpdateSectionOuput
+    UpdateSectionOuput,
 } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
 import { getVideoDurationInSeconds } from "get-video-duration"
@@ -108,57 +113,56 @@ import { getVideoDurationInSeconds } from "get-video-duration"
 @Injectable()
 export class CoursesService {
     constructor(
-        @InjectRepository(CourseMySqlEntity)
-        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-        @InjectRepository(SectionMySqlEntity)
-        private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
-        @InjectRepository(SectionContentMySqlEntity)
-        private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
-        @InjectRepository(LessonMySqlEntity)
-        private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
-        @InjectRepository(CourseTargetMySqlEntity)
-        private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
-        @InjectRepository(ResourceMySqlEntity)
-        private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
-        @InjectRepository(ResourceAttachmentMySqlEntity)
-        private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
-        @InjectRepository(EnrolledInfoEntity)
-        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoEntity>,
-        @InjectRepository(CategoryMySqlEntity)
-        private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
-        @InjectRepository(CourseCategoryMySqlEntity)
-        private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
-        @InjectRepository(CourseReviewMySqlEntity)
-        private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
-        @InjectRepository(CertificateMySqlEntity)
-        private readonly courseCertificateMySqlEntity: Repository<CertificateMySqlEntity>,
-        @InjectRepository(QuizMySqlEntity)
-        private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
-        @InjectRepository(QuizQuestionMySqlEntity)
-        private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
-        @InjectRepository(QuizQuestionAnswerMySqlEntity)
-        private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
-        @InjectRepository(ProgressMySqlEntity)
-        private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
-        @InjectRepository(QuizAttemptMySqlEntity)
-        private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
-        @InjectRepository(QuizAttemptAnswerMySqlEntity)
-        private readonly quizAttemptAnswerMySqlRepository: Repository<QuizAttemptAnswerMySqlEntity>,
-        @InjectRepository(AccountMySqlEntity)
-        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
-        @InjectRepository(AccountGradeMySqlEntity)
-        private readonly accountGradeMySqlRepository: Repository<AccountGradeMySqlEntity>,
-        @InjectRepository(ReportCourseMySqlEntity)
-        private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
-        private readonly storageService: StorageService,
-        private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
-        private readonly dataSource: DataSource,
-    ) { }
+    @InjectRepository(CourseMySqlEntity)
+    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+    @InjectRepository(SectionMySqlEntity)
+    private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
+    @InjectRepository(SectionContentMySqlEntity)
+    private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
+    @InjectRepository(LessonMySqlEntity)
+    private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
+    @InjectRepository(CourseTargetMySqlEntity)
+    private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+    @InjectRepository(ResourceMySqlEntity)
+    private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+    @InjectRepository(ResourceAttachmentMySqlEntity)
+    private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
+    @InjectRepository(EnrolledInfoEntity)
+    private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoEntity>,
+    @InjectRepository(CategoryMySqlEntity)
+    private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
+    @InjectRepository(CourseCategoryMySqlEntity)
+    private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
+    @InjectRepository(CourseReviewMySqlEntity)
+    private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
+    @InjectRepository(CertificateMySqlEntity)
+    private readonly courseCertificateMySqlEntity: Repository<CertificateMySqlEntity>,
+    @InjectRepository(QuizMySqlEntity)
+    private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+    @InjectRepository(QuizQuestionMySqlEntity)
+    private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
+    @InjectRepository(QuizQuestionAnswerMySqlEntity)
+    private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
+    @InjectRepository(ProgressMySqlEntity)
+    private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
+    @InjectRepository(QuizAttemptMySqlEntity)
+    private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
+    @InjectRepository(QuizAttemptAnswerMySqlEntity)
+    private readonly quizAttemptAnswerMySqlRepository: Repository<QuizAttemptAnswerMySqlEntity>,
+    @InjectRepository(AccountMySqlEntity)
+    private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+    @InjectRepository(AccountGradeMySqlEntity)
+    private readonly accountGradeMySqlRepository: Repository<AccountGradeMySqlEntity>,
+    @InjectRepository(ReportCourseMySqlEntity)
+    private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
+    private readonly storageService: StorageService,
+    private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
+    private readonly dataSource: DataSource,
+    ) {}
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
         const { data, accountId } = input
         const { courseId } = data
-
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
@@ -171,7 +175,7 @@ export class CoursesService {
                 },
                 relations: {
                     sections: {
-                        contents: true
+                        contents: true,
                     },
                 },
             })
@@ -186,7 +190,7 @@ export class CoursesService {
                 price: coursePrice,
                 duration,
                 sections,
-                creatorId
+                creatorId,
             } = course
 
             if (accountId === creatorId) {
@@ -216,14 +220,24 @@ export class CoursesService {
             const minimumBalanceRequired = computeDenomination(price)
             const courseCreatorShares = computeDenomination(price / BigInt(2))
 
-            const { balance } = await this.accountMySqlRepository.findOneBy({ accountId })
+            const { balance } = await this.accountMySqlRepository.findOneBy({
+                accountId,
+            })
 
             if (balance < minimumBalanceRequired) {
-                throw new ConflictException("Your account does not have sufficient balance to enroll in this course.")
+                throw new ConflictException(
+                    "Your account does not have sufficient balance to enroll in this course.",
+                )
             }
 
-            await this.accountMySqlRepository.update(accountId, { balance: balance - minimumBalanceRequired })
-            await this.accountMySqlRepository.increment({ accountId: creatorId }, "balance", courseCreatorShares)
+            await this.accountMySqlRepository.update(accountId, {
+                balance: balance - minimumBalanceRequired,
+            })
+            await this.accountMySqlRepository.increment(
+                { accountId: creatorId },
+                "balance",
+                courseCreatorShares,
+            )
 
             const enrollDate = new Date()
             const endDate = new Date(enrollDate)
@@ -238,16 +252,21 @@ export class CoursesService {
             })
 
             const gradedSectionIds = sections
-                .flatMap(section => section.contents.some(content => content.type === SectionContentType.Quiz) ? [section.sectionId] : [])
-                .filter(sectionId => sectionId !== undefined)
+                .flatMap((section) =>
+                    section.contents.some(
+                        (content) => content.type === SectionContentType.Quiz,
+                    )
+                        ? [section.sectionId]
+                        : [],
+                )
+                .filter((sectionId) => sectionId !== undefined)
 
-            const accountGrades = gradedSectionIds.map(sectionId => ({
+            const accountGrades = gradedSectionIds.map((sectionId) => ({
                 enrolledInfoId,
-                sectionId
+                sectionId,
             }))
 
             await this.accountGradeMySqlRepository.save(accountGrades)
-
 
             await queryRunner.commitTransaction()
 
@@ -291,7 +310,7 @@ export class CoursesService {
             enableDiscount,
             title,
             receivedWalletAddress,
-            categoryIds
+            categoryIds,
         } = data
         const course: DeepPartial<CourseMySqlEntity> = {
             courseId,
@@ -300,13 +319,13 @@ export class CoursesService {
             price,
             discountPrice,
             enableDiscount,
-            receivedWalletAddress
+            receivedWalletAddress,
         }
 
         const promises: Array<Promise<void>> = []
 
         const { previewVideoId, thumbnailId } =
-            await this.courseMySqlRepository.findOneBy({ courseId })
+      await this.courseMySqlRepository.findOneBy({ courseId })
 
         if (Number.isInteger(previewVideoIndex)) {
             const promise = async () => {
@@ -348,12 +367,11 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-
             if (categoryIds?.length) {
                 await this.courseCategoryMySqlRepository.delete({ courseId })
-                const newCategories = categoryIds?.map(categoryId => ({
+                const newCategories = categoryIds?.map((categoryId) => ({
                     categoryId,
-                    courseId
+                    courseId,
                 }))
                 await this.courseCategoryMySqlRepository.save(newCategories)
             }
@@ -387,7 +405,9 @@ export class CoursesService {
         }
 
         if (accountId === course.creatorId) {
-            throw new ConflictException("You cannot write a review on your created course.")
+            throw new ConflictException(
+                "You cannot write a review on your created course.",
+            )
         }
 
         const enrolled = await this.enrolledInfoMySqlRepository.findOneBy({
@@ -480,7 +500,6 @@ export class CoursesService {
         const { data } = input
         const { courseId, title, position, isLocked } = data
 
-
         const course = await this.courseMySqlRepository.findOneBy({
             courseId,
         })
@@ -489,22 +508,23 @@ export class CoursesService {
             courseId,
             title,
             position,
-            isLocked: (position === 0) ? false : isLocked
+            isLocked: position === 0 ? false : isLocked,
         })
 
         return {
             message: `A section with id ${created.sectionId} has been created successfully.`,
         }
-
     }
 
-    async createSectionContent(input: CreateSectionContentInput): Promise<CreateSectionContentOutput> {
+    async createSectionContent(
+        input: CreateSectionContentInput,
+    ): Promise<CreateSectionContentOutput> {
         const { sectionId, type } = input.data
 
         const sectionContents = await this.sectionContentMySqlRepository.find({
             where: {
-                sectionId
-            }
+                sectionId,
+            },
         })
 
         const position = sectionContents.reduce((max, current) => {
@@ -514,30 +534,51 @@ export class CoursesService {
         const { sectionContentId } = await this.sectionContentMySqlRepository.save({
             type,
             sectionId,
-            position: position + 1
+            title: "Untitled",
+            position: position + 1,
         })
 
         switch (type) {
         case SectionContentType.Lesson: {
-            await this.lessonMySqlRepository.save({
+            const lesson = await this.lessonMySqlRepository.save({
                 lessonId: sectionContentId,
-                position
+                description: "Write some description here.",
             })
+            await this.sectionContentMySqlRepository.update(
+                {
+                    sectionContentId,
+                },
+                {
+                    lessonId: lesson.lessonId,
+                    lesson,
+                },
+            )
             break
         }
         case SectionContentType.Quiz: {
-            await this.quizMySqlRepository.save({
+            const quiz = await this.quizMySqlRepository.save({
                 quizId: sectionContentId,
-                position
             })
+            await this.sectionContentMySqlRepository.update(
+                {
+                    sectionContentId,
+                },
+                {
+                    quizId: quiz.quizId,
+                    quiz,
+                },
+            )
             break
         }
         case SectionContentType.Resource: {
-            const { resourceId } = await this.resourceMySqlRepository.save({
+            const resource = await this.resourceMySqlRepository.save({
                 resourceId: sectionContentId,
-                position
+                position,
             })
-            await this.sectionContentMySqlRepository.update(sectionContentId, {resourceId})
+            await this.sectionContentMySqlRepository.update(sectionContentId, {
+                resourceId: resource.resourceId,
+                resource,
+            })
             break
         }
         }
@@ -559,16 +600,14 @@ export class CoursesService {
         return {
             message: "Content creeated successfully.",
         }
-
     }
 
     async updateLesson(input: UpdateLessonInput): Promise<UpdateLessonOutput> {
         const { data, files } = input
-        const { lessonId, description, lessonVideoIndex, thumbnailIndex } =
-            data
+        const { lessonId, description, lessonVideoIndex, thumbnailIndex } = data
 
         const { thumbnailId, lessonVideoId } =
-            await this.lessonMySqlRepository.findOneBy({ lessonId })
+      await this.lessonMySqlRepository.findOneBy({ lessonId })
 
         const promises: Array<Promise<void>> = []
 
@@ -667,11 +706,15 @@ export class CoursesService {
         }
     }
 
-    async deleteSectionContent(input: DeleteSectionContentInput): Promise<DeleteSectionContentOutput> {
+    async deleteSectionContent(
+        input: DeleteSectionContentInput,
+    ): Promise<DeleteSectionContentOutput> {
         const { data } = input
         const { sectionContentId } = data
 
-        const sectionContent = await this.sectionContentMySqlRepository.findOneBy({ sectionContentId })
+        const sectionContent = await this.sectionContentMySqlRepository.findOneBy({
+            sectionContentId,
+        })
 
         if (!sectionContent) {
             throw new NotFoundException("Content not found")
@@ -679,7 +722,9 @@ export class CoursesService {
 
         switch (sectionContent.type) {
         case SectionContentType.Lesson: {
-            const lesson = await this.lessonMySqlRepository.findOneBy({ lessonId: sectionContentId })
+            const lesson = await this.lessonMySqlRepository.findOneBy({
+                lessonId: sectionContentId,
+            })
             if (lesson) {
                 if (lesson.thumbnailId || lesson.lessonVideoId) {
                     const lessonMedia = [lesson.thumbnailId, lesson.lessonVideoId]
@@ -692,14 +737,17 @@ export class CoursesService {
             break
         }
         case SectionContentType.Resource: {
-            const attachments = await this.resourceAttachmentMySqlRepository.findBy({ resourceId: sectionContentId })
+            const attachments = await this.resourceAttachmentMySqlRepository.findBy(
+                { resourceId: sectionContentId },
+            )
             if (attachments) {
                 const mediaIds = attachments.map(({ fileId }) => fileId)
                 await this.storageService.delete(...mediaIds)
             }
             break
         }
-        default: break
+        default:
+            break
         }
 
         await this.sectionContentMySqlRepository.delete({ sectionContentId })
@@ -766,7 +814,7 @@ export class CoursesService {
             attachments: [],
         }
 
-        if(files){
+        if (files) {
             const promises: Array<Promise<void>> = []
             for (const attachment of resourceAttachments) {
                 const { fileIndex } = attachment
@@ -791,9 +839,10 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            const deletedResourceAttachments = await this.resourceAttachmentMySqlRepository.findBy({
-                resourceId,
-            })
+            const deletedResourceAttachments =
+        await this.resourceAttachmentMySqlRepository.findBy({
+            resourceId,
+        })
             await this.resourceAttachmentMySqlRepository.delete({ resourceId })
             await this.resourceMySqlRepository.save(resource)
 
@@ -813,8 +862,6 @@ export class CoursesService {
         } finally {
             await queryRunner.release()
         }
-
-        
     }
 
     async updateSection(input: UpdateSectionInput): Promise<UpdateSectionOuput> {
@@ -822,7 +869,7 @@ export class CoursesService {
         const { sectionId, title, position } = data
         await this.sectionMySqlRepository.update(sectionId, {
             title,
-            position
+            position,
         })
         return {
             message: `A section with id  ${sectionId} has been updated successfully.`,
@@ -844,14 +891,18 @@ export class CoursesService {
         const { data } = input
         const { resourceAttachmentId } = data
 
-        const attachment = await this.resourceAttachmentMySqlRepository.findOneBy({ resourceAttachmentId })
+        const attachment = await this.resourceAttachmentMySqlRepository.findOneBy({
+            resourceAttachmentId,
+        })
 
         if (!attachment) {
             throw new NotFoundException("Resource not found")
         }
 
         await this.storageService.delete(attachment.fileId)
-        await this.resourceAttachmentMySqlRepository.delete({ resourceAttachmentId })
+        await this.resourceAttachmentMySqlRepository.delete({
+            resourceAttachmentId,
+        })
 
         return {
             message: "Attachment has been deleted successfully.",
@@ -1133,8 +1184,8 @@ export class CoursesService {
         //Tìm quiz trong db, nếu chưa có thì tạo mới, nếu có thì chỉ thêm question và answer
         const course = await this.courseMySqlRepository.findOne({
             where: {
-                creatorId: accountId
-            }
+                creatorId: accountId,
+            },
         })
 
         if (accountId !== course.creatorId) {
@@ -1149,10 +1200,12 @@ export class CoursesService {
 
         const { quizId } = await this.quizMySqlRepository.save({
             quizId: sectionContentId,
-            timeLimit
+            timeLimit,
         })
 
-        await this.sectionContentMySqlRepository.update(sectionContentId, { quizId })
+        await this.sectionContentMySqlRepository.update(sectionContentId, {
+            quizId,
+        })
 
         if (!quizQuestions || quizQuestions.length === 0) {
             throw new ConflictException(
@@ -1177,7 +1230,7 @@ export class CoursesService {
                 }
 
                 const { quizQuestionId } =
-                    await this.quizQuestionMySqlRepository.save(quizQuestion)
+          await this.quizQuestionMySqlRepository.save(quizQuestion)
 
                 if (!answers || answers.length < 2) {
                     throw new ConflictException("Question must have at least 2 answers")
@@ -1207,15 +1260,17 @@ export class CoursesService {
 
             const now = new Date()
 
-            const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.findOne({
-                where: {
-                    endDate: MoreThan(now)
-                }
-            })
+            const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.findOne(
+                {
+                    where: {
+                        endDate: MoreThan(now),
+                    },
+                },
+            )
 
             await this.accountGradeMySqlRepository.save({
                 enrolledInfoId,
-                sectionId
+                sectionId,
             })
 
             await queryRunner.commitTransaction()
@@ -1370,17 +1425,17 @@ export class CoursesService {
                     }
 
                     const numberOfCorrectQuizQuestionAnswersResult =
-                        await queryRunner.manager
-                            .createQueryBuilder()
-                            .select("COUNT(*)", "count")
-                            .from(QuizQuestionAnswerMySqlEntity, "quiz-question-answer")
-                            .where("quiz-question-answer.quizQuestionId = :quizQuestionId", {
-                                quizQuestionId,
-                            })
-                            .andWhere("quiz-question-answer.isCorrect = :isCorrect", {
-                                isCorrect: true,
-                            })
-                            .getRawOne()
+            await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count")
+                .from(QuizQuestionAnswerMySqlEntity, "quiz-question-answer")
+                .where("quiz-question-answer.quizQuestionId = :quizQuestionId", {
+                    quizQuestionId,
+                })
+                .andWhere("quiz-question-answer.isCorrect = :isCorrect", {
+                    isCorrect: true,
+                })
+                .getRawOne()
                     const numberOfQuizQuestionAnswersResult = await queryRunner.manager
                         .createQueryBuilder()
                         .select("COUNT(*)", "count")
@@ -1478,20 +1533,25 @@ export class CoursesService {
                     sections: {
                         contents: {
                             type: SectionContentType.Quiz,
-                            quizId
-                        }
-                    }
-                }
+                            quizId,
+                        },
+                    },
+                },
             })
 
-            const enrollments = await this.enrolledInfoMySqlRepository.findBy({ courseId: course.courseId })
+            const enrollments = await this.enrolledInfoMySqlRepository.findBy({
+                courseId: course.courseId,
+            })
             const now = new Date()
-            const activeEnrollment = enrollments.filter(date => new Date(date.endDate) < now)
+            const activeEnrollment = enrollments.filter(
+                (date) => new Date(date.endDate) < now,
+            )
 
             if (!activeEnrollment) {
-                throw new ConflictException("Your enrollment(s) in this course have been expired")
+                throw new ConflictException(
+                    "Your enrollment(s) in this course have been expired",
+                )
             }
-
 
             const doing = await this.quizAttemptMySqlRepository.findOne({
                 where: {
@@ -1505,32 +1565,49 @@ export class CoursesService {
                 throw new ConflictException("You havent completed the last attempt.")
             }
 
-            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0)
-            const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59)
+            const startOfDay = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                0,
+                0,
+                0,
+            )
+            const endOfDay = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                23,
+                59,
+                59,
+            )
 
             const currentDateAttempts = await this.quizAttemptMySqlRepository.find({
                 where: {
                     accountId,
                     quizId,
-                    createdAt: Between(startOfDay, endOfDay)
+                    createdAt: Between(startOfDay, endOfDay),
                 },
                 order: {
-                    createdAt: "ASC"
-                }
+                    createdAt: "ASC",
+                },
             })
 
             if (currentDateAttempts.length >= 3) {
                 const thirdAttemptTimestamps = currentDateAttempts
                     .filter((_, index) => (index + 1) % 3 === 0)
-                    .map(attempt => attempt.createdAt)
-                
+                    .map((attempt) => attempt.createdAt)
+
                 if (thirdAttemptTimestamps.length > 0) {
-                    const latestThirdAttemptTimestamp = thirdAttemptTimestamps[thirdAttemptTimestamps.length - 1]
+                    const latestThirdAttemptTimestamp =
+            thirdAttemptTimestamps[thirdAttemptTimestamps.length - 1]
                     const unlockTime = new Date(latestThirdAttemptTimestamp)
                     unlockTime.setHours(unlockTime.getHours() + 8)
-          
+
                     if (now < unlockTime) {
-                        throw new ConflictException("You can only create a new attempt 8 hours after your last 3rd attempt.")
+                        throw new ConflictException(
+                            "You can only create a new attempt 8 hours after your last 3rd attempt.",
+                        )
                     }
                 }
             }
@@ -1636,7 +1713,8 @@ export class CoursesService {
 
             questionsWithCorrectAnswers.forEach((question) => {
                 const correctAnswerCount = question.correctAnswers.length
-                const accountAnswerCount = questionAnswerCountMap[question.quizQuestionId] || 0
+                const accountAnswerCount =
+          questionAnswerCountMap[question.quizQuestionId] || 0
                 maxPoints += Number(question.point)
                 if (accountAnswerCount === correctAnswerCount) {
                     totalPoints += Number(question.point)
@@ -1644,18 +1722,19 @@ export class CoursesService {
             })
             const score = (totalPoints / maxPoints) * 10
 
-
             await this.quizAttemptMySqlRepository.save({
                 quizAttemptId,
                 score,
                 questionAnswers,
-                timeTaken
+                timeTaken,
             })
 
-            const accountAnswers = quizQuestionAnswerIds.map(quizQuestionAnswerId => ({
-                quizAttemptId,
-                quizQuestionAnswerId
-            }))
+            const accountAnswers = quizQuestionAnswerIds.map(
+                (quizQuestionAnswerId) => ({
+                    quizAttemptId,
+                    quizQuestionAnswerId,
+                }),
+            )
 
             await this.quizAttemptAnswerMySqlRepository.save(accountAnswers)
 
@@ -1774,46 +1853,64 @@ export class CoursesService {
 
     // }
 
-    async createCourseReport(input: CreateCourseReportInput): Promise<CreateCourseReportOutput> {
+    async createCourseReport(
+        input: CreateCourseReportInput,
+    ): Promise<CreateCourseReportOutput> {
         const { data, accountId } = input
         const { reportedCourseId, title, description } = data
 
-        const reportedCourse = await this.courseMySqlRepository.findOneBy({ courseId: reportedCourseId })
+        const reportedCourse = await this.courseMySqlRepository.findOneBy({
+            courseId: reportedCourseId,
+        })
 
         if (!reportedCourse || reportedCourse.isDeleted) {
-            throw new NotFoundException("Reported course is not found or has been deleted")
+            throw new NotFoundException(
+                "Reported course is not found or has been deleted",
+            )
         }
 
         const processing = await this.reportCourseMySqlRepository.find({
             where: {
-                reportedCourseId
-            }
+                reportedCourseId,
+            },
         })
 
-        if (processing && processing.some(processing => processing.processStatus === ReportProcessStatus.Processing)) {
-            throw new ConflictException("You have reported this course before and it is processing. Try update your report instead.")
+        if (
+            processing &&
+      processing.some(
+          (processing) =>
+              processing.processStatus === ReportProcessStatus.Processing,
+      )
+        ) {
+            throw new ConflictException(
+                "You have reported this course before and it is processing. Try update your report instead.",
+            )
         }
 
         const { reportCourseId } = await this.reportCourseMySqlRepository.save({
             reporterAccountId: accountId,
             reportedCourseId,
             title,
-            description
+            description,
         })
 
         return {
             message: `A report to course ${reportedCourse.title} has been submitted.`,
             others: {
-                reportCourseId
-            }
+                reportCourseId,
+            },
         }
     }
 
-    async updateCourseReport(input: UpdateCourseReportInput): Promise<UpdateCourseReportOutput> {
+    async updateCourseReport(
+        input: UpdateCourseReportInput,
+    ): Promise<UpdateCourseReportOutput> {
         const { data, accountId } = input
         const { reportCourseId, title, description } = data
 
-        const found = await this.reportCourseMySqlRepository.findOneBy({ reportCourseId })
+        const found = await this.reportCourseMySqlRepository.findOneBy({
+            reportCourseId,
+        })
 
         if (!found) {
             throw new NotFoundException("Post's report not found.")
@@ -1827,21 +1924,28 @@ export class CoursesService {
             throw new ConflictException("You aren't the owner of this report.")
         }
 
-        await this.reportCourseMySqlRepository.update(reportCourseId, { title, description })
+        await this.reportCourseMySqlRepository.update(reportCourseId, {
+            title,
+            description,
+        })
 
         return {
             message: "Your Report has been updated successfully",
             others: {
-                reportCourseId
-            }
+                reportCourseId,
+            },
         }
     }
 
-    async resolveCourseReport(input: ResolveCourseReportInput): Promise<ResolveCourseReportOutput> {
+    async resolveCourseReport(
+        input: ResolveCourseReportInput,
+    ): Promise<ResolveCourseReportOutput> {
         const { data } = input
         const { reportCourseId, processNote, processStatus } = data
 
-        const found = await this.reportCourseMySqlRepository.findOneBy({ reportCourseId })
+        const found = await this.reportCourseMySqlRepository.findOneBy({
+            reportCourseId,
+        })
 
         if (!found) {
             throw new NotFoundException("Report not found")
@@ -1851,10 +1955,13 @@ export class CoursesService {
             throw new ConflictException("This report has already been resolved")
         }
 
-        await this.reportCourseMySqlRepository.update(reportCourseId, { processStatus, processNote })
+        await this.reportCourseMySqlRepository.update(reportCourseId, {
+            processStatus,
+            processNote,
+        })
 
         return {
-            message: "Report successfully resolved and closed."
+            message: "Report successfully resolved and closed.",
         }
     }
 
