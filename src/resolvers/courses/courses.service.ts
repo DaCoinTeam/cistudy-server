@@ -242,7 +242,7 @@ export class CoursesService {
                 return total
             }
 
-            const overallCourseRating = totalNumStars() / totalNumberOfRatings
+            const overallCourseRating = totalNumberOfRatings > 0 ? totalNumStars() / totalNumberOfRatings : 0   
 
             const courseRatings: CourseRating = {
                 numberOf1StarRatings,

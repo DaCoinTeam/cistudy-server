@@ -176,7 +176,7 @@ export class DeleteSectionOuput implements Output {
     message: string
 }
 
-export class DeleteResourceOuput implements Output {
+export class DeleteResourceAttachmentOuput implements Output {
     message: string
 }
 

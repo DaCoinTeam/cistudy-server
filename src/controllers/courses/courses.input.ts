@@ -185,9 +185,9 @@ export class UpdateResourceInputData {
     @ApiProperty()
         resourceId: string
     @ApiProperty({ nullable: true})
-        description?: string
+        title?: string
     @ApiProperty({ nullable: true})
-        resourceAttachments?: Array<ResourceAttachmentInputData>
+        description?: string
 }
 
 export class UpdateResourceInput
@@ -196,7 +196,7 @@ implements AuthInput<UpdateResourceInputData>
     @IsUUID("4")
         accountId: string
     data: UpdateResourceInputData
-    files: Express.Multer.File[]
+    files?: Express.Multer.File[]
 
 }
 //
@@ -267,17 +267,17 @@ export class UpdateSectionInput implements AuthInput<UpdateSectionInputData> {
   data: UpdateSectionInputData
 }
 
-export class DeleteResourceInputData {
+export class DeleteResourceAttachmentInputData {
   @IsUUID()
   @ApiProperty()
       resourceAttachmentId: string
 }
 
-export class DeleteResourceInput implements AuthInput<DeleteResourceInputData> {
+export class DeleteResourceAttachmentInput implements AuthInput<DeleteResourceAttachmentInputData> {
   @IsUUID("4")
       accountId: string
   @ApiProperty()
-      data: DeleteResourceInputData
+      data: DeleteResourceAttachmentInputData
 }
 
 //dev only apis

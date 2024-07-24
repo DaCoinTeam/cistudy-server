@@ -40,7 +40,7 @@ import {
     UpdateLessonInput,
     DeleteSectionInput,
     UpdateSectionInput,
-    DeleteResourceInput,
+    DeleteResourceAttachmentInput,
     EnrollCourseInput,
     CreateCategoryInput,
     CreateCourseReviewInput,
@@ -91,7 +91,7 @@ import {
     DeleteCourseCategoryOutput,
     DeleteCourseReviewOutput,
     DeleteCourseTargetOuput,
-    DeleteResourceOuput,
+    DeleteResourceAttachmentOuput,
     DeleteSectionContentOutput,
     DeleteSectionOuput,
     EnrollCourseOutput,
@@ -573,7 +573,7 @@ export class CoursesService {
         case SectionContentType.Resource: {
             const resource = await this.resourceMySqlRepository.save({
                 resourceId: sectionContentId,
-                position,
+                description: "Write some description here.",
             })
             await this.sectionContentMySqlRepository.update(sectionContentId, {
                 resourceId: resource.resourceId,
@@ -604,7 +604,7 @@ export class CoursesService {
 
     async updateLesson(input: UpdateLessonInput): Promise<UpdateLessonOutput> {
         const { data, files } = input
-        const { lessonId, description, lessonVideoIndex, thumbnailIndex } = data
+        const { lessonId, description, lessonVideoIndex, thumbnailIndex, title } = data
 
         const { thumbnailId, lessonVideoId } =
       await this.lessonMySqlRepository.findOneBy({ lessonId })
@@ -701,8 +701,11 @@ export class CoursesService {
 
         if (existKeyNotUndefined(lesson))
             await this.lessonMySqlRepository.update(lessonId, lesson)
+        await this.sectionContentMySqlRepository.update(lessonId, {
+            title
+        })
         return {
-            message: `A lesson with id ${lessonId} has been updated successfully.`,
+            message: "Update lesson successfully.",
         }
     }
 
@@ -806,51 +809,49 @@ export class CoursesService {
         input: UpdateResourceInput,
     ): Promise<UpdateResourceOutput> {
         const { files, data } = input
-        const { resourceId, description, resourceAttachments } = data
-
-        const resource: DeepPartial<ResourceMySqlEntity> = {
-            resourceId,
-            description,
-            attachments: [],
-        }
-
-        if (files) {
-            const promises: Array<Promise<void>> = []
-            for (const attachment of resourceAttachments) {
-                const { fileIndex } = attachment
-                const promise = async () => {
-                    const file = files.at(fileIndex)
-                    const { assetId } = await this.storageService.upload({
-                        rootFile: file,
-                    })
-                    resource.attachments.push({
-                        resourceId,
-                        name: file.originalname,
-                        fileId: assetId,
-                    } as ResourceAttachmentMySqlEntity)
-                }
-                promises.push(promise())
-            }
-            await Promise.all(promises)
-        }
+        const { resourceId, description, title } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
 
         try {
-            const deletedResourceAttachments =
-        await this.resourceAttachmentMySqlRepository.findBy({
-            resourceId,
-        })
-            await this.resourceAttachmentMySqlRepository.delete({ resourceId })
-            
-            const fileIds = deletedResourceAttachments.map(
-                (deletedResourceAttachments) => deletedResourceAttachments.fileId,
-            )
-            await this.storageService.delete(...fileIds)
+            const resource = await this.resourceMySqlRepository.findOne({
+                where: {
+                    resourceId
+                },
+                relations: {
+                    attachments: true
+                }
+            })
+
+            resource.description = description
+            const attachments = resource.attachments
+
+            if (files) {
+                const promises: Array<Promise<void>> = []
+                for (const file of files) {
+                    const promise = async () => {
+                        const { assetId } = await this.storageService.upload({
+                            rootFile: file,
+                        })
+                        attachments.push({
+                            resourceId,
+                            name: file.originalname,
+                            fileId: assetId,
+                        } as ResourceAttachmentMySqlEntity)
+                    }
+                    promises.push(promise())
+                }
+                await Promise.all(promises)
+            }
+
+            resource.attachments = attachments
 
             await this.resourceMySqlRepository.save(resource)
+            await this.sectionContentMySqlRepository.update(resourceId, {
+                title
+            })
 
             await queryRunner.commitTransaction()
 
@@ -886,8 +887,8 @@ export class CoursesService {
     }
 
     async deleteResourceAttachment(
-        input: DeleteResourceInput,
-    ): Promise<DeleteResourceOuput> {
+        input: DeleteResourceAttachmentInput,
+    ): Promise<DeleteResourceAttachmentOuput> {
         const { data } = input
         const { resourceAttachmentId } = data
 
