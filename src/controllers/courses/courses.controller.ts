@@ -33,8 +33,7 @@ import {
     CreateCourseTargetInputData,
     CreateSectionContentInputData,
     CreateQuizAttemptInputData,
-    CreateQuizInputData,
-    CreateResourceAttachmentsInputData, CreateResourceInputData, CreateSectionInputData,
+    CreateQuizInputData, CreateSectionInputData,
     DeleteCourseCategoryInputData,
     EnrollCourseInputData,
     FinishQuizAttemptInputData,
@@ -47,16 +46,16 @@ import {
     UpdateLessonInputData,
     UpdateQuizInputData,
     //UpdateQuizInputData,
-    UpdateSectionInputData
+    UpdateSectionInputData,
+    UpdateResourceInputData
 } from "./courses.input"
 
 import {
     createCategorySchema,
-    createQuizSchema,
-    CreateResourceAttachmentsSchema,
-    updateCourseSchema,
+    createQuizSchema, updateCourseSchema,
     updateLessonSchema,
-    updateQuizSchema
+    updateQuizSchema,
+    UpdateResourceSchema
 } from "./courses.schema"
 
 import { Files, SystemRoles } from "@common"
@@ -259,35 +258,21 @@ export class CoursesController {
     }
 
     @ApiBearerAuth()
-    @Put("create-resource")
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User)
-    @UseInterceptors(AuthInterceptor)
-    async createResource(
-        @AccountId() accountId: string,
-        @Body() body: CreateResourceInputData,
-    ) {
-        return this.coursesService.createResource({
-            accountId,
-            data: body,
-        })
-    }
-    @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
-    @ApiBody({ schema: CreateResourceAttachmentsSchema })
-    @Post("create-resource-attachment")
+    @ApiBody({ schema: UpdateResourceSchema })
+    @Patch("update-resource")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(
         AuthInterceptor,
         FileFieldsInterceptor([{ name: "files", maxCount: 10 }]),
     )
-    async createResourceAttachments(
+    async updateResource(
         @AccountId() accountId: string,
-        @DataFromBody() data: CreateResourceAttachmentsInputData,
+        @DataFromBody() data: UpdateResourceInputData,
         @UploadedFiles() { files }: Files,
     ) {
-        return this.coursesService.createResourceAttachments({
+        return this.coursesService.updateResource({
             accountId,
             data,
             files,
@@ -451,13 +436,12 @@ export class CoursesController {
     @Post("create-quiz")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
-    @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
+    @UseInterceptors(AuthInterceptor)
     async createQuiz(
         @AccountId() accountId: string,
         @DataFromBody() data: CreateQuizInputData,
-        @UploadedFiles() { files }: Files,
     ) {
-        return await this.coursesService.createQuiz({ accountId, data, files })
+        return await this.coursesService.createQuiz({ accountId, data })
     }
 
     @ApiBearerAuth()
@@ -466,13 +450,12 @@ export class CoursesController {
     @Put("update-quiz")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
-    @UseInterceptors(AuthInterceptor, FileFieldsInterceptor([{ name: "files" }]))
+    @UseInterceptors(AuthInterceptor)
     async updateQuiz(
         @AccountId() accountId: string,
         @DataFromBody() data: UpdateQuizInputData,
-        @UploadedFiles() { files }: Files,
     ) {
-        return await this.coursesService.updateQuiz({ accountId, data, files })
+        return await this.coursesService.updateQuiz({ accountId, data})
     }
 
     @ApiBearerAuth()

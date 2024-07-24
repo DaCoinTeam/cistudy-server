@@ -75,13 +75,6 @@ export class CoursesResolver {
       return await this.coursesService.findManyLessons({ accountId, data })
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @UseInterceptors(AuthInterceptor)
-  // @Query(() => FindManyResourcesOutput)
-  // async findManyResources(@AccountId() accountId: string, @Args("data") data: FindManyResourcesInputData) {
-  //     return await this.coursesService.findManyResources({ accountId, data })
-  // }
-
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   @Query(() => FindManyCourseTargetsOutput)
@@ -91,11 +84,6 @@ export class CoursesResolver {
   ) {
       return await this.coursesService.findManyCourseTargets({ accountId, data })
   }
-
-  // @Query(() => CategoryMySqlEntity)
-  // async findOneCategory(@Args("data") data: FindOneCategoryInputData) {
-  //     return await this.coursesService.findOneCategory({ data })
-  // }
 
   @Query(() => CourseReviewMySqlEntity)
   async findOneCourseReview(@Args("data") data: FindOneCourseReviewInputData) {
@@ -108,11 +96,6 @@ export class CoursesResolver {
   ) {
       return await this.coursesService.findManyCourseReviews({ data })
   }
-
-  // @Query(() => [TopicMySqlEntity])
-  // async findManyTopics() {
-  //     return await this.coursesService.findManyCoursesTopic({data})
-  // }
 
   @Query(() => FindManyCoursesTopicOutputData)
   async findManyCoursesTopic(

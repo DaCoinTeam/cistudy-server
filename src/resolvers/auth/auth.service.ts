@@ -1,4 +1,4 @@
-import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity, EnrolledInfoMySqlEntity, PostMySqlEntity, RoleMySqlEntity } from "@database"
+import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, CourseRating, CourseReviewMySqlEntity, EnrolledInfoMySqlEntity, PostMySqlEntity, RoleMySqlEntity } from "@database"
 import {
     Injectable,
     NotFoundException,
@@ -112,35 +112,57 @@ export class AuthService {
                 },
                 relations:{
                     enrolledInfos: true,
-                    creator : true
+                    creator : true,
+                    courseTargets: true
                 }
             })
-    
-            const coursesReviews = await this.courseReviewMySqlRepository.find({
-                where: {
-                    courseId: In(totalNumberOfAvailableCourses.map(course => course.courseId)),
-                },
-            })
-    
-            await Promise.all(totalNumberOfAvailableCourses.map(async (course) => {
-                const reviews = coursesReviews.filter(review => review.courseId === course.courseId)
-                const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0)
-                const ratingCounts = [1, 2, 3, 4, 5].map(star =>
-                    reviews.filter(review => review.rating === star).length
-                )
-                const overallCourseRating = reviews.length ? totalRating / reviews.length : 0
-    
-                course.courseRatings = {
+            
+            for(const course of totalNumberOfAvailableCourses) {
+                const courseReviews = await this.courseReviewMySqlRepository.find({
+                    where: {
+                        courseId: course.courseId
+                    }
+                })
+                const countWithNumStars = (numStars: number) => {
+                    let count = 0
+                    for (const { rating } of courseReviews) {
+                        if (rating === numStars) {
+                            count++
+                        }
+                    }
+
+                    return count
+                }
+
+                const numberOf1StarRatings = countWithNumStars(1)
+                const numberOf2StarRatings = countWithNumStars(2)
+                const numberOf3StarRatings = countWithNumStars(3)
+                const numberOf4StarRatings = countWithNumStars(4)
+                const numberOf5StarRatings = countWithNumStars(5)
+                const totalNumberOfRatings = courseReviews.length
+
+                const totalNumStars = () => {
+                    let total = 0
+                    for (let index = 1; index <= 5; index++) {
+                        total += countWithNumStars(index) * index
+                    }
+                    return total
+                }
+
+                const overallCourseRating = totalNumStars() / totalNumberOfRatings
+
+                const courseRatings: CourseRating = {
+                    numberOf1StarRatings,
+                    numberOf2StarRatings,
+                    numberOf3StarRatings,
+                    numberOf4StarRatings,
+                    numberOf5StarRatings,
                     overallCourseRating,
-                    totalNumberOfRatings: coursesReviews.length,
-                    numberOf1StarRatings: ratingCounts[0],
-                    numberOf2StarRatings: ratingCounts[1],
-                    numberOf3StarRatings: ratingCounts[2],
-                    numberOf4StarRatings: ratingCounts[3],
-                    numberOf5StarRatings: ratingCounts[4],
+                    totalNumberOfRatings
                 }
-                course.numberOfEnrollments = course.enrolledInfos.length
-            }))
+
+                course.courseRatings = courseRatings
+            }
 
             const highRatedCourses = totalNumberOfAvailableCourses
                 .filter(course => course.courseRatings.overallCourseRating >= 4)
@@ -158,7 +180,8 @@ export class AuthService {
                 },
 
                 relations:{
-                    creator: true
+                    creator: true,
+                    courseTargets: true
                 },
 
                 order: {

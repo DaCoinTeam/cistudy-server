@@ -113,7 +113,7 @@ export const createCategorySchema: SchemaObject = {
     }
 }
 
-export const CreateResourceAttachmentsSchema: SchemaObject = {
+export const UpdateResourceSchema: SchemaObject = {
     type: "object",
     properties: {
         data: {
@@ -121,6 +121,20 @@ export const CreateResourceAttachmentsSchema: SchemaObject = {
             properties: {
                 resourceId: {
                     type: "string",
+                },
+                description: {
+                    type: "string",
+                },
+                resourceAttachments: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            fileIndex: {
+                                type: "number",
+                            },
+                        }
+                    }
                 },
             },
         },
@@ -185,6 +199,9 @@ export const createQuizSchema: SchemaObject = {
                             question: {
                                 type: "string",
                             },
+                            position:{
+                                type: "number",
+                            },
                             point:{
                                 type: "number",
                                 minimum: 10
@@ -194,6 +211,9 @@ export const createQuizSchema: SchemaObject = {
                                 items: {
                                     type: "object",
                                     properties: {
+                                        position:{
+                                            type: "number",
+                                        },
                                         content: {
                                             type: "string",
                                         },
@@ -203,30 +223,11 @@ export const createQuizSchema: SchemaObject = {
                                     }
                                 }
                             },
-                            questionMedias: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        mediaIndex: {
-                                            type: "number",
-                                        },
-                                    }
-                                }
-
-                            },
                         }
                     }
                 }
             },
-        },
-        files: {
-            type: "array",
-            items: {
-                type: "string",
-                format: "binary",
-            },
-        },
+        }
     },
 }
 
@@ -251,6 +252,9 @@ export const updateQuizSchema: SchemaObject = {
                             question: {
                                 type: "string",
                             },
+                            position:{
+                                type: "number",
+                            },
                             point: {
                                 type: "number",
                                 minimum: 10,
@@ -260,23 +264,15 @@ export const updateQuizSchema: SchemaObject = {
                                 items: {
                                     type: "object",
                                     properties: {
+                                        position:{
+                                            type: "number",
+                                        },
                                         content: {
                                             type: "string",
                                         },
                                         isCorrect: {
                                             type: "boolean",
                                         }
-                                    }
-                                }
-                            },
-                            questionMedias: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        mediaIndex: {
-                                            type: "number",
-                                        },
                                     }
                                 }
                             }
@@ -294,20 +290,12 @@ export const updateQuizSchema: SchemaObject = {
                             question: {
                                 type: "string",
                             },
+                            position:{
+                                type: "number",
+                            },
                             point:{
                                 type: "number",
                                 minimum: 10
-                            },
-                            questionMedias: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        mediaIndex: {
-                                            type: "number",
-                                        },
-                                    }
-                                }
                             },
                             quizAnswerIdsToUpdate: {
                                 type: "array",
@@ -316,6 +304,9 @@ export const updateQuizSchema: SchemaObject = {
                                     properties: {
                                         quizQuestionAnswerId: {
                                             type: "string",
+                                        },
+                                        position:{
+                                            type: "number",
                                         },
                                         content: {
                                             type: "string",
@@ -331,6 +322,9 @@ export const updateQuizSchema: SchemaObject = {
                                 items: {
                                     type: "object",
                                     properties: {
+                                        position:{
+                                            type: "number",
+                                        },
                                         content: {
                                             type: "string",
                                         },
@@ -344,24 +338,8 @@ export const updateQuizSchema: SchemaObject = {
                                 type: "array",
                                 items: {
                                     type: "string",
-                                    properties: {
-                                        quizQuestionAnswerId: {
-                                            type: "string",
-                                        }
-                                    }
                                 }
-                            },
-                            mediaIdsToDelete: {
-                                type: "array",
-                                items: {
-                                    type: "string",
-                                    properties: {
-                                        mediaId: {
-                                            type: "string",
-                                        }
-                                    }
-                                }
-                            },
+                            }
                         }
                     }
                 },
@@ -371,14 +349,6 @@ export const updateQuizSchema: SchemaObject = {
                         type: "string",
                     }
                 }
-            },
-        },
-
-        files: {
-            type: "array",
-            items: {
-                type: "string",
-                format: "binary",
             },
         },
     },

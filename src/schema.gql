@@ -73,21 +73,11 @@ type QuizAttemptAnswerEntity {
 type QuizQuestionAnswerEntity {
   quizQuestionAnswerId: ID!
   quizQuestionId: ID!
+  position: Int!
   content: String!
   isCorrect: Boolean!
   quizQuestion: [QuizQuestionEntity!]!
   attemptAnswers: QuizAttemptAnswerEntity!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type QuizQuestionMediaEntity {
-  quizQuestionMediaId: ID!
-  position: Int!
-  mediaId: ID!
-  quizQuestionId: ID!
-  mediaType: String!
-  quiz: QuizQuestionEntity!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -97,8 +87,8 @@ type QuizQuestionEntity {
   quizId: ID!
   point: Float
   question: String!
-  questionMedias: [QuizQuestionMediaEntity!]
   answers: [QuizQuestionAnswerEntity!]
+  position: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
   quiz: QuizEntity!
@@ -112,16 +102,18 @@ type QuizEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   sectionContent: SectionContentEntity!
-  quizAttempts: QuizAttemptEntity
+  quizAttempts: [QuizAttemptEntity!]
   totalNumberOfAttempts: Int
   highestScoreRecorded: Float
   lastAttemptScore: Float
   lastAttemptTimeTaken: String
   isPassed: Boolean
+  isLocked: Boolean!
 }
 
 type ResourceAttachmentEntity {
   resourceAttachmentId: ID!
+  position: Int!
   resourceId: ID!
   name: String!
   fileId: String!
@@ -1036,7 +1028,7 @@ input FindOneQuizAttemptInputOptions {
 }
 
 input FindManyLevelCategoriesInputData {
-  categoryParentId: ID
+  level: Int
 }
 
 input FindManyCourseReportsInputData {

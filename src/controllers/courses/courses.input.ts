@@ -1,6 +1,6 @@
-import { AuthEmptyDataInput, AuthInput, MediaType, ReportProcessStatus, SectionContentType } from "@common"
+import { AuthEmptyDataInput, AuthInput, ReportProcessStatus, SectionContentType } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsInt, IsNumber, IsOptional, IsUUID, Length, Max, Min, MinLength } from "class-validator"
+import { IsNumber, IsOptional, IsUUID, Length, Max, Min, MinLength } from "class-validator"
 
 export class CreateCourseInput implements AuthEmptyDataInput {
   @IsUUID("4")
@@ -175,17 +175,26 @@ export class CreateSectionInput implements AuthInput<CreateSectionInputData> {
   data: CreateSectionInputData
 }
 //
-export class CreateResourceAttachmentsInputData {
+export class ResourceAttachmentInputData {
+    @ApiProperty()
+        fileIndex: number
+}
+
+export class UpdateResourceInputData {
     @IsUUID("4")
     @ApiProperty()
         resourceId: string
+    @ApiProperty()
+        description: string
+    @ApiProperty()
+        resourceAttachments?: Array<ResourceAttachmentInputData>
 }
-export class CreateResourceAttachmentsInput
-implements AuthInput<CreateResourceAttachmentsInputData>
+export class UpdateResourceInput
+implements AuthInput<UpdateResourceInputData>
 {
     @IsUUID("4")
         accountId: string
-    data: CreateResourceAttachmentsInputData
+    data: UpdateResourceInputData
     files: Express.Multer.File[]
 
 }
@@ -405,19 +414,13 @@ implements AuthInput<CreateCertificateInputData>
 
 export class QuizQuestionAnswerInputData {
   @ApiProperty()
+      position: number
+
+  @ApiProperty()
       content: string
 
   @ApiProperty()
       isCorrect: boolean
-}
-
-export class QuizQuestionMediaInputData {
-  @IsInt()
-  @ApiProperty()
-      mediaIndex: number
-
-  @ApiProperty()
-      mediaType: MediaType
 }
 
 export class QuizQuestionInputData {
@@ -431,8 +434,9 @@ export class QuizQuestionInputData {
   @ApiProperty()
       answers: Array<QuizQuestionAnswerInputData>
 
-  @ApiProperty({ nullable: true })
-      questionMedias?: Array<QuizQuestionMediaInputData>
+  @ApiProperty()
+      position: number
+
 }
 
 export class CreateQuizInputData {
@@ -455,7 +459,6 @@ export class CreateQuizInput implements AuthInput<CreateQuizInputData> {
   @IsUUID("4")
       accountId: string
   data: CreateQuizInputData
-  files?: Array<Express.Multer.File>
 }
 
 export class UpdateQuizQuestionAnswerInputData {
@@ -468,6 +471,9 @@ export class UpdateQuizQuestionAnswerInputData {
 
   @ApiProperty()
       isCorrect?: boolean
+
+  @ApiProperty()
+      position: number
 }
 
 export class UpdateQuizQuestionInputData {
@@ -478,21 +484,18 @@ export class UpdateQuizQuestionInputData {
   @ApiProperty({ nullable: true })
       question?: string
 
+  @ApiProperty()
+      position: number
+
   @ApiProperty({ nullable: true })
   @Min(10)
       point?: number
-
-  @ApiProperty({ nullable: true })
-      questionMedias?: Array<QuizQuestionMediaInputData>
 
   @ApiProperty({ nullable: true })
       quizAnswerIdsToUpdate?: Array<UpdateQuizQuestionAnswerInputData>
 
   @ApiProperty({ nullable: true })
       quizAnswerIdsToDelete?: Array<string>
-
-  @ApiProperty({ nullable: true })
-      mediaIdsToDelete?: Array<string>
 
   @ApiProperty({ nullable: true })
       newQuizQuestionAnswer?: Array<QuizQuestionAnswerInputData>

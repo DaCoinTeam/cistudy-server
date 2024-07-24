@@ -1,8 +1,8 @@
-import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
+import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 import { QuizQuestionAnswerEntity } from "./quiz-question-answer.entity"
 import { QuizEntity } from "./quiz.entity"
-import { QuizQuestionMediaEntity } from "./quiz-question-media.entity"
+
 
 
 @ObjectType()
@@ -24,16 +24,14 @@ export class QuizQuestionEntity {
     @Field(() => String)
     @Column({ type: "varchar", length: 2000 })
         question: string
-    
-    @Field(() => [QuizQuestionMediaEntity], { nullable: true })
-    @OneToMany(() => QuizQuestionMediaEntity, (quizMedia) => quizMedia.quiz, {
-        cascade: true, nullable: true
-    })
-        questionMedias: Array<QuizQuestionMediaEntity>
 
     @Field(() => [QuizQuestionAnswerEntity], {nullable: true})
     @OneToMany(() => QuizQuestionAnswerEntity, (quizAnswer) => quizAnswer.quizQuestion, { onDelete: "CASCADE", onUpdate: "CASCADE", nullable: true })
         answers: Array<QuizQuestionAnswerEntity>
+
+    @Field(() => Int)
+    @Column({ type: "int", default: 0 })
+        position: number
 
     @Field(() => Date)
     @CreateDateColumn()

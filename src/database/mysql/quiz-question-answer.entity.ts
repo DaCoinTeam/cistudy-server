@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from "@nestjs/graphql"
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 import { QuizQuestionEntity } from "./quiz-question.entity"
 import { QuizAttemptAnswerEntity } from "./quiz-attempt-answer.entity"
@@ -14,6 +14,10 @@ export class QuizQuestionAnswerEntity {
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
         quizQuestionId: string
+
+    @Field(() => Int)
+    @Column({ type: "int", default: 0 })
+        position: number
 
     @Field(() => String)
     @Column({ type: "varchar", length: 1000 , nullable: true })
