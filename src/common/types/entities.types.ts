@@ -35,7 +35,7 @@ export enum OrderStatus {
 }
 
 registerEnumType(OrderStatus, {
-    name: "OrderStatus"
+    name: "OrderStatus",
 })
 
 registerEnumType(CourseVerifyStatus, {
@@ -50,7 +50,6 @@ export enum MediaType {
 registerEnumType(MediaType, {
     name: "MediaType",
 })
-
 
 export enum ProcessStatus {
   Pending = "pending",
@@ -73,7 +72,7 @@ registerEnumType(VideoType, {
 
 export enum QuizAttemptStatus {
   Started = "started",
-  Ended = "ended"
+  Ended = "ended",
 }
 
 registerEnumType(QuizAttemptStatus, {
@@ -83,7 +82,7 @@ registerEnumType(QuizAttemptStatus, {
 export enum CourseApproveStatus {
   Pending = "pending",
   Approved = "approved",
-  Rejected = "rejected"
+  Rejected = "rejected",
 }
 
 registerEnumType(CourseApproveStatus, {
@@ -93,18 +92,18 @@ registerEnumType(CourseApproveStatus, {
 export enum ReportProcessStatus {
   Processing = "processing",
   Approved = "approved",
-  Rejected = "rejected"
+  Rejected = "rejected",
 }
 
-registerEnumType(ReportProcessStatus,{
-    name: "ReportProcessStatus"
+registerEnumType(ReportProcessStatus, {
+    name: "ReportProcessStatus",
 })
 
 export enum ReportType {
   Account = "account",
   Course = "course",
   Post = "post",
-  PostComment = "postComment"
+  PostComment = "postComment",
 }
 
 // export enum UpdatedField {
@@ -120,15 +119,35 @@ export enum ReportType {
 export enum TransactionType {
   Buy = "buy",
   Deposit = "deposit",
-  Withdraw = "withdraw"
+  Withdraw = "withdraw",
 }
 
 export enum SectionContentType {
   Lesson = "lesson",
   Quiz = "quiz",
-  Resource = "resource"
+  Resource = "resource",
 }
 
-registerEnumType(SectionContentType,{
-    name: "SectionContentType"
+registerEnumType(SectionContentType, {
+    name: "SectionContentType",
+})
+
+export enum LockState {
+  Completed = "completed",
+  InProgress = "inProgress",
+  Locked = "locked",
+}
+
+registerEnumType(LockState, {
+    name: "LockState",
+})
+
+export enum CompleteState {
+  Completed = "completed",
+  Failed = "failed",
+  Undone = "undone",
+}
+
+registerEnumType(CompleteState, {
+    name: "CompleteState",
 })

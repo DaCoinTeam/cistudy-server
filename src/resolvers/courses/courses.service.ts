@@ -729,7 +729,7 @@ export class CoursesService {
                     enrolledInfoId
                 })
             }
-            sectionContent.isCompleted = progress.isCompleted
+            sectionContent.completeState = progress.isCompleted
 
             const creatorFollow = await this.followMySqlRepository.find({
                 where: {

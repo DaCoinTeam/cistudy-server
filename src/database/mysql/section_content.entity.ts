@@ -11,7 +11,7 @@ import {
 } from "typeorm"
 import { LessonEntity } from "./lesson.entity"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
-import { SectionContentType } from "@common"
+import { CompleteState, SectionContentType } from "@common"
 import { SectionEntity } from "./section.entity"
 import { QuizEntity } from "./quiz.entity"
 import { ResourceEntity } from "./resource.entity"
@@ -85,7 +85,7 @@ export class SectionContentEntity {
         accountProgresses? : Array<ProgressEntity>
 
     //graphqh
-    @Field(() => Boolean)
-        isCompleted?: boolean
+    @Field(() => CompleteState)
+        completeState?: CompleteState
 
 }
