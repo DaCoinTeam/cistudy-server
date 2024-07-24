@@ -212,6 +212,6 @@ export class ResolveCourseReportOutput implements Output {
     message: string
 }
 
-export class CreateResourceAttachmentsOutput implements Output {
+export class UpdateResourceOutput implements Output {
     message: string
 }

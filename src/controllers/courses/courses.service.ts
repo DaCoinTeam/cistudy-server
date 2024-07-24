@@ -55,10 +55,8 @@ import {
     CreateCourseReportInput,
     UpdateCourseReportInput,
     ResolveCourseReportInput,
-    DeleteSectionContentInput,
-    CreateResourceAttachmentsInput,
-    CreateResourceInput,
-    MarkContentAsCompletedInput
+    DeleteSectionContentInput, MarkContentAsCompletedInput,
+    UpdateResourceInput
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -83,10 +81,7 @@ import {
     CreateCourseReviewOutput,
     CreateCourseTargetOuput,
     CreateQuizAttemptOutput,
-    CreateQuizOutput,
-    CreateResourceAttachmentsOutput,
-    CreateResourcesOuput,
-    CreateSectionContentOutput,
+    CreateQuizOutput, CreateSectionContentOutput,
     CreateSectionOutput,
     DeleteCategoryOutput,
     DeleteCourseCategoryOutput,
@@ -104,6 +99,7 @@ import {
     UpdateCourseTargetOuput,
     UpdateLessonOutput,
     UpdateQuizOutput,
+    UpdateResourceOutput,
     UpdateSectionOuput
 } from "./courses.output"
 import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
@@ -537,10 +533,11 @@ export class CoursesService {
             break
         }
         case SectionContentType.Resource: {
-            await this.resourceMySqlRepository.save({
+            const { resourceId } = await this.resourceMySqlRepository.save({
                 resourceId: sectionContentId,
                 position
             })
+            await this.sectionContentMySqlRepository.update(sectionContentId, {resourceId})
             break
         }
         }
@@ -757,63 +754,72 @@ export class CoursesService {
         }
     }
 
-    async createResource(input: CreateResourceInput): Promise<CreateResourcesOuput> {
-        const { data } = input
-        const { sectionId, title } = data
-
-        const { sectionContentId } = await this.sectionContentMySqlRepository.save({
-            type: SectionContentType.Resource,
-            sectionId,
-            title
-        })
-        await this.sectionContentMySqlRepository.update(sectionContentId, { sectionContentId })
-
-        const now = new Date()
-
-        const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.findOne({
-            where: {
-                endDate: MoreThan(now)
-            }
-        })
-
-        await this.progressMySqlRepository.save({
-            enrolledInfoId,
-            sectionContentId
-        })
-
-        return {
-            message: "Resource has been created sucessfully"
-        }
-    }
-
-    async createResourceAttachments(
-        input: CreateResourceAttachmentsInput,
-    ): Promise<CreateResourceAttachmentsOutput> {
+    async updateResource(
+        input: UpdateResourceInput,
+    ): Promise<UpdateResourceOutput> {
         const { files, data } = input
-        const { resourceId } = data
+        const { resourceId, description, resourceAttachments } = data
 
-        const promises: Array<Promise<void>> = []
-        const resources: Array<DeepPartial<ResourceAttachmentMySqlEntity>> = []
+        const resource: DeepPartial<ResourceMySqlEntity> = {
+            resourceId,
+            description,
+            attachments: [],
+        }
 
-        for (const file of files) {
-            const promise = async () => {
-                const { assetId } = await this.storageService.upload({
-                    rootFile: file,
-                })
-                resources.push({
-                    name: file.originalname,
-                    fileId: assetId,
-                    resourceId,
-                })
+        if(files){
+            const promises: Array<Promise<void>> = []
+            let filePosition = 0
+            for (const attachment of resourceAttachments) {
+                const { fileIndex } = attachment
+
+                const position = filePosition
+                const promise = async () => {
+                    const file = files.at(fileIndex)
+                    const { assetId } = await this.storageService.upload({
+                        rootFile: file,
+                    })
+                    resource.attachments.push({
+                        resourceId,
+                        position,
+                        name: file.originalname,
+                        fileId: assetId,
+                    } as ResourceAttachmentMySqlEntity)
+                }
+                filePosition++
+                promises.push(promise())
             }
-            promises.push(promise())
+            await Promise.all(promises)
         }
-        await Promise.all(promises)
+        console.log(resource.attachments)
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
 
-        await this.resourceAttachmentMySqlRepository.save(resources)
-        return {
-            message: "Attachment added sucessfully",
+        try {
+            const deletedResourceAttachments = await this.resourceAttachmentMySqlRepository.findBy({
+                resourceId,
+            })
+            await this.resourceAttachmentMySqlRepository.delete({ resourceId })
+            await this.resourceMySqlRepository.save(resource)
+
+            await queryRunner.commitTransaction()
+
+            const fileIds = deletedResourceAttachments.map(
+                (deletedResourceAttachments) => deletedResourceAttachments.fileId,
+            )
+
+            await this.storageService.delete(...fileIds)
+
+            return {
+                message: "Resource updated sucessfully",
+            }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
         }
+
+        
     }
 
     async updateSection(input: UpdateSectionInput): Promise<UpdateSectionOuput> {

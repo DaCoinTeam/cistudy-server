@@ -113,7 +113,7 @@ export const createCategorySchema: SchemaObject = {
     }
 }
 
-export const CreateResourceAttachmentsSchema: SchemaObject = {
+export const UpdateResourceSchema: SchemaObject = {
     type: "object",
     properties: {
         data: {
@@ -121,6 +121,20 @@ export const CreateResourceAttachmentsSchema: SchemaObject = {
             properties: {
                 resourceId: {
                     type: "string",
+                },
+                description: {
+                    type: "string",
+                },
+                resourceAttachments: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            fileIndex: {
+                                type: "number",
+                            },
+                        }
+                    }
                 },
             },
         },

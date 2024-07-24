@@ -113,6 +113,7 @@ type QuizEntity {
 
 type ResourceAttachmentEntity {
   resourceAttachmentId: ID!
+  position: Int!
   resourceId: ID!
   name: String!
   fileId: String!

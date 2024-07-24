@@ -32,7 +32,7 @@ export class ResourceEntity {
         updatedAt: Date
 
     @Field(() => [ResourceAttachmentEntity], { nullable: true })
-    @OneToMany(() => ResourceAttachmentEntity, (resourceAttachment) => resourceAttachment.resource, { nullable: true })
+    @OneToMany(() => ResourceAttachmentEntity, (resourceAttachment) => resourceAttachment.resource, { cascade: true, nullable: true })
         attachments: Array<ResourceAttachmentEntity>
 
     @Field(() => SectionContentEntity)

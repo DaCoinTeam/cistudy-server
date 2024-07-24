@@ -7,7 +7,7 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn
 } from "typeorm"
-import { Field, ID, ObjectType } from "@nestjs/graphql"
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { ResourceEntity } from "./resource.entity"
 
 @ObjectType()
@@ -17,6 +17,10 @@ export class ResourceAttachmentEntity {
     @PrimaryGeneratedColumn("uuid")
         resourceAttachmentId: string
 
+    @Field(() => Int)
+    @Column({ type: "int", default: 0 })
+        position: number
+        
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
         resourceId: string

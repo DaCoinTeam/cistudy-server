@@ -175,17 +175,26 @@ export class CreateSectionInput implements AuthInput<CreateSectionInputData> {
   data: CreateSectionInputData
 }
 //
-export class CreateResourceAttachmentsInputData {
+export class ResourceAttachmentInputData {
+    @ApiProperty()
+        fileIndex: number
+}
+
+export class UpdateResourceInputData {
     @IsUUID("4")
     @ApiProperty()
         resourceId: string
+    @ApiProperty()
+        description: string
+    @ApiProperty()
+        resourceAttachments?: Array<ResourceAttachmentInputData>
 }
-export class CreateResourceAttachmentsInput
-implements AuthInput<CreateResourceAttachmentsInputData>
+export class UpdateResourceInput
+implements AuthInput<UpdateResourceInputData>
 {
     @IsUUID("4")
         accountId: string
-    data: CreateResourceAttachmentsInputData
+    data: UpdateResourceInputData
     files: Express.Multer.File[]
 
 }
@@ -474,7 +483,7 @@ export class UpdateQuizQuestionInputData {
 
   @ApiProperty({ nullable: true })
       question?: string
-      
+
   @ApiProperty()
       position: number
 
