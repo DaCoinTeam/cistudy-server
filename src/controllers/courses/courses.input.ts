@@ -184,11 +184,12 @@ export class UpdateResourceInputData {
     @IsUUID("4")
     @ApiProperty()
         resourceId: string
-    @ApiProperty()
-        description: string
-    @ApiProperty()
+    @ApiProperty({ nullable: true})
+        description?: string
+    @ApiProperty({ nullable: true})
         resourceAttachments?: Array<ResourceAttachmentInputData>
 }
+
 export class UpdateResourceInput
 implements AuthInput<UpdateResourceInputData>
 {

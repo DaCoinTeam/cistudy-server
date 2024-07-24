@@ -838,7 +838,7 @@ export class CoursesService {
             }
             await Promise.all(promises)
         }
-        console.log(resource.attachments)
+
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
@@ -849,15 +849,15 @@ export class CoursesService {
             resourceId,
         })
             await this.resourceAttachmentMySqlRepository.delete({ resourceId })
-            await this.resourceMySqlRepository.save(resource)
-
-            await queryRunner.commitTransaction()
-
+            
             const fileIds = deletedResourceAttachments.map(
                 (deletedResourceAttachments) => deletedResourceAttachments.fileId,
             )
-
             await this.storageService.delete(...fileIds)
+
+            await this.resourceMySqlRepository.save(resource)
+
+            await queryRunner.commitTransaction()
 
             return {
                 message: "Resource updated sucessfully",
