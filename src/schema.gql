@@ -73,6 +73,7 @@ type QuizAttemptAnswerEntity {
 type QuizQuestionAnswerEntity {
   quizQuestionAnswerId: ID!
   quizQuestionId: ID!
+  position: Int!
   content: String!
   isCorrect: Boolean!
   quizQuestion: [QuizQuestionEntity!]!

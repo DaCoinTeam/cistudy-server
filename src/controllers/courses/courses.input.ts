@@ -405,6 +405,9 @@ implements AuthInput<CreateCertificateInputData>
 
 export class QuizQuestionAnswerInputData {
   @ApiProperty()
+      position: number
+
+  @ApiProperty()
       content: string
 
   @ApiProperty()
@@ -421,6 +424,9 @@ export class QuizQuestionInputData {
 
   @ApiProperty()
       answers: Array<QuizQuestionAnswerInputData>
+
+  @ApiProperty()
+      position: number
 
 }
 
@@ -456,6 +462,9 @@ export class UpdateQuizQuestionAnswerInputData {
 
   @ApiProperty()
       isCorrect?: boolean
+
+  @ApiProperty()
+      position: number
 }
 
 export class UpdateQuizQuestionInputData {
@@ -465,6 +474,9 @@ export class UpdateQuizQuestionInputData {
 
   @ApiProperty({ nullable: true })
       question?: string
+      
+  @ApiProperty()
+      position: number
 
   @ApiProperty({ nullable: true })
   @Min(10)

@@ -185,6 +185,9 @@ export const createQuizSchema: SchemaObject = {
                             question: {
                                 type: "string",
                             },
+                            position:{
+                                type: "number",
+                            },
                             point:{
                                 type: "number",
                                 minimum: 10
@@ -194,6 +197,9 @@ export const createQuizSchema: SchemaObject = {
                                 items: {
                                     type: "object",
                                     properties: {
+                                        position:{
+                                            type: "number",
+                                        },
                                         content: {
                                             type: "string",
                                         },
@@ -202,18 +208,6 @@ export const createQuizSchema: SchemaObject = {
                                         }
                                     }
                                 }
-                            },
-                            questionMedias: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        mediaIndex: {
-                                            type: "number",
-                                        },
-                                    }
-                                }
-
                             },
                         }
                     }
@@ -244,6 +238,9 @@ export const updateQuizSchema: SchemaObject = {
                             question: {
                                 type: "string",
                             },
+                            position:{
+                                type: "number",
+                            },
                             point: {
                                 type: "number",
                                 minimum: 10,
@@ -253,6 +250,9 @@ export const updateQuizSchema: SchemaObject = {
                                 items: {
                                     type: "object",
                                     properties: {
+                                        position:{
+                                            type: "number",
+                                        },
                                         content: {
                                             type: "string",
                                         },
@@ -276,6 +276,9 @@ export const updateQuizSchema: SchemaObject = {
                             question: {
                                 type: "string",
                             },
+                            position:{
+                                type: "number",
+                            },
                             point:{
                                 type: "number",
                                 minimum: 10
@@ -287,6 +290,9 @@ export const updateQuizSchema: SchemaObject = {
                                     properties: {
                                         quizQuestionAnswerId: {
                                             type: "string",
+                                        },
+                                        position:{
+                                            type: "number",
                                         },
                                         content: {
                                             type: "string",
@@ -302,6 +308,9 @@ export const updateQuizSchema: SchemaObject = {
                                 items: {
                                     type: "object",
                                     properties: {
+                                        position:{
+                                            type: "number",
+                                        },
                                         content: {
                                             type: "string",
                                         },
@@ -315,11 +324,6 @@ export const updateQuizSchema: SchemaObject = {
                                 type: "array",
                                 items: {
                                     type: "string",
-                                    properties: {
-                                        quizQuestionAnswerId: {
-                                            type: "string",
-                                        }
-                                    }
                                 }
                             }
                         }
