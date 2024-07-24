@@ -53,40 +53,40 @@ import {
 @Injectable()
 export class CoursesService {
     constructor(
-    @InjectRepository(CourseMySqlEntity)
-    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-    @InjectRepository(SectionContentMySqlEntity)
-    private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
-    @InjectRepository(LessonMySqlEntity)
-    private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
-    @InjectRepository(ResourceMySqlEntity)
-    private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
-    @InjectRepository(ResourceAttachmentMySqlEntity)
-    private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
-    @InjectRepository(CourseTargetMySqlEntity)
-    private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
-    @InjectRepository(CategoryMySqlEntity)
-    private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
-    @InjectRepository(CourseReviewMySqlEntity)
-    private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
-    @InjectRepository(EnrolledInfoMySqlEntity)
-    private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
-    @InjectRepository(QuizAttemptMySqlEntity)
-    private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
-    @InjectRepository(CourseCategoryMySqlEntity)
-    private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
-    @InjectRepository(QuizQuestionMySqlEntity)
-    private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
-    @InjectRepository(ReportCourseMySqlEntity)
-    private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
-    @InjectRepository(QuizMySqlEntity)
-    private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
-    @InjectRepository(ProgressMySqlEntity)
-    private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
-    @InjectRepository(FollowMySqlEnitity)
-    private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
-    private readonly dataSource: DataSource,
-    ) {}
+        @InjectRepository(CourseMySqlEntity)
+        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(SectionContentMySqlEntity)
+        private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
+        @InjectRepository(LessonMySqlEntity)
+        private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
+        @InjectRepository(ResourceMySqlEntity)
+        private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+        @InjectRepository(ResourceAttachmentMySqlEntity)
+        private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
+        @InjectRepository(CourseTargetMySqlEntity)
+        private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+        @InjectRepository(CategoryMySqlEntity)
+        private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
+        @InjectRepository(CourseReviewMySqlEntity)
+        private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
+        @InjectRepository(EnrolledInfoMySqlEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
+        @InjectRepository(QuizAttemptMySqlEntity)
+        private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
+        @InjectRepository(CourseCategoryMySqlEntity)
+        private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
+        @InjectRepository(QuizQuestionMySqlEntity)
+        private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
+        @InjectRepository(ReportCourseMySqlEntity)
+        private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
+        @InjectRepository(QuizMySqlEntity)
+        private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+        @InjectRepository(ProgressMySqlEntity)
+        private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
+        @InjectRepository(FollowMySqlEnitity)
+        private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
+        private readonly dataSource: DataSource,
+    ) { }
 
     async findManyCourseReviews(
         input: FindManyCourseReviewsInput,
@@ -208,15 +208,6 @@ export class CoursesService {
                 .andWhere("courseId = :courseId", { courseId })
                 .getRawOne()
 
-            const courseReviews = await this.courseReviewMySqlRepository.findBy({
-                courseId,
-            })
-
-            const ratingCounts = [1, 2, 3, 4, 5].map(
-                (star) =>
-                    courseReviews.filter((review) => review.rating === star).length,
-            )
-
             await queryRunner.commitTransaction()
 
             course.creator.numberOfFollowers = numberOfFollowersResult.count
@@ -225,23 +216,49 @@ export class CoursesService {
             course.enrolled = enrolledInfo ? true : false
             course.isReviewed = isReviewed ? true : false
 
-            const totalRating = courseReviews.reduce(
-                (sum, review) => sum + review.rating,
-                0,
-            )
-            const overallCourseRating = courseReviews.length
-                ? totalRating / courseReviews.length
-                : 0
+            const courseReviews = await this.courseReviewMySqlRepository.findBy({
+                courseId,
+            })
 
-            course.courseRatings = {
-                overallCourseRating,
-                totalNumberOfRatings: courseReviews.length,
-                numberOf1StarRatings: ratingCounts[0],
-                numberOf2StarRatings: ratingCounts[1],
-                numberOf3StarRatings: ratingCounts[2],
-                numberOf4StarRatings: ratingCounts[3],
-                numberOf5StarRatings: ratingCounts[4],
+            const countWithNumStars = (numStars: number) => {
+                let count = 0
+                for (const { rating } of courseReviews) {
+                    if (rating === numStars) {
+                        count++
+                    }
+                }
+
+                return count
             }
+
+            const numberOf1StarRatings = countWithNumStars(1)
+            const numberOf2StarRatings = countWithNumStars(2)
+            const numberOf3StarRatings = countWithNumStars(3)
+            const numberOf4StarRatings = countWithNumStars(4)
+            const numberOf5StarRatings = countWithNumStars(5)
+            const totalNumberOfRatings = courseReviews.length
+
+            const totalNumStars = () => {
+                let total = 0
+                for (let index = 1; index <= 5; index++) {
+                    total += countWithNumStars(index) * index
+                }
+                return total
+            }
+
+            const overallCourseRating = totalNumStars() / totalNumberOfRatings
+
+            const courseRatings: CourseRating = {
+                numberOf1StarRatings,
+                numberOf2StarRatings,
+                numberOf3StarRatings,
+                numberOf4StarRatings,
+                numberOf5StarRatings,
+                overallCourseRating,
+                totalNumberOfRatings
+            }
+
+            course.courseRatings = courseRatings
             course.isCreator = accountId ? accountId === course.creatorId : false
 
             const numberOfLessons = await this.lessonMySqlRepository.count({
@@ -270,7 +287,7 @@ export class CoursesService {
 
             const numberOfResources = await this.resourceAttachmentMySqlRepository.count({
                 where: {
-                    resource:{
+                    resource: {
                         sectionContent: {
                             section: {
                                 course: {
@@ -278,7 +295,7 @@ export class CoursesService {
                                 },
                             },
                         },
-                    } 
+                    }
                 },
             })
             course.numberOfLessons = numberOfLessons
@@ -364,15 +381,6 @@ export class CoursesService {
                 .andWhere("courseId = :courseId", { courseId })
                 .getRawOne()
 
-            const courseReviews = await this.courseReviewMySqlRepository.findBy({
-                courseId,
-            })
-
-            const ratingCounts = [1, 2, 3, 4, 5].map(
-                (star) =>
-                    courseReviews.filter((review) => review.rating === star).length,
-            )
-
             await queryRunner.commitTransaction()
 
             course.creator.numberOfFollowers = numberOfFollowersResult.count
@@ -381,23 +389,49 @@ export class CoursesService {
             course.enrolled = enrolledInfo ? true : false
             course.isReviewed = isReviewed ? true : false
 
-            const totalRating = courseReviews.reduce(
-                (sum, review) => sum + review.rating,
-                0,
-            )
-            const overallCourseRating = courseReviews.length
-                ? totalRating / courseReviews.length
-                : 0
+            const courseReviews = await this.courseReviewMySqlRepository.findBy({
+                courseId,
+            })
 
-            course.courseRatings = {
-                overallCourseRating,
-                totalNumberOfRatings: courseReviews.length,
-                numberOf1StarRatings: ratingCounts[0],
-                numberOf2StarRatings: ratingCounts[1],
-                numberOf3StarRatings: ratingCounts[2],
-                numberOf4StarRatings: ratingCounts[3],
-                numberOf5StarRatings: ratingCounts[4],
+            const countWithNumStars = (numStars: number) => {
+                let count = 0
+                for (const { rating } of courseReviews) {
+                    if (rating === numStars) {
+                        count++
+                    }
+                }
+
+                return count
             }
+
+            const numberOf1StarRatings = countWithNumStars(1)
+            const numberOf2StarRatings = countWithNumStars(2)
+            const numberOf3StarRatings = countWithNumStars(3)
+            const numberOf4StarRatings = countWithNumStars(4)
+            const numberOf5StarRatings = countWithNumStars(5)
+            const totalNumberOfRatings = courseReviews.length
+
+            const totalNumStars = () => {
+                let total = 0
+                for (let index = 1; index <= 5; index++) {
+                    total += countWithNumStars(index) * index
+                }
+                return total
+            }
+
+            const overallCourseRating = totalNumStars() / totalNumberOfRatings
+
+            const courseRatings: CourseRating = {
+                numberOf1StarRatings,
+                numberOf2StarRatings,
+                numberOf3StarRatings,
+                numberOf4StarRatings,
+                numberOf5StarRatings,
+                overallCourseRating,
+                totalNumberOfRatings
+            }
+
+            course.courseRatings = courseRatings
             course.isCreator = accountId ? accountId === course.creatorId : false
 
             const numberOfLessons = await this.lessonMySqlRepository.count({
@@ -479,7 +513,7 @@ export class CoursesService {
             })
 
             if (categoryIds?.length) {
-                results = results.filter(({courseCategories}) => {
+                results = results.filter(({ courseCategories }) => {
                     let found = false
                     for (const { categoryId } of courseCategories) {
                         if (categoryIds.includes(categoryId)) {
@@ -487,13 +521,13 @@ export class CoursesService {
                         }
                     }
                     return found
-                })    
+                })
             }
 
             const count = results.length
 
             results = results.slice(skip, skip + take)
-            
+
             for (const course of results) {
                 const courseReviews = await this.courseReviewMySqlRepository.find({
                     where: {
@@ -502,7 +536,7 @@ export class CoursesService {
                 })
                 const countWithNumStars = (numStars: number) => {
                     let count = 0
-                    for (const {rating} of courseReviews) {
+                    for (const { rating } of courseReviews) {
                         if (rating === numStars) {
                             count++
                         }
@@ -524,11 +558,11 @@ export class CoursesService {
                         total += countWithNumStars(index) * index
                     }
                     return total
-                } 
+                }
 
                 const overallCourseRating = totalNumStars() / totalNumberOfRatings
 
-                const courseRatings : CourseRating = {
+                const courseRatings: CourseRating = {
                     numberOf1StarRatings,
                     numberOf2StarRatings,
                     numberOf3StarRatings,
@@ -563,7 +597,7 @@ export class CoursesService {
             await queryRunner.release()
         }
     }
- 
+
     async findOneSectionContent(
         input: FindOneSectionContentInput,
     ): Promise<SectionContentMySqlEntity> {
@@ -585,7 +619,7 @@ export class CoursesService {
             const sectionContent = await this.sectionContentMySqlRepository.findOne({
                 where: { sectionContentId },
                 relations: {
-                    accountProgresses:true,
+                    accountProgresses: true,
                     quiz: {
                         questions: {
                             answers: true,
@@ -612,15 +646,17 @@ export class CoursesService {
                 },
             })
 
-            let progress = sectionContent.accountProgresses.find((progress) => enrolledInfoId === progress.enrolledInfoId && 
+            let progress = sectionContent.accountProgresses.find((progress) => enrolledInfoId === progress.enrolledInfoId &&
                 sectionContent.sectionContentId === progress.sectionContentId
             )
+
             if (!progress) {
                 progress = await this.progressMySqlRepository.save({
                     sectionContentId: sectionContent.sectionContentId,
                     enrolledInfoId
                 })
             }
+
             sectionContent.completeState = progress.completeState
 
             const creatorFollow = await this.followMySqlRepository.find({
@@ -649,22 +685,21 @@ export class CoursesService {
                         sectionContent.quiz.totalNumberOfAttempts = finishedAttempts.length
                         sectionContent.quiz.highestScoreRecorded = finishedAttempts[0].score
 
-                        const latestAttempt = finishedAttempts.reduce((latest, current) => {
-                            return new Date(latest.createdAt) > new Date(current.createdAt)
-                                ? latest
-                                : current
-                        })
-                        sectionContent.quiz.lastAttemptScore = latestAttempt.score
+                        const latestAttempt = finishedAttempts.sort((prev, next) => prev.createdAt.getTime() - next.createdAt.getTime())
 
-                        const milliseconds = latestAttempt.timeTaken
-                        const hours = Math.floor(milliseconds / (1000 * 60 * 60))
-                        const minutes = Math.floor(
-                            (milliseconds % (1000 * 60 * 60)) / (1000 * 60),
-                        )
-                        const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000)
+                        sectionContent.quiz.lastAttemptScore = latestAttempt[0].score
+                        const milliseconds = latestAttempt[0].timeTaken
 
-                        const lastAttemptTimeTaken = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+                        const millisecondsToTime = (milliseconds: number) => {
+                            const hours = Math.floor(milliseconds / (1000 * 60 * 60))
+                            const minutes = Math.floor(
+                                (milliseconds % (1000 * 60 * 60)) / (1000 * 60),
+                            )
+                            const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000)
+                            return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}` 
+                        }
 
+                        const lastAttemptTimeTaken = millisecondsToTime(milliseconds)
                         sectionContent.quiz.lastAttemptTimeTaken = lastAttemptTimeTaken
                         sectionContent.quiz.isPassed = (finishedAttempts[0].score >= passingScore)
                     }
@@ -674,10 +709,10 @@ export class CoursesService {
             sectionContent.section.course.creator.numberOfFollowers = creatorFollow.length
 
             sectionContent.section.course.creator.followed = creatorFollow.some(followed => followed.followerId === accountId)
-            
+
             for (const section of sectionContent.section.course.sections) {
                 for (const content of section.contents) {
-                    let progress = content.accountProgresses.find((progress) => enrolledInfoId === progress.enrolledInfoId && 
+                    let progress = content.accountProgresses.find((progress) => enrolledInfoId === progress.enrolledInfoId &&
                         content.sectionContentId === progress.sectionContentId
                     )
                     if (!progress) {
@@ -696,10 +731,9 @@ export class CoursesService {
 
             if (sections.length > 1) {
                 for (let i = 1; i < sections.length; i++) {
-                    //const isLocked = LockState.Locked
                     let allCompleted = true
                     let hasCompletedOrFailed = false
-            
+
                     for (const content of sections[i - 1].contents) {
                         if (content.completeState === CompleteState.Completed || content.completeState === CompleteState.Failed) {
                             hasCompletedOrFailed = true
@@ -708,7 +742,7 @@ export class CoursesService {
                             allCompleted = false
                         }
                     }
-            
+
                     if (allCompleted) {
                         sections[i].lockState = LockState.Completed
                     } else if (hasCompletedOrFailed) {
@@ -718,7 +752,6 @@ export class CoursesService {
                     }
                 }
             }
-            
 
             sectionContent.section.course.sections = sections
 

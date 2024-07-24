@@ -1730,8 +1730,7 @@ export class CoursesService {
 
             questionsWithCorrectAnswers.forEach((question) => {
                 const correctAnswerCount = question.correctAnswers.length
-                const accountAnswerCount =
-                    questionAnswerCountMap[question.quizQuestionId] || 0
+                const accountAnswerCount = questionAnswerCountMap[question.quizQuestionId] || 0
                 maxPoints += Number(question.point)
                 if (accountAnswerCount === correctAnswerCount) {
                     totalPoints += Number(question.point)
