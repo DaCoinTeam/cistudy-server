@@ -73,6 +73,7 @@ import {
     computeRaw,
     existKeyNotUndefined,
     SectionContentType,
+    CompleteState,
 } from "@common"
 import {
     CreateCategoryOutput,
@@ -1543,7 +1544,7 @@ export class CoursesService {
 
             await this.progressMySqlRepository.update(
                 { sectionContentId },
-                { isCompleted: true },
+                { completeState: CompleteState.Completed },
             )
             
             await queryRunner.commitTransaction()

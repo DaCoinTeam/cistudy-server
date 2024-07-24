@@ -44,8 +44,7 @@ type SectionEntity {
   course: CourseEntity!
   contents: [SectionContentEntity!]
   accountGrade: [AccountGradeEntity!]
-  isCompleted: Boolean!
-  unlocked: Boolean
+  lockState: String!
 }
 
 type QuizAttemptEntity {
@@ -157,14 +156,14 @@ type SectionContentEntity {
   quiz: QuizEntity
   resource: ResourceEntity
   accountProgresses: [ProgressEntity!]
-  isCompleted: Boolean!
+  completeState: String!
 }
 
 type ProgressEntity {
   progressId: ID!
   enrolledInfoId: ID!
   sectionContentId: ID!
-  isCompleted: Boolean!
+  completeState: String!
   content: SectionContentEntity!
   enrolledInfo: EnrolledInfoEntity!
 }

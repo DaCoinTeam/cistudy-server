@@ -85,7 +85,7 @@ export class SectionContentEntity {
         accountProgresses? : Array<ProgressEntity>
 
     //graphqh
-    @Field(() => CompleteState)
+    @Field(() => String, {defaultValue: CompleteState.Undone})
         completeState?: CompleteState
 
 }

@@ -11,6 +11,7 @@ import {
 
 import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { SectionContentEntity } from "./section_content.entity"
+import { CompleteState } from "@common"
 
 @ObjectType()
 @Entity("progress")
@@ -28,9 +29,9 @@ export class ProgressEntity {
     @Column({ type: "uuid", length: 36 })
         sectionContentId: string
 
-    @Field(() => Boolean, { defaultValue: false })
-    @Column({ type: "boolean", default: false })
-        isCompleted: boolean
+    @Field(() => String)
+    @Column({ type: "enum", enum: CompleteState, default: CompleteState.Undone })
+        completeState: CompleteState
 
     @Field(() => SectionContentEntity)
     @ManyToOne(() => SectionContentEntity, (content) => content.accountProgresses, {onDelete: "CASCADE"} )

@@ -128,26 +128,6 @@ export enum SectionContentType {
   Resource = "resource",
 }
 
-registerEnumType(SectionContentType, {
-    name: "SectionContentType",
-})
-
-export enum LockState {
-  Completed = "completed",
-  InProgress = "inProgress",
-  Locked = "locked",
-}
-
-registerEnumType(LockState, {
-    name: "LockState",
-})
-
-export enum CompleteState {
-  Completed = "completed",
-  Failed = "failed",
-  Undone = "undone",
-}
-
-registerEnumType(CompleteState, {
-    name: "CompleteState",
+registerEnumType(SectionContentType,{
+    name: "SectionContentType"
 })
