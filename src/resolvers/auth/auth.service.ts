@@ -116,7 +116,8 @@ export class AuthService {
                     courseTargets: true
                 }
             })
-            totalNumberOfAvailableCourses.forEach(async (course)=> {
+            
+            for(const course of totalNumberOfAvailableCourses) {
                 const courseReviews = await this.courseReviewMySqlRepository.find({
                     where: {
                         courseId: course.courseId
@@ -161,7 +162,7 @@ export class AuthService {
                 }
 
                 course.courseRatings = courseRatings
-            })
+            }
 
             const highRatedCourses = totalNumberOfAvailableCourses
                 .filter(course => course.courseRatings.overallCourseRating >= 4)

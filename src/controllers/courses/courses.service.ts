@@ -219,8 +219,6 @@ export class CoursesService {
                 )
             }
 
-
-
             const price = computeRaw(enableDiscount ? discountPrice : coursePrice)
             const minimumBalanceRequired = computeDenomination(price)
             const courseCreatorShares = computeDenomination(price / BigInt(2))
