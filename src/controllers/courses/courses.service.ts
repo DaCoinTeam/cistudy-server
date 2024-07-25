@@ -343,7 +343,7 @@ export class CoursesService {
             const promise = async () => {
                 const file = files.at(previewVideoIndex)
                 if (previewVideoId) {
-                    await this.storageService.update(thumbnailId, {
+                    await this.storageService.update(previewVideoId, {
                         rootFile: file,
                     })
                 } else {
