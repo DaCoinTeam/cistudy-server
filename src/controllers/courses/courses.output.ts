@@ -215,3 +215,7 @@ export class ResolveCourseReportOutput implements Output {
 export class UpdateResourceOutput implements Output {
     message: string
 }
+
+export class CreateQuestionOutput implements Output {
+    message: string
+}

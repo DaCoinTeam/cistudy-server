@@ -666,3 +666,17 @@ export class ResolveCourseReportInput implements AuthInput<ResolveCourseReportIn
     accountId: string
     data: ResolveCourseReportInputData
 }
+
+export class CreateQuestionInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        quizId: string
+}
+
+export class CreateQuestionInput
+implements AuthInput<CreateQuestionInputData>
+{
+    @IsUUID("4")
+        accountId: string
+    data: CreateQuestionInputData
+}

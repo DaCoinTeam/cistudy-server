@@ -60,6 +60,7 @@ import {
     DeleteSectionContentInput,
     MarkContentAsCompletedInput,
     UpdateResourceInput,
+    CreateQuestionInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -83,6 +84,7 @@ import {
     CreateCourseReportOutput,
     CreateCourseReviewOutput,
     CreateCourseTargetOuput,
+    CreateQuestionOutput,
     CreateQuizAttemptOutput,
     CreateQuizOutput,
     CreateSectionContentOutput,
@@ -1966,7 +1968,17 @@ export class CoursesService {
         }
     }
 
-    // async updateLessonVideoView(input : UpdateLessonVideoViewInput) : Promise<void> {
+    async createQuestion(input: CreateQuestionInput): Promise<CreateQuestionOutput> {
+        const { data } = input
+        const { quizId } = data
+        await this.quizQuestionMySqlRepository.save({
+            quizId,
+            point: 10,
+            question: "How does climate change affect biodiversity in marine ecosystems?"
+        })
+        return {
+            message: "Create question succesfully",
+        }
+    }
 
-    // }
 }
