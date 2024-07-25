@@ -763,17 +763,17 @@ type FindManyAccountReportsOutput {
   tokens: AuthTokens
 }
 
-type FindManyUnverifiedCourseOutputMetadata {
+type FindManyPendingCourseOutputMetadata {
   count: Int
 }
 
-type FindManyUnverifiedCourseOutputData {
+type FindManyPendingCourseOutputData {
   results: [CourseEntity!]!
-  metadata: FindManyUnverifiedCourseOutputMetadata!
+  metadata: FindManyPendingCourseOutputMetadata!
 }
 
-type FindManyUnverifiedCourseOutput {
-  data: FindManyUnverifiedCourseOutputData!
+type FindManyPendingCourseOutput {
+  data: FindManyPendingCourseOutputData!
   tokens: AuthTokens
 }
 
@@ -897,7 +897,7 @@ type Query {
   findManyAccounts(data: FindManyAccountsInputData!): FindManyAccountsOutput!
   findManyAccountReviews(data: FindManyAccountReviewsInputData!): FindManyAccountReviewsOutputData!
   findManyAccountReports(data: FindManyAccountReportsInputData!): FindManyAccountReportsOutput!
-  findManyUnverifiedCourses(data: FindManyUnverifiedCourseInputData!): FindManyUnverifiedCourseOutput!
+  findManyPendingCourses(data: FindManyPendingCourseInputData!): FindManyPendingCourseOutput!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
@@ -1173,11 +1173,11 @@ input FindManyAccountReportsInputOptions {
   skip: Int
 }
 
-input FindManyUnverifiedCourseInputData {
-  options: FindManyUnverifiedCourseInputOptions
+input FindManyPendingCourseInputData {
+  options: FindManyPendingCourseInputOptions
 }
 
-input FindManyUnverifiedCourseInputOptions {
+input FindManyPendingCourseInputOptions {
   take: Int
   skip: Int
 }
