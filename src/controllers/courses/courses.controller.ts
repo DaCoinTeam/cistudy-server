@@ -50,7 +50,8 @@ import {
     CreateQuizQuestionInputData,
     CreateQuizQuestionAnswerInputData,
     UpdateQuizQuestionInputData,
-    UpdateQuizQuestionAnswerInputData
+    UpdateQuizQuestionAnswerInputData,
+    PublishCourseInputData
 } from "./courses.input"
 
 import {
@@ -86,6 +87,20 @@ export class CoursesController {
         })
     }
 
+    @ApiBearerAuth()
+    @Patch("publish-course")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async publishCourse(
+        @AccountId() accountId: string,
+        @Body() data : PublishCourseInputData
+    ) {
+        return await this.coursesService.publishCourse({
+            accountId,
+            data
+        })
+    }
     // trang trí để cho swagger biết đây là api cần auth
     @ApiBearerAuth()
     @Patch("enroll-course")

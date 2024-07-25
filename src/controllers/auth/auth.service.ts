@@ -53,7 +53,7 @@ export class AuthService {
         await this.mailerService.sendVerifyRegistrationMail(created.accountId, data.email, created.username)
         return {
             data: {
-                message: "Your accoutn has been created successfully, please check your email to confirm registration"
+                message: "Your account has been created successfully, please check your email to confirm registration"
             }
         }
     }
