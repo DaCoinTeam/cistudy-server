@@ -558,7 +558,7 @@ export class CoursesController {
     @ApiBearerAuth()
     @Post("create-question")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User, SystemRoles.Instructor)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async createQuestion(
         @AccountId() accountId: string,
