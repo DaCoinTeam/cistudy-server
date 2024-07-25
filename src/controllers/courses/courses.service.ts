@@ -1504,6 +1504,7 @@ export class CoursesService {
         })
 
         await this.quizQuestionMySqlRepository.save({
+            quizId,
             question: "Untitled",
             position: questions[0].position + 1,
         })
