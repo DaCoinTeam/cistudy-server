@@ -526,7 +526,6 @@ export class CoursesService {
             courseId,
             title,
             position: maxSectionPosition ? maxSectionPosition.count + 1 : 0,
-            isLocked: maxSectionPosition === 0 ? false : true,
         })
 
         return {
