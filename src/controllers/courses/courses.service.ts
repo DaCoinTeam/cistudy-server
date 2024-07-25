@@ -1486,7 +1486,7 @@ export class CoursesService {
 
     async createQuizQuestion (input: CreateQuizQuestionInput): Promise<CreateQuizQuestionOutput> {
         const { data } = input
-        const { quizId, position } = data
+        const { quizId } = data
 
         const quiz = await this.quizMySqlRepository.findOneBy({ quizId })
 
@@ -1494,9 +1494,18 @@ export class CoursesService {
             throw new NotFoundException("Quiz Not Found.")
         }
 
+        const questions = await this.quizQuestionMySqlRepository.find({
+            where:{
+                quizId
+            },
+            order:{
+                position: "DESC"
+            }
+        })
+
         await this.quizQuestionMySqlRepository.save({
             question: "Untitled",
-            position,
+            position: questions[0].position + 1,
         })
 
         return {
@@ -1546,19 +1555,28 @@ export class CoursesService {
 
     async createQuizQuestionAnswer (input: CreateQuizQuestionAnswerInput): Promise<CreateQuizQuestionAnswerOutput> {
         const { data } = input
-        const { quizQuestionId, position } = data
+        const { quizQuestionId } = data
 
         const question = await this.quizQuestionMySqlRepository.findOneBy({quizQuestionId})
 
         if(!question){
             throw new NotFoundException("Question not found")
         }
+
+        const answers = await this.quizQuestionAnswerMySqlRepository.find({
+            where:{
+                quizQuestionId
+            },
+            order:{
+                position: "DESC"
+            }
+        })
+
         await this.quizQuestionAnswerMySqlRepository.save({
             content: "Untitled",
             quizQuestionId,
-            position
+            position: answers[0].position + 1
         })
-
         return {
             message: "Answer to quiz has been created successfully.",
         }

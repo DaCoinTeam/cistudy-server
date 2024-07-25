@@ -79,23 +79,23 @@ export class FindManyAccountReportsOutput implements AuthOutput<FindManyAccountR
 }
 
 @ObjectType()
-export class FindManyUnverifiedCourseOutputMetadata {
+export class FindManyPendingCourseOutputMetadata {
     @Field(() => Int, { nullable: true })
         count?: number
 }
 
 @ObjectType()
-export class FindManyUnverifiedCourseOutputData implements ResultsWithMetadata<CourseMySqlEntity, FindManyUnverifiedCourseOutputMetadata>{
+export class FindManyPendingCourseOutputData implements ResultsWithMetadata<CourseMySqlEntity, FindManyPendingCourseOutputMetadata>{
     @Field(() => [CourseMySqlEntity])
         results: Array<CourseMySqlEntity>
-    @Field(() => FindManyUnverifiedCourseOutputMetadata)
-        metadata?: FindManyUnverifiedCourseOutputMetadata
+    @Field(() => FindManyPendingCourseOutputMetadata)
+        metadata?: FindManyPendingCourseOutputMetadata
 }
 
 @ObjectType()
-export class FindManyUnverifiedCourseOutput implements AuthOutput<FindManyUnverifiedCourseOutputData> {
-    @Field(() => FindManyUnverifiedCourseOutputData)
-        data: FindManyUnverifiedCourseOutputData
+export class FindManyPendingCourseOutput implements AuthOutput<FindManyPendingCourseOutputData> {
+    @Field(() => FindManyPendingCourseOutputData)
+        data: FindManyPendingCourseOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }

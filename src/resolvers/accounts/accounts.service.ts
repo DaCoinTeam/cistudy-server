@@ -1,9 +1,9 @@
 import { FollowMySqlEnitity, AccountMySqlEntity, AccountReviewMySqlEntity, ReportAccountMySqlEntity, CourseMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { DataSource, Repository } from "typeorm"
-import { FindManyFollowersInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindOneAccountInput, FindManyAccountReportsInput, FindManyUnverifiedCourseInput } from "./accounts.input"
+import { FindManyFollowersInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindOneAccountInput, FindManyAccountReportsInput, FindManyPendingCourseInput } from "./accounts.input"
 import { InjectRepository } from "@nestjs/typeorm"
-import { FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyAccountReportsOutputData, FindManyUnverifiedCourseOutputData } from "./accounts.output"
+import { FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyAccountReportsOutputData, FindManyPendingCourseOutputData } from "./accounts.output"
 import { CourseVerifyStatus } from "@common"
 
 @Injectable()
@@ -202,7 +202,7 @@ export class AccountsService {
         }
     }
 
-    async findManyUnverifiedCourse(input: FindManyUnverifiedCourseInput): Promise<FindManyUnverifiedCourseOutputData> {
+    async findManyPendingCourse(input: FindManyPendingCourseInput): Promise<FindManyPendingCourseOutputData> {
         const { data } = input
         const { options } = data
         const { skip, take } = options

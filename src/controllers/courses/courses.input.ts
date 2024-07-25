@@ -659,9 +659,6 @@ implements AuthInput<CreateQuestionInputData>
 export class CreateQuizQuestionAnswerInputData {
     @ApiProperty()
         quizQuestionId: string
-  
-    @ApiProperty()
-        position?: number
 }
 
 export class CreateQuizQuestionAnswerInput implements AuthInput<CreateQuizQuestionAnswerInputData> {
@@ -687,8 +684,6 @@ export class DeleteQuizQuestionAnswerInput implements AuthInput<DeleteQuizQuesti
 export class CreateQuizQuestionInputData {
     @ApiProperty()
         quizId: string
-    @ApiProperty()
-        position: number
 }
 
 export class CreateQuizQuestionInput implements AuthInput<CreateQuizQuestionInputData> {
