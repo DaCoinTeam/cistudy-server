@@ -666,3 +666,22 @@ export class ResolveCourseReportInput implements AuthInput<ResolveCourseReportIn
     accountId: string
     data: ResolveCourseReportInputData
 }
+
+export class CreateQuizQuestionAnswerInputData {
+    @ApiProperty()
+        quizQuestionId: string
+        
+    @ApiProperty()
+        content?: string
+  
+    @ApiProperty()
+        isCorrect?: boolean
+  
+    @ApiProperty()
+        position: number
+}
+
+export class CreateQuizQuestionAnswerInput implements AuthInput<CreateQuizQuestionAnswerInputData> {
+    accountId: string
+    data: CreateQuizQuestionAnswerInputData
+}
