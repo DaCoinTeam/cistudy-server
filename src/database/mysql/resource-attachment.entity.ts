@@ -38,7 +38,7 @@ export class ResourceAttachmentEntity {
         updatedAt: Date
 
     @Field(() => ResourceEntity)
-    @ManyToOne(() => ResourceEntity, (resource) => resource.attachments, {onDelete: "CASCADE"})
+    @ManyToOne(() => ResourceEntity, (resource) => resource.attachments, { onDelete: "CASCADE" })
     @JoinColumn({ name: "resourceId" })
         resource: ResourceEntity
 

@@ -60,6 +60,7 @@ import {
     DeleteSectionContentInput,
     MarkContentAsCompletedInput,
     UpdateResourceInput,
+    CreateQuizQuestionAnswerInput,
     CreateQuestionInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
@@ -87,6 +88,7 @@ import {
     CreateQuestionOutput,
     CreateQuizAttemptOutput,
     CreateQuizOutput,
+    CreateQuizQuestionAnswerOutput,
     CreateSectionContentOutput,
     CreateSectionOutput,
     DeleteCategoryOutput,
@@ -1468,6 +1470,27 @@ export class CoursesService {
             throw ex
         } finally {
             await queryRunner.release()
+        }
+    }
+
+    async createQuizQuestionAnswer (input: CreateQuizQuestionAnswerInput): Promise<CreateQuizQuestionAnswerOutput> {
+        const { data } = input
+        const { quizQuestionId, content, isCorrect, position } = data
+
+        const question = await this.quizQuestionMySqlRepository.findOneBy({quizQuestionId})
+
+        if(!question){
+            throw new NotFoundException("Question not found")
+        }
+        await this.quizQuestionAnswerMySqlRepository.save({
+            content,
+            isCorrect,
+            quizQuestionId,
+            position
+        })
+
+        return {
+            message: "Answer to quiz has been created successfully.",
         }
     }
 
