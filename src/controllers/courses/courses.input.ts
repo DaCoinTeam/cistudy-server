@@ -176,11 +176,6 @@ export class CreateSectionInputData {
   @ApiProperty()
       title: string
 
-  @ApiProperty()
-      position: number
-
-  @ApiProperty({default: true})
-      isLocked : boolean
 }
 
 export class CreateSectionInput implements AuthInput<CreateSectionInputData> {

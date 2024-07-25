@@ -510,17 +510,23 @@ export class CoursesService {
 
     async createSection(input: CreateSectionInput): Promise<CreateSectionOutput> {
         const { data } = input
-        const { courseId, title, position, isLocked } = data
+        const { courseId, title } = data
 
         const course = await this.courseMySqlRepository.findOneBy({
             courseId,
         })
+
+        const maxSectionPosition = await this.sectionMySqlRepository
+            .createQueryBuilder()
+            .select("MAX(position)", "count")
+            .getRawOne()
+
         if (!course) throw new NotFoundException("Course not found.")
         const created = await this.sectionMySqlRepository.save({
             courseId,
             title,
-            position,
-            isLocked: position === 0 ? false : isLocked,
+            position: maxSectionPosition ? maxSectionPosition.count + 1 : 0,
+            isLocked: maxSectionPosition === 0 ? false : true,
         })
 
         return {
@@ -604,9 +610,9 @@ export class CoursesService {
         const { data } = input
         const { sectionContentId, title } = data
 
-        const content = await this.sectionContentMySqlRepository.findOneBy({sectionContentId})
-        
-        if(!content){
+        const content = await this.sectionContentMySqlRepository.findOneBy({ sectionContentId })
+
+        if (!content) {
             throw new NotFoundException("Section Content not found")
         }
 
@@ -1200,7 +1206,33 @@ export class CoursesService {
         const { data } = input
         const { quizId, passingScore, timeLimit } = data
 
-        await this.quizMySqlRepository.update(quizId, { passingScore, timeLimit })
+        const numberOfQuizQuestions = await this.quizQuestionMySqlRepository.find({
+            where: {
+                quizId
+            },
+            relations: {
+                answers: true
+            }
+        })
+
+        if (numberOfQuizQuestions && numberOfQuizQuestions.length < 2) {
+            throw new ConflictException("Please provide at least 2 questions for the quiz")
+        }
+
+        numberOfQuizQuestions.forEach(question => {
+            if (question.answers.length < 2) {
+                throw new ConflictException(`Question: ${question.question} must have at least 2 answers.`)
+            }
+
+            const hasCorrectAnswer = question.answers.some(answer => answer.isCorrect === true)
+            if (!hasCorrectAnswer) {
+                throw new ConflictException(`Question: ${question.question} must have at least 1 correct answer.`)
+            }
+        })
+
+        if (passingScore || timeLimit) {
+            await this.quizMySqlRepository.update(quizId, { passingScore, timeLimit })
+        }
 
         return {
             message: "Quiz Updated Successfully"
@@ -1303,7 +1335,7 @@ export class CoursesService {
             position: answers.length ? answers[0].position + 1 : 0
         })
         return {
-            message: "Answer to quiz has been created successfully.",
+            message: "Answer to question has been created successfully.",
         }
     }
 
