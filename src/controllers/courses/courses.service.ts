@@ -1506,7 +1506,7 @@ export class CoursesService {
         await this.quizQuestionMySqlRepository.save({
             quizId,
             question: "Untitled",
-            position: questions[0].position + 1,
+            position: questions ? questions[0].position + 1 : 0,
         })
 
         return {
@@ -1576,7 +1576,7 @@ export class CoursesService {
         await this.quizQuestionAnswerMySqlRepository.save({
             content: "Untitled",
             quizQuestionId,
-            position: answers[0].position + 1
+            position: answers ? answers[0].position + 1 : 0
         })
         return {
             message: "Answer to quiz has been created successfully.",
