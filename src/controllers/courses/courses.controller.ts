@@ -47,7 +47,10 @@ import {
     UpdateQuizInputData,
     UpdateSectionInputData,
     UpdateResourceInputData,
-    CreateQuizQuestionInputData
+    CreateQuizQuestionInputData,
+    CreateQuizQuestionAnswerInputData,
+    UpdateQuizQuestionInputData,
+    UpdateQuizQuestionAnswerInputData
 } from "./courses.input"
 
 import {
@@ -458,6 +461,96 @@ export class CoursesController {
         return await this.coursesService.updateQuiz({ accountId, data})
     }
 
+    @ApiBearerAuth()
+    @Post("create-quiz-question")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User,SystemRoles.Instructor)
+    @UseInterceptors(AuthInterceptor)
+    async createQuizQuestion(
+        @AccountId() accountId: string,
+        @Body() data: CreateQuizQuestionInputData,
+    ) {
+        return await this.coursesService.createQuizQuestion({
+            accountId,
+            data
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-quiz-question-answer")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Instructor)
+    @UseInterceptors(AuthInterceptor)
+    async createQuizQuestionAnswer(
+        @AccountId() accountId: string,
+        @Body() data: CreateQuizQuestionAnswerInputData,
+    ) {
+        return await this.coursesService.createQuizQuestionAnswer({
+            accountId,
+            data
+        })
+    }
+    //
+    @ApiBearerAuth()
+    @Patch("update-quiz-question")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User,SystemRoles.Instructor)
+    @UseInterceptors(AuthInterceptor)
+    async updateQuizQuestion(
+        @AccountId() accountId: string,
+        @Body() data: UpdateQuizQuestionInputData,
+    ) {
+        return await this.coursesService.updateQuizQuestion({
+            accountId,
+            data
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("update-quiz-question-answer")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User,SystemRoles.Instructor)
+    @UseInterceptors(AuthInterceptor)
+    async updateQuizQuestionAnswer(
+        @AccountId() accountId: string,
+        @Body() data: UpdateQuizQuestionAnswerInputData,
+    ) {
+        return await this.coursesService.updateQuizQuestionAnswer({
+            accountId,
+            data
+        })
+    }
+
+    //
+    @ApiBearerAuth()
+    @Delete("delete-quiz-question/:quizQuestionId")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async deleteQuizQuestion(
+        @AccountId() accountId: string,
+        @Param("quizQuestionId") quizQuestionId: string,
+    ) {
+        return this.coursesService.deleteQuizQuestion({
+            accountId,
+            data: { quizQuestionId },
+        })
+    }
+
+    @ApiBearerAuth()
+    @Delete("delete-quiz-question-answer/:quizQuestionAnswerId")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async deleteQuizQuestionAnswer(
+        @AccountId() accountId: string,
+        @Param("quizQuestionAnswerId") quizQuestionAnswerId: string,
+    ) {
+        return this.coursesService.deleteQuizQuestionAnswer({
+            accountId,
+            data: { quizQuestionAnswerId },
+        })
+    }
     @ApiBearerAuth()
     @Post("mark-content-complete")
     @UseGuards(JwtAuthGuard, RolesGuard)

@@ -66,6 +66,7 @@ import {
     UpdateQuizQuestionInput,
     DeleteQuizQuestionInput,
     PublishCourseInput,
+    UpdateQuizQuestionAnswerInput,
 } from "./courses.input"
 import { ProcessMpegDashProducer } from "@workers"
 import { DeepPartial } from "typeorm"
@@ -115,6 +116,7 @@ import {
     UpdateCourseTargetOuput,
     UpdateLessonOutput,
     UpdateQuizOutput,
+    UpdateQuizQuestionAnswerOutput,
     UpdateQuizQuestionOutput,
     UpdateResourceOutput,
     UpdateSectionOuput,
@@ -1559,6 +1561,27 @@ export class CoursesService {
 
         return {
             message: "Answer to quiz has been created successfully.",
+        }
+    }
+
+    async updateQuizQuestionAnswer (input: UpdateQuizQuestionAnswerInput): Promise<UpdateQuizQuestionAnswerOutput> {
+        const { data } = input
+        const { quizQuestionAnswerId, position, content, isCorrect } = data
+
+        const answer = await this.quizQuestionAnswerMySqlRepository.findOneBy({ quizQuestionAnswerId })
+
+        if(!answer){
+            throw new NotFoundException("Quiz Question Not Found.")
+        }
+
+        await this.quizQuestionAnswerMySqlRepository.update(quizQuestionAnswerId,{
+            content,
+            isCorrect,
+            position,
+        })
+
+        return {
+            message: "Quiz's question has been updated successfully.",
         }
     }
 

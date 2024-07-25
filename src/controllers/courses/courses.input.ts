@@ -474,7 +474,7 @@ export class UpdateQuizQuestionAnswerInputData {
       isCorrect?: boolean
 
   @ApiProperty()
-      position: number
+      position?: number
 }
 
 export class UpdateQuizInputData {
@@ -661,7 +661,7 @@ export class CreateQuizQuestionAnswerInputData {
         quizQuestionId: string
   
     @ApiProperty()
-        position: number
+        position?: number
 }
 
 export class CreateQuizQuestionAnswerInput implements AuthInput<CreateQuizQuestionAnswerInputData> {
