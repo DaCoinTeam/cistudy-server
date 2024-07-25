@@ -47,7 +47,8 @@ import {
     UpdateQuizInputData,
     //UpdateQuizInputData,
     UpdateSectionInputData,
-    UpdateResourceInputData
+    UpdateResourceInputData,
+    CreateQuestionInputData
 } from "./courses.input"
 
 import {
@@ -551,6 +552,21 @@ export class CoursesController {
         return this.coursesService.resolveCourseReport({
             accountId,
             data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-question")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Instructor)
+    @UseInterceptors(AuthInterceptor)
+    async createQuestion(
+        @AccountId() accountId: string,
+        @Body() data: CreateQuestionInputData,
+    ) {
+        return this.coursesService.createQuestion({
+            accountId,
+            data,
         })
     }
 }

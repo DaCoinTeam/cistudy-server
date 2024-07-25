@@ -216,6 +216,10 @@ export class UpdateResourceOutput implements Output {
     message: string
 }
 
+export class CreateQuestionOutput implements Output {
+    message: string
+}
+  
 export class CreateQuizQuestionAnswerOutput implements Output {
     message: string
 }
