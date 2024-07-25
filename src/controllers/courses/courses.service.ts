@@ -1506,7 +1506,7 @@ export class CoursesService {
         await this.quizQuestionMySqlRepository.save({
             quizId,
             question: "Untitled",
-            position: questions ? questions[0].position + 1 : 0,
+            position: questions.length ? questions[0].position + 1 : 0,
         })
 
         return {
