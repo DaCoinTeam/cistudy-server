@@ -484,6 +484,10 @@ export class UpdateQuizInputData {
   @ApiProperty()
   @Max(10)
       passingScore?: number
+  @ApiProperty()
+      title?: string
+  @ApiProperty()
+      description?: string
 }
 
 export class UpdateQuizInput implements AuthInput<UpdateQuizInputData> {

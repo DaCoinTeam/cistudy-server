@@ -96,6 +96,7 @@ type QuizQuestionEntity {
 
 type QuizEntity {
   quizId: ID!
+  description: String
   questions: [QuizQuestionEntity!]
   timeLimit: Int
   passingScore: Float

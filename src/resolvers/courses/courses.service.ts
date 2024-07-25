@@ -146,7 +146,9 @@ export class CoursesService {
                         contents: {
                             lesson: true,
                             quiz: {
-                                questions: true,
+                                questions: {
+                                    answers: true
+                                }
                             },
                             resource: {
                                 attachments: true,

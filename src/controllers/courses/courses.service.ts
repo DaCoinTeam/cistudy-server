@@ -1203,38 +1203,48 @@ export class CoursesService {
 
     async updateQuiz(input: UpdateQuizInput): Promise<UpdateQuizOutput> {
         const { data } = input
-        const { quizId, passingScore, timeLimit } = data
+        const { quizId, passingScore, timeLimit, title, description } = data
 
-        const numberOfQuizQuestions = await this.quizQuestionMySqlRepository.find({
-            where: {
-                quizId
-            },
-            relations: {
-                answers: true
-            }
+        await this.quizMySqlRepository.update(quizId, {
+            passingScore,
+            timeLimit,
+            description
         })
 
-        if (numberOfQuizQuestions && numberOfQuizQuestions.length < 2) {
-            throw new ConflictException("Please provide at least 2 questions for the quiz")
-        }
-
-        numberOfQuizQuestions.forEach(question => {
-            if (question.answers.length < 2) {
-                throw new ConflictException(`Question: ${question.question} must have at least 2 answers.`)
-            }
-
-            const hasCorrectAnswer = question.answers.some(answer => answer.isCorrect === true)
-            if (!hasCorrectAnswer) {
-                throw new ConflictException(`Question: ${question.question} must have at least 1 correct answer.`)
-            }
+        await this.sectionContentMySqlRepository.update(quizId, {
+            title,
         })
 
-        if (passingScore || timeLimit) {
-            await this.quizMySqlRepository.update(quizId, { passingScore, timeLimit })
-        }
+        // const numberOfQuizQuestions = await this.quizQuestionMySqlRepository.find({
+        //     where: {
+        //         quizId
+        //     },
+        //     relations: {
+        //         answers: true
+        //     }
+        // })
+
+        // if (numberOfQuizQuestions && numberOfQuizQuestions.length < 2) {
+        //     throw new ConflictException("Please provide at least 2 questions for the quiz")
+        // }
+
+        // numberOfQuizQuestions.forEach(question => {
+        //     if (question.answers.length < 2) {
+        //         throw new ConflictException(`Question: ${question.question} must have at least 2 answers.`)
+        //     }
+
+        //     const hasCorrectAnswer = question.answers.some(answer => answer.isCorrect === true)
+        //     if (!hasCorrectAnswer) {
+        //         throw new ConflictException(`Question: ${question.question} must have at least 1 correct answer.`)
+        //     }
+        // })
+
+        // if (passingScore || timeLimit) {
+        //     await this.quizMySqlRepository.update(quizId, { passingScore, timeLimit })
+        // }
 
         return {
-            message: "Quiz Updated Successfully"
+            message: "Quiz updated successfully"
         }
 
     }
@@ -1260,8 +1270,15 @@ export class CoursesService {
 
         await this.quizQuestionMySqlRepository.save({
             quizId,
-            question: "Untitled",
-            position: questions.length ? questions[0].position + 1 : 0,
+            question: "Is this a question?",
+            position: questions.length ? questions[0].position + 1 : 1,
+            answers: [
+                {
+                    isCorrect: true,
+                    content: "This is a correct anwser.",
+                    position: 1,   
+                }
+            ]
         })
 
         return {
@@ -1328,11 +1345,15 @@ export class CoursesService {
             }
         })
 
+        const hasTrueAnwser = !!answers.find(({ isCorrect }) => isCorrect)
+
         await this.quizQuestionAnswerMySqlRepository.save({
-            content: "Untitled",
+            content: hasTrueAnwser ? "This is a wrong awnser." : "This is a correct awnser.",
             quizQuestionId,
+            isCorrect: !hasTrueAnwser,
             position: answers.length ? answers[0].position + 1 : 0
         })
+
         return {
             message: "Answer to question has been created successfully.",
         }

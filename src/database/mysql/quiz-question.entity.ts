@@ -26,7 +26,7 @@ export class QuizQuestionEntity {
         question: string
 
     @Field(() => [QuizQuestionAnswerEntity], {nullable: true})
-    @OneToMany(() => QuizQuestionAnswerEntity, (quizAnswer) => quizAnswer.quizQuestion, { onDelete: "CASCADE", onUpdate: "CASCADE", nullable: true })
+    @OneToMany(() => QuizQuestionAnswerEntity, (quizAnswer) => quizAnswer.quizQuestion, { cascade: true, nullable: true })
         answers: Array<QuizQuestionAnswerEntity>
 
     @Field(() => Int)

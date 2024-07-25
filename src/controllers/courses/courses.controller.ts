@@ -58,7 +58,6 @@ import {
     createCategorySchema,
     updateCourseSchema,
     updateLessonSchema,
-    updateQuizSchema,
     UpdateResourceSchema
 } from "./courses.schema"
 
@@ -449,15 +448,13 @@ export class CoursesController {
     }
 
     @ApiBearerAuth()
-    @ApiConsumes("multipart/form-data")
-    @ApiBody({ schema: updateQuizSchema })
     @Put("update-quiz")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async updateQuiz(
         @AccountId() accountId: string,
-        @DataFromBody() data: UpdateQuizInputData,
+        @Body() data: UpdateQuizInputData,
     ) {
         return await this.coursesService.updateQuiz({ accountId, data})
     }
@@ -465,7 +462,7 @@ export class CoursesController {
     @ApiBearerAuth()
     @Post("create-quiz-question")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User,SystemRoles.Instructor)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async createQuizQuestion(
         @AccountId() accountId: string,
@@ -480,7 +477,7 @@ export class CoursesController {
     @ApiBearerAuth()
     @Post("create-quiz-question-answer")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User, SystemRoles.Instructor)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async createQuizQuestionAnswer(
         @AccountId() accountId: string,
@@ -495,7 +492,7 @@ export class CoursesController {
     @ApiBearerAuth()
     @Patch("update-quiz-question")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User,SystemRoles.Instructor)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async updateQuizQuestion(
         @AccountId() accountId: string,
@@ -510,7 +507,7 @@ export class CoursesController {
     @ApiBearerAuth()
     @Patch("update-quiz-question-answer")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User,SystemRoles.Instructor)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async updateQuizQuestionAnswer(
         @AccountId() accountId: string,
