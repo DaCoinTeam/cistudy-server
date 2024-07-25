@@ -246,4 +246,7 @@ export class PublishCourseOutput implements Output {
     message: string
 }
 
+export class UpdateSectionContentOuput implements Output {
+    message: string
+}
 

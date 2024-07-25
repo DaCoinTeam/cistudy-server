@@ -141,6 +141,20 @@ export class CreateSectionContentInput implements AuthInput<CreateSectionContent
   data: CreateSectionContentInputData
 }
 
+export class UpdateSectionContentInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        sectionContentId: string
+
+    @ApiProperty()
+        title: string
+}
+
+export class UpdateSectionContentInput implements AuthInput<UpdateSectionContentInputData> {
+    accountId: string
+    data: UpdateSectionContentInputData
+}
+
 export class DeleteSectionContentInputData {
   @IsUUID()
   @ApiProperty()
@@ -424,21 +438,7 @@ export class QuizQuestionAnswerInputData {
       isCorrect: boolean
 }
 
-export class QuizQuestionInputData {
-  @ApiProperty()
-      question: string
 
-  @ApiProperty()
-  @Min(10)
-      point: number
-
-  @ApiProperty()
-      answers: Array<QuizQuestionAnswerInputData>
-
-  @ApiProperty()
-      position: number
-
-}
 
 export class CreateQuizInputData {
   @IsUUID("4")
@@ -449,7 +449,8 @@ export class CreateQuizInputData {
       title: string
 
   @ApiProperty()
-      quizQuestions: Array<QuizQuestionInputData>
+  @Max(10)
+      passingScore?: number
 
   @ApiProperty()
   @Min(5)
@@ -485,15 +486,9 @@ export class UpdateQuizInputData {
   @ApiProperty()
   @Min(5)
       timeLimit?: number
-
-  @ApiProperty({ nullable: true })
-      newQuestions?: Array<QuizQuestionInputData>
-
-  @ApiProperty({ nullable: true })
-      quizQuestionIdsToUpdate?: Array<UpdateQuizQuestionInputData>
-
-  @ApiProperty({ nullable: true })
-      quizQuestionIdsToDelete?: Array<string>
+  @ApiProperty()
+  @Max(10)
+      passingScore?: number
 }
 
 export class UpdateQuizInput implements AuthInput<UpdateQuizInputData> {
@@ -501,7 +496,6 @@ export class UpdateQuizInput implements AuthInput<UpdateQuizInputData> {
   @ApiProperty()
       accountId: string
   data: UpdateQuizInputData
-  files?: Array<Express.Multer.File>
 }
 
 export class DeleteQuizInputData {
