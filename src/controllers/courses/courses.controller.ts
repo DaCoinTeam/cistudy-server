@@ -448,20 +448,6 @@ export class CoursesController {
         })
     }
 
-    // @ApiBearerAuth()
-    // @ApiConsumes("multipart/form-data")
-    // @ApiBody({ schema: createQuizSchema })
-    // @Post("create-quiz")
-    // @UseGuards(JwtAuthGuard, RolesGuard)
-    // @Roles(SystemRoles.User)
-    // @UseInterceptors(AuthInterceptor)
-    // async createQuiz(
-    //     @AccountId() accountId: string,
-    //     @DataFromBody() data: CreateQuizInputData,
-    // ) {
-    //     return await this.coursesService.createQuiz({ accountId, data })
-    // }
-
     @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
     @ApiBody({ schema: updateQuizSchema })
@@ -604,18 +590,6 @@ export class CoursesController {
     ) {
         return await this.coursesService.finishQuizAttempt({ accountId, data })
     }
-
-    // @ApiBearerAuth()
-    // @Post("gift-course")
-    // @UseGuards(JwtAuthGuard, RolesGuard)
-    // @Roles(SystemRoles.User)
-    // @UseInterceptors(AuthInterceptor)
-    // async giftCourse(
-    //     @AccountId() accountId: string,
-    //     @Body() data: GiftCourseInputData,
-    // ) {
-    //     return await this.coursesService.giftCourse({ accountId, data })
-    // }
 
     @ApiBearerAuth()
     @Post("create-course-report")

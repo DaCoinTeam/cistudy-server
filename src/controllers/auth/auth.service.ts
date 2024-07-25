@@ -69,7 +69,7 @@ export class AuthService {
 
         try {
             const { accountId } = await this.authManagerService.verifyToken(token)
-
+            
             const account = await this.accountMySqlRepository.findOne({
                 where: {
                     accountId

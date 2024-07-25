@@ -223,7 +223,7 @@ export class AccountsService {
                 }
             })
 
-            const numberOfUnverifiedCourse = await queryRunner.manager
+            const numberOfPendingCourse = await queryRunner.manager
                 .createQueryBuilder()
                 .select("COUNT(*)", "count")
                 .from(CourseMySqlEntity, "course")
@@ -233,7 +233,7 @@ export class AccountsService {
             return {
                 results,
                 metadata: {
-                    count: numberOfUnverifiedCourse.count
+                    count: numberOfPendingCourse.count
                 }
             }
         } catch (ex) {
