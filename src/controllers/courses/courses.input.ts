@@ -670,9 +670,6 @@ export class ResolveCourseReportInput implements AuthInput<ResolveCourseReportIn
 export class CreateQuizQuestionAnswerInputData {
     @ApiProperty()
         quizQuestionId: string
-        
-    @ApiProperty()
-        content?: string
   
     @ApiProperty()
         isCorrect?: boolean
@@ -684,4 +681,19 @@ export class CreateQuizQuestionAnswerInputData {
 export class CreateQuizQuestionAnswerInput implements AuthInput<CreateQuizQuestionAnswerInputData> {
     accountId: string
     data: CreateQuizQuestionAnswerInputData
+}
+
+export class UpdateQuizQuestionAnswerInput implements AuthInput<UpdateQuizQuestionAnswerInputData> {
+    accountId: string
+    data: UpdateQuizQuestionAnswerInputData
+}
+
+export class DeleteQuizQuestionAnswerInputData {
+    @ApiProperty()
+        quizQuestionAnswerId: string
+}
+
+export class DeleteQuizQuestionAnswerInput implements AuthInput<DeleteQuizQuestionAnswerInputData> {
+    accountId: string
+    data: DeleteQuizQuestionAnswerInputData
 }

@@ -219,3 +219,11 @@ export class UpdateResourceOutput implements Output {
 export class CreateQuizQuestionAnswerOutput implements Output {
     message: string
 }
+
+export class UpdateQuizQuestionAnswerOutput implements Output {
+    message: string
+}
+
+export class DeleteQuizQuestionAnswerOutput implements Output {
+    message: string
+}
