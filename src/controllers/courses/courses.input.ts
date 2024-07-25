@@ -477,31 +477,6 @@ export class UpdateQuizQuestionAnswerInputData {
       position: number
 }
 
-export class UpdateQuizQuestionInputData {
-  @IsUUID("4")
-  @ApiProperty({ nullable: true })
-      quizQuestionId?: string
-
-  @ApiProperty({ nullable: true })
-      question?: string
-
-  @ApiProperty()
-      position: number
-
-  @ApiProperty({ nullable: true })
-  @Min(10)
-      point?: number
-
-  @ApiProperty({ nullable: true })
-      quizAnswerIdsToUpdate?: Array<UpdateQuizQuestionAnswerInputData>
-
-  @ApiProperty({ nullable: true })
-      quizAnswerIdsToDelete?: Array<string>
-
-  @ApiProperty({ nullable: true })
-      newQuizQuestionAnswer?: Array<QuizQuestionAnswerInputData>
-}
-
 export class UpdateQuizInputData {
   @IsUUID("4")
   @ApiProperty()
@@ -686,9 +661,6 @@ export class CreateQuizQuestionAnswerInputData {
         quizQuestionId: string
   
     @ApiProperty()
-        isCorrect?: boolean
-  
-    @ApiProperty()
         position: number
 }
 
@@ -710,4 +682,51 @@ export class DeleteQuizQuestionAnswerInputData {
 export class DeleteQuizQuestionAnswerInput implements AuthInput<DeleteQuizQuestionAnswerInputData> {
     accountId: string
     data: DeleteQuizQuestionAnswerInputData
+}
+
+export class CreateQuizQuestionInputData {
+    @ApiProperty()
+        quizId: string
+    @ApiProperty()
+        position: number
+}
+
+export class CreateQuizQuestionInput implements AuthInput<CreateQuizQuestionInputData> {
+    accountId: string
+    data: CreateQuizQuestionInputData
+}
+
+export class UpdateQuizQuestionInputData {
+    @ApiProperty()
+        quizQuestionId: string
+    @ApiProperty()
+        question: string
+    @ApiProperty()
+        point: number
+    @ApiProperty()
+        position: number
+}
+
+export class UpdateQuizQuestionInput implements AuthInput<UpdateQuizQuestionInputData> {
+    accountId: string
+    data: UpdateQuizQuestionInputData
+}
+
+export class DeleteQuizQuestionInputData {
+    @ApiProperty()
+        quizQuestionId: string
+}
+
+export class DeleteQuizQuestionInput implements AuthInput<DeleteQuizQuestionInputData> {
+    accountId: string
+    data: DeleteQuizQuestionInputData
+}
+
+export class PublishCourseInputData {
+    @ApiProperty()
+        courseId: string
+}
+export class PublishCourseInput implements AuthInput<PublishCourseInputData> {
+    accountId: string
+    data: PublishCourseInputData
 }

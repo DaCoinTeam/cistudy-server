@@ -45,10 +45,9 @@ import {
     UpdateCourseTargetInputData,
     UpdateLessonInputData,
     UpdateQuizInputData,
-    //UpdateQuizInputData,
     UpdateSectionInputData,
     UpdateResourceInputData,
-    CreateQuestionInputData
+    CreateQuizQuestionInputData
 } from "./courses.input"
 
 import {
@@ -556,15 +555,15 @@ export class CoursesController {
     }
 
     @ApiBearerAuth()
-    @Post("create-question")
+    @Post("create-quiz-question")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User, SystemRoles.Instructor)
     @UseInterceptors(AuthInterceptor)
     async createQuestion(
         @AccountId() accountId: string,
-        @Body() data: CreateQuestionInputData,
+        @Body() data: CreateQuizQuestionInputData,
     ) {
-        return this.coursesService.createQuestion({
+        return this.coursesService.createQuizQuestion({
             accountId,
             data,
         })

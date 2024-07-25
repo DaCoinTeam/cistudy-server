@@ -216,10 +216,8 @@ export class UpdateResourceOutput implements Output {
     message: string
 }
 
-export class CreateQuestionOutput implements Output {
-    message: string
-}
-  
+
+
 export class CreateQuizQuestionAnswerOutput implements Output {
     message: string
 }
@@ -231,3 +229,21 @@ export class UpdateQuizQuestionAnswerOutput implements Output {
 export class DeleteQuizQuestionAnswerOutput implements Output {
     message: string
 }
+
+export class CreateQuizQuestionOutput implements Output {
+    message: string
+}
+
+export class UpdateQuizQuestionOutput implements Output {
+    message: string
+}
+
+export class DeleteQuizQuestionOutput implements Output {
+    message: string
+}
+
+export class PublishCourseOutput implements Output {
+    message: string
+}
+
+
