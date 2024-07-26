@@ -25,7 +25,7 @@ export class QuizEntity {
         timeLimit: number
 
     @Field(() => Float, { nullable: true })
-    @Column({ type: "float", nullable: true })
+    @Column({ type: "float", default: 8 })
         passingScore: number
 
     @Field(() => Date)

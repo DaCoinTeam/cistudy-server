@@ -1276,7 +1276,7 @@ export class CoursesService {
                 {
                     isCorrect: true,
                     content: "This is a correct anwser.",
-                    position: 1,   
+                    position: 1,
                 }
             ]
         })
@@ -1320,8 +1320,29 @@ export class CoursesService {
                 "Quiz question not found",
             )
         }
+        const { position, quizId } = question
+
+        const {questions} = await this.quizMySqlRepository.findOne({
+            where:{
+                quizId
+            },
+            relations:{
+                questions: true
+            }
+        }) 
+
+        if (!questions || questions.length - 1 < 1) {
+            throw new ConflictException("Quiz must have at least 1 question(s)")
+        }
 
         await this.quizQuestionMySqlRepository.delete({ quizQuestionId })
+
+        await this.quizQuestionMySqlRepository
+            .createQueryBuilder()
+            .update()
+            .set({ position: () => "position - 1" })
+            .where("position > :position", { position })
+            .execute()
 
         return { message: "Question deleted successfully" }
     }
@@ -1351,7 +1372,7 @@ export class CoursesService {
             content: hasTrueAnwser ? "This is a wrong awnser." : "This is a correct awnser.",
             quizQuestionId,
             isCorrect: !hasTrueAnwser,
-            position: answers.length ? answers[0].position + 1 : 0
+            position: answers.length ? answers[0].position + 1 : 1
         })
 
         return {
@@ -1393,9 +1414,38 @@ export class CoursesService {
                 "Answer not found",
             )
         }
+        const { position, quizQuestionId, isCorrect } = answer
+        
+        const { answers } = await this.quizQuestionMySqlRepository.findOne({ 
+            where:{
+                quizQuestionId
+            },
+            relations:{
+                answers: true
+            }
+        })
+        
+        if (!answers || answers.length - 1 < 2) {
+            throw new ConflictException("Quiz question must have at least 2 answers")
+        }
 
         await this.quizQuestionAnswerMySqlRepository.delete({ quizQuestionAnswerId })
 
+        await this.quizQuestionAnswerMySqlRepository
+            .createQueryBuilder()
+            .update()
+            .set({ position: () => "position - 1" })
+            .where("position > :position", { position })
+            .execute()
+
+        if (isCorrect) {
+            await this.quizQuestionAnswerMySqlRepository
+                .createQueryBuilder()
+                .update()
+                .set({ isCorrect: true })
+                .where("position = :position", { position })
+                .execute()
+        }
         return { message: "Answer deleted successfully" }
     }
 
