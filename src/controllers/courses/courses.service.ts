@@ -389,7 +389,6 @@ export class CoursesService {
             }
 
             if (existKeyNotUndefined(course)) {
-                course.verifyStatus = CourseVerifyStatus.Pending
                 await this.courseMySqlRepository.save(course)
             }
 

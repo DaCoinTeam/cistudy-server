@@ -682,9 +682,15 @@ export class CoursesService {
                             sections: {
                                 contents: {
                                     section: true,
-                                    quiz: true,
+                                    quiz: {
+                                        questions: {
+                                            answers: true
+                                        }
+                                    },
                                     lesson: true,
-                                    resource: true,
+                                    resource: {
+                                        attachments: true
+                                    },
                                     accountProgresses: true,
                                 },
                             },
@@ -775,20 +781,25 @@ export class CoursesService {
 
             sectionContent.section.course.creator.followed = creatorFollow.some(followed => followed.followerId === accountId)
 
+            const promises: Array<Promise<void>> = []
             for (const section of sectionContent.section.course.sections) {
                 for (const content of section.contents) {
-                    let progress = content.accountProgresses.find((progress) => enrolledInfoId === progress.enrolledInfoId &&
+                    const promise = async () => {
+                        let progress = content.accountProgresses.find((progress) => enrolledInfoId === progress.enrolledInfoId &&
                         content.sectionContentId === progress.sectionContentId
-                    )
-                    if (!progress) {
-                        progress = await this.progressMySqlRepository.save({
-                            sectionContentId: content.sectionContentId,
-                            enrolledInfoId
-                        })
+                        )
+                        if (!progress) {
+                            progress = await this.progressMySqlRepository.save({
+                                sectionContentId: content.sectionContentId,
+                                enrolledInfoId
+                            })
+                        }
+                        content.completeState = progress.completeState
                     }
-                    content.completeState = progress.completeState
+                    promises.push(promise())
                 }
             }
+            await Promise.all(promises)
 
             const sections = Object.assign(sectionContent.section.course.sections, [])
             sections.sort((prev, next) => prev.position - next.position)
