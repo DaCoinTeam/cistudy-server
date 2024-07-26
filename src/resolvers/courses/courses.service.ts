@@ -571,6 +571,36 @@ export class CoursesService {
                 }
 
                 course.courseRatings = courseRatings
+                const numberOfEnrollments = await this.enrolledInfoMySqlRepository.findBy({courseId : course.courseId})
+                const numberOfQuizzes = await this.quizMySqlRepository.count({
+                    where: {
+                        sectionContent: {
+                            section: {
+                                course: {
+                                    courseId: course.courseId,
+                                },
+                            },
+                        },
+                    },
+                })
+    
+                const numberOfResources = await this.resourceAttachmentMySqlRepository.count({
+                    where: {
+                        resource: {
+                            sectionContent: {
+                                section: {
+                                    course: {
+                                        courseId: course.courseId,
+                                    },
+                                },
+                            },
+                        }
+                    },
+                })
+
+                course.numberOfEnrollments = numberOfEnrollments.length
+                course.numberOfResources = numberOfResources
+                course.numberOfQuizzes = numberOfQuizzes 
             }
 
             const relativeTopics = searchValue ? await this.categoryMySqlRepository.find({
