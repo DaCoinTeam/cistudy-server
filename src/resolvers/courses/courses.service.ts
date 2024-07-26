@@ -526,67 +526,57 @@ export class CoursesService {
 
             results = results.slice(skip, skip + take)
 
+            const promises : Array<Promise<void>> = []
+
             for (const course of results) {
-                const courseReviews = await this.courseReviewMySqlRepository.find({
-                    where: {
-                        courseId: course.courseId
-                    }
-                })
-                const countWithNumStars = (numStars: number) => {
-                    let count = 0
-                    for (const { rating } of courseReviews) {
-                        if (rating === numStars) {
-                            count++
+                const promise = async () => {
+                    const courseReviews = await this.courseReviewMySqlRepository.find({
+                        where: {
+                            courseId: course.courseId
                         }
-                    }
-
-                    return count
-                }
-
-                const numberOf1StarRatings = countWithNumStars(1)
-                const numberOf2StarRatings = countWithNumStars(2)
-                const numberOf3StarRatings = countWithNumStars(3)
-                const numberOf4StarRatings = countWithNumStars(4)
-                const numberOf5StarRatings = countWithNumStars(5)
-                const totalNumberOfRatings = courseReviews.length
-
-                const totalNumStars = () => {
-                    let total = 0
-                    for (let index = 1; index <= 5; index++) {
-                        total += countWithNumStars(index) * index
-                    }
-                    return total
-                }
-
-                const overallCourseRating = totalNumberOfRatings > 0 ? totalNumStars() / totalNumberOfRatings : 0
-
-                const courseRatings: CourseRating = {
-                    numberOf1StarRatings,
-                    numberOf2StarRatings,
-                    numberOf3StarRatings,
-                    numberOf4StarRatings,
-                    numberOf5StarRatings,
-                    overallCourseRating,
-                    totalNumberOfRatings
-                }
-
-                course.courseRatings = courseRatings
-                const numberOfEnrollments = await this.enrolledInfoMySqlRepository.findBy({courseId : course.courseId})
-                const numberOfQuizzes = await this.quizMySqlRepository.count({
-                    where: {
-                        sectionContent: {
-                            section: {
-                                course: {
-                                    courseId: course.courseId,
-                                },
-                            },
-                        },
-                    },
-                })
+                    })
+                    const countWithNumStars = (numStars: number) => {
+                        let count = 0
+                        for (const { rating } of courseReviews) {
+                            if (rating === numStars) {
+                                count++
+                            }
+                        }
     
-                const numberOfResources = await this.resourceAttachmentMySqlRepository.count({
-                    where: {
-                        resource: {
+                        return count
+                    }
+    
+                    const numberOf1StarRatings = countWithNumStars(1)
+                    const numberOf2StarRatings = countWithNumStars(2)
+                    const numberOf3StarRatings = countWithNumStars(3)
+                    const numberOf4StarRatings = countWithNumStars(4)
+                    const numberOf5StarRatings = countWithNumStars(5)
+                    const totalNumberOfRatings = courseReviews.length
+    
+                    const totalNumStars = () => {
+                        let total = 0
+                        for (let index = 1; index <= 5; index++) {
+                            total += countWithNumStars(index) * index
+                        }
+                        return total
+                    }
+    
+                    const overallCourseRating = totalNumberOfRatings > 0 ? totalNumStars() / totalNumberOfRatings : 0
+    
+                    const courseRatings: CourseRating = {
+                        numberOf1StarRatings,
+                        numberOf2StarRatings,
+                        numberOf3StarRatings,
+                        numberOf4StarRatings,
+                        numberOf5StarRatings,
+                        overallCourseRating,
+                        totalNumberOfRatings
+                    }
+    
+                    course.courseRatings = courseRatings
+                    const numberOfEnrollments = await this.enrolledInfoMySqlRepository.findBy({courseId : course.courseId})
+                    const numberOfQuizzes = await this.quizMySqlRepository.count({
+                        where: {
                             sectionContent: {
                                 section: {
                                     course: {
@@ -594,14 +584,42 @@ export class CoursesService {
                                     },
                                 },
                             },
-                        }
-                    },
-                })
+                        },
+                    })
+        
+                    const numberOfResources = await this.resourceMySqlRepository.count({
+                        where: {
+                            sectionContent: {
+                                section: {
+                                    course: {
+                                        courseId: course.courseId,
+                                    },
+                                },
+                            },
+                        },
+                    })
 
-                course.numberOfEnrollments = numberOfEnrollments.length
-                course.numberOfResources = numberOfResources
-                course.numberOfQuizzes = numberOfQuizzes 
+                    const numberOfLessons = await this.lessonMySqlRepository.count({
+                        where: {
+                            sectionContent: {
+                                section: {
+                                    course: {
+                                        courseId: course.courseId,
+                                    },
+                                },
+                            },
+                        },
+                    })
+    
+                    course.numberOfEnrollments = numberOfEnrollments.length
+                    course.numberOfResources = numberOfResources
+                    course.numberOfQuizzes = numberOfQuizzes 
+                    course.numberOfLessons = numberOfLessons
+                }
+                promises.push(promise())
             }
+            
+            await Promise.all(promises)
 
             const relativeTopics = searchValue ? await this.categoryMySqlRepository.find({
                 where: {
