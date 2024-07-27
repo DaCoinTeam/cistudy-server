@@ -1,20 +1,20 @@
 import { Injectable } from "@nestjs/common"
 
 import {
-    Metadata,
     FilesData,
+    Metadata,
     isMinimalFile,
     makeDirectoryIfNotExisted,
 } from "@common"
-import { v4 as uuid4, validate as validateUuid4 } from "uuid"
-import { join, dirname, basename } from "path"
+import { pathsConfig } from "@config"
 import {
     ReadStream,
     Stats,
     createReadStream as fsCreateReadStream,
     promises as fsPromises,
 } from "fs"
-import { pathsConfig } from "@config"
+import { basename, dirname, join } from "path"
+import { v4 as uuid4, validate as validateUuid4 } from "uuid"
 
 const METADATA_FILE_NAME = "metadata.json"
 

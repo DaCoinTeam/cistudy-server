@@ -1,21 +1,21 @@
-import { Module } from "@nestjs/common"
-import { AuthController } from "./auth.controller"
-import { TypeOrmModule } from "@nestjs/typeorm"
 import {
-    SessionMySqlEntity,
     AccountMySqlEntity,
-    PostMySqlEntity,
+    CartMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
-    SectionMySqlEntity,
     LessonMySqlEntity,
-    ResourceMySqlEntity,
+    PostCommentLikeMySqlEntity,
     PostCommentMySqlEntity,
     PostLikeMySqlEntity,
-    PostCommentLikeMySqlEntity,
-    CartMySqlEntity,
+    PostMySqlEntity,
+    ResourceMySqlEntity,
     RoleMySqlEntity,
+    SectionMySqlEntity,
+    SessionMySqlEntity,
 } from "@database"
+import { Module } from "@nestjs/common"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { AuthController } from "./auth.controller"
 import { AuthService } from "./auth.service"
 
 @Module({

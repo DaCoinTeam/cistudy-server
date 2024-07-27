@@ -1,5 +1,5 @@
-import { AuthTokens, AuthOutput, ResultsWithMetadata } from "@common"
-import { LessonMySqlEntity, ResourceMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity, QuizAttemptMySqlEntity, CategoryMySqlEntity, ReportCourseMySqlEntity } from "@database"
+import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
+import { CategoryMySqlEntity, CourseMySqlEntity, CourseReviewMySqlEntity, LessonMySqlEntity, QuizAttemptMySqlEntity, ReportCourseMySqlEntity, ResourceMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 import { CategoryEntity } from "src/database/mysql/category.entity"
 import { CourseTargetEntity } from "src/database/mysql/course-target.entity"

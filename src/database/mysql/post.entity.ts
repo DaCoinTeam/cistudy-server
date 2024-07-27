@@ -1,3 +1,4 @@
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import {
     Column,
     CreateDateColumn,
@@ -8,11 +9,10 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm"
+import { AccountEntity } from "./account.entity"
 import { CourseEntity } from "./course.entity"
 import { PostCommentEntity } from "./post-comment.entity"
 import { PostLikeEntity } from "./post-like.entity"
-import { AccountEntity } from "./account.entity"
-import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { PostMediaEntity } from "./post-media.entity"
 import { ReportPostEntity } from "./report-post.entity"
 

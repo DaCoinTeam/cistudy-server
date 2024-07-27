@@ -1,13 +1,19 @@
+import { SystemRoles } from "@common"
 import {
     Body,
-    Controller, Delete, Param, Patch, Post, UseGuards, UseInterceptors,
+    Controller, 
+    Delete, 
+    Param, 
+    Patch, 
+    Post, 
+    UseGuards, 
+    UseInterceptors,
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger"
-import { AccountsService } from "./accounts.service"
-import { AuthInterceptor, JwtAuthGuard, AccountId, Roles } from "../shared"
-import { CreateAccountReportInputData, CreateAccountReviewInputData, CreateAccountRoleInputData, DeleteCourseInputData, ResolveAccountReportInputData, ToggleFollowInputData, ToggleRoleInputData, UpdateAccountReportInputData, UpdateAccountReviewInputData, UpdateAccountRoleInputData, VerifyCourseInputData } from "./accounts.input"
+import { AccountId, AuthInterceptor, JwtAuthGuard, Roles } from "../shared"
 import { RolesGuard } from "../shared/guards/role.guard"
-import { SystemRoles } from "@common"
+import { CreateAccountReportInputData, CreateAccountReviewInputData, CreateAccountRoleInputData, DeleteCourseInputData, ResolveAccountReportInputData, ToggleFollowInputData, ToggleRoleInputData, UpdateAccountReportInputData, UpdateAccountReviewInputData, UpdateAccountRoleInputData, VerifyCourseInputData } from "./accounts.input"
+import { AccountsService } from "./accounts.service"
 
 @ApiTags("Accounts")
 @ApiHeader({

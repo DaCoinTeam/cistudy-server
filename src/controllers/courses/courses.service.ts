@@ -1,88 +1,91 @@
 import {
-    ConflictException,
-    Injectable,
-    NotFoundException,
-    InternalServerErrorException,
-} from "@nestjs/common"
-import {
-    CategoryMySqlEntity,
-    CertificateMySqlEntity,
-    CourseMySqlEntity,
-    CourseReviewMySqlEntity,
-    CourseTargetMySqlEntity,
-    LessonMySqlEntity,
-    QuizQuestionAnswerMySqlEntity,
-    QuizMySqlEntity,
-    ResourceMySqlEntity,
-    SectionMySqlEntity,
-    QuizQuestionMySqlEntity,
-    ProgressMySqlEntity,
-    QuizAttemptMySqlEntity,
-    AccountMySqlEntity,
-    CourseCategoryMySqlEntity,
-    ReportCourseMySqlEntity,
-    QuizAttemptAnswerMySqlEntity,
-    SectionContentMySqlEntity,
-    ResourceAttachmentMySqlEntity,
-    AccountGradeMySqlEntity,
-} from "@database"
-import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, DataSource, In, Between } from "typeorm"
-import { StorageService } from "@global"
-import {
-    CreateCourseInput,
-    CreateSectionInput,
-    CreateSectionContentInput,
-    UpdateCourseInput,
-    CreateCourseTargetInput,
-    UpdateCourseTargetInput,
-    DeleteCourseTargetInput,
-    UpdateLessonInput,
-    DeleteSectionInput,
-    UpdateSectionInput,
-    DeleteResourceAttachmentInput,
-    EnrollCourseInput,
-    CreateCategoryInput,
-    CreateCourseReviewInput,
-    UpdateCourseReviewInput,
-    DeleteCourseReviewInput,
-    CreateCertificateInput, UpdateQuizInput,
-    CreateQuizAttemptInput,
-    FinishQuizAttemptInput,
-    DeleteCategoryInput,
-    CreateCourseCategoriesInput,
-    DeleteCourseCategoryInput,
-    CreateCourseReportInput,
-    UpdateCourseReportInput,
-    ResolveCourseReportInput,
-    DeleteSectionContentInput,
-    MarkContentAsCompletedInput,
-    UpdateResourceInput,
-    CreateQuizQuestionAnswerInput,
-    DeleteQuizQuestionAnswerInput,
-    CreateQuizQuestionInput,
-    UpdateQuizQuestionInput,
-    DeleteQuizQuestionInput,
-    PublishCourseInput,
-    UpdateQuizQuestionAnswerInput,
-    UpdateSectionContentInput,
-    UpdateQuizAttemptInput,
-    UpdateQuizAttemptAnswersInput
-} from "./courses.input"
-import { ProcessMpegDashProducer } from "@workers"
-import { DeepPartial } from "typeorm"
-import {
+    CompleteState,
+    computeDenomination,
+    computeRaw,
+    CourseVerifyStatus,
+    existKeyNotUndefined,
     ProcessStatus,
     QuizAttemptStatus,
     ReportProcessStatus,
-    CourseVerifyStatus,
-    VideoType,
-    computeDenomination,
-    computeRaw,
-    existKeyNotUndefined,
     SectionContentType,
-    CompleteState,
+    VideoType,
 } from "@common"
+import {
+    AccountGradeMySqlEntity,
+    AccountMySqlEntity,
+    CategoryMySqlEntity,
+    CertificateMySqlEntity,
+    CourseCategoryMySqlEntity,
+    CourseMySqlEntity,
+    CourseReviewMySqlEntity,
+    CourseTargetMySqlEntity,
+    EnrolledInfoMySqlEntity,
+    LessonMySqlEntity,
+    ProgressMySqlEntity,
+    QuizAttemptAnswerMySqlEntity,
+    QuizAttemptMySqlEntity,
+    QuizMySqlEntity,
+    QuizQuestionAnswerMySqlEntity,
+    QuizQuestionMySqlEntity,
+    ReportCourseMySqlEntity,
+    ResourceAttachmentMySqlEntity,
+    ResourceMySqlEntity,
+    SectionContentMySqlEntity,
+    SectionMySqlEntity,
+} from "@database"
+import { StorageService } from "@global"
+import {
+    ConflictException,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+} from "@nestjs/common"
+import { InjectRepository } from "@nestjs/typeorm"
+import { ProcessMpegDashProducer } from "@workers"
+import { getVideoDurationInSeconds } from "get-video-duration"
+import { Between, DataSource, DeepPartial, In, Repository } from "typeorm"
+import {
+    CreateCategoryInput,
+    CreateCertificateInput,
+    CreateCourseCategoriesInput,
+    CreateCourseInput,
+    CreateCourseReportInput,
+    CreateCourseReviewInput,
+    CreateCourseTargetInput,
+    CreateQuizAttemptInput,
+    CreateQuizQuestionAnswerInput,
+    CreateQuizQuestionInput,
+    CreateSectionContentInput,
+    CreateSectionInput,
+    DeleteCategoryInput,
+    DeleteCourseCategoryInput,
+    DeleteCourseReviewInput,
+    DeleteCourseTargetInput,
+    DeleteQuizQuestionAnswerInput,
+    DeleteQuizQuestionInput,
+    DeleteResourceAttachmentInput,
+    DeleteSectionContentInput,
+    DeleteSectionInput,
+    EnrollCourseInput,
+    FinishQuizAttemptInput,
+    MarkContentAsCompletedInput,
+    PublishCourseInput,
+    ResolveCourseReportInput,
+    UpdateCategoryInput,
+    UpdateCourseInput,
+    UpdateCourseReportInput,
+    UpdateCourseReviewInput,
+    UpdateCourseTargetInput,
+    UpdateLessonInput,
+    UpdateQuizAttemptAnswersInput,
+    UpdateQuizAttemptInput,
+    UpdateQuizInput,
+    UpdateQuizQuestionAnswerInput,
+    UpdateQuizQuestionInput,
+    UpdateResourceInput,
+    UpdateSectionContentInput,
+    UpdateSectionInput
+} from "./courses.input"
 import {
     CreateCategoryOutput,
     CreateCertificateOutput,
@@ -109,6 +112,7 @@ import {
     MarkContentAsCompletedOutput,
     PublishCourseOutput,
     ResolveCourseReportOutput,
+    UpdateCategoryOutput,
     UpdateCourseOutput,
     UpdateCourseReportOutput,
     UpdateCourseReviewOutput,
@@ -122,8 +126,6 @@ import {
     UpdateSectionContentOuput,
     UpdateSectionOuput
 } from "./courses.output"
-import { EnrolledInfoEntity } from "../../database/mysql/enrolled-info.entity"
-import { getVideoDurationInSeconds } from "get-video-duration"
 
 @Injectable()
 export class CoursesService {
@@ -142,8 +144,8 @@ export class CoursesService {
         private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
         @InjectRepository(ResourceAttachmentMySqlEntity)
         private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
-        @InjectRepository(EnrolledInfoEntity)
-        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoEntity>,
+        @InjectRepository(EnrolledInfoMySqlEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         @InjectRepository(CategoryMySqlEntity)
         private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
         @InjectRepository(CourseCategoryMySqlEntity)
@@ -603,7 +605,7 @@ export class CoursesService {
         }
 
         return {
-            message: "Content creeated successfully.",
+            message: "Content created successfully.",
         }
     }
 
@@ -906,7 +908,7 @@ export class CoursesService {
         const { sectionId } = data
         await this.sectionMySqlRepository.delete({ sectionId })
         return {
-            message: `A section with id ${sectionId} has been deleted successfully.`,
+            message: "Section has been deleted successfully.",
         }
     }
 
@@ -1045,6 +1047,40 @@ export class CoursesService {
             await queryRunner.release()
         }
     }
+
+    async updateCategory(input: UpdateCategoryInput) : Promise<UpdateCategoryOutput>{
+        const { data, files } = input
+        const { categoryId, name, imageIndex } = data
+
+        const category = await this.categoryMySqlRepository.findOneBy({categoryId})
+        
+        if(!category){
+            throw new NotFoundException("Category not found or has been deleted.")
+        }
+
+        let imageId : string | undefined
+
+        if(files){
+            if (Number.isInteger(imageIndex)) {
+                if(category.imageId){
+                    await this.storageService.delete(category.imageId)
+                }
+                const { assetId } = await this.storageService.upload({
+                    rootFile: files.at(imageIndex),
+                })
+                imageId = assetId
+            }
+        }
+
+        await this.categoryMySqlRepository.update(categoryId,{
+            imageId,
+            name,
+        })
+        
+        return {
+            message: `Category : ${category.name} has been updated successfully.`
+        }
+    }   
 
     async deleteCategory(
         input: DeleteCategoryInput,

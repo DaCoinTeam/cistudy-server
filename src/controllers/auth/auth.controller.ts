@@ -6,9 +6,9 @@ import {
     UseInterceptors,
 } from "@nestjs/common"
 import { ApiHeader, ApiTags } from "@nestjs/swagger"
+import { GenerateAuthTokensInterceptor } from "../shared"
 import { SignInInputData, SignUpData, VerifyRegistrationInputData } from "./auth.input"
 import { AuthService } from "./auth.service"
-import { GenerateAuthTokensInterceptor } from "../shared"
 
 @ApiTags("Auth")
 @ApiHeader({

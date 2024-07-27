@@ -1,27 +1,27 @@
+import { CourseVerifyStatus } from "@common"
+import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
-    CreateDateColumn,
     UpdateDateColumn,
 } from "typeorm"
-import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
-import { CourseVerifyStatus } from "@common"
-import { PostEntity } from "./post.entity"
-import { EnrolledInfoEntity } from "./enrolled-info.entity"
-import { SectionEntity } from "./section.entity"
+import { CourseCategoryLevel, CourseRating } from "../dto"
 import { AccountEntity } from "./account.entity"
-import { CourseTargetEntity } from "./course-target.entity"
-import { CourseReviewEntity } from "./course-review.entity"
 import { CartCourseEntity } from "./cart-course.enity"
 import { CertificateEntity } from "./certificate"
-import { OrderCourseEntity } from "./order-course.entity"
 import { CourseCategoryEntity } from "./course-category.entity"
+import { CourseReviewEntity } from "./course-review.entity"
+import { CourseTargetEntity } from "./course-target.entity"
+import { EnrolledInfoEntity } from "./enrolled-info.entity"
+import { OrderCourseEntity } from "./order-course.entity"
+import { PostEntity } from "./post.entity"
 import { ReportCourseEntity } from "./report-course.entity"
-import { CourseCategoryLevel, CourseRating } from "../dto"
+import { SectionEntity } from "./section.entity"
 
 
 interface CourseIncludes {

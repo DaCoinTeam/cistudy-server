@@ -1,16 +1,16 @@
-import { Module } from "@nestjs/common"
-import { AuthResolver } from "./auth.resolver"
-import { TypeOrmModule } from "@nestjs/typeorm"
 import {
-    CartMySqlEntity,
     AccountMySqlEntity,
-    RoleMySqlEntity,
-    CourseMySqlEntity,
-    PostMySqlEntity,
-    CourseReviewMySqlEntity,
     AccountReviewMySqlEntity,
+    CartMySqlEntity,
+    CourseMySqlEntity,
+    CourseReviewMySqlEntity,
     EnrolledInfoMySqlEntity,
+    PostMySqlEntity,
+    RoleMySqlEntity,
 } from "@database"
+import { Module } from "@nestjs/common"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { AuthResolver } from "./auth.resolver"
 import { AuthService } from "./auth.service"
 
 @Module({

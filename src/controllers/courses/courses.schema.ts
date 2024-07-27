@@ -113,6 +113,33 @@ export const createCategorySchema: SchemaObject = {
     }
 }
 
+export const updateCategorySchema: SchemaObject = {
+    type: "object",
+    properties: {
+        data: {
+            type: "object",
+            properties: {
+                categoryId: {
+                    type: "string",
+                },
+                name: {
+                    type: "string",
+                },
+                imageIndex: {
+                    type: "number"
+                }
+            },
+        },
+        files: {
+            type: "array",
+            items: {
+                type: "string",
+                format: "binary"
+            },
+        },
+    }
+}
+
 export const UpdateResourceSchema: SchemaObject = {
     type: "object",
     properties: {

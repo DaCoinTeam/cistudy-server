@@ -1,17 +1,17 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql"
 import {
-    Entity,
-    PrimaryGeneratedColumn,
     Column,
-    ManyToOne,
     CreateDateColumn,
-    UpdateDateColumn,
-    JoinColumn
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
 } from "typeorm"
 
+import { CompleteState } from "@common"
 import { EnrolledInfoEntity } from "./enrolled-info.entity"
 import { SectionContentEntity } from "./section_content.entity"
-import { CompleteState } from "@common"
 
 @ObjectType()
 @Entity("progress")

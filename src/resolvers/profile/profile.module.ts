@@ -1,17 +1,17 @@
-import { Module } from "@nestjs/common"
-import { ProfileResolver } from "./profile.resolver"
-import { TypeOrmModule } from "@nestjs/typeorm"
 import {
+    AccountMySqlEntity,
     CourseMySqlEntity,
     FollowMySqlEnitity,
-    AccountMySqlEntity,
     PostMySqlEntity,
     ReportAccountMySqlEntity,
     ReportCourseMySqlEntity,
-    ReportPostMySqlEntity,
     ReportPostCommentMySqlEntity,
+    ReportPostMySqlEntity,
     TransactionMySqlEntity,
 } from "@database"
+import { Module } from "@nestjs/common"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { ProfileResolver } from "./profile.resolver"
 import { ProfileService } from "./profile.service"
 
 @Module({

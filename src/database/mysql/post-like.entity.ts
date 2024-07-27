@@ -1,15 +1,15 @@
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
-    CreateDateColumn,
     UpdateDateColumn,
 } from "typeorm"
 import { AccountEntity } from "./account.entity"
 import { PostEntity } from "./post.entity"
-import { Field, ID, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
 @Entity("post_like")

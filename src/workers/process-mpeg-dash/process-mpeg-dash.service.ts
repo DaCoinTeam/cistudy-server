@@ -4,14 +4,14 @@ import {
     FilesData,
     isMinimalFile,
 } from "@common"
+import { pathsConfig, videoConfig } from "@config"
+import { Bento4Service, FfmpegService, StorageService } from "@global"
 import { Injectable, Logger } from "@nestjs/common"
+import { InjectEntityManager } from "@nestjs/typeorm"
 import { promises as fsPromise } from "fs"
 import { basename, dirname, extname, join } from "path"
-import { FfmpegService, Bento4Service, StorageService } from "@global"
-import { pathsConfig, videoConfig } from "@config"
-import { validate as validateUuidv4 } from "uuid"
 import { EntityManager } from "typeorm"
-import { InjectEntityManager } from "@nestjs/typeorm"
+import { validate as validateUuidv4 } from "uuid"
 
 const MANIFEST_FILE_NAME = "manifest.mpd"
 

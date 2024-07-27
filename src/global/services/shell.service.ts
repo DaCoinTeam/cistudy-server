@@ -1,5 +1,5 @@
-import { Injectable } from "@nestjs/common"
 import { getEnvValue } from "@common"
+import { Injectable } from "@nestjs/common"
 import { exec } from "child_process"
 
 @Injectable()

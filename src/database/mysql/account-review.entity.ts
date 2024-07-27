@@ -1,12 +1,13 @@
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
-    CreateDateColumn,
-    UpdateDateColumn} from "typeorm"
-import { Field, ID, ObjectType, Int } from "@nestjs/graphql"
+    UpdateDateColumn
+} from "typeorm"
 import { AccountEntity } from "./account.entity"
 
 @ObjectType()

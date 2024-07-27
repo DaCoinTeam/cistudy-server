@@ -1,30 +1,30 @@
-import { Module } from "@nestjs/common"
 import {
-    CourseMySqlEntity,
-    EnrolledInfoMySqlEntity,
-    SectionMySqlEntity,
-    LessonMySqlEntity,
-    ResourceMySqlEntity,
     AccountMySqlEntity,
-    SessionMySqlEntity,
+    CategoryMySqlEntity,
+    CourseCategoryMySqlEntity,
+    CourseMySqlEntity,
+    CourseReviewMySqlEntity,
     CourseTargetMySqlEntity,
     CryptoWalletMySqlEntity,
-    CategoryMySqlEntity,
-    CourseReviewMySqlEntity,
+    EnrolledInfoMySqlEntity,
+    FollowMySqlEnitity,
+    LessonMySqlEntity,
+    ProgressMySqlEntity,
     QuizAttemptMySqlEntity,
     QuizMySqlEntity,
     QuizQuestionMySqlEntity,
-    RoleMySqlEntity,
     ReportCourseMySqlEntity,
-    CourseCategoryMySqlEntity,
+    ResourceMySqlEntity,
+    RoleMySqlEntity,
     SectionContentMySqlEntity,
-    ProgressMySqlEntity,
-    FollowMySqlEnitity,
+    SectionMySqlEntity,
+    SessionMySqlEntity,
 } from "@database"
-import { CoursesResolver } from "./courses.resolver"
+import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { CoursesService } from "./courses.service"
 import { ResourceAttachmentEntity } from "src/database/mysql/resource-attachment.entity"
+import { CoursesResolver } from "./courses.resolver"
+import { CoursesService } from "./courses.service"
 
 @Module({
     imports: [

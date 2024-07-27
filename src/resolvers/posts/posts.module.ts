@@ -1,17 +1,17 @@
-import { Module } from "@nestjs/common"
-import { PostsResolver } from "./posts.resolver"
-import { TypeOrmModule } from "@nestjs/typeorm"
 import {
-    PostMySqlEntity,
-    PostLikeMySqlEntity,
-    PostCommentMySqlEntity,
-    PostCommentLikeMySqlEntity,
-    PostCommentReplyMySqlEntity,
     AccountMySqlEntity,
-    RoleMySqlEntity,
+    PostCommentLikeMySqlEntity,
+    PostCommentMySqlEntity,
+    PostCommentReplyMySqlEntity,
+    PostLikeMySqlEntity,
+    PostMySqlEntity,
     ReportPostCommentMySqlEntity,
-    ReportPostMySqlEntity
+    ReportPostMySqlEntity,
+    RoleMySqlEntity
 } from "@database"
+import { Module } from "@nestjs/common"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { PostsResolver } from "./posts.resolver"
 import { PostsService } from "./posts.service"
 
 @Module({

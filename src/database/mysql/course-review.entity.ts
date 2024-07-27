@@ -1,14 +1,15 @@
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
-    CreateDateColumn,
-    UpdateDateColumn} from "typeorm"
-import { Field, ID, ObjectType, Int } from "@nestjs/graphql"
-import { CourseEntity } from "./course.entity"
+    UpdateDateColumn
+} from "typeorm"
 import { AccountEntity } from "./account.entity"
+import { CourseEntity } from "./course.entity"
 
 @ObjectType()
 @Entity("course-review")

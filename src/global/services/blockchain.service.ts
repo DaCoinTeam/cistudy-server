@@ -1,7 +1,3 @@
-import { Injectable, OnModuleInit } from "@nestjs/common"
-import Web3, { Address } from "web3"
-import { Web3Account } from "web3-eth-accounts"
-import { blockchainConfig } from "@config"
 import {
     ChainId,
     ERC20Contract,
@@ -10,7 +6,11 @@ import {
     chainInfos,
     getHttpProvider,
 } from "@blockchain"
+import { blockchainConfig } from "@config"
+import { Injectable, OnModuleInit } from "@nestjs/common"
+import Web3, { Address } from "web3"
 import { RegisteredSubscription } from "web3-eth"
+import { Web3Account } from "web3-eth-accounts"
 
 @Injectable()
 export class BlockchainService implements OnModuleInit {

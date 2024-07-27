@@ -1,9 +1,9 @@
-import { Resolver, Query, Args } from "@nestjs/graphql"
-import { AuthService } from "./auth.service"
-import { AuthInterceptor, GenerateAuthTokensInterceptor, JwtAuthGuard, AccountId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
-import { InitLandingPageOutputOthers, InitOutput, SignInOutput, VerifyGoogleAccessTokenOutput } from "./auth.output"
+import { Args, Query, Resolver } from "@nestjs/graphql"
+import { AccountId, AuthInterceptor, GenerateAuthTokensInterceptor, JwtAuthGuard } from "../shared"
 import { SignInInputData, VerifyGoogleAccessTokenData } from "./auth.input"
+import { InitLandingPageOutputOthers, InitOutput, SignInOutput, VerifyGoogleAccessTokenOutput } from "./auth.output"
+import { AuthService } from "./auth.service"
 
 @Resolver()
 export class AuthResolver {

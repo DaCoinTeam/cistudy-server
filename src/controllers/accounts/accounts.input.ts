@@ -1,4 +1,4 @@
-import { AuthInput, ReportProcessStatus, SystemRoles, CourseVerifyStatus } from "@common"
+import { AuthInput, CourseVerifyStatus, ReportProcessStatus, SystemRoles } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID, Max, Min, MinLength } from "class-validator"
 

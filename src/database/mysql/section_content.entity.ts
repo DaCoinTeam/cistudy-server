@@ -1,21 +1,21 @@
+import { CompleteState, SectionContentType } from "@common"
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
-    PrimaryGeneratedColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
+    OneToMany,
     OneToOne,
-    OneToMany
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
 } from "typeorm"
 import { LessonEntity } from "./lesson.entity"
-import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
-import { CompleteState, SectionContentType } from "@common"
-import { SectionEntity } from "./section.entity"
+import { ProgressEntity } from "./progress.entity"
 import { QuizEntity } from "./quiz.entity"
 import { ResourceEntity } from "./resource.entity"
-import { ProgressEntity } from "./progress.entity"
+import { SectionEntity } from "./section.entity"
 
 @ObjectType()
 @Entity("section_content")

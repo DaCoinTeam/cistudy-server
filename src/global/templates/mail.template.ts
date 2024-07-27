@@ -1,4 +1,4 @@
-export const acceptCourseMail = (username : string, email : string, title : string) => `
+export const acceptCourseMail = (username: string, email: string, title: string) => `
             <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,7 +56,7 @@ export const acceptCourseMail = (username : string, email : string, title : stri
 </body>
 </html>
         `
-export const rejectCourseMail = (username : string, email : string, title : string, note : string, courseId: string) => `
+export const rejectCourseMail = (username: string, email: string, title: string, note: string, courseId: string) => `
             <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -133,7 +133,7 @@ export const rejectCourseMail = (username : string, email : string, title : stri
 </body>
 </html>
         `
-export const verifyAccountMail = (username : string, email: string, frontendUrl: string, token : string) =>  `
+export const verifyAccountMail = (username: string, email: string, frontendUrl: string, token: string) => `
             <!DOCTYPE html>
 <html lang="en">
 <head>

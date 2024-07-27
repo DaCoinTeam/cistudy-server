@@ -47,6 +47,10 @@ export class CreateCategoryOutput implements Output<CreateCategoryOutputOthers> 
     others: CreateCategoryOutputOthers
 }
 
+export class UpdateCategoryOutput implements Output{
+    message: string
+}
+
 export class DeleteCategoryOutput implements Output {
     message: string
 }

@@ -1,15 +1,15 @@
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
     OneToOne,
     PrimaryColumn,
+    UpdateDateColumn,
 } from "typeorm"
 
-import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { ProcessStatus, VideoType } from "@common"
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { SectionContentEntity } from "./section_content.entity"
 
 @ObjectType()

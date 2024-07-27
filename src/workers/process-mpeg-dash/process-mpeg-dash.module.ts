@@ -1,8 +1,8 @@
-import { Global, Module } from "@nestjs/common"
 import { BullModule } from "@nestjs/bull"
-import { ProcessMpegDashProducer } from "./process-mpeg-dash.producer"
-import { ProcessMpegDashConsumer } from "./process-mpeg-dash.consumer"
+import { Global, Module } from "@nestjs/common"
 import { QUEUE_NAME } from "./process-mpeg-dash.constants"
+import { ProcessMpegDashConsumer } from "./process-mpeg-dash.consumer"
+import { ProcessMpegDashProducer } from "./process-mpeg-dash.producer"
 import { ProcessMpegDashService } from "./process-mpeg-dash.service"
 
 @Global()

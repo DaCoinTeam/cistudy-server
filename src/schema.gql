@@ -68,6 +68,7 @@ type QuizAttemptAnswerEntity {
   quizAttemptId: ID!
   quizQuestionAnswerId: ID!
   createdAt: DateTime!
+  observedAt: DateTime!
   updatedAt: DateTime!
   quizAttempt: QuizAttemptEntity!
   quizQuestionAnswer: QuizQuestionAnswerEntity!

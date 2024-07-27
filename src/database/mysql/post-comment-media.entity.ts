@@ -1,14 +1,14 @@
 import {
     Column,
     Entity,
-    PrimaryGeneratedColumn,
-    ManyToOne,
     JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
 } from "typeorm"
 
+import { MediaType } from "@common"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { PostCommentEntity } from "./post-comment.entity"
-import { MediaType } from "@common"
 
 @ObjectType()
 @Entity("post_comment_media")

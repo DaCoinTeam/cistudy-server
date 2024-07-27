@@ -1,9 +1,18 @@
-import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
-import { AccountEntity } from "./account.entity"
-import { QuizEntity } from "./quiz.entity"
 import { QuizAttemptStatus } from "@common"
+import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
+} from "typeorm"
+import { AccountEntity } from "./account.entity"
 import { QuizAttemptAnswerEntity } from "./quiz-attempt-answer.entity"
+import { QuizEntity } from "./quiz.entity"
 
 
 @ObjectType()

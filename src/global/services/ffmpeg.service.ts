@@ -1,7 +1,7 @@
+import { pathsConfig, videoConfig } from "@config"
 import { Injectable } from "@nestjs/common"
 import ffmpeg from "fluent-ffmpeg"
 import { join } from "path"
-import { pathsConfig, videoConfig } from "@config"
 
 @Injectable()
 export class FfmpegService {

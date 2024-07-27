@@ -1,5 +1,5 @@
+import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@common"
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
-import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions} from "@common"
 import { IsOptional, IsUUID } from "class-validator"
 
 @InputType()

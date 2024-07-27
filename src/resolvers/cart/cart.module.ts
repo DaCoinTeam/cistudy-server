@@ -1,12 +1,12 @@
-import { Module } from "@nestjs/common"
-import { TypeOrmModule } from "@nestjs/typeorm"
 import {
-    CartMySqlEntity,
+    AccountMySqlEntity,
     CartCourseMySqlEntity,
+    CartMySqlEntity,
     CourseMySqlEntity,
     OrderMySqlEntity,
-    AccountMySqlEntity,
 } from "@database"
+import { Module } from "@nestjs/common"
+import { TypeOrmModule } from "@nestjs/typeorm"
 
 import { CartResolver } from "./cart.resolver"
 import { CartService } from "./cart.service"

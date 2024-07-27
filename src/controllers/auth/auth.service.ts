@@ -1,11 +1,11 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
+import { SystemRoles } from "@common"
 import { AccountMySqlEntity, RoleMySqlEntity } from "@database"
+import { AuthManagerService, MailerService, Sha256Service } from "@global"
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository } from "typeorm"
-import { AuthManagerService, MailerService, Sha256Service } from "@global"
 import { SignInInput, SignUpInput, VerifyRegistrationInput } from "./auth.input"
 import { SignUpOutput, VerifyRegistrationOutput } from "./auth.output"
-import { SystemRoles } from "@common"
 
 @Injectable()
 export class AuthService {
