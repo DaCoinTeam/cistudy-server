@@ -51,7 +51,9 @@ import {
     CreateQuizQuestionAnswerInputData,
     UpdateQuizQuestionInputData,
     UpdateQuizQuestionAnswerInputData,
-    PublishCourseInputData
+    PublishCourseInputData,
+    UpdateQuizAttemptInputData,
+    UpdateQuizAttemptAnswersInputData
 } from "./courses.input"
 
 import {
@@ -643,6 +645,36 @@ export class CoursesController {
         @Body() data: CreateQuizQuestionInputData,
     ) {
         return this.coursesService.createQuizQuestion({
+            accountId,
+            data,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("update-quiz-attempt")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async updateQuizAttempt(
+        @AccountId() accountId: string,
+        @Body() data: UpdateQuizAttemptInputData,
+    ) {
+        return this.coursesService.updateQuizAttempt({
+            accountId,
+            data,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("update-quiz-attempt-answers")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async updateQuizAttemptAnswers(
+        @AccountId() accountId: string,
+        @Body() data: UpdateQuizAttemptAnswersInputData,
+    ) {
+        return this.coursesService.updateQuizAttemptAnswers({
             accountId,
             data,
         })

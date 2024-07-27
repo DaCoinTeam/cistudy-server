@@ -667,7 +667,6 @@ export class CoursesService {
                 relations: {
                     accountProgresses: true,
                     quiz: {
-                        quizAttempts:true,
                         questions: {
                             answers: true,
                         },
@@ -698,6 +697,27 @@ export class CoursesService {
                     },
                 },
             })
+
+            let activeQuizAttempt = await this.quizAttemptMySqlRepository.findOne({
+                where: {
+                    quizId: sectionContentId,
+                    accountId,
+                    attemptStatus: QuizAttemptStatus.Started,
+                },
+                relations: {
+                    attemptAnswers: true
+                }
+            })
+
+            if (!activeQuizAttempt) {
+                activeQuizAttempt = await this.quizAttemptMySqlRepository.save({
+                    quizId: sectionContentId,
+                    accountId,
+                    attemptStatus: QuizAttemptStatus.Started
+                })
+            }
+
+            sectionContent.quiz.activeQuizAttempt = activeQuizAttempt
 
             let progress = sectionContent.accountProgresses.find((progress) => enrolledInfoId === progress.enrolledInfoId &&
                 sectionContent.sectionContentId === progress.sectionContentId

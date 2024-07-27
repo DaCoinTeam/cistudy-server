@@ -33,6 +33,10 @@ export class QuizAttemptEntity {
     @Field(() => Int)
     @Column({ type: "int", default: 0 })
         timeTaken : number
+    
+    @Field(() => Int)
+    @Column({ type: "int", default: 1 })
+        currentQuestionPosition: number
 
     @Field(() => Date)
     @CreateDateColumn()

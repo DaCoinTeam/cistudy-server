@@ -250,3 +250,6 @@ export class UpdateSectionContentOuput implements Output {
     message: string
 }
 
+export class UpdateQuizAttemptOutput implements Output {
+    message: string
+}
