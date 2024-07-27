@@ -58,4 +58,6 @@ export class QuizEntity {
         isPassed?: boolean
     @Field(() => Boolean, { defaultValue: false })
         isLocked?: boolean
+    @Field(() => QuizAttemptEntity, { nullable: true })
+        activeQuizAttempt?: QuizAttemptEntity
 }

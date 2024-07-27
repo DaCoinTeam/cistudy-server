@@ -54,5 +54,7 @@ export class QuizQuestionEntity {
     @ManyToOne(() => QuizEntity, (quiz) => quiz.questions, {onDelete : "CASCADE"})
     @JoinColumn({ name: "quizId" })
         quiz: QuizEntity
-
+    
+    @Field(() => Boolean)
+        answered?: boolean
 }

@@ -198,6 +198,7 @@ type QuizEntity {
   lastAttemptTimeTaken: String
   isPassed: Boolean
   isLocked: Boolean!
+  activeQuizAttempt: QuizAttemptEntity
 }
 
 type ResourceAttachmentEntity {

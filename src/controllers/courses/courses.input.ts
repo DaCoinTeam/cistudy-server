@@ -733,3 +733,34 @@ export class PublishCourseInput implements AuthInput<PublishCourseInputData> {
     accountId: string
     data: PublishCourseInputData
 }
+
+export class UpdateQuizAttemptInputData {
+    @ApiProperty()
+        quizAttemptId: string
+    @ApiProperty()
+        currentQuestionPosition?: number
+    @ApiProperty()
+        quizId: string
+}
+
+export class UpdateQuizAttemptInput implements AuthInput<UpdateQuizAttemptInputData> {
+    accountId: string
+    data: UpdateQuizAttemptInputData
+}
+
+export class UpdateQuizAttemptAnswersInputData {
+    @ApiProperty()
+        quizAttemptId: string
+    @ApiProperty()
+        quizQuestionId: string
+    @ApiProperty()
+        quizQuestionAnswerIds: Array<string>
+    @ApiProperty()
+        quizId: string
+}
+
+export class UpdateQuizAttemptAnswersInput implements AuthInput<UpdateQuizAttemptAnswersInputData> {
+    accountId: string
+    data: UpdateQuizAttemptAnswersInputData
+}
+

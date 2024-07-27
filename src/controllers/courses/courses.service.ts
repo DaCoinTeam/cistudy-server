@@ -77,6 +77,8 @@ import {
     UpdateCourseReviewInput,
     UpdateCourseTargetInput,
     UpdateLessonInput,
+    UpdateQuizAttemptAnswersInput,
+    UpdateQuizAttemptInput,
     UpdateQuizInput,
     UpdateQuizQuestionAnswerInput,
     UpdateQuizQuestionInput,
@@ -116,6 +118,7 @@ import {
     UpdateCourseReviewOutput,
     UpdateCourseTargetOuput,
     UpdateLessonOutput,
+    UpdateQuizAttemptOutput,
     UpdateQuizOutput,
     UpdateQuizQuestionAnswerOutput,
     UpdateQuizQuestionOutput,
@@ -391,7 +394,6 @@ export class CoursesService {
             }
 
             if (existKeyNotUndefined(course)) {
-                course.verifyStatus = CourseVerifyStatus.Pending
                 await this.courseMySqlRepository.save(course)
             }
 
@@ -1893,6 +1895,48 @@ export class CoursesService {
 
         return {
             message: "Your course has been submitted for review, thank you."
+        }
+    }
+
+    async updateQuizAttempt(
+        input: UpdateQuizAttemptInput,
+    ): Promise<UpdateQuizAttemptOutput> {
+        const { data } = input
+        const { quizAttemptId, currentQuestionPosition } = data
+
+        await this.quizAttemptMySqlRepository.update(quizAttemptId, {
+            currentQuestionPosition
+        })
+
+        return {
+            message: "Your attempt has been updated successfully",
+        }
+    }
+
+    async  updateQuizAttemptAnswers(
+        input: UpdateQuizAttemptAnswersInput,
+    ): Promise<UpdateQuizAttemptOutput> {
+        const { data } = input
+        const { quizAttemptId, quizQuestionId, quizQuestionAnswerIds } = data
+
+        const answers = await this.quizQuestionAnswerMySqlRepository.find({
+            where: {
+                quizQuestionId
+            }
+        })
+
+        await this.quizAttemptAnswerMySqlRepository.delete({
+            quizAttemptId,
+            quizQuestionAnswerId: In(answers.map(({quizQuestionAnswerId}) => quizQuestionAnswerId))
+        })
+
+        await this.quizAttemptAnswerMySqlRepository.save(quizQuestionAnswerIds.map(quizQuestionAnswerId => ({
+            quizQuestionAnswerId,
+            quizAttemptId
+        })))
+
+        return {
+            message: "Your attempt has been updated successfully",
         }
     }
 }

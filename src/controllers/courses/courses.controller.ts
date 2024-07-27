@@ -23,6 +23,8 @@ import {
     JwtAuthGuard,
     DataFromBody,
     Roles,
+    QuizAttemptTimeGuard,
+    RolesGuard
 } from "../shared"
 import {
     CreateCategoryInputData,
@@ -52,7 +54,9 @@ import {
     UpdateQuizQuestionInputData,
     UpdateQuizQuestionAnswerInputData,
     PublishCourseInputData,
-    UpdateCategoryInputData
+    UpdateCategoryInputData,
+    UpdateQuizAttemptInputData,
+    UpdateQuizAttemptAnswersInputData
 } from "./courses.input"
 
 import {
@@ -66,7 +70,6 @@ import {
 import { Files, SystemRoles } from "@common"
 import { CoursesService } from "./courses.service"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
-import { RolesGuard } from "../shared/guards/role.guard"
 
 @ApiTags("Courses")
 @ApiHeader({
@@ -667,6 +670,36 @@ export class CoursesController {
         @Body() data: CreateQuizQuestionInputData,
     ) {
         return this.coursesService.createQuizQuestion({
+            accountId,
+            data,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("update-quiz-attempt")
+    @UseGuards(JwtAuthGuard, RolesGuard, QuizAttemptTimeGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async updateQuizAttempt(
+        @AccountId() accountId: string,
+        @Body() data: UpdateQuizAttemptInputData,
+    ) {
+        return this.coursesService.updateQuizAttempt({
+            accountId,
+            data,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("update-quiz-attempt-answers")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async updateQuizAttemptAnswers(
+        @AccountId() accountId: string,
+        @Body() data: UpdateQuizAttemptAnswersInputData,
+    ) {
+        return this.coursesService.updateQuizAttemptAnswers({
             accountId,
             data,
         })
