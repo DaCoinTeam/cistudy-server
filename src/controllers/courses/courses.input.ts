@@ -724,6 +724,8 @@ export class UpdateQuizAttemptInputData {
         quizAttemptId: string
     @ApiProperty()
         currentQuestionPosition?: number
+    @ApiProperty()
+        quizId: string
 }
 
 export class UpdateQuizAttemptInput implements AuthInput<UpdateQuizAttemptInputData> {
@@ -738,6 +740,8 @@ export class UpdateQuizAttemptAnswersInputData {
         quizQuestionId: string
     @ApiProperty()
         quizQuestionAnswerIds: Array<string>
+    @ApiProperty()
+        quizId: string
 }
 
 export class UpdateQuizAttemptAnswersInput implements AuthInput<UpdateQuizAttemptAnswersInputData> {

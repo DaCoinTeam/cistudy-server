@@ -53,6 +53,7 @@ type QuizAttemptEntity {
   score: Float
   attemptStatus: String!
   timeTaken: Int!
+  timeLeft: Int!
   currentQuestionPosition: Int!
   createdAt: DateTime!
   updatedAt: DateTime!

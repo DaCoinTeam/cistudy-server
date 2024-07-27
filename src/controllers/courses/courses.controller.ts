@@ -23,6 +23,8 @@ import {
     JwtAuthGuard,
     DataFromBody,
     Roles,
+    QuizAttemptTimeGuard,
+    RolesGuard
 } from "../shared"
 import {
     CreateCategoryInputData,
@@ -66,7 +68,6 @@ import {
 import { Files, SystemRoles } from "@common"
 import { CoursesService } from "./courses.service"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
-import { RolesGuard } from "../shared/guards/role.guard"
 
 @ApiTags("Courses")
 @ApiHeader({
@@ -652,7 +653,7 @@ export class CoursesController {
 
     @ApiBearerAuth()
     @Patch("update-quiz-attempt")
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard, QuizAttemptTimeGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async updateQuizAttempt(

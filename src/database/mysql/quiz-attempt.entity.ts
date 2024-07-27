@@ -35,6 +35,10 @@ export class QuizAttemptEntity {
         timeTaken : number
     
     @Field(() => Int)
+    @Column({ type: "int", default: 1000 * 60 * 60 * 60 })
+        timeLeft : number
+    
+    @Field(() => Int)
     @Column({ type: "int", default: 1 })
         currentQuestionPosition: number
 

@@ -16,7 +16,7 @@ import {
     SectionContentMySqlEntity,
     CourseRating
 } from "@database"
-import { Injectable, NotFoundException } from "@nestjs/common"
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, DataSource, Like } from "typeorm"
 import {
@@ -715,6 +715,22 @@ export class CoursesService {
                     accountId,
                     attemptStatus: QuizAttemptStatus.Started
                 })
+            }
+
+            const currentTimeLeft = activeQuizAttempt.timeLeft - (Date.now() - activeQuizAttempt.updatedAt.getTime())
+            console.log(Date.now() - activeQuizAttempt.updatedAt.getTime())
+
+            if (currentTimeLeft <= 0) {
+                await this.quizAttemptMySqlRepository.update(activeQuizAttempt.quizAttemptId, {
+                    attemptStatus: QuizAttemptStatus.Ended,
+                    timeLeft: 0
+                })
+                activeQuizAttempt.timeLeft = 0
+            } else {
+                await this.quizAttemptMySqlRepository.update(activeQuizAttempt.quizAttemptId, {
+                    timeLeft: currentTimeLeft
+                })
+                activeQuizAttempt.timeLeft = currentTimeLeft
             }
 
             sectionContent.quiz.activeQuizAttempt = activeQuizAttempt
