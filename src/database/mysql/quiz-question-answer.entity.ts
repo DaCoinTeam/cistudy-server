@@ -34,7 +34,7 @@ export class QuizQuestionAnswerEntity {
     
     @Field(() => QuizAttemptAnswerEntity)
     @OneToMany(() => QuizAttemptAnswerEntity, (attemptAnswers) => attemptAnswers.quizQuestionAnswer, { onDelete: "CASCADE" })
-        attemptAnswers : QuizAttemptAnswerEntity
+        attemptAnswers : Array<QuizAttemptAnswerEntity>
 
     @Field(() => Date)
     @CreateDateColumn()

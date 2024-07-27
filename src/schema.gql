@@ -94,6 +94,7 @@ type QuizQuestionEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   quiz: QuizEntity!
+  answered: Boolean!
 }
 
 type QuizEntity {
