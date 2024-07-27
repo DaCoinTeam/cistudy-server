@@ -1,9 +1,9 @@
+import { AuthOutput, AuthTokens, AuthTokenType, Payload } from "@common"
 import { jwtConfig } from "@config"
-import { SessionMySqlEntity, AccountMySqlEntity, RoleMySqlEntity } from "@database"
+import { AccountMySqlEntity, RoleMySqlEntity, SessionMySqlEntity } from "@database"
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
 import { JsonWebTokenError, JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Payload, AuthTokens, AuthTokenType, AuthOutput } from "@common"
 import { Repository } from "typeorm"
 
 @Injectable()

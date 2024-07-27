@@ -52,7 +52,3 @@ implements Input<VerifyGoogleAccessTokenData>
 {
     data: VerifyGoogleAccessTokenData
 }
-
-export class InitLandingPageInput {
-
-}

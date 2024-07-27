@@ -13,7 +13,8 @@ import {
     FindManyCoursesInputData,
     FindManyCoursesTopicInputData,
     FindManyLessonsInputData,
-    FindManyLevelCategoriesInputData, FindOneCourseAuthInputData,
+    FindManyLevelCategoriesInputData,
+    FindOneCourseAuthInputData,
     FindOneCourseInputData,
     FindOneCourseReviewInputData,
     FindOneQuizAttemptInputData,
@@ -25,7 +26,8 @@ import {
     FindManyCourseTargetsOutput,
     FindManyCoursesOutputData,
     FindManyCoursesTopicOutputData,
-    FindManyLessonsOutput, FindOneCourseAuthOutput,
+    FindManyLessonsOutput,
+    FindOneCourseAuthOutput,
     FindOneQuizAttemptOutput,
     FindOneSectionContentOutput
 } from "./courses.output"

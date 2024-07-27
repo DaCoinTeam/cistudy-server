@@ -1,10 +1,10 @@
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
-    CreateDateColumn,
     UpdateDateColumn
 } from "typeorm"
 

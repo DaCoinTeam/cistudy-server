@@ -1,6 +1,14 @@
 import {
+    CompleteState,
+    CourseVerifyStatus,
+    LockState,
+    QuizAttemptStatus,
+    SectionContentType,
+} from "@common"
+import {
     CategoryMySqlEntity,
     CourseMySqlEntity,
+    CourseRating,
     CourseReviewMySqlEntity,
     CourseTargetMySqlEntity,
     EnrolledInfoMySqlEntity,
@@ -13,24 +21,23 @@ import {
     ReportCourseMySqlEntity,
     ResourceAttachmentMySqlEntity,
     ResourceMySqlEntity,
-    SectionContentMySqlEntity,
-    CourseRating
+    SectionContentMySqlEntity
 } from "@database"
 import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository, DataSource, Like } from "typeorm"
+import { DataSource, Like, Repository } from "typeorm"
 import {
-    FindOneCourseInput,
-    FindManyCoursesInput,
-    FindManyLessonsInput,
-    FindManyCourseTargetsInput,
-    FindOneCourseReviewInput,
-    FindManyCourseReviewsInput,
-    FindManyCoursesTopicInput,
-    FindOneQuizAttemptInput,
-    FindManyLevelCategoriesInput,
     FindManyCourseReportsInput,
+    FindManyCourseReviewsInput,
+    FindManyCoursesInput,
+    FindManyCoursesTopicInput,
+    FindManyCourseTargetsInput,
+    FindManyLessonsInput,
+    FindManyLevelCategoriesInput,
     FindOneCourseAuthInput,
+    FindOneCourseInput,
+    FindOneCourseReviewInput,
+    FindOneQuizAttemptInput,
     FindOneSectionContentInput,
 } from "./courses.input"
 import {
@@ -40,13 +47,6 @@ import {
     FindManyCoursesTopicOutputData,
     FindOneQuizAttemptOutput,
 } from "./courses.output"
-import {
-    CompleteState,
-    CourseVerifyStatus,
-    LockState,
-    QuizAttemptStatus,
-    SectionContentType,
-} from "@common"
 
 @Injectable()
 export class CoursesService {

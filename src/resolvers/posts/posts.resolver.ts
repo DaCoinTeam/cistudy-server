@@ -1,4 +1,6 @@
-import { Resolver, Query, Args } from "@nestjs/graphql"
+import { UseGuards, UseInterceptors } from "@nestjs/common"
+import { Args, Query, Resolver } from "@nestjs/graphql"
+import { AccountId, AuthInterceptor, JwtAuthGuard } from "../shared"
 import {
     FindManyPostCommentRepliesInputData,
     FindManyPostCommentReportsInputData,
@@ -8,9 +10,6 @@ import {
     FindOnePostCommentInputData,
     FindOnePostInputData,
 } from "./posts.input"
-import { PostsService } from "./posts.service"
-import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
-import { UseGuards, UseInterceptors } from "@nestjs/common"
 import {
     FindManyPostCommentRepliesOutput,
     FindManyPostCommentReportsOutput,
@@ -20,6 +19,7 @@ import {
     FindOnePostCommentOutput,
     FindOnePostOutput,
 } from "./posts.output"
+import { PostsService } from "./posts.service"
 
 
 @Resolver()

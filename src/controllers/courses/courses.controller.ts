@@ -51,11 +51,13 @@ import {
     CreateQuizQuestionAnswerInputData,
     UpdateQuizQuestionInputData,
     UpdateQuizQuestionAnswerInputData,
-    PublishCourseInputData
+    PublishCourseInputData,
+    UpdateCategoryInputData
 } from "./courses.input"
 
 import {
     createCategorySchema,
+    updateCategorySchema,
     updateCourseSchema,
     updateLessonSchema,
     UpdateResourceSchema
@@ -379,6 +381,28 @@ export class CoursesController {
         @UploadedFiles() { files }: Files,
     ) {
         return this.coursesService.createCategory({
+            accountId,
+            data,
+            files,
+        })
+    }
+
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: updateCategorySchema })
+    @Patch("update-category")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(
+        AuthInterceptor,
+        FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
+    )
+    async updateCategory(
+        @AccountId() accountId: string,
+        @DataFromBody() data: UpdateCategoryInputData,
+        @UploadedFiles() { files }: Files,
+    ) {
+        return this.coursesService.updateCategory({
             accountId,
             data,
             files,

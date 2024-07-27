@@ -1,39 +1,42 @@
+import { CourseVerifyStatus, ReportProcessStatus, SystemRoles } from "@common"
+import {
+    AccountMySqlEntity,
+    AccountReviewMySqlEntity,
+    CourseMySqlEntity,
+    EnrolledInfoMySqlEntity,
+    FollowMySqlEnitity,
+    ReportAccountMySqlEntity,
+    RoleMySqlEntity,
+} from "@database"
+import { MailerService } from "@global"
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
+import { JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, In, Repository } from "typeorm"
-import { CreateAccountReviewInput, 
-    DeleteCourseInput, 
-    DeleteAccountReviewInput, 
-    ToggleFollowInput, 
-    UpdateAccountReviewInput, 
-    VerifyCourseInput, 
-    ToggleRoleInput, 
-    CreateAccountRoleInput, 
-    UpdateAccountRoleInput, 
-    CreateAccountReportInput, 
-    UpdateAccountReportInput, 
-    ResolveAccountReportInput
+import {
+    CreateAccountReportInput,
+    CreateAccountReviewInput,
+    CreateAccountRoleInput,
+    DeleteAccountReviewInput,
+    DeleteCourseInput,
+    ResolveAccountReportInput,
+    ToggleFollowInput,
+    ToggleRoleInput,
+    UpdateAccountReportInput,
+    UpdateAccountReviewInput,
+    UpdateAccountRoleInput,
+    VerifyCourseInput
 } from "./accounts.input"
-import { AccountMySqlEntity, 
-    CourseMySqlEntity, 
-    EnrolledInfoMySqlEntity, 
-    FollowMySqlEnitity, 
-    AccountReviewMySqlEntity, 
-    RoleMySqlEntity, 
-    ReportAccountMySqlEntity, 
-} from "@database"
-import { CreateAccountReportOutput, 
-    CreateAccountReviewOutput, 
-    CreateAccountRoleOutput, 
-    ResolveAccountReportOutput, 
-    ToggleRoleOutput, 
-    UpdateAccountReportOutput, 
-    UpdateAccountRoleOutput, 
-    VerifyCourseOuput 
+import {
+    CreateAccountReportOutput,
+    CreateAccountReviewOutput,
+    CreateAccountRoleOutput,
+    ResolveAccountReportOutput,
+    ToggleRoleOutput,
+    UpdateAccountReportOutput,
+    UpdateAccountRoleOutput,
+    VerifyCourseOuput
 } from "./accounts.output"
-import { JwtService } from "@nestjs/jwt"
-import { CourseVerifyStatus, ReportProcessStatus, SystemRoles } from "@common"
-import { MailerService } from "@global"
 
 @Injectable()
 export class AccountsService {

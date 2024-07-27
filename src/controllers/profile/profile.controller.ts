@@ -1,19 +1,19 @@
-import {
-    Controller,
-    UseInterceptors,
-    UseGuards,
-    UploadedFiles,
-    Put,
-    Patch,
-    Body,
-} from "@nestjs/common"
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
-import { AccountId, AuthInterceptor, JwtAuthGuard, DataFromBody } from "../shared"
 import { Files } from "@common"
+import {
+    Body,
+    Controller,
+    Patch,
+    Put,
+    UploadedFiles,
+    UseGuards,
+    UseInterceptors,
+} from "@nestjs/common"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
-import { ProfileService } from "./profile.service"
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
+import { AccountId, AuthInterceptor, DataFromBody, JwtAuthGuard } from "../shared"
 import { DepositData, UpdateProfileData, WithdrawData } from "./profile.input"
 import { updateProfileSchema } from "./profile.schema"
+import { ProfileService } from "./profile.service"
 
 @ApiTags("Profile")
 @ApiHeader({

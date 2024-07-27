@@ -1,14 +1,14 @@
-import { CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, ProgressMySqlEntity, SectionMySqlEntity, AccountMySqlEntity, PostMySqlEntity, ReportAccountMySqlEntity, ReportCourseMySqlEntity, ReportPostCommentMySqlEntity, ReportPostMySqlEntity, TransactionMySqlEntity, SectionContentMySqlEntity } from "@database"
+import { CompleteState } from "@common"
+import { AccountMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, PostMySqlEntity, ProgressMySqlEntity, SectionContentMySqlEntity, SectionMySqlEntity, TransactionMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
-import { Repository, DataSource } from "typeorm"
+import { InjectRepository } from "@nestjs/typeorm"
+import { DataSource, Repository } from "typeorm"
 import {
     FindManyEnrolledCoursesInput,
     FindManySelfCreatedCoursesInput,
     FindManyTransactionsInput,
 } from "./profile.input"
-import { InjectRepository } from "@nestjs/typeorm"
 import { FindManyEnrolledCoursesOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData } from "./profile.output"
-import { CompleteState } from "@common"
 
 
 @Injectable()
@@ -18,14 +18,6 @@ export class ProfileService {
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
         @InjectRepository(PostMySqlEntity)
         private readonly postMySqlRepository: Repository<PostMySqlEntity>,
-        @InjectRepository(ReportAccountMySqlEntity)
-        private readonly reportAccountMySqlRepository: Repository<ReportAccountMySqlEntity>,
-        @InjectRepository(ReportCourseMySqlEntity)
-        private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
-        @InjectRepository(ReportPostMySqlEntity)
-        private readonly reportPostMySqlRepository: Repository<ReportPostMySqlEntity>,
-        @InjectRepository(ReportPostCommentMySqlEntity)
-        private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
         @InjectRepository(TransactionMySqlEntity)
         private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
         private readonly dataSource: DataSource,

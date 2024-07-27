@@ -1,10 +1,10 @@
-import { Resolver, Query, Args } from "@nestjs/graphql"
-import { AccountsService } from "./accounts.service"
-import { FindManyFollowersInputData, FindManyAccountReviewsInputData, FindManyAccountsInputData, FindOneAccountInputData, FindManyAccountReportsInputData, FindManyPendingCourseInputData } from "./accounts.input"
 import { AccountMySqlEntity } from "@database"
-import { FindManyAccountReportsOutput, FindManyAccountReviewsOutputData, FindManyAccountsOutput, FindManyPendingCourseOutput } from "./accounts.output"
-import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
+import { Args, Query, Resolver } from "@nestjs/graphql"
+import { AccountId, AuthInterceptor, JwtAuthGuard } from "../shared"
+import { FindManyAccountReportsInputData, FindManyAccountReviewsInputData, FindManyAccountsInputData, FindManyFollowersInputData, FindManyPendingCourseInputData, FindOneAccountInputData } from "./accounts.input"
+import { FindManyAccountReportsOutput, FindManyAccountReviewsOutputData, FindManyAccountsOutput, FindManyPendingCourseOutput } from "./accounts.output"
+import { AccountsService } from "./accounts.service"
 
 @Resolver()
 export class AccountsResolver {

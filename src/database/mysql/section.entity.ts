@@ -1,19 +1,19 @@
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
-    CreateDateColumn,
     UpdateDateColumn
 } from "typeorm"
 
-import { CourseEntity } from "./course.entity"
-import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
-import { SectionContentEntity } from "./section_content.entity"
-import { AccountGradeEntity } from "./account-grade.entity"
 import { LockState } from "@common"
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
+import { AccountGradeEntity } from "./account-grade.entity"
+import { CourseEntity } from "./course.entity"
+import { SectionContentEntity } from "./section_content.entity"
 
 @ObjectType()
 @Entity("section")

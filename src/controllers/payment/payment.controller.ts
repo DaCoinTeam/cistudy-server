@@ -1,16 +1,16 @@
+import { SystemRoles } from "@common"
 import {
-    Controller,
     Body,
+    Controller,
     Post,
     UseGuards,
     UseInterceptors,
 } from "@nestjs/common"
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger"
-import { PaymentService } from "./payment.service"
-import { CaptureOrderData, CreateOrderData } from "./payment.input"
 import { AccountId, AuthInterceptor, JwtAuthGuard, Roles } from "../shared"
-import { SystemRoles } from "@common"
 import { RolesGuard } from "../shared/guards/role.guard"
+import { CaptureOrderData, CreateOrderData } from "./payment.input"
+import { PaymentService } from "./payment.service"
 
 @ApiTags("Payment")
 @ApiHeader({

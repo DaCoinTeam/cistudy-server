@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common"
-import { InjectQueue } from "@nestjs/bull"
-import { Queue } from "bull"
-import { ProcessMpegDashService } from "./process-mpeg-dash.service"
-import { QUEUE_NAME } from "./process-mpeg-dash.constants"
 import { AnyFileProcessData, isMinimalFile } from "@common"
+import { InjectQueue } from "@nestjs/bull"
+import { Injectable } from "@nestjs/common"
+import { Queue } from "bull"
+import { QUEUE_NAME } from "./process-mpeg-dash.constants"
+import { ProcessMpegDashService } from "./process-mpeg-dash.service"
 
 @Injectable()
 export class ProcessMpegDashProducer {

@@ -1,16 +1,16 @@
-import {
-    Entity,
-    CreateDateColumn,
-    UpdateDateColumn,
-    PrimaryColumn,
-    JoinColumn,
-    OneToOne,
-    OneToMany,
-    Column
-} from "typeorm"
 import { Field, ID, ObjectType } from "@nestjs/graphql"
-import { SectionContentEntity } from "./section_content.entity"
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    OneToMany,
+    OneToOne,
+    PrimaryColumn,
+    UpdateDateColumn
+} from "typeorm"
 import { ResourceAttachmentEntity } from "./resource-attachment.entity"
+import { SectionContentEntity } from "./section_content.entity"
 
 @ObjectType()
 @Entity("resource")

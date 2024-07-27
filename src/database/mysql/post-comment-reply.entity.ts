@@ -1,16 +1,16 @@
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
-    CreateDateColumn,
     UpdateDateColumn
 } from "typeorm"
-import { PostEntity } from "./post.entity"
 import { AccountEntity } from "./account.entity"
-import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { PostCommentEntity } from "./post-comment.entity"
+import { PostEntity } from "./post.entity"
 
 @ObjectType()
 @Entity("post_comment_reply")

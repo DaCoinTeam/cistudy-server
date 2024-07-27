@@ -1,3 +1,5 @@
+import { SystemRoles } from "@common"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 import {
     Column,
     CreateDateColumn,
@@ -6,9 +8,7 @@ import {
     ManyToOne, PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm"
-import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { AccountEntity } from "./account.entity"
-import { SystemRoles } from "@common"
 
 
 @ObjectType()

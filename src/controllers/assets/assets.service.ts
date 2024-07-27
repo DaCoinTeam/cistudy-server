@@ -1,7 +1,7 @@
+import { getContentType } from "@common"
 import { StorageService } from "@global"
 import { HttpStatus, Injectable, StreamableFile } from "@nestjs/common"
 import { GetAssetInput, GetFileOptions } from "./assets.input"
-import { getContentType } from "@common"
 
 @Injectable()
 export class AssetsService {

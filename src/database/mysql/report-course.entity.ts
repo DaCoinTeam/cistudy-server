@@ -1,15 +1,16 @@
+import { ReportProcessStatus } from "@common"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
-    CreateDateColumn,
-    UpdateDateColumn} from "typeorm"
-import { Field, ID, ObjectType } from "@nestjs/graphql"
-import { CourseEntity } from "./course.entity"
+    UpdateDateColumn
+} from "typeorm"
 import { AccountEntity } from "./account.entity"
-import { ReportProcessStatus } from "@common"
+import { CourseEntity } from "./course.entity"
 
 @ObjectType()
 @Entity("report-course")

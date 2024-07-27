@@ -1,7 +1,15 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn } from "typeorm"
+import { Field, ID, ObjectType } from "@nestjs/graphql"
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
+} from "typeorm"
 import { AccountEntity } from "./account.entity"
 import { PostCommentEntity } from "./post-comment.entity"
-import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { PostEntity } from "./post.entity"
 
 @ObjectType()

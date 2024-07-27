@@ -1,7 +1,15 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql"
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
-import { CourseEntity } from "./course.entity"
+import { 
+    Column, 
+    CreateDateColumn, 
+    Entity, 
+    JoinColumn, 
+    ManyToOne, 
+    PrimaryGeneratedColumn, 
+    UpdateDateColumn 
+} from "typeorm"
 import { CategoryEntity } from "./category.entity"
+import { CourseEntity } from "./course.entity"
 
 @ObjectType()
 @Entity("course-category")

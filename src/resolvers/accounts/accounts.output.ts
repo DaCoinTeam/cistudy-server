@@ -1,10 +1,6 @@
-import { AuthTokens, AuthOutput, ResultsWithMetadata } from "@common"
+import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
 import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, ReportAccountMySqlEntity } from "@database"
-import { ObjectType, Int, Field } from "@nestjs/graphql"
-
-
-
-
+import { Field, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
 export class FindManyAccountsOutputMetadata {

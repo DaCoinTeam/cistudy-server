@@ -1,8 +1,8 @@
-import { Job } from "bull"
-import { OnQueueError, OnQueueFailed, Process, Processor } from "@nestjs/bull"
 import { FilenameProcessData } from "@common"
-import { ProcessMpegDashService } from "./process-mpeg-dash.service"
+import { OnQueueError, OnQueueFailed, Process, Processor } from "@nestjs/bull"
+import { Job } from "bull"
 import { QUEUE_NAME } from "./process-mpeg-dash.constants"
+import { ProcessMpegDashService } from "./process-mpeg-dash.service"
 
 @Processor(QUEUE_NAME)
 export class ProcessMpegDashConsumer {

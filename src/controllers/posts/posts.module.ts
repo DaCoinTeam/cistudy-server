@@ -1,25 +1,25 @@
-import { Module } from "@nestjs/common"
-import { PostsController } from "./posts.controller"
-import { TypeOrmModule } from "@nestjs/typeorm"
 import {
-    SessionMySqlEntity,
     AccountMySqlEntity,
-    PostMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
-    SectionMySqlEntity,
     LessonMySqlEntity,
-    ResourceMySqlEntity,
-    PostCommentMySqlEntity,
-    PostLikeMySqlEntity,
     PostCommentLikeMySqlEntity,
-    PostMediaMySqlEntity,
     PostCommentMediaMySqlEntity,
+    PostCommentMySqlEntity,
     PostCommentReplyMySqlEntity,
-    RoleMySqlEntity,
-    ReportPostMySqlEntity,
+    PostLikeMySqlEntity,
+    PostMediaMySqlEntity,
+    PostMySqlEntity,
     ReportPostCommentMySqlEntity,
+    ReportPostMySqlEntity,
+    ResourceMySqlEntity,
+    RoleMySqlEntity,
+    SectionMySqlEntity,
+    SessionMySqlEntity,
 } from "@database"
+import { Module } from "@nestjs/common"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { PostsController } from "./posts.controller"
 import { PostsService } from "./posts.service"
 
 @Module({

@@ -1,5 +1,5 @@
 
-import { CartMySqlEntity, CartCourseMySqlEntity, OrderMySqlEntity } from "@database"
+import { CartMySqlEntity, OrderMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository } from "typeorm"
@@ -12,8 +12,6 @@ export class CartService {
     constructor(
         @InjectRepository(CartMySqlEntity)
         private readonly cartMySqlRepository: Repository<CartMySqlEntity>,
-        @InjectRepository(CartCourseMySqlEntity)
-        private readonly cartCourseMySqlEntity: Repository<CartCourseMySqlEntity>,
         @InjectRepository(OrderMySqlEntity)
         private readonly orderMySqlEntity: Repository<OrderMySqlEntity>,
         private readonly dataSource: DataSource

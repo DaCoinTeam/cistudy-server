@@ -6,7 +6,6 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
-
 } from "typeorm"
 import { CourseEntity } from "./course.entity"
 

@@ -1,18 +1,18 @@
+import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
 import {
     Column,
+    CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
-    OneToMany
+    UpdateDateColumn
 } from "typeorm"
+import { AccountGradeEntity } from "./account-grade.entity"
 import { AccountEntity } from "./account.entity"
 import { CourseEntity } from "./course.entity"
-import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
 import { ProgressEntity } from "./progress.entity"
-import { AccountGradeEntity } from "./account-grade.entity"
 
 @ObjectType()
 @Entity("enrolled_info")

@@ -1,6 +1,6 @@
+import { pathsConfig } from "@config"
 import { Injectable } from "@nestjs/common"
 import { join } from "path"
-import { pathsConfig } from "@config"
 import { ShellService } from "./shell.service"
 
 @Injectable()

@@ -1,30 +1,29 @@
-import { Module } from "@nestjs/common"
-import { AccountsController } from "./accounts.controller"
-import { TypeOrmModule } from "@nestjs/typeorm"
 import {
-    SessionMySqlEntity,
     AccountMySqlEntity,
-    PostMySqlEntity,
-    CourseMySqlEntity,
-    EnrolledInfoMySqlEntity,
-    SectionMySqlEntity,
-    LessonMySqlEntity,
-    ResourceMySqlEntity,
-    PostCommentMySqlEntity,
-    PostLikeMySqlEntity,
-    PostCommentLikeMySqlEntity,
-    FollowMySqlEnitity,
+    AccountReviewMySqlEntity,
     CartMySqlEntity,
     CertificateMySqlEntity,
+    CourseMySqlEntity,
+    EnrolledInfoMySqlEntity,
+    FollowMySqlEnitity,
+    LessonMySqlEntity,
+    PostCommentLikeMySqlEntity,
+    PostCommentMySqlEntity,
+    PostLikeMySqlEntity,
+    PostMySqlEntity,
     QuizAttemptMySqlEntity,
-    AccountReviewMySqlEntity,
-    RoleMySqlEntity,
     ReportAccountMySqlEntity,
     ReportCourseMySqlEntity,
-    ReportPostMySqlEntity,
     ReportPostCommentMySqlEntity,
-
+    ReportPostMySqlEntity,
+    ResourceMySqlEntity,
+    RoleMySqlEntity,
+    SectionMySqlEntity,
+    SessionMySqlEntity,
 } from "@database"
+import { Module } from "@nestjs/common"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { AccountsController } from "./accounts.controller"
 import { AccountsService } from "./accounts.service"
 
 @Module({

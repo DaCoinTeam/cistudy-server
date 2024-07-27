@@ -1,16 +1,16 @@
-import { Module } from "@nestjs/common"
-import { TypeOrmModule } from "@nestjs/typeorm"
 import {
-    CartMySqlEntity,
+    AccountMySqlEntity,
     CartCourseMySqlEntity,
+    CartMySqlEntity,
     CourseMySqlEntity,
+    OrderCourseMySqlEntity,
+    OrderMySqlEntity,
+    RoleMySqlEntity,
     TransactionMongoEntity,
     TransactionMongoEntitySchema,
-    OrderMySqlEntity,
-    OrderCourseMySqlEntity,
-    AccountMySqlEntity,
-    RoleMySqlEntity,
 } from "@database"
+import { Module } from "@nestjs/common"
+import { TypeOrmModule } from "@nestjs/typeorm"
 
 import { MongooseModule } from "@nestjs/mongoose"
 import { CartController } from "./cart.controller"

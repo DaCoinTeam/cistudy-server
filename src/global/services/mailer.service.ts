@@ -1,9 +1,9 @@
-import { appConfig, jwtConfig, servicesConfig } from "@config"
-import { Injectable } from "@nestjs/common"
-import { createTransport } from "nodemailer"
 import { CourseVerifyStatus, TokenType } from "@common"
-import { JwtService } from "@nestjs/jwt"
+import { appConfig, jwtConfig, servicesConfig } from "@config"
 import { CourseMySqlEntity } from "@database"
+import { Injectable } from "@nestjs/common"
+import { JwtService } from "@nestjs/jwt"
+import { createTransport } from "nodemailer"
 import { acceptCourseMail, rejectCourseMail, verifyAccountMail } from "../templates/mail.template"
 
 @Injectable()

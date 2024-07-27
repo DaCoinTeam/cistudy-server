@@ -1,3 +1,4 @@
+import { Field, ID, ObjectType } from "@nestjs/graphql"
 import {
     Column,
     CreateDateColumn,
@@ -9,7 +10,6 @@ import {
     UpdateDateColumn,
 } from "typeorm"
 import { AccountEntity } from "./account.entity"
-import { Field, ID, ObjectType } from "@nestjs/graphql"
 import { CartCourseEntity } from "./cart-course.enity"
 
 @ObjectType()

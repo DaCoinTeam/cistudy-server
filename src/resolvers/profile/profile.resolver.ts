@@ -1,14 +1,13 @@
-import { Resolver, Query, Args } from "@nestjs/graphql"
-import { ProfileService } from "./profile.service"
-import { FindManyEnrolledCoursesInputData, FindManySelfCreatedCoursesInputData, FindManyTransactionsInputData } from "./profile.input"
-import { AuthInterceptor, JwtAuthGuard, AccountId } from "../shared"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
+import { Args, Query, Resolver } from "@nestjs/graphql"
+import { AccountId, AuthInterceptor, JwtAuthGuard } from "../shared"
+import { FindManyEnrolledCoursesInputData, FindManySelfCreatedCoursesInputData, FindManyTransactionsInputData } from "./profile.input"
 import {
     FindManyEnrolledCoursesOutput,
     FindManySelfCreatedCoursesOutput,
     FindManyTransactionsOutput,
-
 } from "./profile.output"
+import { ProfileService } from "./profile.service"
 
 @Resolver()
 export class ProfileResolver {

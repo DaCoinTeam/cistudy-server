@@ -1,6 +1,5 @@
-import { Global, Module } from "@nestjs/common"
-import { JwtService } from "@nestjs/jwt"
 import {
+    AccountMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     LessonMySqlEntity,
@@ -9,11 +8,12 @@ import {
     PostLikeMySqlEntity,
     PostMySqlEntity,
     ResourceMySqlEntity,
+    RoleMySqlEntity,
     SectionMySqlEntity,
-    SessionMySqlEntity,
-    AccountMySqlEntity,
-    RoleMySqlEntity
+    SessionMySqlEntity
 } from "@database"
+import { Global, Module } from "@nestjs/common"
+import { JwtService } from "@nestjs/jwt"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
     AuthManagerService,

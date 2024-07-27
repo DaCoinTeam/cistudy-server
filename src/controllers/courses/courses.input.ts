@@ -305,9 +305,24 @@ export class CreateCategoryInput implements AuthInput<CreateCategoryInputData> {
   @IsUUID("4")
       accountId: string
   data: CreateCategoryInputData
-  files: Array<Express.Multer.File>
+  files?: Array<Express.Multer.File>
 }
 
+export class UpdateCategoryInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        categoryId: string
+    @ApiProperty()
+        name?: string
+    @ApiProperty({ nullable: true })
+        imageIndex?: number
+}
+
+export class UpdateCategoryInput implements AuthInput<UpdateCategoryInputData>{
+    accountId: string
+    data: UpdateCategoryInputData
+    files?: Express.Multer.File[]
+}
 //dev only apis
 export class DeleteCategoryInputData {
   @ApiProperty()
