@@ -1062,6 +1062,9 @@ export class CoursesService {
 
         if(files){
             if (Number.isInteger(imageIndex)) {
+                if(category.imageId){
+                    await this.storageService.delete(category.imageId)
+                }
                 const { assetId } = await this.storageService.upload({
                     rootFile: files.at(imageIndex),
                 })
