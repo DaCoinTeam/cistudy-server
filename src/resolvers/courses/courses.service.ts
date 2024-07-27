@@ -732,8 +732,7 @@ export class CoursesService {
 
             const currentTimeLeft =
         activeQuizAttempt.timeLeft -
-        (Date.now() - activeQuizAttempt.updatedAt.getTime())
-            console.log(Date.now() - activeQuizAttempt.updatedAt.getTime())
+        (Date.now() - activeQuizAttempt.observedAt.getTime())
 
             if (currentTimeLeft <= 0) {
                 await this.quizAttemptMySqlRepository.update(
@@ -741,6 +740,7 @@ export class CoursesService {
                     {
                         attemptStatus: QuizAttemptStatus.Ended,
                         timeLeft: 0,
+                        observedAt: new Date()
                     },
                 )
                 activeQuizAttempt.timeLeft = 0
@@ -749,6 +749,7 @@ export class CoursesService {
                     activeQuizAttempt.quizAttemptId,
                     {
                         timeLeft: currentTimeLeft,
+                        observedAt: new Date()
                     },
                 )
                 activeQuizAttempt.timeLeft = currentTimeLeft
@@ -771,6 +772,8 @@ export class CoursesService {
                         ).includes(true)
 
                     question.answered = answered
+
+                    question.numberOfCorrectAnswers = question.answers.filter(({isCorrect}) => isCorrect).length
                     return question
                 },
             )
@@ -798,7 +801,7 @@ export class CoursesService {
             })
 
             if (sectionContent.quiz) {
-                const { passingScore, quizAttempts } = sectionContent.quiz
+                const { passingPercent, quizAttempts } = sectionContent.quiz
 
                 if (quizAttempts) {
                     const finishedAttempts = quizAttempts
@@ -831,7 +834,7 @@ export class CoursesService {
                         const lastAttemptTimeTaken = millisecondsToTime(milliseconds)
                         sectionContent.quiz.lastAttemptTimeTaken = lastAttemptTimeTaken
                         sectionContent.quiz.isPassed =
-              finishedAttempts[0].score >= passingScore
+              finishedAttempts[0].score >= passingPercent
 
                         const now = new Date()
                         const startOfDay = new Date(

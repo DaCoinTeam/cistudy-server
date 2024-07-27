@@ -18,7 +18,7 @@ export class QuizAttemptTimeGuard implements CanActivate {
         
         if (!quizId) throw new NotFoundException("Quiz Id not found")
 
-        const { quizAttemptId, timeLeft, updatedAt } = await this.quizAttemptMySqlRepository.findOne({
+        const { quizAttemptId, timeLeft, observedAt } = await this.quizAttemptMySqlRepository.findOne({
             where: {
                 accountId,
                 attemptStatus: QuizAttemptStatus.Started,
@@ -26,17 +26,19 @@ export class QuizAttemptTimeGuard implements CanActivate {
             }
         })
 
-        const currentTimeLeft = timeLeft - (Date.now() - updatedAt.getTime())
+        const currentTimeLeft = timeLeft - (Date.now() - observedAt.getTime())
         
         if (currentTimeLeft <= 0) {
             await this.quizAttemptMySqlRepository.update(quizAttemptId, {
                 attemptStatus: QuizAttemptStatus.Ended,
+                observedAt: new Date(),
                 timeLeft: 0
             })
             throw new ConflictException("Quiz attempt has been ended")
         } else {
             await this.quizAttemptMySqlRepository.update(quizAttemptId, {
-                timeLeft: currentTimeLeft
+                timeLeft: currentTimeLeft,
+                observedAt: new Date(),
             })
         }
         return true

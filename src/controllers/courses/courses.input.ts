@@ -482,8 +482,8 @@ export class UpdateQuizInputData {
   @Min(5)
       timeLimit?: number
   @ApiProperty()
-  @Max(10)
-      passingScore?: number
+  @Max(100)
+      passingPercent?: number
   @ApiProperty()
       title?: string
   @ApiProperty()
@@ -555,12 +555,6 @@ export class FinishQuizAttemptInputData {
   @IsUUID("4")
   @ApiProperty()
       quizAttemptId: string
-
-  @ApiProperty()
-      quizQuestionAnswerIds: Array<string>
-
-  @ApiProperty()
-      timeTaken: number
 }
 
 export class FinishQuizAttemptInput

@@ -1205,10 +1205,10 @@ export class CoursesService {
 
     async updateQuiz(input: UpdateQuizInput): Promise<UpdateQuizOutput> {
         const { data } = input
-        const { quizId, passingScore, timeLimit, title, description } = data
+        const { quizId, passingPercent, timeLimit, title, description } = data
 
         await this.quizMySqlRepository.update(quizId, {
-            passingScore,
+            passingPercent,
             timeLimit,
             description
         })
@@ -1618,15 +1618,22 @@ export class CoursesService {
         input: FinishQuizAttemptInput,
     ): Promise<FinishQuizAttemptOutput> {
         const { data } = input
-        const { quizAttemptId, quizQuestionAnswerIds, timeTaken } = data
+        const { quizAttemptId } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
 
         try {
-            const attempt = await this.quizAttemptMySqlRepository.findOneBy({
-                quizAttemptId,
+            const attempt = await this.quizAttemptMySqlRepository.findOne({
+                where: {
+                    quizAttemptId,
+                },
+                relations: {
+                    attemptAnswers: {
+                        quizQuestionAnswer: true
+                    }
+                }
             })
 
             if (!attempt) {
@@ -1637,97 +1644,102 @@ export class CoursesService {
                 throw new NotFoundException("Attempt already ended")
             }
 
-            await this.quizAttemptMySqlRepository.update(quizAttemptId, {
-                attemptStatus: QuizAttemptStatus.Ended,
-            })
-            const { quizId } = await this.quizAttemptMySqlRepository.findOneBy({
-                quizAttemptId,
-            })
+            // const { attemptAnswers } = attempt
+            // const score = attemptAnswers.map(({ quizQuestionAnswer }) => quizQuestionAnswer.isCorrect)
 
-            const quiz = await this.quizMySqlRepository.findOne({
-                where: {
-                    quizId,
-                },
-                relations: {
-                    questions: {
-                        answers: true,
-                    },
-                },
-            })
 
-            if (!quiz) {
-                throw new NotFoundException("Quiz not found")
-            }
+            // await this.quizAttemptMySqlRepository.update(quizAttemptId, {
+            //     attemptStatus: QuizAttemptStatus.Ended,
+            // })
 
-            const questionAnswers = await this.quizQuestionAnswerMySqlRepository.find(
-                {
-                    where: {
-                        quizQuestionAnswerId: In(quizQuestionAnswerIds),
-                    },
-                },
-            )
+            // const { quizId } = await this.quizAttemptMySqlRepository.findOneBy({
+            //     quizAttemptId,
+            // })
 
-            const questionsWithCorrectAnswers = quiz.questions.map((question) => {
-                const correctAnswers = question.answers
-                    .filter((answer) => answer.isCorrect)
-                    .map((answer) => answer.quizQuestionAnswerId)
-                return {
-                    quizQuestionId: question.quizQuestionId,
-                    point: question.point,
-                    correctAnswers: correctAnswers,
-                }
-            })
+            // const quiz = await this.quizMySqlRepository.findOne({
+            //     where: {
+            //         quizId,
+            //     },
+            //     relations: {
+            //         questions: {
+            //             answers: true,
+            //         },
+            //     },
+            // })
 
-            let totalPoints = 0
-            let maxPoints = 0
+            // if (!quiz) {
+            //     throw new NotFoundException("Quiz not found")
+            // }
 
-            const questionAnswerCountMap: { [key: string]: number } = {}
+            // const questionAnswers = await this.quizQuestionAnswerMySqlRepository.find(
+            //     {
+            //         // where: {
+            //         //     quizQuestionAnswerId: In(quizQuestionAnswerIds),
+            //         // },
+            //     },
+            // )
 
-            quizQuestionAnswerIds.forEach((answerId) => {
-                questionsWithCorrectAnswers.forEach((question) => {
-                    if (question.correctAnswers.includes(answerId)) {
-                        if (!questionAnswerCountMap[question.quizQuestionId]) {
-                            questionAnswerCountMap[question.quizQuestionId] = 0
-                        }
-                        questionAnswerCountMap[question.quizQuestionId]++
-                    }
-                })
-            })
+            // const questionsWithCorrectAnswers = quiz.questions.map((question) => {
+            //     const correctAnswers = question.answers
+            //         .filter((answer) => answer.isCorrect)
+            //         .map((answer) => answer.quizQuestionAnswerId)
+            //     return {
+            //         quizQuestionId: question.quizQuestionId,
+            //         point: question.point,
+            //         correctAnswers: correctAnswers,
+            //     }
+            // })
 
-            questionsWithCorrectAnswers.forEach((question) => {
-                const correctAnswerCount = question.correctAnswers.length
-                const accountAnswerCount =
-                    questionAnswerCountMap[question.quizQuestionId] || 0
-                maxPoints += Number(question.point)
-                if (accountAnswerCount === correctAnswerCount) {
-                    totalPoints += Number(question.point)
-                }
-            })
-            const score = (totalPoints / maxPoints) * 10
+            // let totalPoints = 0
+            // let maxPoints = 0
 
-            await this.quizAttemptMySqlRepository.save({
-                quizAttemptId,
-                score,
-                questionAnswers,
-                timeTaken,
-            })
+            // const questionAnswerCountMap: { [key: string]: number } = {}
 
-            const accountAnswers = quizQuestionAnswerIds.map(
-                (quizQuestionAnswerId) => ({
-                    quizAttemptId,
-                    quizQuestionAnswerId,
-                }),
-            )
+            // // quizQuestionAnswerIds.forEach((answerId) => {
+            // //     questionsWithCorrectAnswers.forEach((question) => {
+            // //         if (question.correctAnswers.includes(answerId)) {
+            // //             if (!questionAnswerCountMap[question.quizQuestionId]) {
+            // //                 questionAnswerCountMap[question.quizQuestionId] = 0
+            // //             }
+            // //             questionAnswerCountMap[question.quizQuestionId]++
+            // //         }
+            // //     })
+            // // })
 
-            await this.quizAttemptAnswerMySqlRepository.save(accountAnswers)
+            // questionsWithCorrectAnswers.forEach((question) => {
+            //     const correctAnswerCount = question.correctAnswers.length
+            //     const accountAnswerCount =
+            //         questionAnswerCountMap[question.quizQuestionId] || 0
+            //     maxPoints += Number(question.point)
+            //     if (accountAnswerCount === correctAnswerCount) {
+            //         totalPoints += Number(question.point)
+            //     }
+            // })
+            // const score = (totalPoints / maxPoints) * 10
+
+            // await this.quizAttemptMySqlRepository.save({
+            //     quizAttemptId,
+            //     score,
+            //     questionAnswers,
+            //     timeTaken,
+            // })
+
+            // const accountAnswers = quizQuestionAnswerIds.map(
+            //     (quizQuestionAnswerId) => ({
+            //         quizAttemptId,
+            //         quizQuestionAnswerId,
+            //     }),
+            // )
+
+            // await this.quizAttemptAnswerMySqlRepository.save(accountAnswers)
 
             await queryRunner.commitTransaction()
 
             return {
                 message: "Quiz ended successfully!",
-                others: {
-                    score,
-                },
+                // others: {
+                //     score,
+                // },
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()

@@ -24,6 +24,9 @@ export class QuizAttemptAnswerEntity {
         createdAt: Date
 
     @Field(() => Date)
+        observedAt: Date
+
+    @Field(() => Date)
     @UpdateDateColumn()
         updatedAt: Date
 
