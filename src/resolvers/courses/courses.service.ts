@@ -799,7 +799,9 @@ export class CoursesService {
                         return current.createdAt > latest.createdAt ? current : latest
                     },
                 ).receivedPoints
-                sectionContent.quiz.isPassed = !!finishedAttemps.filter(({isPassed}) => isPassed).length
+                sectionContent.quiz.isPassed = !!finishedAttemps.filter(
+                    ({ isPassed }) => isPassed,
+                ).length
             }
 
             let progress = sectionContent.accountProgresses.find(
