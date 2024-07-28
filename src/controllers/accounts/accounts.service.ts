@@ -427,13 +427,16 @@ export class AccountsService {
             throw new ConflictException("You have reported this accout before and it is processing. Try update your report instead.")
         }
 
-        const { reportAccountId } = await this.reportAccountMySqlRepository.save({
+        const { reportAccountId, createdAt } = await this.reportAccountMySqlRepository.save({
             reporterAccountId: accountId,
             reportedAccountId,
             title,
             description
         })
+        const {username} = await this.accountMySqlRepository.findOneBy({accountId})
 
+        await this.mailerService.sendReportAccountMail(reportedAccount.email, username, reportedAccount.username, createdAt, title, description)
+        
         return {
             message: `A report to user ${reportedAccount.accountId} has been submitted.`,
             others: {
