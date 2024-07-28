@@ -3,6 +3,114 @@ type AuthTokens {
   refreshToken: String!
 }
 
+type AccountRating {
+  overallAccountRating: Float
+  totalNumberOfRatings: Int
+  numberOf1StarRatings: Int
+  numberOf2StarRatings: Int
+  numberOf3StarRatings: Int
+  numberOf4StarRatings: Int
+  numberOf5StarRatings: Int
+}
+
+type AccountReviewEntity {
+  accountReviewId: ID!
+  accountId: ID!
+  reviewedAccountId: ID!
+  content: String
+  rating: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  account: AccountEntity!
+  reviewedAccount: AccountEntity!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type CategoryRelationEntity {
+  categoryRelationId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  categoryId: ID!
+  categoryParentId: ID!
+  category: CategoryEntity
+  categoryParent: CategoryEntity
+}
+
+type CourseCategoryEntity {
+  courseCategoryId: ID!
+  courseId: ID!
+  categoryId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  course: CourseEntity!
+  category: CategoryEntity
+}
+
+type CategoryEntity {
+  categoryId: ID!
+  level: Int!
+  name: String
+  imageId: ID
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  courseCategories: [CourseCategoryEntity!]
+  categoryParentRelations: [CategoryRelationEntity!]
+  categoryRelations: [CategoryRelationEntity!]
+}
+
+type CourseCategoryLevel {
+  level0Categories: [CategoryEntity!]
+  level1Categories: [CategoryEntity!]
+  level2Categories: [CategoryEntity!]
+}
+
+type CourseRating {
+  overallCourseRating: Float
+  totalNumberOfRatings: Int
+  numberOf1StarRatings: Int
+  numberOf2StarRatings: Int
+  numberOf3StarRatings: Int
+  numberOf4StarRatings: Int
+  numberOf5StarRatings: Int
+}
+
+type CertificateEntity {
+  certificateId: ID!
+  courseId: ID!
+  accountId: ID!
+  createdAt: DateTime!
+  achievedDate: DateTime
+  expireDate: DateTime
+  account: AccountEntity!
+  course: CourseEntity
+}
+
+type CourseReviewEntity {
+  courseReviewId: ID!
+  courseId: ID!
+  accountId: ID!
+  content: String
+  rating: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  course: CourseEntity!
+  account: AccountEntity
+}
+
+type CourseTargetEntity {
+  courseTargetId: ID!
+  content: String!
+  position: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  courseId: ID!
+  course: CourseEntity!
+}
+
 type LessonEntity {
   lessonId: ID!
   thumbnailId: ID
@@ -17,73 +125,13 @@ type LessonEntity {
   sectionContent: SectionContentEntity!
 }
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-type AccountGradeEntity {
-  accountGradeId: ID!
+type ProgressEntity {
+  progressId: ID!
   enrolledInfoId: ID!
-  sectionId: ID!
-  grade: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  sectionContentId: ID!
+  completeState: String!
+  content: SectionContentEntity!
   enrolledInfo: EnrolledInfoEntity!
-  section: SectionEntity!
-}
-
-type SectionEntity {
-  sectionId: ID!
-  title: String!
-  courseId: ID!
-  position: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  course: CourseEntity!
-  contents: [SectionContentEntity!]
-  accountGrade: [AccountGradeEntity!]
-  lockState: String!
-}
-
-type QuizAttemptEntity {
-  quizAttemptId: ID!
-  quizId: ID!
-  accountId: ID!
-  score: Float
-  attemptStatus: String!
-  timeTaken: Int!
-  timeLeft: Int!
-  currentQuestionPosition: Int!
-  createdAt: DateTime!
-  observedAt: DateTime!
-  updatedAt: DateTime!
-  account: AccountEntity!
-  quiz: QuizEntity!
-  attemptAnswers: [QuizAttemptAnswerEntity!]!
-}
-
-type QuizAttemptAnswerEntity {
-  quizAttemptAnswerId: ID!
-  quizAttemptId: ID!
-  quizQuestionAnswerId: ID!
-  createdAt: DateTime!
-  observedAt: DateTime!
-  updatedAt: DateTime!
-  quizAttempt: QuizAttemptEntity!
-  quizQuestionAnswer: QuizQuestionAnswerEntity!
-}
-
-type QuizQuestionAnswerEntity {
-  quizQuestionAnswerId: ID!
-  quizQuestionId: ID!
-  position: Int!
-  content: String!
-  isCorrect: Boolean!
-  quizQuestion: [QuizQuestionEntity!]!
-  attemptAnswers: QuizAttemptAnswerEntity!
-  createdAt: DateTime!
-  updatedAt: DateTime!
 }
 
 type QuizQuestionEntity {
@@ -98,6 +146,47 @@ type QuizQuestionEntity {
   quiz: QuizEntity!
   answered: Boolean!
   numberOfCorrectAnswers: Int
+}
+
+type QuizQuestionAnswerEntity {
+  quizQuestionAnswerId: ID!
+  quizQuestionId: ID!
+  position: Int!
+  content: String!
+  isCorrect: Boolean!
+  quizQuestion: [QuizQuestionEntity!]!
+  attemptAnswers: QuizAttemptAnswerEntity!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type QuizAttemptAnswerEntity {
+  quizAttemptAnswerId: ID!
+  quizAttemptId: ID!
+  quizQuestionAnswerId: ID!
+  createdAt: DateTime!
+  observedAt: DateTime!
+  updatedAt: DateTime!
+  quizAttempt: QuizAttemptEntity!
+  quizQuestionAnswer: QuizQuestionAnswerEntity!
+}
+
+type QuizAttemptEntity {
+  quizAttemptId: ID!
+  quizId: ID!
+  accountId: ID!
+  receivedPercent: Float
+  isPassed: Float
+  attemptStatus: String!
+  timeTaken: Int!
+  timeLeft: Int!
+  currentQuestionPosition: Int!
+  createdAt: DateTime!
+  observedAt: DateTime!
+  updatedAt: DateTime!
+  account: AccountEntity!
+  quiz: QuizEntity!
+  attemptAnswers: [QuizAttemptAnswerEntity!]!
 }
 
 type QuizEntity {
@@ -157,13 +246,28 @@ type SectionContentEntity {
   completeState: String!
 }
 
-type ProgressEntity {
-  progressId: ID!
+type SectionEntity {
+  sectionId: ID!
+  title: String!
+  courseId: ID!
+  position: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  course: CourseEntity!
+  contents: [SectionContentEntity!]
+  accountGrade: [AccountGradeEntity!]
+  lockState: String!
+}
+
+type AccountGradeEntity {
+  accountGradeId: ID!
   enrolledInfoId: ID!
-  sectionContentId: ID!
-  completeState: String!
-  content: SectionContentEntity!
+  sectionId: ID!
+  grade: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   enrolledInfo: EnrolledInfoEntity!
+  section: SectionEntity!
 }
 
 type EnrolledInfoEntity {
@@ -179,58 +283,6 @@ type EnrolledInfoEntity {
   account: AccountEntity!
   accountGrade: AccountGradeEntity!
   courseProgress: [ProgressEntity!]!
-}
-
-type CourseTargetEntity {
-  courseTargetId: ID!
-  content: String!
-  position: Float!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  courseId: ID!
-  course: CourseEntity!
-}
-
-type CourseReviewEntity {
-  courseReviewId: ID!
-  courseId: ID!
-  accountId: ID!
-  content: String
-  rating: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  course: CourseEntity!
-  account: AccountEntity
-}
-
-type CartEntity {
-  cartId: ID!
-  cartCourses: [CartCourseEntity!]
-  isDeleted: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  account: AccountEntity
-}
-
-type CartCourseEntity {
-  cartCourseId: ID!
-  cartId: ID!
-  courseId: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  course: CourseEntity!
-  cart: CartEntity!
-}
-
-type CertificateEntity {
-  certificateId: ID!
-  courseId: ID!
-  accountId: ID!
-  createdAt: DateTime!
-  achievedDate: DateTime
-  expireDate: DateTime
-  account: AccountEntity!
-  course: CourseEntity
 }
 
 type OrderEntity {
@@ -258,42 +310,30 @@ type OrderCourseEntity {
   course: CourseEntity!
 }
 
-type CategoryRelationEntity {
-  categoryRelationId: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  categoryId: ID!
-  categoryParentId: ID!
-  category: CategoryEntity
-  categoryParent: CategoryEntity
+type PostCommentMediaEntity {
+  postCommentMediaId: ID!
+  position: Int!
+  mediaId: ID!
+  postCommentId: String!
+  mediaType: String!
+  postComment: PostCommentEntity!
 }
 
-type CategoryEntity {
-  categoryId: ID!
-  level: Int!
-  name: String
-  imageId: ID
+type PostCommentReplyEntity {
+  postCommentReplyId: ID!
+  creatorId: ID!
+  postCommentId: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  courseCategories: [CourseCategoryEntity!]
-  categoryParentRelations: [CategoryRelationEntity!]
-  categoryRelations: [CategoryRelationEntity!]
+  content: String!
+  postComment: PostEntity!
+  creator: AccountEntity!
 }
 
-type CourseCategoryEntity {
-  courseCategoryId: ID!
-  courseId: ID!
-  categoryId: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  course: CourseEntity!
-  category: CategoryEntity
-}
-
-type ReportCourseEntity {
-  reportCourseId: ID!
+type ReportPostCommentEntity {
+  reportPostCommentId: ID!
   reporterAccountId: ID!
-  reportedCourseId: ID!
+  reportedPostCommentId: ID!
   title: String
   description: String
   processStatus: String!
@@ -301,73 +341,26 @@ type ReportCourseEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   reporterAccount: AccountEntity!
-  reportedCourse: CourseEntity!
+  reportedPostComment: PostCommentEntity!
 }
 
-type AccountRating {
-  overallAccountRating: Float
-  totalNumberOfRatings: Int
-  numberOf1StarRatings: Int
-  numberOf2StarRatings: Int
-  numberOf3StarRatings: Int
-  numberOf4StarRatings: Int
-  numberOf5StarRatings: Int
-}
-
-type CourseCategoryLevel {
-  level0Categories: [CategoryEntity!]
-  level1Categories: [CategoryEntity!]
-  level2Categories: [CategoryEntity!]
-}
-
-type CourseRating {
-  overallCourseRating: Float
-  totalNumberOfRatings: Int
-  numberOf1StarRatings: Int
-  numberOf2StarRatings: Int
-  numberOf3StarRatings: Int
-  numberOf4StarRatings: Int
-  numberOf5StarRatings: Int
-}
-
-type CourseEntity {
-  courseId: ID!
-  title: String
-  thumbnailId: ID
-  description: String
+type PostCommentEntity {
+  postCommentId: ID!
   creatorId: ID!
-  price: Float!
-  discountPrice: Float!
-  enableDiscount: Boolean!
-  verifyStatus: String!
-  creator: AccountEntity!
-  isDeleted: Boolean!
-  receivedWalletAddress: String
-  previewVideoId: ID
-  includes: String
-  duration: Int!
+  postId: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  courseCategories: [CourseCategoryEntity!]
-  courseTargets: [CourseTargetEntity!]
-  posts: [PostEntity!]
-  sections: [SectionEntity!]
-  cartCourses: [CartCourseEntity!]!
-  certificate: [CertificateEntity!]!
-  orderCourses: [OrderCourseEntity!]!
-  courseReview: [CourseReviewEntity!]
-  courseReports: [ReportCourseEntity!]
-  numberOfEnrollments: Int
-  enrolled: Boolean
-  isReviewed: Boolean
-  isCreator: Boolean
-  courseProgress: Float
-  numberOfRewardedPostsLeft: Int
-  courseRatings: CourseRating
-  courseCategoryLevels: CourseCategoryLevel
-  numberOfQuizzes: Int
-  numberOfLessons: Int
-  numberOfResources: Int
+  html: String!
+  isSolution: Boolean!
+  post: PostEntity!
+  creator: AccountEntity!
+  postCommentMedias: [PostCommentMediaEntity!]!
+  postCommentReports: [ReportPostCommentEntity!]!
+  numberOfLikes: Int
+  numberOfReplies: Int
+  liked: Boolean
+  isCommentOwner: Boolean
+  isRewardable: Boolean
 }
 
 type PostLikeEntity {
@@ -427,30 +420,10 @@ type PostEntity {
   numberOfRewardableCommentsLeft: Int
 }
 
-type PostCommentMediaEntity {
-  postCommentMediaId: ID!
-  position: Int!
-  mediaId: ID!
-  postCommentId: String!
-  mediaType: String!
-  postComment: PostCommentEntity!
-}
-
-type PostCommentReplyEntity {
-  postCommentReplyId: ID!
-  creatorId: ID!
-  postCommentId: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  content: String!
-  postComment: PostEntity!
-  creator: AccountEntity!
-}
-
-type ReportPostCommentEntity {
-  reportPostCommentId: ID!
+type ReportCourseEntity {
+  reportCourseId: ID!
   reporterAccountId: ID!
-  reportedPostCommentId: ID!
+  reportedCourseId: ID!
   title: String
   description: String
   processStatus: String!
@@ -458,37 +431,66 @@ type ReportPostCommentEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   reporterAccount: AccountEntity!
-  reportedPostComment: PostCommentEntity!
+  reportedCourse: CourseEntity!
 }
 
-type PostCommentEntity {
-  postCommentId: ID!
+type CourseEntity {
+  courseId: ID!
+  title: String
+  thumbnailId: ID
+  description: String
   creatorId: ID!
-  postId: ID!
+  price: Float!
+  discountPrice: Float!
+  enableDiscount: Boolean!
+  verifyStatus: String!
+  creator: AccountEntity!
+  isDeleted: Boolean!
+  receivedWalletAddress: String
+  previewVideoId: ID
+  includes: String
+  duration: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
-  html: String!
-  isSolution: Boolean!
-  post: PostEntity!
-  creator: AccountEntity!
-  postCommentMedias: [PostCommentMediaEntity!]!
-  postCommentReports: [ReportPostCommentEntity!]!
-  numberOfLikes: Int
-  numberOfReplies: Int
-  liked: Boolean
-  isCommentOwner: Boolean
-  isRewardable: Boolean
+  courseCategories: [CourseCategoryEntity!]
+  courseTargets: [CourseTargetEntity!]
+  posts: [PostEntity!]
+  sections: [SectionEntity!]
+  cartCourses: [CartCourseEntity!]!
+  certificate: [CertificateEntity!]!
+  orderCourses: [OrderCourseEntity!]!
+  courseReview: [CourseReviewEntity!]
+  courseReports: [ReportCourseEntity!]
+  numberOfEnrollments: Int
+  enrolled: Boolean
+  isReviewed: Boolean
+  isCreator: Boolean
+  courseProgress: Float
+  numberOfRewardedPostsLeft: Int
+  courseRatings: CourseRating
+  courseCategoryLevels: CourseCategoryLevel
+  numberOfQuizzes: Int
+  numberOfLessons: Int
+  numberOfResources: Int
 }
 
-type FollowEntity {
-  followId: ID!
-  followerId: String!
-  followedAccountId: String!
-  followed: Boolean!
+type CartCourseEntity {
+  cartCourseId: ID!
+  cartId: ID!
+  courseId: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  follower: AccountEntity!
-  followedAccount: AccountEntity!
+  course: CourseEntity!
+  cart: CartEntity!
+}
+
+type CartEntity {
+  cartId: ID!
+  cartCourses: [CartCourseEntity!]
+  isDeleted: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  account: AccountEntity
 }
 
 type CryptoWalletEntity {
@@ -500,26 +502,15 @@ type CryptoWalletEntity {
   account: AccountEntity!
 }
 
-type AccountReviewEntity {
-  accountReviewId: ID!
-  accountId: ID!
-  reviewedAccountId: ID!
-  content: String
-  rating: Int!
+type FollowEntity {
+  followId: ID!
+  followerId: String!
+  followedAccountId: String!
+  followed: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
-  account: AccountEntity!
-  reviewedAccount: AccountEntity!
-}
-
-type RoleEntity {
-  roleId: ID!
-  accountId: ID!
-  name: String!
-  isDisabled: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  accountRoles: AccountEntity!
+  follower: AccountEntity!
+  followedAccount: AccountEntity!
 }
 
 type ReportAccountEntity {
@@ -534,6 +525,16 @@ type ReportAccountEntity {
   updatedAt: DateTime!
   reporterAccount: AccountEntity!
   reportedAccount: AccountEntity!
+}
+
+type RoleEntity {
+  roleId: ID!
+  accountId: ID!
+  name: String!
+  isDisabled: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  accountRoles: AccountEntity!
 }
 
 type AccountEntity {

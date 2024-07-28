@@ -33,7 +33,11 @@ export class QuizAttemptEntity {
 
     @Field(() => Float, { nullable: true })
     @Column({ type: "float", default: 0, nullable: true })
-        score: number
+        receivedPercent?: number
+
+    @Field(() => Float, { nullable: true })
+    @Column({ type: "boolean", default: false, nullable: true })
+        isPassed?: boolean
 
     @Field(() => String)
     @Column({ type: "enum", enum: QuizAttemptStatus, default: QuizAttemptStatus.Started })
@@ -56,7 +60,7 @@ export class QuizAttemptEntity {
 
         createdAt: Date
     @Field(() => Date)
-    
+
     @CreateDateColumn()
         observedAt: Date
 

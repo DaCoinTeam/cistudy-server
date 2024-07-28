@@ -803,86 +803,86 @@ export class CoursesService {
             if (sectionContent.quiz) {
                 const { passingPercent, quizAttempts } = sectionContent.quiz
 
-                if (quizAttempts) {
-                    const finishedAttempts = quizAttempts
-                        .filter(
-                            (attempt) => attempt.attemptStatus === QuizAttemptStatus.Ended,
-                        )
-                        .sort((prev, next) => next.score - prev.score)
+                //     if (quizAttempts) {
+                //         const finishedAttempts = quizAttempts
+                //             .filter(
+                //                 (attempt) => attempt.attemptStatus === QuizAttemptStatus.Ended,
+                //             )
+                //             .sort((prev, next) => next.score - prev.score)
 
-                    if (finishedAttempts && finishedAttempts.length > 0) {
-                        sectionContent.quiz.totalNumberOfAttempts = finishedAttempts.length
-                        sectionContent.quiz.highestScoreRecorded = finishedAttempts[0].score
+                //         if (finishedAttempts && finishedAttempts.length > 0) {
+                //             sectionContent.quiz.totalNumberOfAttempts = finishedAttempts.length
+                //             sectionContent.quiz.highestScoreRecorded = finishedAttempts[0].score
 
-                        const latestAttempt = finishedAttempts.sort(
-                            (prev, next) =>
-                                prev.createdAt.getTime() - next.createdAt.getTime(),
-                        )
+                //             const latestAttempt = finishedAttempts.sort(
+                //                 (prev, next) =>
+                //                     prev.createdAt.getTime() - next.createdAt.getTime(),
+                //             )
 
-                        sectionContent.quiz.lastAttemptScore = latestAttempt[0].score
-                        const milliseconds = latestAttempt[0].timeTaken
+                //             sectionContent.quiz.lastAttemptScore = latestAttempt[0].score
+                //             const milliseconds = latestAttempt[0].timeTaken
 
-                        const millisecondsToTime = (milliseconds: number) => {
-                            const hours = Math.floor(milliseconds / (1000 * 60 * 60))
-                            const minutes = Math.floor(
-                                (milliseconds % (1000 * 60 * 60)) / (1000 * 60),
-                            )
-                            const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000)
-                            return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-                        }
+                //             const millisecondsToTime = (milliseconds: number) => {
+                //                 const hours = Math.floor(milliseconds / (1000 * 60 * 60))
+                //                 const minutes = Math.floor(
+                //                     (milliseconds % (1000 * 60 * 60)) / (1000 * 60),
+                //                 )
+                //                 const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000)
+                //                 return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+                //             }
 
-                        const lastAttemptTimeTaken = millisecondsToTime(milliseconds)
-                        sectionContent.quiz.lastAttemptTimeTaken = lastAttemptTimeTaken
-                        sectionContent.quiz.isPassed =
-              finishedAttempts[0].score >= passingPercent
+                //             const lastAttemptTimeTaken = millisecondsToTime(milliseconds)
+                //             sectionContent.quiz.lastAttemptTimeTaken = lastAttemptTimeTaken
+                //             sectionContent.quiz.isPassed =
+                //   finishedAttempts[0].score >= passingPercent
 
-                        const now = new Date()
-                        const startOfDay = new Date(
-                            now.getFullYear(),
-                            now.getMonth(),
-                            now.getDate(),
-                            0,
-                            0,
-                            0,
-                        )
-                        const endOfDay = new Date(
-                            now.getFullYear(),
-                            now.getMonth(),
-                            now.getDate(),
-                            23,
-                            59,
-                            59,
-                        )
+                //             const now = new Date()
+                //             const startOfDay = new Date(
+                //                 now.getFullYear(),
+                //                 now.getMonth(),
+                //                 now.getDate(),
+                //                 0,
+                //                 0,
+                //                 0,
+                //             )
+                //             const endOfDay = new Date(
+                //                 now.getFullYear(),
+                //                 now.getMonth(),
+                //                 now.getDate(),
+                //                 23,
+                //                 59,
+                //                 59,
+                //             )
 
-                        const currentDateAttempts = sectionContent.quiz.quizAttempts
-                            .sort(
-                                (prev, next) =>
-                                    prev.createdAt.getTime() - next.createdAt.getTime(),
-                            )
-                            .filter(
-                                (attempt) =>
-                                    attempt.createdAt > startOfDay &&
-                  attempt.createdAt < endOfDay,
-                            )
+                //             const currentDateAttempts = sectionContent.quiz.quizAttempts
+                //                 .sort(
+                //                     (prev, next) =>
+                //                         prev.createdAt.getTime() - next.createdAt.getTime(),
+                //                 )
+                //                 .filter(
+                //                     (attempt) =>
+                //                         attempt.createdAt > startOfDay &&
+                //       attempt.createdAt < endOfDay,
+                //                 )
 
-                        if (currentDateAttempts.length >= 3) {
-                            const thirdAttemptTimestamps = currentDateAttempts
-                                .filter((_, index) => (index + 1) % 3 === 0)
-                                .map((attempt) => attempt.createdAt)
+                //             if (currentDateAttempts.length >= 3) {
+                //                 const thirdAttemptTimestamps = currentDateAttempts
+                //                     .filter((_, index) => (index + 1) % 3 === 0)
+                //                     .map((attempt) => attempt.createdAt)
 
-                            if (thirdAttemptTimestamps.length > 0) {
-                                const latestThirdAttemptTimestamp =
-                  thirdAttemptTimestamps[thirdAttemptTimestamps.length - 1]
-                                const unlockTime = new Date(latestThirdAttemptTimestamp)
-                                unlockTime.setHours(unlockTime.getHours() + 8)
+                //                 if (thirdAttemptTimestamps.length > 0) {
+                //                     const latestThirdAttemptTimestamp =
+                //       thirdAttemptTimestamps[thirdAttemptTimestamps.length - 1]
+                //                     const unlockTime = new Date(latestThirdAttemptTimestamp)
+                //                     unlockTime.setHours(unlockTime.getHours() + 8)
 
-                                if (now < unlockTime) {
-                                    sectionContent.quiz.isLocked = true
-                                }
-                            }
-                        }
-                    }
-                }
+            //                     if (now < unlockTime) {
+            //                         sectionContent.quiz.isLocked = true
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
             }
 
             sectionContent.section.course.creator.numberOfFollowers =

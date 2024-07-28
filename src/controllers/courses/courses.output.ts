@@ -125,8 +125,11 @@ export class CreateQuizAttemptOutput implements Output<CreateQuizAttemptOutputOt
 }
 
 export class FinishQuizAttemptOutputOther {
-    score : number
+    receivedPercent : number
+    isPassed: boolean
+    timeTaken: number
 }
+
 export class FinishQuizAttemptOutput implements Output<FinishQuizAttemptOutputOther> {
     message: string
     others?: FinishQuizAttemptOutputOther
