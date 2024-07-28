@@ -660,243 +660,230 @@ export class CoursesService {
         const { params } = data
         const { sectionContentId } = params
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.findOne(
-                {
-                    where: {
-                        accountId,
-                    },
+        const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.findOne(
+            {
+                where: {
+                    accountId,
                 },
-            )
+            },
+        )
 
-            const sectionContent = await this.sectionContentMySqlRepository.findOne({
-                where: { sectionContentId },
-                relations: {
-                    accountProgresses: true,
-                    quiz: {
-                        questions: {
-                            answers: {
-                                attemptAnswers: true,
-                            },
-                        },
-                        quizAttempts: true,
-                    },
-                    resource: {
-                        attachments: true,
-                    },
-                    lesson: true,
-                    section: {
-                        course: {
-                            creator: true,
-                            sections: {
-                                contents: {
-                                    section: true,
-                                    quiz: {
-                                        questions: {
-                                            answers: true,
-                                        },
-                                    },
-                                    lesson: true,
-                                    resource: {
-                                        attachments: true,
-                                    },
-                                    accountProgresses: true,
-                                },
-                            },
-                        },
-                    },
-                },
-            })
-
-            const quiz = sectionContent.quiz
-            if (quiz) {
-                const activeQuizAttempt = await this.quizAttemptMySqlRepository.findOne(
-                    {
-                        where: {
-                            quizId: quiz.quizId,
-                            accountId,
-                            attemptStatus: QuizAttemptStatus.Started,
-                        },
-                        relations: {
+        const sectionContent = await this.sectionContentMySqlRepository.findOne({
+            where: { sectionContentId },
+            relations: {
+                accountProgresses: true,
+                quiz: {
+                    questions: {
+                        answers: {
                             attemptAnswers: true,
                         },
                     },
-                )
+                    quizAttempts: true,
+                },
+                resource: {
+                    attachments: true,
+                },
+                lesson: true,
+                section: {
+                    course: {
+                        creator: true,
+                        sections: {
+                            contents: {
+                                section: true,
+                                quiz: {
+                                    questions: {
+                                        answers: true,
+                                    },
+                                },
+                                lesson: true,
+                                resource: {
+                                    attachments: true,
+                                },
+                                accountProgresses: true,
+                            },
+                        },
+                    },
+                },
+            },
+        })
 
-                if (activeQuizAttempt) {
-                    const currentTimeLeft =
+        const quiz = sectionContent.quiz
+        if (quiz) {
+            const activeQuizAttempt = await this.quizAttemptMySqlRepository.findOne(
+                {
+                    where: {
+                        quizId: quiz.quizId,
+                        accountId,
+                        attemptStatus: QuizAttemptStatus.Started,
+                    },
+                    relations: {
+                        attemptAnswers: true,
+                    },
+                },
+            )
+
+            if (activeQuizAttempt) {
+                const currentTimeLeft =
             activeQuizAttempt.timeLeft -
             (Date.now() - activeQuizAttempt.observedAt.getTime())
 
-                    if (currentTimeLeft <= 0) {
-                        await this.quizAttemptMySqlRepository.update(
-                            activeQuizAttempt.quizAttemptId,
-                            {
-                                attemptStatus: QuizAttemptStatus.Ended,
-                                timeLeft: 0,
-                                observedAt: new Date(),
-                            },
-                        )
-                        activeQuizAttempt.timeLeft = 0
-                    } else {
-                        await this.quizAttemptMySqlRepository.update(
-                            activeQuizAttempt.quizAttemptId,
-                            {
-                                timeLeft: currentTimeLeft,
-                                observedAt: new Date(),
-                            },
-                        )
-                        activeQuizAttempt.timeLeft = currentTimeLeft
-                    }
+                if (currentTimeLeft <= 0) {
+                    await this.quizAttemptMySqlRepository.update(
+                        activeQuizAttempt.quizAttemptId,
+                        {
+                            attemptStatus: QuizAttemptStatus.Ended,
+                            timeLeft: 0,
+                            observedAt: new Date(),
+                        },
+                    )
+                    activeQuizAttempt.timeLeft = 0
+                } else {
+                    await this.quizAttemptMySqlRepository.update(
+                        activeQuizAttempt.quizAttemptId,
+                        {
+                            timeLeft: currentTimeLeft,
+                            observedAt: new Date(),
+                        },
+                    )
+                    activeQuizAttempt.timeLeft = currentTimeLeft
+                }
 
-                    sectionContent.quiz.activeQuizAttempt = activeQuizAttempt
+                sectionContent.quiz.activeQuizAttempt = activeQuizAttempt
 
-                    sectionContent.quiz.questions = sectionContent.quiz.questions.map(
-                        (question) => {
-                            const answered = question.answers
-                                .map((answer) => {
-                                    const attemptAnswer = answer.attemptAnswers.find(
-                                        ({ quizAttemptId, quizQuestionAnswerId }) =>
-                                            activeQuizAttempt.quizAttemptId === quizAttemptId &&
+                sectionContent.quiz.questions = sectionContent.quiz.questions.map(
+                    (question) => {
+                        const answered = question.answers
+                            .map((answer) => {
+                                const attemptAnswer = answer.attemptAnswers.find(
+                                    ({ quizAttemptId, quizQuestionAnswerId }) =>
+                                        activeQuizAttempt.quizAttemptId === quizAttemptId &&
                       quizQuestionAnswerId === answer.quizQuestionAnswerId,
-                                    )
-                                    return !!attemptAnswer
-                                })
-                                .includes(true)
+                                )
+                                return !!attemptAnswer
+                            })
+                            .includes(true)
 
-                            question.answered = answered
+                        question.answered = answered
 
-                            question.numberOfCorrectAnswers = question.answers.filter(
-                                ({ isCorrect }) => isCorrect,
-                            ).length
-                            return question
-                        },
-                    )
-                }
-
-                const finishedAttemps = sectionContent.quiz.quizAttempts?.filter(
-                    ({ attemptStatus }) => attemptStatus === QuizAttemptStatus.Ended,
-                )
-
-                if (finishedAttemps.length) {
-                    sectionContent.quiz.highestScoreRecorded = finishedAttemps.reduce(
-                        (max, attempt) => {
-                            return (attempt.receivedPoints ?? 0) > max
-                                ? attempt.receivedPoints
-                                : max
-                        },
-                        0,
-                    )
-                }
-
-                sectionContent.quiz.totalNumberOfAttempts = finishedAttemps.length
-                sectionContent.quiz.lastAttemptScore = finishedAttemps.reduce(
-                    (latest, current) => {
-                        return current.createdAt > latest.createdAt ? current : latest
+                        question.numberOfCorrectAnswers = question.answers.filter(
+                            ({ isCorrect }) => isCorrect,
+                        ).length
+                        return question
                     },
-                ).receivedPoints
-                sectionContent.quiz.isPassed = !!finishedAttemps.filter(
-                    ({ isPassed }) => isPassed,
-                ).length
+                )
             }
 
-            let progress = sectionContent.accountProgresses.find(
-                (progress) =>
-                    enrolledInfoId === progress.enrolledInfoId &&
-          sectionContent.sectionContentId === progress.sectionContentId,
+            const finishedAttemps = sectionContent.quiz.quizAttempts?.filter(
+                ({ attemptStatus }) => attemptStatus === QuizAttemptStatus.Ended,
             )
 
-            if (!progress) {
-                progress = await this.progressMySqlRepository.save({
-                    sectionContentId: sectionContent.sectionContentId,
-                    enrolledInfoId,
-                })
+            if (finishedAttemps.length) {
+                sectionContent.quiz.highestScoreRecorded = finishedAttemps.reduce(
+                    (max, attempt) => {
+                        return (attempt.receivedPoints ?? 0) > max
+                            ? attempt.receivedPoints
+                            : max
+                    },
+                    0,
+                )
             }
 
-            sectionContent.completeState = progress.completeState
-
-            const creatorFollow = await this.followMySqlRepository.find({
-                where: {
-                    followedAccountId: sectionContent.section.course.creator.accountId,
-                    followed: true,
+            sectionContent.quiz.totalNumberOfAttempts = finishedAttemps.length
+            sectionContent.quiz.lastAttemptScore = finishedAttemps.reduce(
+                (latest, current) => {
+                    return current.createdAt > latest.createdAt ? current : latest
                 },
-            })
+            ).receivedPoints
+            sectionContent.quiz.isPassed = !!finishedAttemps.filter(
+                ({ isPassed }) => isPassed,
+            ).length
+        }
 
-            sectionContent.section.course.creator.numberOfFollowers =
+        let progress = sectionContent.accountProgresses.find(
+            (progress) =>
+                enrolledInfoId === progress.enrolledInfoId &&
+          sectionContent.sectionContentId === progress.sectionContentId,
+        )
+
+        if (!progress) {
+            progress = await this.progressMySqlRepository.save({
+                sectionContentId: sectionContent.sectionContentId,
+                enrolledInfoId,
+            })
+        }
+
+        sectionContent.completeState = progress.completeState
+
+        const creatorFollow = await this.followMySqlRepository.find({
+            where: {
+                followedAccountId: sectionContent.section.course.creator.accountId,
+                followed: true,
+            },
+        })
+
+        sectionContent.section.course.creator.numberOfFollowers =
         creatorFollow.length
 
-            sectionContent.section.course.creator.followed = creatorFollow.some(
-                (followed) => followed.followerId === accountId,
-            )
+        sectionContent.section.course.creator.followed = creatorFollow.some(
+            (followed) => followed.followerId === accountId,
+        )
 
-            const promises: Array<Promise<void>> = []
-            for (const section of sectionContent.section.course.sections) {
-                for (const content of section.contents) {
-                    const promise = async () => {
-                        let progress = content.accountProgresses.find(
-                            (progress) =>
-                                enrolledInfoId === progress.enrolledInfoId &&
+        const promises: Array<Promise<void>> = []
+        for (const section of sectionContent.section.course.sections) {
+            for (const content of section.contents) {
+                const promise = async () => {
+                    let progress = content.accountProgresses.find(
+                        (progress) =>
+                            enrolledInfoId === progress.enrolledInfoId &&
                 content.sectionContentId === progress.sectionContentId,
-                        )
-                        if (!progress) {
-                            progress = await this.progressMySqlRepository.save({
-                                sectionContentId: content.sectionContentId,
-                                enrolledInfoId,
-                            })
-                        }
-                        content.completeState = progress.completeState
+                    )
+                    if (!progress) {
+                        progress = await this.progressMySqlRepository.save({
+                            sectionContentId: content.sectionContentId,
+                            enrolledInfoId,
+                        })
                     }
-                    promises.push(promise())
+                    content.completeState = progress.completeState
                 }
+                promises.push(promise())
             }
-            await Promise.all(promises)
-
-            const sections = Object.assign(sectionContent.section.course.sections, [])
-            sections.sort((prev, next) => prev.position - next.position)
-            sections.at(0).lockState = LockState.InProgress
-
-            if (sections.length > 1) {
-                for (let i = 1; i < sections.length; i++) {
-                    let allCompleted = true
-                    let hasCompletedOrFailed = false
-
-                    for (const content of sections[i - 1].contents) {
-                        if (
-                            content.completeState === CompleteState.Completed ||
-              content.completeState === CompleteState.Failed
-                        ) {
-                            hasCompletedOrFailed = true
-                        }
-                        if (content.completeState !== CompleteState.Completed) {
-                            allCompleted = false
-                        }
-                    }
-
-                    if (allCompleted) {
-                        sections[i].lockState = LockState.Completed
-                    } else if (hasCompletedOrFailed) {
-                        sections[i].lockState = LockState.InProgress
-                    } else {
-                        sections[i].lockState = LockState.Locked
-                    }
-                }
-            }
-
-            sectionContent.section.course.sections = sections
-
-            await queryRunner.commitTransaction()
-
-            return sectionContent
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
         }
+        await Promise.all(promises)
+
+        const sections = Object.assign(sectionContent.section.course.sections, [])
+        sections.sort((prev, next) => prev.position - next.position)
+        sections.at(0).lockState = LockState.InProgress
+
+        if (sections.length > 1) {
+            for (let i = 1; i < sections.length; i++) {
+                let allCompleted = true
+                let hasCompletedOrFailed = false
+
+                for (const content of sections[i - 1].contents) {
+                    if (
+                        content.completeState === CompleteState.Completed ||
+              content.completeState === CompleteState.Failed
+                    ) {
+                        hasCompletedOrFailed = true
+                    }
+                    if (content.completeState !== CompleteState.Completed) {
+                        allCompleted = false
+                    }
+                }
+
+                if (allCompleted) {
+                    sections[i].lockState = LockState.Completed
+                } else if (hasCompletedOrFailed) {
+                    sections[i].lockState = LockState.InProgress
+                } else {
+                    sections[i].lockState = LockState.Locked
+                }
+            }
+        }
+
+        sectionContent.section.course.sections = sections
+
+        return sectionContent
     }
 
     async findManyLessons(
