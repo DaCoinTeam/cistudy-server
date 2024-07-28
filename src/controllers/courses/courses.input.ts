@@ -757,4 +757,3 @@ export class UpdateQuizAttemptAnswersInput implements AuthInput<UpdateQuizAttemp
     accountId: string
     data: UpdateQuizAttemptAnswersInputData
 }
-

@@ -19,15 +19,15 @@ import { QuizEntity } from "./quiz.entity"
 @Entity("quiz-attempt")
 export class QuizAttemptEntity {
 
-    @Field(() => ID)
+    @Field(() => ID, { nullable: true })
     @PrimaryGeneratedColumn("uuid")
         quizAttemptId: string
 
-    @Field(() => ID)
+    @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36 })
         quizId: string
 
-    @Field(() => ID)
+    @Field(() => ID, { nullable: true })
     @Column({ type: "uuid", length: 36 })
         accountId: string
 
@@ -39,17 +39,25 @@ export class QuizAttemptEntity {
     @Column({ type: "boolean", default: false, nullable: true })
         isPassed?: boolean
 
-    @Field(() => String)
+    @Field(() => String, { nullable: true })
     @Column({ type: "enum", enum: QuizAttemptStatus, default: QuizAttemptStatus.Started })
         attemptStatus: QuizAttemptStatus
 
-    @Field(() => Int)
+    @Field(() => Int, { nullable: true })
     @Column({ type: "int", default: 0 })
         timeTaken : number
     
-    @Field(() => Int)
+    @Field(() => Int, { nullable: true })
     @Column({ type: "int", default: 1000 * 60 * 60 * 60 })
         timeLeft : number
+    
+    @Field(() => Int, { nullable: true })
+    @Column({ type: "int", nullable: true })
+        receivedPoints : number
+    
+    @Field(() => Int, { nullable: true })
+    @Column({ type: "int", nullable: true })
+        totalPoints : number
     
     @Field(() => Int)
     @Column({ type: "int", default: 1 })

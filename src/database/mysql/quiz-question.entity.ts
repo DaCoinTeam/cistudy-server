@@ -55,7 +55,7 @@ export class QuizQuestionEntity {
     @JoinColumn({ name: "quizId" })
         quiz: QuizEntity
     
-    @Field(() => Boolean)
+    @Field(() => Boolean, { nullable: true })
         answered?: boolean
     
     @Field(() => Int, { nullable: true })

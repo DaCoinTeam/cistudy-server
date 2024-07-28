@@ -43,7 +43,7 @@ import {
 import { InjectRepository } from "@nestjs/typeorm"
 import { ProcessMpegDashProducer } from "@workers"
 import { getVideoDurationInSeconds } from "get-video-duration"
-import { Between, DataSource, DeepPartial, In, Repository } from "typeorm"
+import { DataSource, DeepPartial, In, Repository } from "typeorm"
 import {
     CreateCategoryInput,
     CreateCertificateInput,
@@ -1574,88 +1574,18 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            const course = await this.courseMySqlRepository.findOne({
+            const attempt = await this.quizAttemptMySqlRepository.findOne({
                 where: {
-                    sections: {
-                        contents: {
-                            type: SectionContentType.Quiz,
-                            quizId,
-                        },
-                    },
-                },
-            })
-
-            const enrollments = await this.enrolledInfoMySqlRepository.findBy({
-                courseId: course.courseId,
-            })
-            const now = new Date()
-            const activeEnrollment = enrollments.filter(
-                (date) => new Date(date.endDate) < now,
-            )
-
-            if (!activeEnrollment) {
-                throw new ConflictException(
-                    "Your enrollment(s) in this course have been expired",
-                )
-            }
-
-            const doing = await this.quizAttemptMySqlRepository.findOne({
-                where: {
-                    quizId,
-                    accountId,
                     attemptStatus: QuizAttemptStatus.Started,
-                },
-            })
-
-            if (doing) {
-                throw new ConflictException("You havent completed the last attempt.")
-            }
-
-            const startOfDay = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate(),
-                0,
-                0,
-                0,
-            )
-            const endOfDay = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate(),
-                23,
-                59,
-                59,
-            )
-
-            const currentDateAttempts = await this.quizAttemptMySqlRepository.find({
-                where: {
                     accountId,
-                    quizId,
-                    createdAt: Between(startOfDay, endOfDay),
-                },
-                order: {
-                    createdAt: "ASC",
+                    quizId
                 },
             })
 
-            if (currentDateAttempts.length >= 3) {
-                const thirdAttemptTimestamps = currentDateAttempts
-                    .filter((_, index) => (index + 1) % 3 === 0)
-                    .map((attempt) => attempt.createdAt)
-
-                if (thirdAttemptTimestamps.length > 0) {
-                    const latestThirdAttemptTimestamp =
-            thirdAttemptTimestamps[thirdAttemptTimestamps.length - 1]
-                    const unlockTime = new Date(latestThirdAttemptTimestamp)
-                    unlockTime.setHours(unlockTime.getHours() + 8)
-
-                    if (now < unlockTime) {
-                        throw new ConflictException(
-                            "You can only create a new attempt 8 hours after your last 3rd attempt.",
-                        )
-                    }
-                }
+            if (attempt) {
+                throw new ConflictException(
+                    "An attempt has been started.",
+                )
             }
 
             const { quizAttemptId } = await this.quizAttemptMySqlRepository.save({
@@ -1715,12 +1645,12 @@ export class CoursesService {
             const { attemptAnswers, quiz, timeLeft } = attempt
             const { questions } = quiz
 
-            let pointReceived = 0
+            let receivedPoints = 0
 
             for (const { answers, point } of questions) {
-                const correctAnswers = answers.filter(({ isCorrect }) => isCorrect)
+                const correctAnswers = answers.filter(({ isCorrect }) => isCorrect) 
                 if (!correctAnswers.length) {
-                    pointReceived += point
+                    receivedPoints += point
                     continue
                 }
                 const pointEachCorrectAnswer = point / correctAnswers.length
@@ -1738,7 +1668,7 @@ export class CoursesService {
                             .map(({ quizQuestionAnswerId }) => quizQuestionAnswerId)
                             .includes(quizQuestionAnswerId)
                     ) {
-                        pointReceived += pointEachCorrectAnswer
+                        receivedPoints += pointEachCorrectAnswer
                     }
                 }
             }
@@ -1747,7 +1677,7 @@ export class CoursesService {
                 return accumulator + point
             }, 0)
 
-            const receivedPercent = (pointReceived / totalPoints) * 100
+            const receivedPercent = (receivedPoints / totalPoints) * 100
             const isPassed = receivedPercent >= quiz.passingPercent
             const timeTaken = quiz.timeLimit - timeLeft/(1000*60)
                 
@@ -1755,6 +1685,8 @@ export class CoursesService {
                 isPassed,
                 receivedPercent,
                 timeTaken,
+                receivedPoints,
+                totalPoints,
                 observedAt: new Date(),
                 attemptStatus: QuizAttemptStatus.Ended,
             })
@@ -1766,7 +1698,9 @@ export class CoursesService {
                 others: {
                     receivedPercent,
                     isPassed,
-                    timeTaken
+                    timeTaken,
+                    receivedPoints,
+                    totalPoints
                 }
             }
         } catch (ex) {

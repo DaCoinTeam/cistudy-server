@@ -21,7 +21,7 @@ import {
     ReportCourseMySqlEntity,
     ResourceAttachmentMySqlEntity,
     ResourceMySqlEntity,
-    SectionContentMySqlEntity
+    SectionContentMySqlEntity,
 } from "@database"
 import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
@@ -683,6 +683,7 @@ export class CoursesService {
                                 attemptAnswers: true,
                             },
                         },
+                        quizAttempts: true,
                     },
                     resource: {
                         attachments: true,
@@ -711,72 +712,95 @@ export class CoursesService {
                 },
             })
 
-            let activeQuizAttempt = await this.quizAttemptMySqlRepository.findOne({
-                where: {
-                    quizId: sectionContentId,
-                    accountId,
-                    attemptStatus: QuizAttemptStatus.Started,
-                },
-                relations: {
-                    attemptAnswers: true,
-                },
-            })
-
-            if (!activeQuizAttempt) {
-                activeQuizAttempt = await this.quizAttemptMySqlRepository.save({
-                    quizId: sectionContentId,
-                    accountId,
-                    attemptStatus: QuizAttemptStatus.Started,
-                })
-            }
-
-            const currentTimeLeft =
-        activeQuizAttempt.timeLeft -
-        (Date.now() - activeQuizAttempt.observedAt.getTime())
-
-            if (currentTimeLeft <= 0) {
-                await this.quizAttemptMySqlRepository.update(
-                    activeQuizAttempt.quizAttemptId,
+            const quiz = sectionContent.quiz
+            if (quiz) {
+                const activeQuizAttempt = await this.quizAttemptMySqlRepository.findOne(
                     {
-                        attemptStatus: QuizAttemptStatus.Ended,
-                        timeLeft: 0,
-                        observedAt: new Date()
+                        where: {
+                            quizId: quiz.quizId,
+                            accountId,
+                            attemptStatus: QuizAttemptStatus.Started,
+                        },
+                        relations: {
+                            attemptAnswers: true,
+                        },
                     },
                 )
-                activeQuizAttempt.timeLeft = 0
-            } else {
-                await this.quizAttemptMySqlRepository.update(
-                    activeQuizAttempt.quizAttemptId,
-                    {
-                        timeLeft: currentTimeLeft,
-                        observedAt: new Date()
-                    },
+
+                if (activeQuizAttempt) {
+                    const currentTimeLeft =
+            activeQuizAttempt.timeLeft -
+            (Date.now() - activeQuizAttempt.observedAt.getTime())
+
+                    if (currentTimeLeft <= 0) {
+                        await this.quizAttemptMySqlRepository.update(
+                            activeQuizAttempt.quizAttemptId,
+                            {
+                                attemptStatus: QuizAttemptStatus.Ended,
+                                timeLeft: 0,
+                                observedAt: new Date(),
+                            },
+                        )
+                        activeQuizAttempt.timeLeft = 0
+                    } else {
+                        await this.quizAttemptMySqlRepository.update(
+                            activeQuizAttempt.quizAttemptId,
+                            {
+                                timeLeft: currentTimeLeft,
+                                observedAt: new Date(),
+                            },
+                        )
+                        activeQuizAttempt.timeLeft = currentTimeLeft
+                    }
+
+                    sectionContent.quiz.activeQuizAttempt = activeQuizAttempt
+
+                    sectionContent.quiz.questions = sectionContent.quiz.questions.map(
+                        (question) => {
+                            const answered = question.answers
+                                .map((answer) => {
+                                    const attemptAnswer = answer.attemptAnswers.find(
+                                        ({ quizAttemptId, quizQuestionAnswerId }) =>
+                                            activeQuizAttempt.quizAttemptId === quizAttemptId &&
+                      quizQuestionAnswerId === answer.quizQuestionAnswerId,
+                                    )
+                                    return !!attemptAnswer
+                                })
+                                .includes(true)
+
+                            question.answered = answered
+
+                            question.numberOfCorrectAnswers = question.answers.filter(
+                                ({ isCorrect }) => isCorrect,
+                            ).length
+                            return question
+                        },
+                    )
+                }
+
+                const finishedAttemps = sectionContent.quiz.quizAttempts?.filter(
+                    ({ attemptStatus }) => attemptStatus === QuizAttemptStatus.Ended,
                 )
-                activeQuizAttempt.timeLeft = currentTimeLeft
+
+                if (finishedAttemps.length) {
+                    sectionContent.quiz.highestScoreRecorded = finishedAttemps.reduce(
+                        (max, attempt) => {
+                            return (attempt.receivedPoints ?? 0) > max
+                                ? attempt.receivedPoints
+                                : max
+                        },
+                        0,
+                    )
+                }
+
+                sectionContent.quiz.totalNumberOfAttempts = finishedAttemps.length
+                sectionContent.quiz.lastAttemptScore = finishedAttemps.reduce(
+                    (latest, current) => {
+                        return current.createdAt > latest.createdAt ? current : latest
+                    },
+                ).receivedPoints
+                sectionContent.quiz.isPassed = !!finishedAttemps.filter(({isPassed}) => isPassed).length
             }
-
-            sectionContent.quiz.activeQuizAttempt = activeQuizAttempt
-
-            sectionContent.quiz.questions = sectionContent.quiz.questions.map(
-                (question) => {
-                    const answered = question.answers
-                        .map(
-                            (answer) => {
-                                const attemptAnswer = answer.attemptAnswers.find(
-                                    ({ quizAttemptId, quizQuestionAnswerId }) =>
-                                        activeQuizAttempt.quizAttemptId === quizAttemptId &&
-                    quizQuestionAnswerId === answer.quizQuestionAnswerId,
-                                )
-                                return !!attemptAnswer 
-                            } 
-                        ).includes(true)
-
-                    question.answered = answered
-
-                    question.numberOfCorrectAnswers = question.answers.filter(({isCorrect}) => isCorrect).length
-                    return question
-                },
-            )
 
             let progress = sectionContent.accountProgresses.find(
                 (progress) =>
@@ -799,91 +823,6 @@ export class CoursesService {
                     followed: true,
                 },
             })
-
-            if (sectionContent.quiz) {
-                const { passingPercent, quizAttempts } = sectionContent.quiz
-
-                //     if (quizAttempts) {
-                //         const finishedAttempts = quizAttempts
-                //             .filter(
-                //                 (attempt) => attempt.attemptStatus === QuizAttemptStatus.Ended,
-                //             )
-                //             .sort((prev, next) => next.score - prev.score)
-
-                //         if (finishedAttempts && finishedAttempts.length > 0) {
-                //             sectionContent.quiz.totalNumberOfAttempts = finishedAttempts.length
-                //             sectionContent.quiz.highestScoreRecorded = finishedAttempts[0].score
-
-                //             const latestAttempt = finishedAttempts.sort(
-                //                 (prev, next) =>
-                //                     prev.createdAt.getTime() - next.createdAt.getTime(),
-                //             )
-
-                //             sectionContent.quiz.lastAttemptScore = latestAttempt[0].score
-                //             const milliseconds = latestAttempt[0].timeTaken
-
-                //             const millisecondsToTime = (milliseconds: number) => {
-                //                 const hours = Math.floor(milliseconds / (1000 * 60 * 60))
-                //                 const minutes = Math.floor(
-                //                     (milliseconds % (1000 * 60 * 60)) / (1000 * 60),
-                //                 )
-                //                 const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000)
-                //                 return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-                //             }
-
-                //             const lastAttemptTimeTaken = millisecondsToTime(milliseconds)
-                //             sectionContent.quiz.lastAttemptTimeTaken = lastAttemptTimeTaken
-                //             sectionContent.quiz.isPassed =
-                //   finishedAttempts[0].score >= passingPercent
-
-                //             const now = new Date()
-                //             const startOfDay = new Date(
-                //                 now.getFullYear(),
-                //                 now.getMonth(),
-                //                 now.getDate(),
-                //                 0,
-                //                 0,
-                //                 0,
-                //             )
-                //             const endOfDay = new Date(
-                //                 now.getFullYear(),
-                //                 now.getMonth(),
-                //                 now.getDate(),
-                //                 23,
-                //                 59,
-                //                 59,
-                //             )
-
-                //             const currentDateAttempts = sectionContent.quiz.quizAttempts
-                //                 .sort(
-                //                     (prev, next) =>
-                //                         prev.createdAt.getTime() - next.createdAt.getTime(),
-                //                 )
-                //                 .filter(
-                //                     (attempt) =>
-                //                         attempt.createdAt > startOfDay &&
-                //       attempt.createdAt < endOfDay,
-                //                 )
-
-                //             if (currentDateAttempts.length >= 3) {
-                //                 const thirdAttemptTimestamps = currentDateAttempts
-                //                     .filter((_, index) => (index + 1) % 3 === 0)
-                //                     .map((attempt) => attempt.createdAt)
-
-                //                 if (thirdAttemptTimestamps.length > 0) {
-                //                     const latestThirdAttemptTimestamp =
-                //       thirdAttemptTimestamps[thirdAttemptTimestamps.length - 1]
-                //                     const unlockTime = new Date(latestThirdAttemptTimestamp)
-                //                     unlockTime.setHours(unlockTime.getHours() + 8)
-
-            //                     if (now < unlockTime) {
-            //                         sectionContent.quiz.isLocked = true
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     }
-            }
 
             sectionContent.section.course.creator.numberOfFollowers =
         creatorFollow.length

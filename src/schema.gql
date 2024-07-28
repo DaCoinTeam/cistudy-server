@@ -144,7 +144,7 @@ type QuizQuestionEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   quiz: QuizEntity!
-  answered: Boolean!
+  answered: Boolean
   numberOfCorrectAnswers: Int
 }
 
@@ -172,14 +172,16 @@ type QuizAttemptAnswerEntity {
 }
 
 type QuizAttemptEntity {
-  quizAttemptId: ID!
-  quizId: ID!
-  accountId: ID!
+  quizAttemptId: ID
+  quizId: ID
+  accountId: ID
   receivedPercent: Float
   isPassed: Float
-  attemptStatus: String!
-  timeTaken: Int!
-  timeLeft: Int!
+  attemptStatus: String
+  timeTaken: Int
+  timeLeft: Int
+  receivedPoints: Int
+  totalPoints: Int
   currentQuestionPosition: Int!
   createdAt: DateTime!
   observedAt: DateTime!
