@@ -668,6 +668,7 @@ export class CoursesService {
             },
         )
 
+        const now = new Date()
         const sectionContent = await this.sectionContentMySqlRepository.findOne({
             where: { sectionContentId },
             relations: {
@@ -706,6 +707,9 @@ export class CoursesService {
                 },
             },
         })
+
+        const _now = new Date().getTime() - now.getTime()
+        console.log(_now)
 
         const quiz = sectionContent.quiz
         if (quiz) {
@@ -780,23 +784,23 @@ export class CoursesService {
             if (finishedAttemps.length) {
                 sectionContent.quiz.highestScoreRecorded = finishedAttemps.reduce(
                     (max, attempt) => {
-                        return (attempt.receivedPoints ?? 0) > max
-                            ? attempt.receivedPoints
+                        return (attempt.receivedPercent ?? 0) > max
+                            ? attempt.receivedPercent
                             : max
                     },
                     0,
                 )
-            }
 
-            sectionContent.quiz.totalNumberOfAttempts = finishedAttemps.length
-            sectionContent.quiz.lastAttemptScore = finishedAttemps.reduce(
-                (latest, current) => {
-                    return current.createdAt > latest.createdAt ? current : latest
-                },
-            ).receivedPoints
-            sectionContent.quiz.isPassed = !!finishedAttemps.filter(
-                ({ isPassed }) => isPassed,
-            ).length
+                sectionContent.quiz.totalNumberOfAttempts = finishedAttemps.length
+                sectionContent.quiz.lastAttemptScore = finishedAttemps.reduce(
+                    (latest, current) => {
+                        return current.createdAt > latest.createdAt ? current : latest
+                    },
+                ).receivedPercent
+                sectionContent.quiz.isPassed = !!finishedAttemps.filter(
+                    ({ isPassed }) => isPassed,
+                ).length
+            }
         }
 
         let progress = sectionContent.accountProgresses.find(

@@ -59,8 +59,11 @@ import { CacheModule } from "@nestjs/cache-manager"
             database: databaseConfig().mysql.schema,
             autoLoadEntities: true,
             synchronize: true,
-            poolSize: 10000,      
+            poolSize: 1000000,    
             timezone: "Z",
+            driver: require("mysql2"),
+            connectorPackage: "mysql2",
+            
         }),
 
         GraphQLModule.forRoot<ApolloDriverConfig>({
