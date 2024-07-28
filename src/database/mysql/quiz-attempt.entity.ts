@@ -48,7 +48,11 @@ export class QuizAttemptEntity {
         timeTaken : number
     
     @Field(() => Int, { nullable: true })
-    @Column({ type: "int", default: 1000 * 60 * 60 * 60 })
+    @Column({ type: "int", default: 1000* 60 * 15 })
+        timeLimitAtStart : number
+
+    @Field(() => Int, { nullable: true })
+    @Column({ type: "int", default: 1000* 60 * 15 })
         timeLeft : number
     
     @Field(() => Int, { nullable: true })

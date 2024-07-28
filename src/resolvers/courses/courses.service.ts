@@ -668,23 +668,22 @@ export class CoursesService {
             },
         )
 
-        const now = new Date()
         const sectionContent = await this.sectionContentMySqlRepository.findOne({
             where: { sectionContentId },
             relations: {
                 accountProgresses: true,
-                quiz: {
-                    questions: {
-                        answers: {
-                            attemptAnswers: true,
-                        },
-                    },
-                    quizAttempts: true,
-                },
-                resource: {
-                    attachments: true,
-                },
-                lesson: true,
+                // quiz: {
+                //     questions: {
+                //         answers: {
+                //             attemptAnswers: true,
+                //         },
+                //     },
+                //     quizAttempts: true,
+                // },
+                // resource: {
+                //     attachments: true,
+                // },
+                //lesson: true,
                 section: {
                     course: {
                         creator: true,
@@ -708,11 +707,25 @@ export class CoursesService {
             },
         })
 
-        const _now = new Date().getTime() - now.getTime()
-        console.log(_now)
+        if (sectionContent.type === SectionContentType.Quiz) {
+            const quiz = await this.quizMySqlRepository.findOne({
+                where: {
+                    quizId: sectionContentId
+                },
+                relations: {
+                    questions: {
+                        answers: {
+                            attemptAnswers: true
+                        }
+                    },
+                    quizAttempts: {
+                        attemptAnswers: true
+                    }
+                }
+            })
 
-        const quiz = sectionContent.quiz
-        if (quiz) {
+            sectionContent.quiz = quiz
+
             const activeQuizAttempt = await this.quizAttemptMySqlRepository.findOne(
                 {
                     where: {
@@ -727,6 +740,7 @@ export class CoursesService {
             )
 
             if (activeQuizAttempt) {
+                console.log(Date.now() - activeQuizAttempt.observedAt.getTime())
                 const currentTimeLeft =
             activeQuizAttempt.timeLeft -
             (Date.now() - activeQuizAttempt.observedAt.getTime())

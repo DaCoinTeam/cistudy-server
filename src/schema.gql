@@ -179,6 +179,7 @@ type QuizAttemptEntity {
   isPassed: Float
   attemptStatus: String
   timeTaken: Int
+  timeLimitAtStart: Int
   timeLeft: Int
   receivedPoints: Int
   totalPoints: Int
@@ -195,7 +196,7 @@ type QuizEntity {
   quizId: ID!
   description: String
   questions: [QuizQuestionEntity!]
-  timeLimit: Int
+  timeLimit: Float!
   passingPercent: Float
   createdAt: DateTime!
   updatedAt: DateTime!

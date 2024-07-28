@@ -20,8 +20,8 @@ export class QuizEntity {
     @OneToMany(() => QuizQuestionEntity, (quizQuestion) => quizQuestion.quiz, { onDelete: "CASCADE", onUpdate: "CASCADE" })
         questions: Array<QuizQuestionEntity>
 
-    @Field(() => Int, { nullable: true })
-    @Column({ type: "int", nullable: true })
+    @Field(() => Float)
+    @Column({ type: "float", default: 1000 * 60 * 15 })
         timeLimit: number
 
     @Field(() => Float, { nullable: true })

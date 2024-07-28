@@ -692,7 +692,7 @@ export class CoursesController {
 
     @ApiBearerAuth()
     @Patch("update-quiz-attempt-answers")
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard, QuizAttemptTimeGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async updateQuizAttemptAnswers(

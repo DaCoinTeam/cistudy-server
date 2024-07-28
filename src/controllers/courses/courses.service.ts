@@ -1588,9 +1588,18 @@ export class CoursesService {
                 )
             }
 
+            const { timeLimit } = await this.quizMySqlRepository.findOne({
+                where: {
+                    quizId
+                },
+            })
+
             const { quizAttemptId } = await this.quizAttemptMySqlRepository.save({
                 accountId,
                 quizId,
+                timeLeft: timeLimit,
+                observedAt: new Date(),
+                timeLimitAtStart: timeLimit
             })
 
             return {
@@ -1642,7 +1651,7 @@ export class CoursesService {
                 throw new NotFoundException("Attempt already ended")
             }
 
-            const { attemptAnswers, quiz, timeLeft } = attempt
+            const { attemptAnswers, quiz, timeLeft, timeLimitAtStart } = attempt
             const { questions } = quiz
 
             let receivedPoints = 0
@@ -1679,7 +1688,7 @@ export class CoursesService {
 
             const receivedPercent = (receivedPoints / totalPoints) * 100
             const isPassed = receivedPercent >= quiz.passingPercent
-            const timeTaken = quiz.timeLimit - timeLeft/(1000*60)
+            const timeTaken = timeLimitAtStart - timeLeft
                 
             await this.quizAttemptMySqlRepository.update(quizAttemptId, {
                 isPassed,
