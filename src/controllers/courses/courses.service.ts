@@ -1147,6 +1147,7 @@ export class CoursesService {
                 courseCategories,
             )
 
+            await queryRunner.commitTransaction()
             return {
                 message: "Course Category has been created successfully",
             }
