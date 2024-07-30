@@ -1609,13 +1609,14 @@ export class CoursesService {
                 timeLimitAtStart: timeLimit
             })
 
+            await queryRunner.commitTransaction()
             return {
                 message: "Attempt Started Successfully!",
                 others: {
                     quizAttemptId,
                 },
             }
-        } catch (ex) {
+        } catch (ex) {  
             await queryRunner.rollbackTransaction()
             throw ex
         } finally {
