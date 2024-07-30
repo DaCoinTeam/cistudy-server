@@ -903,8 +903,6 @@ export class CoursesService {
             }
         }
 
-        console.log(sections[0].lockState)
-
         sectionContent.section.course.sections = sections
 
         return sectionContent
