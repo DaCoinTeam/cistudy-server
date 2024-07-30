@@ -1523,7 +1523,7 @@ export class CoursesService {
     async markContentAsCompleted(
         input: MarkContentAsCompletedInput,
     ): Promise<MarkContentAsCompletedOutput> {
-        const { data, accountId } = input
+        const { data } = input
         const { sectionContentId } = data
 
         const queryRunner = this.dataSource.createQueryRunner()
@@ -1531,6 +1531,7 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
+            console.log(sectionContentId)
             // const progress = await this.progressMySqlRepository.findOne({
             //     where: { sectionContentId },
             //     relations: { enrolledInfo: true },
