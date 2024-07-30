@@ -56,7 +56,9 @@ import {
     PublishCourseInputData,
     UpdateCategoryInputData,
     UpdateQuizAttemptInputData,
-    UpdateQuizAttemptAnswersInputData
+    UpdateQuizAttemptAnswersInputData,
+    MarkAsCompleteResourceInputData,
+    UpdateLessonProgressInputData
 } from "./courses.input"
 
 import {
@@ -700,6 +702,36 @@ export class CoursesController {
         @Body() data: UpdateQuizAttemptAnswersInputData,
     ) {
         return this.coursesService.updateQuizAttemptAnswers({
+            accountId,
+            data,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("mark-as-completed-resource")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async markAsCompletedResource(
+        @AccountId() accountId: string,
+        @Body() data: MarkAsCompleteResourceInputData,
+    ) {
+        return this.coursesService.markAsCompletedResource({
+            accountId,
+            data,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Put("update-lesson-progress")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async updateLessonProgress(
+        @AccountId() accountId: string,
+        @Body() data: UpdateLessonProgressInputData,
+    ) {
+        return this.coursesService.updateLessonProgress({
             accountId,
             data,
         })

@@ -40,6 +40,8 @@ import { ReportPostCommentEntity as ReportPostCommentMySqlEntity } from "./repor
 import { TransactionEntity as TransactionMySqlEntity } from "./transaction.enity"
 import { SectionContentEntity as SectionContentMySqlEntity } from "./section_content.entity"
 import { AccountGradeEntity as AccountGradeMySqlEntity } from "./account-grade.entity"
+import { CompleteResourceEntity as CompleteResourceMySqlEntity } from "./complete-resource.entity"
+
 export {
     AccountMySqlEntity,
     RoleMySqlEntity,
@@ -82,5 +84,6 @@ export {
     ReportPostCommentMySqlEntity,
     TransactionMySqlEntity,
     SectionContentMySqlEntity,
-    AccountGradeMySqlEntity
+    AccountGradeMySqlEntity,
+    CompleteResourceMySqlEntity
 }

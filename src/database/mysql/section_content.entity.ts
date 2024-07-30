@@ -6,13 +6,11 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
-    OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm"
 import { LessonEntity } from "./lesson.entity"
-import { ProgressEntity } from "./progress.entity"
 import { QuizEntity } from "./quiz.entity"
 import { ResourceEntity } from "./resource.entity"
 import { SectionEntity } from "./section.entity"
@@ -80,12 +78,8 @@ export class SectionContentEntity {
     @JoinColumn({ name: "resourceId" })
         resource: ResourceEntity
 
-    @Field(() => [ProgressEntity], {nullable: true})
-    @OneToMany(() => ProgressEntity, (accountProgress) => accountProgress.content)
-        accountProgresses? : Array<ProgressEntity>
-
     //graphqh
-    @Field(() => String, {defaultValue: CompleteState.Undone})
+    @Field(() => String, {defaultValue: CompleteState.Undone, nullable: true})
         completeState?: CompleteState
 
 }

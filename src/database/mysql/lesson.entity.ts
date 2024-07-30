@@ -3,6 +3,7 @@ import {
     CreateDateColumn,
     Entity,
     JoinColumn,
+    OneToMany,
     OneToOne,
     PrimaryColumn,
     UpdateDateColumn,
@@ -11,6 +12,7 @@ import {
 import { ProcessStatus, VideoType } from "@common"
 import { Field, ID, Int, ObjectType } from "@nestjs/graphql"
 import { SectionContentEntity } from "./section_content.entity"
+import { ProgressEntity } from "./progress.entity"
 
 @ObjectType()
 @Entity("lesson")
@@ -51,6 +53,10 @@ export class LessonEntity {
     @CreateDateColumn()
         createdAt: Date
 
+    @Field(() => [ProgressEntity], { nullable: true })
+    @OneToMany(() => ProgressEntity, (enrolledInfo) => enrolledInfo.lesson, { cascade: true, nullable: true })
+        progresses: Array<ProgressEntity>    
+
     @Field(() => Date)
     @UpdateDateColumn()
         updatedAt: Date
@@ -63,4 +69,6 @@ export class LessonEntity {
     @JoinColumn({ name: "lessonId" })
         sectionContent: SectionContentEntity
 
+    @Field(() => Boolean, { nullable: true})
+        enableSeek?: boolean
 }

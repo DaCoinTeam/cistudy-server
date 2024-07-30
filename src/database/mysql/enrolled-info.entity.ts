@@ -12,7 +12,6 @@ import {
 import { AccountGradeEntity } from "./account-grade.entity"
 import { AccountEntity } from "./account.entity"
 import { CourseEntity } from "./course.entity"
-import { ProgressEntity } from "./progress.entity"
 
 @ObjectType()
 @Entity("enrolled_info")
@@ -67,9 +66,4 @@ export class EnrolledInfoEntity {
     @Field(() => AccountGradeEntity)
     @OneToMany(() => AccountGradeEntity, (accountGrade) => accountGrade.enrolledInfo)
         accountGrade: AccountGradeEntity
-
-    @Field(() => [ProgressEntity])
-    @OneToMany(() => ProgressEntity, (courseProgress) => courseProgress.enrolledInfo)
-        courseProgress: Array<ProgressEntity>
-
 }

@@ -266,3 +266,11 @@ export class UpdateQuizAttemptOutput implements Output {
 export class StartQuizAttemptOutput implements Output {
     message: string
 }
+
+export class MarkAsCompletedResourceOutput implements Output {
+    message: string
+}
+
+export class UpdateLessonProgressOutput implements Output {
+    message: string
+}

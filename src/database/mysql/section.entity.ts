@@ -56,6 +56,6 @@ export class SectionEntity {
         accountGrade: Array<AccountGradeEntity>
 
     //graphQL
-    @Field(() => String, { defaultValue:LockState.Locked })
+    @Field(() => String, { defaultValue: LockState.Locked, nullable : true })
         lockState?: LockState
 }

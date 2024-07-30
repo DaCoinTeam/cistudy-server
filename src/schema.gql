@@ -111,6 +111,16 @@ type CourseTargetEntity {
   course: CourseEntity!
 }
 
+type ProgressEntity {
+  progressId: ID!
+  accountId: ID!
+  lessonId: ID!
+  completePercent: Float
+  completeFirstWatch: Boolean
+  lesson: LessonEntity!
+  account: AccountEntity!
+}
+
 type LessonEntity {
   lessonId: ID!
   thumbnailId: ID
@@ -121,17 +131,10 @@ type LessonEntity {
   durationInSeconds: Int!
   description: String
   createdAt: DateTime!
+  progresses: [ProgressEntity!]
   updatedAt: DateTime!
   sectionContent: SectionContentEntity!
-}
-
-type ProgressEntity {
-  progressId: ID!
-  enrolledInfoId: ID!
-  sectionContentId: ID!
-  completeState: String!
-  content: SectionContentEntity!
-  enrolledInfo: EnrolledInfoEntity!
+  enableSeek: Boolean
 }
 
 type QuizQuestionEntity {
@@ -221,12 +224,24 @@ type ResourceAttachmentEntity {
   resource: ResourceEntity!
 }
 
+type CompleteResourceEntity {
+  completeResourceId: ID
+  resourceId: ID
+  accountId: ID
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  account: AccountEntity!
+  resource: ResourceEntity!
+  attemptAnswers: [QuizAttemptAnswerEntity!]!
+}
+
 type ResourceEntity {
   resourceId: ID!
   description: String
   createdAt: DateTime!
   updatedAt: DateTime!
   attachments: [ResourceAttachmentEntity!]
+  completeResources: [CompleteResourceEntity!]
   sectionContent: SectionContentEntity!
 }
 
@@ -245,8 +260,7 @@ type SectionContentEntity {
   lesson: LessonEntity
   quiz: QuizEntity
   resource: ResourceEntity
-  accountProgresses: [ProgressEntity!]
-  completeState: String!
+  completeState: String
 }
 
 type SectionEntity {
@@ -259,7 +273,7 @@ type SectionEntity {
   course: CourseEntity!
   contents: [SectionContentEntity!]
   accountGrade: [AccountGradeEntity!]
-  lockState: String!
+  lockState: String
 }
 
 type AccountGradeEntity {
@@ -285,7 +299,6 @@ type EnrolledInfoEntity {
   course: CourseEntity!
   account: AccountEntity!
   accountGrade: AccountGradeEntity!
-  courseProgress: [ProgressEntity!]!
 }
 
 type OrderEntity {
@@ -576,6 +589,8 @@ type AccountEntity {
   selfReviews: [AccountReviewEntity!]!
   reportAccounts: [ReportAccountEntity!]!
   accountReports: [ReportAccountEntity!]!
+  completeResources: [CompleteResourceEntity!]!
+  courseProgress: [ProgressEntity!]!
   followed: Boolean!
   numberOfFollowers: Int!
   accountRatings: AccountRating
@@ -892,7 +907,6 @@ type Query {
   findManyCourseTargets(data: FindManyCourseTargetsInputData!): FindManyCourseTargetsOutput!
   findOneCourseReview(data: FindOneCourseReviewInputData!): CourseReviewEntity!
   findManyCourseReviews(data: FindManyCourseReviewsInputData!): FindManyCourseReviewsOutputData!
-  findManyCoursesTopic(data: FindManyCoursesTopicInputData!): FindManyCoursesTopicOutputData!
   findOneQuizAttempt(data: FindOneQuizAttemptInputData!): FindOneQuizAttemptOutput!
   findManyLevelCategories(data: FindManyLevelCategoriesInputData!): [CategoryEntity!]!
   findManyCategories: [CategoryEntity!]!
@@ -1006,20 +1020,6 @@ input FindManyCourseReviewsInputParams {
 }
 
 input FindManyCourseReviewsInputOptions {
-  take: Int
-  skip: Int
-}
-
-input FindManyCoursesTopicInputData {
-  params: FindManyCoursesTopicInputParams!
-  options: FindManyCoursesTopicInputOptions
-}
-
-input FindManyCoursesTopicInputParams {
-  topicId: ID!
-}
-
-input FindManyCoursesTopicInputOptions {
   take: Int
   skip: Int
 }
