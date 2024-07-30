@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from "@nestjs/graphql"
+import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
 import {
     Column,
     CreateDateColumn,
@@ -9,9 +9,8 @@ import {
     UpdateDateColumn
 } from "typeorm"
 
-import { CompleteState } from "@common"
-import { EnrolledInfoEntity } from "./enrolled-info.entity"
-import { SectionContentEntity } from "./section_content.entity"
+import { LessonEntity } from "./lesson.entity"
+import { AccountEntity } from "./account.entity"
 
 @ObjectType()
 @Entity("progress")
@@ -23,25 +22,29 @@ export class ProgressEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        enrolledInfoId: string
+        accountId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        sectionContentId: string
+        lessonId: string
 
-    @Field(() => String)
-    @Column({ type: "enum", enum: CompleteState, default: CompleteState.Undone })
-        completeState: CompleteState
+    @Field(() => Float, { nullable: true })
+    @Column({ type: "float", default: 0 })
+        completePercent: number
+    
+    @Field(() => Boolean, { nullable: true })
+    @Column({ type: "boolean", nullable: true })
+        completeFirstWatch: boolean
 
-    @Field(() => SectionContentEntity)
-    @ManyToOne(() => SectionContentEntity, (content) => content.accountProgresses, {onDelete: "CASCADE"} )
-    @JoinColumn({ name: "sectionContentId" })
-        content: SectionContentEntity
+    @Field(() => LessonEntity)
+    @ManyToOne(() => LessonEntity, (lesson) => lesson.progresses, {onDelete: "CASCADE"} )
+    @JoinColumn({ name: "lessonId" })
+        lesson: LessonEntity
 
-    @Field(() => EnrolledInfoEntity)
-    @ManyToOne(() => EnrolledInfoEntity, (enrolledInfo) => enrolledInfo.courseProgress, {onDelete: "CASCADE"} )
-    @JoinColumn({ name: "enrolledInfoId" })
-        enrolledInfo: EnrolledInfoEntity
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (account) => account.courseProgress, {onDelete: "CASCADE"} )
+    @JoinColumn({ name: "accountId" })
+        account: AccountEntity
 
     @CreateDateColumn()
         createdAt: Date

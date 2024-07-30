@@ -1,5 +1,4 @@
 import {
-    CompleteState,
     computeDenomination,
     computeRaw,
     CourseVerifyStatus,
@@ -15,6 +14,7 @@ import {
     AccountMySqlEntity,
     CategoryMySqlEntity,
     CertificateMySqlEntity,
+    CompleteResourceMySqlEntity,
     CourseCategoryMySqlEntity,
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
@@ -68,6 +68,7 @@ import {
     DeleteSectionInput,
     EnrollCourseInput,
     FinishQuizAttemptInput,
+    MarkAsCompletedResourceInput,
     MarkContentAsCompletedInput,
     PublishCourseInput,
     ResolveCourseReportInput,
@@ -77,6 +78,7 @@ import {
     UpdateCourseReviewInput,
     UpdateCourseTargetInput,
     UpdateLessonInput,
+    UpdateLessonProgressInput,
     UpdateQuizAttemptAnswersInput,
     UpdateQuizAttemptInput,
     UpdateQuizInput,
@@ -110,6 +112,7 @@ import {
     DeleteSectionOuput,
     EnrollCourseOutput,
     FinishQuizAttemptOutput,
+    MarkAsCompletedResourceOutput,
     MarkContentAsCompletedOutput,
     PublishCourseOutput,
     ResolveCourseReportOutput,
@@ -119,6 +122,7 @@ import {
     UpdateCourseReviewOutput,
     UpdateCourseTargetOuput,
     UpdateLessonOutput,
+    UpdateLessonProgressOutput,
     UpdateQuizAttemptOutput,
     UpdateQuizOutput,
     UpdateQuizQuestionAnswerOutput,
@@ -173,6 +177,8 @@ export class CoursesService {
     private readonly accountGradeMySqlRepository: Repository<AccountGradeMySqlEntity>,
     @InjectRepository(ReportCourseMySqlEntity)
     private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
+    @InjectRepository(CompleteResourceMySqlEntity)
+    private readonly completeResourceMySqlRepository: Repository<CompleteResourceMySqlEntity>,
     private readonly storageService: StorageService,
     private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
     private readonly dataSource: DataSource,
@@ -1525,34 +1531,34 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            const progress = await this.progressMySqlRepository.findOne({
-                where: { sectionContentId },
-                relations: { enrolledInfo: true },
-            })
+            // const progress = await this.progressMySqlRepository.findOne({
+            //     where: { sectionContentId },
+            //     relations: { enrolledInfo: true },
+            // })
 
-            if (!progress) {
-                throw new NotFoundException("Content not found")
-            }
+            // if (!progress) {
+            //     throw new NotFoundException("Content not found")
+            // }
 
-            const { enrolledInfo } = progress
+            // const { enrolledInfo } = progress
 
-            if (!enrolledInfo || enrolledInfo.accountId !== accountId) {
-                throw new NotFoundException(
-                    "You haven't enrolled to course that has this content",
-                )
-            }
+            // if (!enrolledInfo || enrolledInfo.accountId !== accountId) {
+            //     throw new NotFoundException(
+            //         "You haven't enrolled to course that has this content",
+            //     )
+            // }
 
-            const now = new Date()
+            // const now = new Date()
 
-            if (now > enrolledInfo.endDate)
-                throw new ConflictException("This Course has expired")
+            // if (now > enrolledInfo.endDate)
+            //     throw new ConflictException("This Course has expired")
 
-            await this.progressMySqlRepository.update(
-                { sectionContentId },
-                { completeState: CompleteState.Completed },
-            )
+            // await this.progressMySqlRepository.update(
+            //     { sectionContentId },
+            //     { completeState: CompleteState.Completed },
+            // )
 
-            await queryRunner.commitTransaction()
+            // await queryRunner.commitTransaction()
 
             return { message: "You have completed this content" }
         } catch (ex) {
@@ -1588,9 +1594,18 @@ export class CoursesService {
                 )
             }
 
+            const { timeLimit } = await this.quizMySqlRepository.findOne({
+                where: {
+                    quizId
+                },
+            })
+
             const { quizAttemptId } = await this.quizAttemptMySqlRepository.save({
                 accountId,
                 quizId,
+                timeLeft: timeLimit,
+                observedAt: new Date(),
+                timeLimitAtStart: timeLimit
             })
 
             return {
@@ -1642,7 +1657,7 @@ export class CoursesService {
                 throw new NotFoundException("Attempt already ended")
             }
 
-            const { attemptAnswers, quiz, timeLeft } = attempt
+            const { attemptAnswers, quiz, timeLeft, timeLimitAtStart } = attempt
             const { questions } = quiz
 
             let receivedPoints = 0
@@ -1679,7 +1694,7 @@ export class CoursesService {
 
             const receivedPercent = (receivedPoints / totalPoints) * 100
             const isPassed = receivedPercent >= quiz.passingPercent
-            const timeTaken = quiz.timeLimit - timeLeft/(1000*60)
+            const timeTaken = timeLimitAtStart - timeLeft
                 
             await this.quizAttemptMySqlRepository.update(quizAttemptId, {
                 isPassed,
@@ -1886,4 +1901,52 @@ export class CoursesService {
             message: "Your attempt has been updated successfully",
         }
     }
-}
+
+    async markAsCompletedResource(
+        input: MarkAsCompletedResourceInput,
+    ): Promise<MarkAsCompletedResourceOutput> {
+        const { data, accountId } = input
+        const { resourceId } = data
+
+        await this.completeResourceMySqlRepository.save({
+            accountId,
+            resourceId
+        })
+
+        return {
+            message: "Marked successfully",
+        }
+    }
+
+    async updateLessonProgress(
+        input: UpdateLessonProgressInput,
+    ): Promise<UpdateLessonProgressOutput> {
+        const { data, accountId } = input
+        const { lessonId, completeFirstWatch, completePercent } = data
+
+        let progress = await this.progressMySqlRepository.findOne({
+            where: {
+                lessonId,
+                accountId
+            }
+        })
+
+        if (!progress) {
+            progress = await this.progressMySqlRepository.save({
+                lessonId,
+                accountId,
+                completeFirstWatch,
+                completePercent
+            })
+        } else {
+            await this.progressMySqlRepository.update(progress.progressId, {
+                completeFirstWatch,
+                completePercent
+            })
+        }
+
+        return {
+            message: "Watch lesson succesfully successfully",
+        }
+    }
+} 

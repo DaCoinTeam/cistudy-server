@@ -757,3 +757,29 @@ export class UpdateQuizAttemptAnswersInput implements AuthInput<UpdateQuizAttemp
     accountId: string
     data: UpdateQuizAttemptAnswersInputData
 }
+
+export class MarkAsCompleteResourceInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        resourceId : string
+}
+
+export class MarkAsCompletedResourceInput implements AuthInput<MarkAsCompleteResourceInputData> {
+    accountId: string
+    data: MarkAsCompleteResourceInputData
+}
+
+export class UpdateLessonProgressInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        lessonId: string
+    @ApiProperty()
+        completePercent?: number
+    @ApiProperty()
+        completeFirstWatch?: boolean
+}
+
+export class UpdateLessonProgressInput implements AuthInput<UpdateLessonProgressInputData> {
+    accountId: string
+    data: UpdateLessonProgressInputData
+}

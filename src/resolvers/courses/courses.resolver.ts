@@ -11,7 +11,6 @@ import {
     FindManyCourseReviewsInputData,
     FindManyCourseTargetsInputData,
     FindManyCoursesInputData,
-    FindManyCoursesTopicInputData,
     FindManyLessonsInputData,
     FindManyLevelCategoriesInputData,
     FindOneCourseAuthInputData,
@@ -25,7 +24,6 @@ import {
     FindManyCourseReviewsOutputData,
     FindManyCourseTargetsOutput,
     FindManyCoursesOutputData,
-    FindManyCoursesTopicOutputData,
     FindManyLessonsOutput,
     FindOneCourseAuthOutput,
     FindOneQuizAttemptOutput,
@@ -97,13 +95,6 @@ export class CoursesResolver {
     @Args("data") data: FindManyCourseReviewsInputData,
   ) {
       return await this.coursesService.findManyCourseReviews({ data })
-  }
-
-  @Query(() => FindManyCoursesTopicOutputData)
-  async findManyCoursesTopic(
-    @Args("data") data: FindManyCoursesTopicInputData,
-  ) {
-      return await this.coursesService.findManyCoursesTopic({ data })
   }
 
   @UseGuards(JwtAuthGuard)

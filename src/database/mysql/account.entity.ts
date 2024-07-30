@@ -27,6 +27,8 @@ import { QuizAttemptEntity } from "./quiz-attempt.entity"
 import { ReportAccountEntity } from "./report-account.entity"
 import { RoleEntity } from "./role.entity"
 import { SessionEntity } from "./session.entity"
+import { CompleteResourceEntity } from "./complete-resource.entity"
+import { ProgressEntity } from "./progress.entity"
 
 
 @ObjectType()
@@ -198,7 +200,15 @@ export class AccountEntity {
     @Field(() => [ReportAccountEntity])
     @OneToMany(() => ReportAccountEntity, (accountReports) => accountReports.reporterAccount, { nullable: true })
         accountReports?: Array<ReportAccountEntity>
+    
+    @Field(() => [CompleteResourceEntity])
+    @OneToMany(() => CompleteResourceEntity, (completeResource) => completeResource.account, { nullable: true })
+        completeResources?: Array<CompleteResourceEntity>
 
+    @Field(() => [ProgressEntity])
+    @OneToMany(() => ProgressEntity, (courseProgress) => courseProgress.account)
+        courseProgress: Array<ProgressEntity>
+        
     // @Field(() => [ReportAccountEntity])
     // @OneToMany(() => ReportAccountEntity, (accountReports) => accountReports.reporterAccount, { nullable: true })
     //     viewedLessons?: Array<ReportAccountEntity>

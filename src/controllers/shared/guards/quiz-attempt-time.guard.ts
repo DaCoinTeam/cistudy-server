@@ -34,6 +34,7 @@ export class QuizAttemptTimeGuard implements CanActivate {
                 observedAt: new Date(),
                 timeLeft: 0
             })
+            
             throw new ConflictException("Quiz attempt has been ended")
         } else {
             await this.quizAttemptMySqlRepository.update(quizAttemptId, {
