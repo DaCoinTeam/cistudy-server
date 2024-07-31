@@ -148,6 +148,7 @@ type QuizQuestionEntity {
   quiz: QuizEntity!
   answered: Boolean
   numberOfCorrectAnswers: Int
+  corrected: Boolean
 }
 
 type QuizQuestionAnswerEntity {
@@ -161,7 +162,6 @@ type QuizQuestionAnswerEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   selected: Boolean
-  corrected: Boolean
 }
 
 type QuizAttemptAnswerEntity {
@@ -195,6 +195,7 @@ type QuizAttemptEntity {
   account: AccountEntity!
   quiz: QuizEntity!
   attemptAnswers: [QuizAttemptAnswerEntity!]!
+  numberOfQuestionAnswered: Int
 }
 
 type QuizEntity {
@@ -892,6 +893,11 @@ type FindManyReceivedNotificationOutput {
   data: FindManyReceivedNotificationOutputData!
 }
 
+type FindOneCertificateOutput {
+  data: CertificateEntity!
+  tokens: AuthTokens
+}
+
 type InitOutput {
   data: AccountEntity!
   tokens: AuthTokens
@@ -975,7 +981,7 @@ type Query {
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
   findManyReceivedNotifications(data: FindManyReceivedNotificationInputData!): FindManyReceivedNotificationOutput!
-  findOneCertificate(data: FindOneCertificateInputData!): CertificateEntity!
+  findOneCertificate(data: FindOneCertificateInputData!): FindOneCertificateOutput!
   findOneCart: FindOneCartOutput!
   findOneOrder(data: FindOneOrderInputData!): FindOneOrderOutput!
   findManyAccountOrders(data: FindManyAccountOrdersInputData!): FindManyAccountOrdersOutput!

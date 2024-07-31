@@ -7,9 +7,10 @@ import {
     FindManyReceivedNotificationOutput,
     FindManySelfCreatedCoursesOutput,
     FindManyTransactionsOutput,
+    FindOneCertificateOutput,
 } from "./profile.output"
 import { ProfileService } from "./profile.service"
-import { CertificateMySqlEntity } from "@database"
+
 
 @Resolver()
 export class ProfileResolver {
@@ -64,7 +65,7 @@ export class ProfileResolver {
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    @Query(() => CertificateMySqlEntity)
+    @Query(() => FindOneCertificateOutput)
     async findOneCertificate(
         @AccountId() accountId: string,
         @Args("data") data: FindOneCertificateInputData,

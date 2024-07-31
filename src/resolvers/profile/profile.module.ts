@@ -1,6 +1,9 @@
 import {
     AccountMySqlEntity,
+    CertificateMySqlEntity,
     CourseMySqlEntity,
+    CourseReviewMySqlEntity,
+    EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
     NotificationMySqlEntity,
     PostMySqlEntity,
@@ -27,7 +30,11 @@ import { ProfileService } from "./profile.service"
             ReportPostMySqlEntity,
             ReportPostCommentMySqlEntity,
             TransactionMySqlEntity,
-            NotificationMySqlEntity
+            NotificationMySqlEntity,
+            CertificateMySqlEntity,
+            FollowMySqlEnitity,
+            CourseReviewMySqlEntity,
+            EnrolledInfoMySqlEntity
         ]),
     ],
     providers: [ProfileResolver, ProfileService ],

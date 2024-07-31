@@ -1,5 +1,5 @@
 import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
-import { CourseMySqlEntity, NotificationMySqlEntity, TransactionMySqlEntity } from "@database"
+import { CertificateMySqlEntity, CourseMySqlEntity, NotificationMySqlEntity, TransactionMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
@@ -107,4 +107,12 @@ export class FindManyReceivedNotificationOutputData implements ResultsWithMetada
 export class FindManyReceivedNotificationOutput implements AuthOutput<FindManyReceivedNotificationOutputData>{
     @Field(() => FindManyReceivedNotificationOutputData)
         data: FindManyReceivedNotificationOutputData
+}
+
+@ObjectType()
+export class FindOneCertificateOutput implements AuthOutput<CertificateMySqlEntity>{
+    @Field(() => CertificateMySqlEntity)
+        data?: CertificateMySqlEntity
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
 }

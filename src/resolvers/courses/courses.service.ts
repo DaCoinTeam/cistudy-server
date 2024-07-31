@@ -56,6 +56,8 @@ export class CoursesService {
     constructor(
         @InjectRepository(CourseMySqlEntity)
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(CertificateMySqlEntity)
+        private readonly certificateMySqlRepository: Repository<CertificateMySqlEntity>,
         @InjectRepository(SectionContentMySqlEntity)
         private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
         @InjectRepository(LessonMySqlEntity)
@@ -916,7 +918,7 @@ export class CoursesService {
             if (allCompleted) {
                 sections[i].lockState = LockState.Completed
                 if (i === sections.length - 1) {
-                    const certificate = await this.certificateMySqlEntity.findOne({
+                    const certificate = await this.certificateMySqlRepository.findOne({
                         where: {
                             courseId: sectionContent.section.course.courseId,
                             accountId
@@ -1107,7 +1109,8 @@ export class CoursesService {
         const results = await this.quizAttemptMySqlRepository.find({
             where: {
                 accountId,
-                quizId
+                quizId,
+                attemptStatus: QuizAttemptStatus.Ended
             },
             skip,
             take,
@@ -1120,22 +1123,42 @@ export class CoursesService {
                 attemptAnswers: {
                     quizQuestionAnswer:true
                 }
+            },
+            order:{
+                observedAt: "DESC"
             }
         })
 
         for (const attempt of results) {
             const { quiz, attemptAnswers } = attempt
             const { questions } = quiz
-        
+
+            let numberOfQuestionsAnswered = 0
             for (const question of questions) {
                 const { answers } = question
+                
+                let questionCorrected = false
         
                 answers.forEach((answer) => {
-                    const selectedAttemptAnswer = attemptAnswers?.find((attemptAnswer) => attemptAnswer.quizQuestionAnswerId === answer.quizQuestionAnswerId)
+                    const selectedAttemptAnswer = attemptAnswers?.find(
+                        (attemptAnswer) => attemptAnswer.quizQuestionAnswerId === answer.quizQuestionAnswerId
+                    )
+        
                     answer.selected = !!selectedAttemptAnswer
-                    answer.corrected = selectedAttemptAnswer ? selectedAttemptAnswer.corrected = answer.isCorrect : false
+        
+                    if (selectedAttemptAnswer) {
+                        numberOfQuestionsAnswered++
+                        selectedAttemptAnswer.corrected = answer.isCorrect
+                        if (answer.isCorrect) {
+                            questionCorrected = true
+                        }
+                    }
                 })
+        
+                question.corrected = questionCorrected
             }
+            quiz.isPassed = attempt.receivedPercent >= quiz.passingPercent
+            attempt.numberOfQuestionAnswered = numberOfQuestionsAnswered
         }
         
         const numberOfAttempts = await this.quizAttemptMySqlRepository.count({

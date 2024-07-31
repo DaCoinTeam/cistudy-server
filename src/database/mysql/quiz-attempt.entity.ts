@@ -93,4 +93,7 @@ export class QuizAttemptEntity {
     @OneToMany(() => QuizAttemptAnswerEntity, (attemptAnswers) => attemptAnswers.quizAttempt)
         attemptAnswers: Array<QuizAttemptAnswerEntity>
 
+    @Field(() => Int, {nullable: true})
+        numberOfQuestionAnswered? : number
+    
 }

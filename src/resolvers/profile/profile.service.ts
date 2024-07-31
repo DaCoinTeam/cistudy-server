@@ -1,6 +1,6 @@
 
-import { AccountMySqlEntity, CertificateMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, NotificationMySqlEntity, PostMySqlEntity, TransactionMySqlEntity } from "@database"
-import { Injectable } from "@nestjs/common"
+import { AccountMySqlEntity, CertificateMySqlEntity, CourseMySqlEntity, CourseRating, CourseReviewMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, NotificationMySqlEntity, PostMySqlEntity, TransactionMySqlEntity } from "@database"
+import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository } from "typeorm"
 import {
@@ -24,6 +24,12 @@ export class ProfileService {
         private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
         @InjectRepository(NotificationMySqlEntity)
         private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+        @InjectRepository(FollowMySqlEnitity)
+        private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
+        @InjectRepository(CourseReviewMySqlEntity)
+        private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
+        @InjectRepository(EnrolledInfoMySqlEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         private readonly dataSource: DataSource,
     ) { }
 
@@ -278,16 +284,88 @@ export class ProfileService {
         const certificate = await this.certificateMySqlRepository.findOne({
             where: {
                 certificateId,
-                accountId
             },
             relations: {
                 account: true,
                 course: {
-                    creator : true
+                    creator : true,
+                    courseTargets: true
                 }
             }
         })
 
+        if(!certificate){ 
+            throw new NotFoundException("Certificate not found")
+        }
+
+        const numberOfCourseCreatorFollowers = await this.followMySqlRepository.count({
+            where:{
+                followedAccountId: certificate.course.courseId,
+                followed: true
+            }
+        })
+
+        const numberOfAccountFollowers = await this.followMySqlRepository.count({
+            where:{
+                followedAccountId: accountId,
+                followed: true
+            }
+        })
+
+        certificate.course.creator.numberOfFollowers = numberOfCourseCreatorFollowers
+        certificate.account.numberOfFollowers = numberOfAccountFollowers
+
+        const courseReviews = await this.courseReviewMySqlRepository.findBy({
+            courseId: certificate.courseId,
+        })
+
+        const courseEnrollments = await this.enrolledInfoMySqlRepository.count({
+            where: {
+                courseId: certificate.courseId
+            }
+        })
+
+        const countWithNumStars = (numStars: number) => {
+            let count = 0
+            for (const { rating } of courseReviews) {
+                if (rating === numStars) {
+                    count++
+                }
+            }
+
+            return count
+        }
+
+        const numberOf1StarRatings = countWithNumStars(1)
+        const numberOf2StarRatings = countWithNumStars(2)
+        const numberOf3StarRatings = countWithNumStars(3)
+        const numberOf4StarRatings = countWithNumStars(4)
+        const numberOf5StarRatings = countWithNumStars(5)
+        const totalNumberOfRatings = courseReviews.length
+
+        const totalNumStars = () => {
+            let total = 0
+            for (let index = 1; index <= 5; index++) {
+                total += countWithNumStars(index) * index
+            }
+            return total
+        }
+
+        const overallCourseRating =
+            totalNumberOfRatings > 0 ? totalNumStars() / totalNumberOfRatings : 0
+
+        const courseRatings: CourseRating = {
+            numberOf1StarRatings,
+            numberOf2StarRatings,
+            numberOf3StarRatings,
+            numberOf4StarRatings,
+            numberOf5StarRatings,
+            overallCourseRating,
+            totalNumberOfRatings,
+        }
+
+        certificate.course.courseRatings = courseRatings
+        certificate.course.numberOfEnrollments = courseEnrollments
 
         return certificate
     }
