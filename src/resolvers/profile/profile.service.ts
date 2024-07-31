@@ -1,13 +1,13 @@
 
-import { AccountMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, NotificationMySqlEntity, PostMySqlEntity, TransactionMySqlEntity } from "@database"
+import { AccountMySqlEntity, CertificateMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, NotificationMySqlEntity, PostMySqlEntity, TransactionMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository } from "typeorm"
 import {
     FindManyEnrolledCoursesInput,
     FindManyReceivedNotificationInput,
-    FindManySelfCreatedCoursesInput, FindManyTransactionsInput
-} from "./profile.input"
+    FindManySelfCreatedCoursesInput, FindManyTransactionsInput,
+    FindOneCertificateInput} from "./profile.input"
 import { FindManyEnrolledCoursesOutputData, FindManyReceivedNotificationOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData } from "./profile.output"
 
 
@@ -16,6 +16,8 @@ export class ProfileService {
     constructor(
         @InjectRepository(CourseMySqlEntity)
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(CertificateMySqlEntity)
+        private readonly certificateMySqlRepository: Repository<CertificateMySqlEntity>,
         @InjectRepository(PostMySqlEntity)
         private readonly postMySqlRepository: Repository<PostMySqlEntity>,
         @InjectRepository(TransactionMySqlEntity)
@@ -267,5 +269,26 @@ export class ProfileService {
                 count: numberOfNotifications
             }
         }
+    }
+
+    async findOneCertificate(input: FindOneCertificateInput): Promise<CertificateMySqlEntity> {
+        const { data, accountId } = input
+        const { certificateId } = data
+
+        const certificate = await this.certificateMySqlRepository.findOne({
+            where: {
+                certificateId,
+                accountId
+            },
+            relations: {
+                account: true,
+                course: {
+                    creator : true
+                }
+            }
+        })
+
+
+        return certificate
     }
 }

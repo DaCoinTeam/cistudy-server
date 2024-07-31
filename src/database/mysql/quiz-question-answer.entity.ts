@@ -46,6 +46,7 @@ export class QuizQuestionAnswerEntity {
     
     @Field(() => Boolean, { nullable: true })
         selected?: boolean
+
     @Field(() => Boolean, { nullable: true })
         corrected?: boolean
 }

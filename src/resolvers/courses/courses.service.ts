@@ -1122,26 +1122,12 @@ export class CoursesService {
                 const { answers } = question
         
                 answers.forEach((answer) => {
-                    answer.selected = attemptAnswers?.some((attemptAnswer) => attemptAnswer.quizQuestionAnswerId === answer.quizQuestionAnswerId)
+                    const selectedAttemptAnswer = attemptAnswers?.find((attemptAnswer) => attemptAnswer.quizQuestionAnswerId === answer.quizQuestionAnswerId)
+                    answer.selected = !!selectedAttemptAnswer
+                    answer.corrected = selectedAttemptAnswer ? selectedAttemptAnswer.corrected = answer.isCorrect : false
                 })
             }
-        
-            for (const attemptAnswer of attemptAnswers) {
-                const { quizQuestionAnswerId } = attemptAnswer
-
-                const question = questions.find((q) =>
-                    q.answers.some((a) => a.quizQuestionAnswerId === quizQuestionAnswerId)
-                )
-        
-                if (question) {
-                    const correctAnswer = question.answers.find((a) => a.isCorrect === true)
-                    attemptAnswer.corrected = correctAnswer && correctAnswer.quizQuestionAnswerId === quizQuestionAnswerId
-                }else {
-                    attemptAnswer.corrected = false
-                }
-            }
         }
-        
         
         const numberOfAttempts = await this.quizAttemptMySqlRepository.count({
             where: {

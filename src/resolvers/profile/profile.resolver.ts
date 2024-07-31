@@ -1,7 +1,7 @@
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { Args, Query, Resolver } from "@nestjs/graphql"
 import { AccountId, AuthInterceptor, JwtAuthGuard } from "../shared"
-import { FindManyEnrolledCoursesInputData, FindManyReceivedNotificationInputData, FindManySelfCreatedCoursesInputData, FindManyTransactionsInputData } from "./profile.input"
+import { FindManyEnrolledCoursesInputData, FindManyReceivedNotificationInputData, FindManySelfCreatedCoursesInputData, FindManyTransactionsInputData, FindOneCertificateInputData } from "./profile.input"
 import {
     FindManyEnrolledCoursesOutput,
     FindManyReceivedNotificationOutput,
@@ -9,6 +9,7 @@ import {
     FindManyTransactionsOutput,
 } from "./profile.output"
 import { ProfileService } from "./profile.service"
+import { CertificateMySqlEntity } from "@database"
 
 @Resolver()
 export class ProfileResolver {
@@ -59,5 +60,15 @@ export class ProfileResolver {
         @Args("data") data: FindManyReceivedNotificationInputData,
     ) {
         return this.profileService.findManyReceivedNotifications({ accountId, data })
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @Query(() => CertificateMySqlEntity)
+    async findOneCertificate(
+        @AccountId() accountId: string,
+        @Args("data") data: FindOneCertificateInputData,
+    ) {
+        return this.profileService.findOneCertificate({ accountId, data })
     }
 }

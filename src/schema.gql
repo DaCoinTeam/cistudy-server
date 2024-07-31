@@ -975,6 +975,7 @@ type Query {
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
   findManyReceivedNotifications(data: FindManyReceivedNotificationInputData!): FindManyReceivedNotificationOutput!
+  findOneCertificate(data: FindOneCertificateInputData!): CertificateEntity!
   findOneCart: FindOneCartOutput!
   findOneOrder(data: FindOneOrderInputData!): FindOneOrderOutput!
   findManyAccountOrders(data: FindManyAccountOrdersInputData!): FindManyAccountOrdersOutput!
@@ -1290,6 +1291,10 @@ input FindManyReceivedNotificationInputData {
 input FindManyReceivedNotificationInputOptions {
   take: Int
   skip: Int
+}
+
+input FindOneCertificateInputData {
+  certificateId: ID!
 }
 
 input FindOneOrderInputData {
