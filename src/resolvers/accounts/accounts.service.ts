@@ -28,46 +28,33 @@ export class AccountsService {
         const { accountId } = params
         const { followerId } = options
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const account = await this.accountMySqlRepository.findOne({
+            where:{
+                accountId
+            }
+        })
 
-        try {
-            const account = await queryRunner.manager.findOne(AccountMySqlEntity, {
-                where: { accountId }
-            })
+        const follow = await this.followMySqlRepository.findOne({
+            where:{
+                followerId,
+                followedAccountId: accountId,
+                followed: true
+            }
+        })
 
-            const follow = await queryRunner.manager.findOne(
-                FollowMySqlEnitity,
-                {
-                    where: {
-                        followerId,
-                        followedAccountId: accountId,
-                        followed: true
-                    }
-                }
-            )
+        const numberOfFollowersResult = await this.followMySqlRepository.count({
+            where:{
+                followedAccountId: accountId,
+                followed: true
+            }
+        })
 
-            const numberOfFollowersResult = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(FollowMySqlEnitity, "follow")
-                .where("followedAccountId = :accountId", { accountId })
-                .andWhere("followed = :followed", { followed: true })
-                .getRawOne()
+        account.numberOfFollowers = numberOfFollowersResult
+        const followed = follow?.followed
+        account.followed = followed ?? false
 
-            await queryRunner.commitTransaction()
+        return account
 
-            account.numberOfFollowers = numberOfFollowersResult.count
-            const followed = follow?.followed
-            account.followed = followed ?? false
-
-            return account
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
-        }
     }
 
     async findManyFollowers(input: FindManyFollowersInput): Promise<Array<AccountMySqlEntity>> {

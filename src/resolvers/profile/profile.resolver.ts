@@ -1,13 +1,12 @@
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { Args, Query, Resolver } from "@nestjs/graphql"
 import { AccountId, AuthInterceptor, JwtAuthGuard } from "../shared"
-import { FindManyEnrolledCoursesInputData, FindManyReceivedNotificationInputData, FindManySelfCreatedCoursesInputData, FindManyTransactionsInputData, FindOneCertificateInputData } from "./profile.input"
+import { FindManyEnrolledCoursesInputData, FindManyReceivedNotificationsInputData, FindManySelfCreatedCoursesInputData, FindManyTransactionsInputData, FindOneCertificateInputData } from "./profile.input"
 import {
-    FindManyEnrolledCoursesOutput,
-    FindManyReceivedNotificationOutput,
+    FindManyEnrolledCoursesOutput, FindManyReceivedNotificationsOutput,
     FindManySelfCreatedCoursesOutput,
     FindManyTransactionsOutput,
-    FindOneCertificateOutput,
+    FindOneCertificateOutput
 } from "./profile.output"
 import { ProfileService } from "./profile.service"
 
@@ -55,10 +54,10 @@ export class ProfileResolver {
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    @Query(() => FindManyReceivedNotificationOutput)
+    @Query(() => FindManyReceivedNotificationsOutput)
     async findManyReceivedNotifications(
         @AccountId() accountId: string,
-        @Args("data") data: FindManyReceivedNotificationInputData,
+        @Args("data") data: FindManyReceivedNotificationsInputData,
     ) {
         return this.profileService.findManyReceivedNotifications({ accountId, data })
     }

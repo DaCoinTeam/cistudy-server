@@ -37,16 +37,23 @@ export class AuthService {
 
     async signUp(input: SignUpInput): Promise<SignUpOutput> {
         const { data } = input
-        const found = await this.accountMySqlRepository.findOne({
-            where: {
-                email: data.email,
-            },
+
+        const foundAccount = await this.accountMySqlRepository.findOne({
+            where: [
+                { email: data.email },
+                { username: data.username }
+            ],
         })
-        if (found) {
-            throw new ConflictException(
-                `Account with email ${data.email} has existed.`,
-            )
+        
+        if (foundAccount) {
+            if (foundAccount.email === data.email) {
+                throw new ConflictException(`Account with email ${data.email} has existed.`)
+            }
+            if (foundAccount.username === data.username) {
+                throw new ConflictException("Username already existed.")
+            }
         }
+
         data.password = this.sha256Service.createHash(data.password)
         const created = await this.accountMySqlRepository.save(data)
 

@@ -83,7 +83,7 @@ implements AuthInput<FindManyTransactionsInputData>
 }
 
 @InputType()
-export class FindManyReceivedNotificationInputOptions {
+export class FindManyReceivedNotificationsInputOptions {
     @Field(() => Int, { nullable: true })
         take?: number
     @Field(() => Int, { nullable: true })
@@ -91,14 +91,14 @@ export class FindManyReceivedNotificationInputOptions {
 }
 
 @InputType()
-export class FindManyReceivedNotificationInputData implements OptionsOnly<FindManyReceivedNotificationInputOptions>{
-    @Field(() => FindManyReceivedNotificationInputOptions, { nullable: true })
-        options?: FindManyReceivedNotificationInputOptions
+export class FindManyReceivedNotificationsInputData implements OptionsOnly<FindManyReceivedNotificationsInputOptions>{
+    @Field(() => FindManyReceivedNotificationsInputOptions, { nullable: true })
+        options?: FindManyReceivedNotificationsInputOptions
 }
 
-export class FindManyReceivedNotificationInput implements AuthInput<FindManyReceivedNotificationInputData>{
+export class FindManyReceivedNotificationsInput implements AuthInput<FindManyReceivedNotificationsInputData>{
     accountId: string
-    data: FindManyReceivedNotificationInputData
+    data: FindManyReceivedNotificationsInputData
 }
 
 @InputType()

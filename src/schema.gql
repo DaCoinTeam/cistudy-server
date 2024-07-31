@@ -881,18 +881,18 @@ type FindManyTransactionsOutput {
   tokens: AuthTokens
 }
 
-type FindManyReceivedNotificationOutputMetadata {
+type FindManyReceivedNotificationsOutputMetadata {
   count: Int
 }
 
-type FindManyReceivedNotificationOutputData {
+type FindManyReceivedNotificationsOutputData {
   results: [NotificationEntity!]!
-  metadata: FindManyReceivedNotificationOutputMetadata
+  metadata: FindManyReceivedNotificationsOutputMetadata
 }
 
-type FindManyReceivedNotificationOutput {
-  data: FindManyReceivedNotificationOutputData!
-  tokens: AuthTokens!
+type FindManyReceivedNotificationsOutput {
+  data: FindManyReceivedNotificationsOutputData!
+  tokens: AuthTokens
 }
 
 type FindOneCertificateOutput {
@@ -982,7 +982,7 @@ type Query {
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
-  findManyReceivedNotifications(data: FindManyReceivedNotificationInputData!): FindManyReceivedNotificationOutput!
+  findManyReceivedNotifications(data: FindManyReceivedNotificationsInputData!): FindManyReceivedNotificationsOutput!
   findOneCertificate(data: FindOneCertificateInputData!): FindOneCertificateOutput!
   findOneCart: FindOneCartOutput!
   findOneOrder(data: FindOneOrderInputData!): FindOneOrderOutput!
@@ -1292,11 +1292,11 @@ input FindManyTransactionsInputOptions {
   skip: Int
 }
 
-input FindManyReceivedNotificationInputData {
-  options: FindManyReceivedNotificationInputOptions
+input FindManyReceivedNotificationsInputData {
+  options: FindManyReceivedNotificationsInputOptions
 }
 
-input FindManyReceivedNotificationInputOptions {
+input FindManyReceivedNotificationsInputOptions {
   take: Int
   skip: Int
 }

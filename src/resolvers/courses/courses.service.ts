@@ -316,8 +316,14 @@ export class CoursesService {
                 sections: {
                     contents: {
                         lesson: true,
-                        quiz: true,
-                        resource: true,
+                        quiz: {
+                            questions: {
+                                answers: true,
+                            },
+                        },
+                        resource: {
+                            attachments: true,
+                        },
                     },
                 },
                 courseTargets: true,
@@ -453,9 +459,18 @@ export class CoursesService {
                 },
             },
         })
+        
+        const certificate = await this.certificateMySqlRepository.findOne({
+            where:{
+                accountId,
+                courseId
+            }
+        })
+
         course.numberOfLessons = numberOfLessons
         course.numberOfResources = numberOfResources
         course.numberOfQuizzes = numberOfQuizzes
+        course.certificate = certificate
 
         return course
     }

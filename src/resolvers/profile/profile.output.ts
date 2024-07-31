@@ -90,25 +90,25 @@ implements AuthOutput<FindManyTransactionsOutputData>
 }
 
 @ObjectType()
-export class FindManyReceivedNotificationOutputMetadata {
+export class FindManyReceivedNotificationsOutputMetadata {
     @Field(() => Int, { nullable: true })
         count?: number
 }
 
 @ObjectType()
-export class FindManyReceivedNotificationOutputData implements ResultsWithMetadata<NotificationMySqlEntity, FindManyReceivedNotificationOutputMetadata>{
+export class FindManyReceivedNotificationsOutputData implements ResultsWithMetadata<NotificationMySqlEntity, FindManyReceivedNotificationsOutputMetadata>{
     @Field(() => [NotificationMySqlEntity])
         results: Array<NotificationMySqlEntity>
-    @Field(() => FindManyReceivedNotificationOutputMetadata, { nullable: true })
-        metadata: FindManyReceivedNotificationOutputMetadata
+    @Field(() => FindManyReceivedNotificationsOutputMetadata, { nullable: true })
+        metadata: FindManyReceivedNotificationsOutputMetadata
 }
 
 @ObjectType()
-export class FindManyReceivedNotificationOutput implements AuthOutput<FindManyReceivedNotificationOutputData>{
-    @Field(() => FindManyReceivedNotificationOutputData)
-        data: FindManyReceivedNotificationOutputData
-    @Field(() => AuthTokens,)
-        tokens: AuthTokens
+export class FindManyReceivedNotificationsOutput implements AuthOutput<FindManyReceivedNotificationsOutputData>{
+    @Field(() => FindManyReceivedNotificationsOutputData)
+        data: FindManyReceivedNotificationsOutputData
+    @Field(() => AuthTokens,{nullable: true})
+        tokens?: AuthTokens
 }
 
 @ObjectType()

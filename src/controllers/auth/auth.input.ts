@@ -26,7 +26,11 @@ export class SignUpData {
     @IsStrongPassword()
     @ApiProperty({ example: "Cuong123_A", description: "Password" })
         password: string
-  
+        
+    @IsNotEmpty()
+    @ApiProperty({ example: "sample123", description: "User's Name" })
+        username: string
+
     @IsNotEmpty()
     @ApiProperty({ example: "Nguyen Van Tu", description: "First Name" })
         firstName: string

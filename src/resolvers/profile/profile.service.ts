@@ -5,10 +5,11 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository } from "typeorm"
 import {
     FindManyEnrolledCoursesInput,
-    FindManyReceivedNotificationInput,
+    FindManyReceivedNotificationsInput,
     FindManySelfCreatedCoursesInput, FindManyTransactionsInput,
-    FindOneCertificateInput} from "./profile.input"
-import { FindManyEnrolledCoursesOutputData, FindManyReceivedNotificationOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData } from "./profile.output"
+    FindOneCertificateInput
+} from "./profile.input"
+import { FindManyEnrolledCoursesOutputData, FindManyReceivedNotificationsOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData } from "./profile.output"
 
 
 @Injectable()
@@ -246,7 +247,7 @@ export class ProfileService {
         }
     }
 
-    async findManyReceivedNotifications(input: FindManyReceivedNotificationInput): Promise<FindManyReceivedNotificationOutputData> {
+    async findManyReceivedNotifications(input: FindManyReceivedNotificationsInput): Promise<FindManyReceivedNotificationsOutputData> {
         const { data, accountId } = input
         const { options } = data
         const { take, skip } = options
