@@ -490,7 +490,7 @@ type CourseEntity {
   numberOfQuizzes: Int
   numberOfLessons: Int
   numberOfResources: Int
-  getableCertificate: Boolean
+  certificateStatus: String
 }
 
 type CartCourseEntity {

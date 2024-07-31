@@ -141,3 +141,9 @@ export enum CompleteState {
 registerEnumType(CompleteState,{
     name: "CompleteState"
 })
+
+export enum CertificateStatus {
+  Cannot = "cannot",
+  Getable = "getable",
+  Gotten = "gotten"
+}
