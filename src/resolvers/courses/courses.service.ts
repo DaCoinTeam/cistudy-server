@@ -601,20 +601,20 @@ export class CoursesService {
 
         await Promise.all(promises)
 
-        const relativeTopics = searchValue
-            ? await this.categoryMySqlRepository.find({
-                where: {
-                    level: 2,
-                    name: searchValue ? Like(`%${searchValue}%`) : undefined,
-                },
-            })
-            : undefined
+        // const relativeTopics = searchValue
+        //     ? await this.categoryMySqlRepository.find({
+        //         where: {
+        //             level: 2,
+        //             name: searchValue ? Like(`%${searchValue}%`) : undefined,
+        //         },
+        //     })
+        //     : undefined
 
         return {
             results,
             metadata: {
                 count,
-                relativeTopics,
+                //relativeTopics,
             },
         }
     }

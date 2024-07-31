@@ -104,7 +104,7 @@ export class AuthService {
             const highRatedInstructors = totalInstructorAccounts
                 .filter(account => account.accountRatings.overallAccountRating >= 4)
                 .sort((a, b) => b.accountRatings.overallAccountRating - a.accountRatings.overallAccountRating)
-                .slice(0, 10)
+                .slice(0, 5)
     
             const totalNumberOfAvailableCourses = await this.courseMySqlRepository.find({
                 where: {
