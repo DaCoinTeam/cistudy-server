@@ -131,7 +131,7 @@ export class CourseEntity {
 
     @Field(() => [CertificateEntity])
     @OneToMany(() => CertificateEntity, (certificate) => certificate.course)
-        certificate?: Array<CertificateEntity>
+        certificates?: Array<CertificateEntity>
 
     @Field(() => [OrderCourseEntity])
     @OneToMany(() => OrderCourseEntity, (orders) => orders.course)
@@ -181,4 +181,7 @@ export class CourseEntity {
     
     @Field(() => String, { nullable: true })
         certificateStatus?: CertificateStatus
+
+    @Field(() => CertificateEntity)
+        certificate?: CertificateEntity
 }

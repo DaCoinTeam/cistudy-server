@@ -42,7 +42,7 @@ export class CertificateEntity {
         account: AccountEntity
 
     @Field(() => CourseEntity, { nullable: true })
-    @ManyToOne(() => CourseEntity, (course) => course.certificate)
+    @ManyToOne(() => CourseEntity, (course) => course.certificates)
     @JoinColumn({ name: "courseId" })
         course: CourseEntity
 

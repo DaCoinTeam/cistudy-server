@@ -929,7 +929,16 @@ export class CoursesService {
             }
         }
 
+        const certificate = await this.certificateMySqlEntity.findOne({
+            where: {
+                courseId: sectionContent.section.course.courseId,
+                accountId
+            }
+        })
+
+        sectionContent.section.course.certificate = certificate
         sectionContent.section.course.sections = sections
+        
         return sectionContent
     }
 
