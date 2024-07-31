@@ -1,4 +1,5 @@
 import {
+    CertificateStatus,
     CompleteState,
     CourseVerifyStatus,
     LockState,
@@ -7,6 +8,7 @@ import {
 } from "@common"
 import {
     CategoryMySqlEntity,
+    CertificateMySqlEntity,
     CompleteResourceMySqlEntity,
     CourseMySqlEntity,
     CourseRating,
@@ -82,6 +84,8 @@ export class CoursesService {
     private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
     @InjectRepository(CompleteResourceMySqlEntity)
     private readonly completeResourceMySqlRepository: Repository<CompleteResourceMySqlEntity>,
+    @InjectRepository(CertificateMySqlEntity)
+    private readonly certificateMySqlEntity: Repository<CertificateMySqlEntity>,
     private readonly dataSource: DataSource,
     ) {}
 
@@ -897,6 +901,8 @@ export class CoursesService {
             section.lockState = LockState.Locked
         }
 
+        sectionContent.section.course.certificateStatus = CertificateStatus.Cannot
+
         for (let i = 0; i < sections.length; i++) {
             sections[i].lockState = LockState.InProgress
             let allCompleted = true
@@ -910,8 +916,13 @@ export class CoursesService {
             if (allCompleted) {
                 sections[i].lockState = LockState.Completed
                 if (i === sections.length - 1) {
-                    sectionContent.section.course.getableCertificate = true
-
+                    const certificate = await this.certificateMySqlEntity.findOne({
+                        where: {
+                            courseId: sectionContent.section.course.courseId,
+                            accountId
+                        }
+                    })
+                    sectionContent.section.course.certificateStatus = certificate ? CertificateStatus.Gotten : CertificateStatus.Getable
                 }
             } else {
                 break

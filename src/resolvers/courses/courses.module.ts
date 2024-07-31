@@ -1,6 +1,8 @@
 import {
     AccountMySqlEntity,
     CategoryMySqlEntity,
+    CertificateMySqlEntity,
+    CompleteResourceMySqlEntity,
     CourseCategoryMySqlEntity,
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
@@ -25,7 +27,6 @@ import { TypeOrmModule } from "@nestjs/typeorm"
 import { ResourceAttachmentEntity } from "src/database/mysql/resource-attachment.entity"
 import { CoursesResolver } from "./courses.resolver"
 import { CoursesService } from "./courses.service"
-import { CompleteResourceEntity } from "src/database/mysql/complete-resource.entity"
 
 @Module({
     imports: [
@@ -51,7 +52,8 @@ import { CompleteResourceEntity } from "src/database/mysql/complete-resource.ent
             ResourceAttachmentEntity,
             ProgressMySqlEntity,
             FollowMySqlEnitity,
-            CompleteResourceEntity
+            CompleteResourceMySqlEntity,
+            CertificateMySqlEntity
         ]),
     ],
     providers: [CoursesResolver, CoursesService],

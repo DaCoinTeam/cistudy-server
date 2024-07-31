@@ -1,4 +1,4 @@
-import { CourseVerifyStatus } from "@common"
+import { CertificateStatus, CourseVerifyStatus } from "@common"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import {
     Column,
@@ -179,6 +179,6 @@ export class CourseEntity {
     @Field(() => Int, { nullable: true })
         numberOfResources?: number
     
-    @Field(() => Boolean, { nullable: true })
-        getableCertificate?: boolean
+    @Field(() => String, { nullable: true })
+        certificateStatus?: CertificateStatus
 }
