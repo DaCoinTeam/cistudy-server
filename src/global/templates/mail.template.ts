@@ -41,7 +41,7 @@ export const acceptCourseMail = (username: string, email: string, title: string)
         <div class="content">
             <h3>Dear ${username ? username : email},</h3>
             <p>We are pleased to inform you that your course submission on <span style="color: #14B8A6;">Ci</span><span style="color: #116761;">Study</span> has been successfully reviewed and approved. Your course has met all the necessary criteria and standards set by our team.</p>
-            <p>Your course titled <strong>"${title}"</strong> has been thoroughly evaluated and we are delighted to inform you that it has been approved. You can now see your course live on our platform and accessible to all users.</p>
+            <p>Your course titled <strong>"${title ?? "Untitled"}"</strong> has been thoroughly evaluated and we are delighted to inform you that it has been approved. You can now see your course live on our platform and accessible to all users.</p>
             <p>We appreciate the effort and dedication you have put into creating this course. We believe it will be a valuable resource for learners on our platform.</p>
             <p>Should you have any questions or need further assistance, please do not hesitate to contact our support team.</p>
             <p>Thank you for being a part of <span style="color: #14B8A6;">Ci</span><span style="color: #116761;">Study</span>.</p>
