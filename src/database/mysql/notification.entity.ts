@@ -25,6 +25,10 @@ export class NotificationEntity {
     @Column({ type: "uuid", length: 36 })
         receiverId: string
 
+    // @Field(() => String, { nullable: true })
+    // @Column({ type: "enum", enum: QuizAttemptStatus, default: QuizAttemptStatus.Started })
+    //     type: QuizAttemptStatus
+
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 100, nullable: true })
         title: string

@@ -41,7 +41,7 @@ export class ResourceEntity {
         completeResources: Array<CompleteResourceEntity>
 
     @Field(() => SectionContentEntity)
-    @OneToOne(() => SectionContentEntity, (sectionContent) => sectionContent.resource, {onDelete: "CASCADE"})
+    @OneToOne(() => SectionContentEntity, (sectionContent) => sectionContent.resource, {cascade: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "resourceId" })
         sectionContent: SectionContentEntity
 }

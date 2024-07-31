@@ -147,3 +147,7 @@ export enum CertificateStatus {
   Getable = "getable",
   Gotten = "gotten"
 }
+
+// export enum NotificationType {
+
+// }
