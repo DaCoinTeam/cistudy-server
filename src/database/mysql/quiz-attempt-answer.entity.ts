@@ -47,4 +47,7 @@ export class QuizAttemptAnswerEntity {
     @ManyToOne(() => QuizQuestionAnswerEntity, (questionAnswer) => questionAnswer.attemptAnswers, { onDelete: "CASCADE" })
     @JoinColumn({ name: "quizQuestionAnswerId" })
         quizQuestionAnswer: QuizQuestionAnswerEntity
+    
+    @Field(() => Boolean, { nullable: true })
+        corrected?: boolean
 }

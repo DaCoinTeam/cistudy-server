@@ -266,3 +266,31 @@ export class FindManyCourseReportsInput implements AuthInput<FindManyCourseRepor
     accountId: string
     data: FindManyCourseReportsInputData
 }
+
+@InputType()
+export class FindManyQuizAttemptsInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+}
+
+@InputType()
+export class FindManyQuizAttemptsInputParams {
+    @Field(() => ID)
+        quizId : string
+}
+
+@InputType()
+export class FindManyQuizAttemptsInputData implements ParamsWithOptions<FindManyQuizAttemptsInputParams, FindManyQuizAttemptsInputOptions>{
+    @Field(() => FindManyQuizAttemptsInputParams)
+        params: FindManyQuizAttemptsInputParams
+    @Field(() => FindManyQuizAttemptsInputOptions, { nullable: true })    
+        options?: FindManyQuizAttemptsInputOptions
+}   
+
+@InputType()
+export class FindManyQuizAttemptsInput implements AuthInput<FindManyQuizAttemptsInputData> {
+    accountId: string
+    data: FindManyQuizAttemptsInputData
+}

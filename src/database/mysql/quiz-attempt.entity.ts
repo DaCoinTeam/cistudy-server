@@ -14,7 +14,6 @@ import { AccountEntity } from "./account.entity"
 import { QuizAttemptAnswerEntity } from "./quiz-attempt-answer.entity"
 import { QuizEntity } from "./quiz.entity"
 
-
 @ObjectType()
 @Entity("quiz-attempt")
 export class QuizAttemptEntity {

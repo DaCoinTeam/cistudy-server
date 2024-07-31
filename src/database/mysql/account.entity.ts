@@ -211,11 +211,11 @@ export class AccountEntity {
         courseProgress: Array<ProgressEntity>
         
     @Field(() => [NotificationEntity])
-    @OneToMany(() => NotificationEntity, (notification) => notification.notificationSent, { nullable: true })
+    @OneToMany(() => NotificationEntity, (notification) => notification.sender, { nullable: true })
         sentNotifications?: Array<NotificationEntity>
 
     @Field(() => [NotificationEntity])
-    @OneToMany(() => NotificationEntity, (notification) => notification.notificationReceive, { nullable: true })
+    @OneToMany(() => NotificationEntity, (notification) => notification.receiver, { nullable: true })
         receiveNotifications?: Array<NotificationEntity>
     //graphql
     @Field(() => Boolean)

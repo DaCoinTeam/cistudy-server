@@ -161,6 +161,8 @@ type QuizQuestionAnswerEntity {
   attemptAnswers: QuizAttemptAnswerEntity!
   createdAt: DateTime!
   updatedAt: DateTime!
+  selected: Boolean
+  corrected: Boolean
 }
 
 type QuizAttemptAnswerEntity {
@@ -172,6 +174,7 @@ type QuizAttemptAnswerEntity {
   updatedAt: DateTime!
   quizAttempt: QuizAttemptEntity!
   quizQuestionAnswer: QuizQuestionAnswerEntity!
+  corrected: Boolean
 }
 
 type QuizAttemptEntity {
@@ -555,16 +558,16 @@ type RoleEntity {
 
 type NotificationEntity {
   notificationId: ID!
-  senderId: ID!
-  receiverId: ID!
+  senderId: ID
+  receiverId: ID
   title: String
   description: String
   referenceLink: String
   viewed: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
-  notificationSent: AccountEntity!
-  notificationReceive: AccountEntity!
+  sender: AccountEntity
+  receiver: AccountEntity
 }
 
 type AccountEntity {
@@ -690,6 +693,20 @@ type FindManyCourseReportsOutputData {
 
 type FindManyCourseReportsOutput {
   data: FindManyCourseReportsOutputData!
+  tokens: AuthTokens
+}
+
+type FindManyQuizAttemptsOutputMetadata {
+  count: Int
+}
+
+type FindManyQuizAttemptsOutputData {
+  results: [QuizAttemptEntity!]!
+  metadata: FindManyQuizAttemptsOutputMetadata
+}
+
+type FindManyQuizAttemptsOutput {
+  data: FindManyQuizAttemptsOutputData!
   tokens: AuthTokens
 }
 
@@ -862,6 +879,19 @@ type FindManyTransactionsOutput {
   tokens: AuthTokens
 }
 
+type FindManyReceivedNotificationOutputMetadata {
+  count: Int
+}
+
+type FindManyReceivedNotificationOutputData {
+  results: [NotificationEntity!]!
+  metadata: FindManyReceivedNotificationOutputMetadata
+}
+
+type FindManyReceivedNotificationOutput {
+  data: FindManyReceivedNotificationOutputData!
+}
+
 type InitOutput {
   data: AccountEntity!
   tokens: AuthTokens
@@ -927,6 +957,7 @@ type Query {
   findManyLevelCategories(data: FindManyLevelCategoriesInputData!): [CategoryEntity!]!
   findManyCategories: [CategoryEntity!]!
   findManyCourseReports(data: FindManyCourseReportsInputData!): FindManyCourseReportsOutput!
+  findManyQuizAttempts(data: FindManyQuizAttemptsInputData!): FindManyQuizAttemptsOutput!
   findOnePost(data: FindOnePostInputData!): FindOnePostOutput!
   findManyPosts(data: FindManyPostsInputData!): FindManyPostsOutput!
   findOnePostComment(data: FindOnePostCommentInputData!): FindOnePostCommentOutput!
@@ -943,6 +974,7 @@ type Query {
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
+  findManyReceivedNotifications(data: FindManyReceivedNotificationInputData!): FindManyReceivedNotificationOutput!
   findOneCart: FindOneCartOutput!
   findOneOrder(data: FindOneOrderInputData!): FindOneOrderOutput!
   findManyAccountOrders(data: FindManyAccountOrdersInputData!): FindManyAccountOrdersOutput!
@@ -1067,6 +1099,20 @@ input FindManyCourseReportsInputData {
 }
 
 input FindManyCourseReportsInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManyQuizAttemptsInputData {
+  params: FindManyQuizAttemptsInputParams!
+  options: FindManyQuizAttemptsInputOptions
+}
+
+input FindManyQuizAttemptsInputParams {
+  quizId: ID!
+}
+
+input FindManyQuizAttemptsInputOptions {
   take: Int
   skip: Int
 }
@@ -1233,6 +1279,15 @@ input FindManyTransactionsInputData {
 }
 
 input FindManyTransactionsInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManyReceivedNotificationInputData {
+  options: FindManyReceivedNotificationInputOptions
+}
+
+input FindManyReceivedNotificationInputOptions {
   take: Int
   skip: Int
 }

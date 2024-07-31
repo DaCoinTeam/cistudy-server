@@ -17,11 +17,11 @@ export class NotificationEntity {
     @PrimaryGeneratedColumn("uuid")
         notificationId: string
 
-    @Field(() => ID)
-    @Column({ type: "uuid", length: 36 , nullable: true })
+    @Field(() => ID, {nullable: true})
+    @Column({ type: "uuid", length: 36, nullable: true })
         senderId: string
 
-    @Field(() => ID)
+    @Field(() => ID, { nullable: true})
     @Column({ type: "uuid", length: 36 })
         receiverId: string
 
@@ -32,7 +32,7 @@ export class NotificationEntity {
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 200, nullable: true })
         description: string
-    
+
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 100, nullable: true })
         referenceLink: string
@@ -49,13 +49,13 @@ export class NotificationEntity {
     @UpdateDateColumn()
         updatedAt: Date
 
-    @Field(() => AccountEntity)
+    @Field(() => AccountEntity, { nullable: true })
     @ManyToOne(() => AccountEntity, (account) => account.sentNotifications, { nullable: true })
     @JoinColumn({ name: "senderId" })
-        notificationSent: AccountEntity
+        sender: AccountEntity
 
-    @Field(() => AccountEntity)
+    @Field(() => AccountEntity, { nullable: true })
     @ManyToOne(() => AccountEntity, (account) => account.receiveNotifications, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "receiverId" })
-        notificationReceive: AccountEntity
+        receiver: AccountEntity
 }
