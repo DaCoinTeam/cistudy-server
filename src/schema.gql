@@ -83,8 +83,7 @@ type CertificateEntity {
   courseId: ID!
   accountId: ID!
   createdAt: DateTime!
-  achievedDate: DateTime
-  expireDate: DateTime
+  expiredDate: DateTime
   account: AccountEntity!
   course: CourseEntity
 }
@@ -488,6 +487,7 @@ type CourseEntity {
   numberOfQuizzes: Int
   numberOfLessons: Int
   numberOfResources: Int
+  getableCertificate: Boolean
 }
 
 type CartCourseEntity {

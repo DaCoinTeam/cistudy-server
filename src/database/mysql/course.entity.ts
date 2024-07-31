@@ -178,4 +178,7 @@ export class CourseEntity {
 
     @Field(() => Int, { nullable: true })
         numberOfResources?: number
+    
+    @Field(() => Boolean, { nullable: true })
+        getableCertificate?: boolean
 }

@@ -352,14 +352,13 @@ export class CoursesService {
                 followed: true,
             },
         })
-    
-        const numberOfEnrollmentsResult =
-          await this.enrolledInfoMySqlRepository.count({
-              where: {
-                  courseId,
-              },
-          })
 
+        const numberOfEnrollmentsResult =
+      await this.enrolledInfoMySqlRepository.count({
+          where: {
+              courseId,
+          },
+      })
 
         course.creator.numberOfFollowers = numberOfFollowersResult
         course.numberOfEnrollments = numberOfEnrollmentsResult
@@ -533,9 +532,7 @@ export class CoursesService {
                 }
 
                 const overallCourseRating =
-            totalNumberOfRatings > 0
-                ? totalNumStars() / totalNumberOfRatings
-                : 0
+          totalNumberOfRatings > 0 ? totalNumStars() / totalNumberOfRatings : 0
 
                 const courseRatings: CourseRating = {
                     numberOf1StarRatings,
@@ -549,9 +546,9 @@ export class CoursesService {
 
                 course.courseRatings = courseRatings
                 const numberOfEnrollments =
-            await this.enrolledInfoMySqlRepository.findBy({
-                courseId: course.courseId,
-            })
+          await this.enrolledInfoMySqlRepository.findBy({
+              courseId: course.courseId,
+          })
                 const numberOfQuizzes = await this.quizMySqlRepository.count({
                     where: {
                         sectionContent: {
@@ -607,7 +604,6 @@ export class CoursesService {
             })
             : undefined
 
-    
         return {
             results,
             metadata: {
@@ -676,12 +672,7 @@ export class CoursesService {
                 },
                 relations: {
                     questions: {
-                        answers: {
-                            attemptAnswers: true,
-                        },
-                    },
-                    quizAttempts: {
-                        attemptAnswers: true,
+                        answers: true,
                     },
                 },
             })
@@ -733,10 +724,9 @@ export class CoursesService {
                     (question) => {
                         const answered = question.answers
                             .map((answer) => {
-                                const attemptAnswer = answer.attemptAnswers.find(
-                                    ({ quizAttemptId, quizQuestionAnswerId }) =>
-                                        activeQuizAttempt.quizAttemptId === quizAttemptId &&
-                      quizQuestionAnswerId === answer.quizQuestionAnswerId,
+                                const attemptAnswer = activeQuizAttempt.attemptAnswers.find(
+                                    ({ quizQuestionAnswerId }) =>
+                                        quizQuestionAnswerId === answer.quizQuestionAnswerId,
                                 )
                                 return !!attemptAnswer
                             })
@@ -751,6 +741,18 @@ export class CoursesService {
                     },
                 )
             }
+
+            const quizAttempts = await this.quizAttemptMySqlRepository.find({
+                where: {
+                    quizId: quiz.quizId,
+                    accountId,
+                },
+                relations: {
+                    attemptAnswers: true,
+                },
+            })
+
+            sectionContent.quiz.quizAttempts = quizAttempts
 
             const finishedAttemps = sectionContent.quiz.quizAttempts?.filter(
                 ({ attemptStatus }) => attemptStatus === QuizAttemptStatus.Ended,
@@ -837,6 +839,15 @@ export class CoursesService {
                             break
                         }
 
+                        const doneAttempt = attempts.find(
+                            ({ attemptStatus }) =>
+                                attemptStatus === QuizAttemptStatus.Ended,
+                        )
+                        if (!doneAttempt) {
+                            content.completeState = CompleteState.Undone
+                            break
+                        } 
+
                         const found = attempts.find((attempt) => attempt.isPassed)
 
                         content.completeState = found
@@ -891,20 +902,23 @@ export class CoursesService {
             let allCompleted = true
             for (const content of sections[i].contents) {
                 if (content.completeState !== CompleteState.Completed) {
-                    allCompleted = false 
+                    allCompleted = false
                     break
                 }
             }
 
             if (allCompleted) {
                 sections[i].lockState = LockState.Completed
+                if (i === sections.length - 1) {
+                    sectionContent.section.course.getableCertificate = true
+
+                }
             } else {
                 break
             }
         }
 
         sectionContent.section.course.sections = sections
-
         return sectionContent
     }
 
