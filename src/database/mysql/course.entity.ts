@@ -182,6 +182,6 @@ export class CourseEntity {
     @Field(() => String, { nullable: true })
         certificateStatus?: CertificateStatus
 
-    @Field(() => CertificateEntity)
+    @Field(() => CertificateEntity, {nullable: true})
         certificate?: CertificateEntity
 }

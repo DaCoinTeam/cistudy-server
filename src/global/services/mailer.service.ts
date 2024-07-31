@@ -38,7 +38,7 @@ export class MailerService {
             { accountId, type: TokenType.Verify },
             { secret: jwtConfig().secret },
         )
-
+        console.log(frontendUrl)
         return {
             from: servicesConfig().mailer.user,
             to: email,
