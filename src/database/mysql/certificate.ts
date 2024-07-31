@@ -32,12 +32,8 @@ export class CertificateEntity {
         createdAt: Date
 
     @Field(() => Date, { nullable: true })
-    @Column({ type: "date" , nullable: true })
-        achievedDate: Date
-
-    @Field(() => Date, { nullable: true })
-    @Column({ type: "date" , nullable: true })
-        expireDate: Date
+    @Column({ type: "datetime" , nullable: true })
+        expiredDate: Date
     //relations
 
     @Field(() => AccountEntity)
