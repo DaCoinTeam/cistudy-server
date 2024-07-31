@@ -1,14 +1,14 @@
-import { CompleteState } from "@common"
-import { AccountMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, PostMySqlEntity, ProgressMySqlEntity, SectionContentMySqlEntity, SectionMySqlEntity, TransactionMySqlEntity } from "@database"
-import { Injectable } from "@nestjs/common"
+
+import { AccountMySqlEntity, CertificateMySqlEntity, CourseMySqlEntity, CourseRating, CourseReviewMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, NotificationMySqlEntity, PostMySqlEntity, TransactionMySqlEntity } from "@database"
+import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository } from "typeorm"
 import {
     FindManyEnrolledCoursesInput,
-    FindManySelfCreatedCoursesInput,
-    FindManyTransactionsInput,
-} from "./profile.input"
-import { FindManyEnrolledCoursesOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData } from "./profile.output"
+    FindManyReceivedNotificationInput,
+    FindManySelfCreatedCoursesInput, FindManyTransactionsInput,
+    FindOneCertificateInput} from "./profile.input"
+import { FindManyEnrolledCoursesOutputData, FindManyReceivedNotificationOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData } from "./profile.output"
 
 
 @Injectable()
@@ -16,10 +16,20 @@ export class ProfileService {
     constructor(
         @InjectRepository(CourseMySqlEntity)
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(CertificateMySqlEntity)
+        private readonly certificateMySqlRepository: Repository<CertificateMySqlEntity>,
         @InjectRepository(PostMySqlEntity)
         private readonly postMySqlRepository: Repository<PostMySqlEntity>,
         @InjectRepository(TransactionMySqlEntity)
         private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
+        @InjectRepository(NotificationMySqlEntity)
+        private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+        @InjectRepository(FollowMySqlEnitity)
+        private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
+        @InjectRepository(CourseReviewMySqlEntity)
+        private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
+        @InjectRepository(EnrolledInfoMySqlEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         private readonly dataSource: DataSource,
     ) { }
 
@@ -80,7 +90,7 @@ export class ProfileService {
                     creator: true,
                     enrolledInfos: true,
                     sections: {
-                        contents:{
+                        contents: {
                             lesson: true
                         }
                     }
@@ -115,21 +125,6 @@ export class ProfileService {
                 .andWhere("enrolledInfo.enrolled = :enrolled", { enrolled: true })
                 .getRawOne()
 
-            const progressResults = await queryRunner.manager
-                .createQueryBuilder()
-                .select("course.courseId", "courseId")
-                .addSelect("COUNT(progress.sectionContentId)", "completedContents")
-                .addSelect("COUNT(DISTINCT progress.sectionContentId)", "totalContents")
-                .from(ProgressMySqlEntity, "progress")
-                .innerJoin(SectionContentMySqlEntity,"section_content", "progress.sectionContentId = section_content.sectionContentId")
-                .innerJoin(SectionMySqlEntity, "section", "section_content.sectionId = section.sectionId")
-                .innerJoin(CourseMySqlEntity, "course", "section.courseId = course.courseId")
-                .innerJoin(EnrolledInfoMySqlEntity, "enrolledInfo", "progress.enrolledInfoId = enrolledInfo.enrolledInfoId")
-                .where("enrolledInfo.accountId = :accountId", { accountId })
-                .andWhere("progress.completeState = :completeState", { completeState: CompleteState.Completed })
-                .groupBy("course.courseId")
-                .getRawMany()
-  
             const numberOfRewardedPosts = await this.postMySqlRepository.find({
                 where: {
                     creatorId: accountId
@@ -147,17 +142,7 @@ export class ProfileService {
                     const numberOfFollowers = numberOfFollowersResults.find(
                         result => result.courseId === course.courseId,
                     )?.count ?? 0
-
-                    const courseProgress = progressResults.find(
-                        result => result.courseId === course.courseId
-                    )
-
-                    const totalLessons = course.sections.reduce((acc, section) => acc + section.contents.map(content => content.lesson).length, 0)
-                    const completedLessons = courseProgress?.completedContents ?? 0
-                    const progress = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0
-
                     course.creator.numberOfFollowers = numberOfFollowers
-                    course.courseProgress = progress
                     course.numberOfRewardedPostsLeft = numberOfRewardedPostsLeft
 
                     return course
@@ -180,14 +165,14 @@ export class ProfileService {
     //     const { options } = data
     //     const { skip, take } = options
     //     const reports: ReportModel[] = []
-    
+
     //     const reportTypes = [
     //         { type: ReportType.Account, repository: this.reportAccountMySqlRepository, additionalRelation: "reportedAccount", Id: "reportAccountId" },
     //         { type: ReportType.Course, repository: this.reportCourseMySqlRepository, additionalRelation: "reportedCourse", Id: "reportCourseId" },
     //         { type: ReportType.Post, repository: this.reportPostMySqlRepository, additionalRelation: "reportedPost", Id: "reportPostId" },
     //         { type: ReportType.PostComment, repository: this.reportPostCommentMySqlRepository, additionalRelation: "reportedPostComment", Id: "reportPostCommentId" }
     //     ]
-    
+
     //     const fetchReports = async ({ type, repository, additionalRelation, Id }) => {
     //         const fetchedReports = await repository.find({
     //             where:{
@@ -198,7 +183,7 @@ export class ProfileService {
     //                 [additionalRelation]: true
     //             }
     //         })
-    
+
     //         reports.push(...fetchedReports.map(report => ({
     //             reportId: report[Id],
     //             type,
@@ -213,11 +198,11 @@ export class ProfileService {
     //             createdAt: report.createdAt,
     //             updatedAt: report.updatedAt
     //         })))
-            
+
     //     }
-    
+
     //     await Promise.all(reportTypes.map(fetchReports))
-    
+
     //     const slicedReports = (skip && take) ? reports.slice(skip, skip + take) : reports
     //     slicedReports?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 
@@ -242,13 +227,13 @@ export class ProfileService {
             relations: {
                 account: true,
             },
-            take, 
-            skip, 
+            take,
+            skip,
             where: {
                 accountId
             },
-            order: { 
-                createdAt: "DESC" 
+            order: {
+                createdAt: "DESC"
             }
         })
 
@@ -259,5 +244,129 @@ export class ProfileService {
                 count
             }
         }
+    }
+
+    async findManyReceivedNotifications(input: FindManyReceivedNotificationInput): Promise<FindManyReceivedNotificationOutputData> {
+        const { data, accountId } = input
+        const { options } = data
+        const { take, skip } = options
+
+        const results = await this.notificationMySqlRepository.find({
+            where: {
+                receiverId: accountId
+            },
+            skip,
+            take,
+            relations: {
+                sender: true,
+                receiver: true,
+            }
+        })
+
+        const numberOfNotifications = await this.notificationMySqlRepository.count({
+            where: {
+                receiverId: accountId
+            }
+        })
+
+        return {
+            results,
+            metadata: {
+                count: numberOfNotifications
+            }
+        }
+    }
+
+    async findOneCertificate(input: FindOneCertificateInput): Promise<CertificateMySqlEntity> {
+        const { data, accountId } = input
+        const { certificateId } = data
+
+        const certificate = await this.certificateMySqlRepository.findOne({
+            where: {
+                certificateId,
+            },
+            relations: {
+                account: true,
+                course: {
+                    creator : true,
+                    courseTargets: true
+                }
+            }
+        })
+
+        if(!certificate){ 
+            throw new NotFoundException("Certificate not found")
+        }
+
+        const numberOfCourseCreatorFollowers = await this.followMySqlRepository.count({
+            where:{
+                followedAccountId: certificate.course.courseId,
+                followed: true
+            }
+        })
+
+        const numberOfAccountFollowers = await this.followMySqlRepository.count({
+            where:{
+                followedAccountId: accountId,
+                followed: true
+            }
+        })
+
+        certificate.course.creator.numberOfFollowers = numberOfCourseCreatorFollowers
+        certificate.account.numberOfFollowers = numberOfAccountFollowers
+
+        const courseReviews = await this.courseReviewMySqlRepository.findBy({
+            courseId: certificate.courseId,
+        })
+
+        const courseEnrollments = await this.enrolledInfoMySqlRepository.count({
+            where: {
+                courseId: certificate.courseId
+            }
+        })
+
+        const countWithNumStars = (numStars: number) => {
+            let count = 0
+            for (const { rating } of courseReviews) {
+                if (rating === numStars) {
+                    count++
+                }
+            }
+
+            return count
+        }
+
+        const numberOf1StarRatings = countWithNumStars(1)
+        const numberOf2StarRatings = countWithNumStars(2)
+        const numberOf3StarRatings = countWithNumStars(3)
+        const numberOf4StarRatings = countWithNumStars(4)
+        const numberOf5StarRatings = countWithNumStars(5)
+        const totalNumberOfRatings = courseReviews.length
+
+        const totalNumStars = () => {
+            let total = 0
+            for (let index = 1; index <= 5; index++) {
+                total += countWithNumStars(index) * index
+            }
+            return total
+        }
+
+        const overallCourseRating =
+            totalNumberOfRatings > 0 ? totalNumStars() / totalNumberOfRatings : 0
+
+        const courseRatings: CourseRating = {
+            numberOf1StarRatings,
+            numberOf2StarRatings,
+            numberOf3StarRatings,
+            numberOf4StarRatings,
+            numberOf5StarRatings,
+            overallCourseRating,
+            totalNumberOfRatings,
+        }
+
+        certificate.course.courseRatings = courseRatings
+        certificate.course.numberOfEnrollments = courseEnrollments
+
+        return certificate
     }
 }

@@ -44,4 +44,7 @@ export class QuizQuestionAnswerEntity {
     @UpdateDateColumn()
         updatedAt: Date
     
+    @Field(() => Boolean, { nullable: true })
+        selected?: boolean
+
 }

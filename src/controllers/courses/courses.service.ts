@@ -1284,7 +1284,9 @@ export class CoursesService {
             achievedDate,
             expireDate,
         })
+
         const {title} = await this.courseMySqlRepository.findOneBy({courseId})
+        
         await this.notificationMySqlRepository.save({
             receiverId: accountId,
             title: "You have received a certificate!",

@@ -13,6 +13,7 @@ import {
     FindManyCoursesInputData,
     FindManyLessonsInputData,
     FindManyLevelCategoriesInputData,
+    FindManyQuizAttemptsInputData,
     FindOneCourseAuthInputData,
     FindOneCourseInputData,
     FindOneCourseReviewInputData,
@@ -25,6 +26,7 @@ import {
     FindManyCourseTargetsOutput,
     FindManyCoursesOutputData,
     FindManyLessonsOutput,
+    FindManyQuizAttemptsOutput,
     FindOneCourseAuthOutput,
     FindOneQuizAttemptOutput,
     FindOneSectionContentOutput
@@ -128,5 +130,15 @@ export class CoursesResolver {
     @AccountId() accountId: string,
   ) {
       return await this.coursesService.findManyCourseReports({ accountId, data })
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  @Query(() => FindManyQuizAttemptsOutput)
+  async findManyQuizAttempts(
+    @Args("data") data: FindManyQuizAttemptsInputData,
+    @AccountId() accountId: string,
+  ) {
+      return await this.coursesService.findManyQuizAttempts({ accountId, data })
   }
 }

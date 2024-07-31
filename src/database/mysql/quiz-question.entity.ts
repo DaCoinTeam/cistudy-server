@@ -60,4 +60,7 @@ export class QuizQuestionEntity {
     
     @Field(() => Int, { nullable: true })
         numberOfCorrectAnswers?: number
+
+    @Field(() => Boolean, { nullable: true })
+        corrected?: boolean
 }

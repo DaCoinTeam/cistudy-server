@@ -76,6 +76,9 @@ export class AccountsService {
                 followerId: accountId,
                 followedAccountId,
             },
+            relations:{
+                follower: true
+            }
         })
 
         if (found === null) {
@@ -92,6 +95,13 @@ export class AccountsService {
         await this.followMySqlRepository.update(followId, {
             followed: !followed,
         })
+
+        await this.notificationMySqlRepository.save({
+            receiverId: followedAccountId,
+            title: "You have new follower!",
+            description: `User ${found.follower.username} has followed you`
+        })
+
         return responseMessage(followId, !followed)
     }
 
@@ -224,6 +234,13 @@ export class AccountsService {
             }
 
             const { accountReviewId } = await this.accountReviewMySqlRepository.save({ content, rating, reviewedAccountId, accountId })
+            const { username } = await this.accountMySqlRepository.findOneBy({accountId})
+
+            await this.notificationMySqlRepository.save({
+                receiverId: reviewedAccountId,
+                title: "You have new review by one of your learner",
+                description: `User ${username} has left you a ${rating}-star review. Check it out!`,
+            })
 
             return {
                 message: "Account Review Created Successfully",
@@ -507,6 +524,5 @@ export class AccountsService {
             message: "Report successfully resolved and closed."
         }
     }
-    
 
 }

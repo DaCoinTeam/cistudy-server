@@ -173,3 +173,27 @@ export class FindManyCourseReportsOutput implements AuthOutput<FindManyCourseRep
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }
+//
+@ObjectType()
+export class FindManyQuizAttemptsOutputMetadata {
+    @Field(() => Int, { nullable: true })
+        count?: number
+}
+
+@ObjectType()
+export class FindManyQuizAttemptsOutputData
+implements ResultsWithMetadata<QuizAttemptMySqlEntity, FindManyQuizAttemptsOutputMetadata>
+{
+    @Field(() => [QuizAttemptMySqlEntity])
+        results: Array<QuizAttemptMySqlEntity>
+    @Field(() => FindManyQuizAttemptsOutputMetadata, { nullable: true })
+        metadata: FindManyQuizAttemptsOutputMetadata
+}
+
+@ObjectType()
+export class FindManyQuizAttemptsOutput implements AuthOutput<FindManyQuizAttemptsOutputData> {
+    @Field(() => FindManyQuizAttemptsOutputData)
+        data: FindManyQuizAttemptsOutputData
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
+}

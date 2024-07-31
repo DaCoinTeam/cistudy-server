@@ -1,5 +1,5 @@
 import { AuthEmptyDataInput, AuthInput, OptionsOnly } from "@common"
-import { Field, InputType, Int } from "@nestjs/graphql"
+import { Field, ID, InputType, Int } from "@nestjs/graphql"
 
 
 @InputType()
@@ -80,4 +80,34 @@ implements AuthInput<FindManyTransactionsInputData>
 {
     accountId: string
     data: FindManyTransactionsInputData
+}
+
+@InputType()
+export class FindManyReceivedNotificationInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+}
+
+@InputType()
+export class FindManyReceivedNotificationInputData implements OptionsOnly<FindManyReceivedNotificationInputOptions>{
+    @Field(() => FindManyReceivedNotificationInputOptions, { nullable: true })
+        options?: FindManyReceivedNotificationInputOptions
+}
+
+export class FindManyReceivedNotificationInput implements AuthInput<FindManyReceivedNotificationInputData>{
+    accountId: string
+    data: FindManyReceivedNotificationInputData
+}
+
+@InputType()
+export class FindOneCertificateInputData {
+    @Field(() => ID)
+        certificateId : string
+}
+
+export class FindOneCertificateInput implements AuthInput<FindOneCertificateInputData> {
+    accountId: string
+    data: FindOneCertificateInputData
 }
