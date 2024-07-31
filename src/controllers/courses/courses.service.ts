@@ -132,6 +132,7 @@ import {
     UpdateSectionContentOuput,
     UpdateSectionOuput,
 } from "./courses.output"
+import { appConfig } from "@config"
 
 @Injectable()
 export class CoursesService {
@@ -305,6 +306,7 @@ export class CoursesService {
                     receiverId: creatorId,
                     title: "You have new enrollment to your course",
                     description: `User ${username} has enrolled to your course: ${title}`,
+                    referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`
                 },
                 {
                     receiverId: creatorId,
@@ -493,7 +495,8 @@ export class CoursesService {
                 await this.notificationMySqlRepository.save({
                     receiverId: course.creatorId,
                     title: `Your course : ${course.title} has received a review!`,
-                    description: `User ${enrolled.account.username} has wrote a ${rating} star(s) review on your course.`
+                    description: `User ${enrolled.account.username} has wrote a ${rating} star(s) review on your course.`,
+                    referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`
                 })
                 return { message: "Review Created Successfully" }
             }
@@ -1286,7 +1289,7 @@ export class CoursesService {
         })
 
         const {title} = await this.courseMySqlRepository.findOneBy({courseId})
-        
+
         await this.notificationMySqlRepository.save({
             receiverId: accountId,
             title: "You have received a certificate!",

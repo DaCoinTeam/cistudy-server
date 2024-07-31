@@ -1,5 +1,5 @@
 import { ReportProcessStatus, computeFixedFloor } from "@common"
-import { blockchainConfig } from "@config"
+import { appConfig, blockchainConfig } from "@config"
 import {
     AccountMySqlEntity,
     CourseMySqlEntity,
@@ -92,7 +92,7 @@ export class PostsService {
         private readonly storageService: StorageService,
         private readonly dataSource: DataSource,
     ) { }
-
+    
     async createPost(input: CreatePostInput): Promise<CreatePostOutput> {
         const { data, files, accountId } = input
         const { postMedias, title, courseId, html } = data
@@ -358,7 +358,8 @@ export class PostsService {
             await this.notificationMySqlRepository.save({
                 receiverId: creatorId,
                 title: `You have new react on your post: ${title}`,
-                description: `User ${isEnrolled.account.username} has reaccted to your post ${title}`
+                description: `User ${isEnrolled.account.username} has reaccted to your post ${title}`,
+                referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
             })
 
             return {
@@ -509,7 +510,8 @@ export class PostsService {
             await this.notificationMySqlRepository.save({
                 receiverId: post.creatorId,
                 title: `You have new comment on your post: ${post.title}`,
-                description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`
+                description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`,
+                referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
             })
 
             return {
@@ -722,8 +724,11 @@ export class PostsService {
                     postCommentId
                 },
                 relations: {
-                    post: true,
-                    creator: true
+                    post: {
+                        course: true
+                    },
+                    creator: true,
+                    
                 }
             })
 
@@ -746,9 +751,10 @@ export class PostsService {
                     description: `User ${username} has replied to your comment at post : ${postComment.post.title}`
                 },
                 {
-                    receiverId: postComment.creatorId,
+                    receiverId: postComment.post.creatorId,
                     title: "You have new comment on your post",
-                    description: `${username} has replied to ${postComment.creator.username} at post : ${postComment.post.title}`
+                    description: `${username} has replied to ${postComment.creator.username} at post : ${postComment.post.title}`,
+                    referenceLink: `${appConfig().frontendUrl}/courses/${postComment.post.course.courseId}/home`
                 }
             ]
 
