@@ -49,5 +49,6 @@ export class QuizAttemptAnswerEntity {
         quizQuestionAnswer: QuizQuestionAnswerEntity
     
     @Field(() => Boolean, { nullable: true })
+    //@Column({type: "boolean"})
         corrected?: boolean
 }

@@ -356,6 +356,7 @@ export class PostsService {
             const { postLikeId } = await this.postLikeMySqlRepository.save({ accountId, postId })
 
             await this.notificationMySqlRepository.save({
+                senderId: accountId,
                 receiverId: creatorId,
                 title: `You have new react on your post: ${title}`,
                 description: `User ${isEnrolled.account.username} has reaccted to your post ${title}`,
@@ -508,6 +509,7 @@ export class PostsService {
             const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
 
             await this.notificationMySqlRepository.save({
+                senderId: isEnrolled.account.username,
                 receiverId: post.creatorId,
                 title: `You have new comment on your post: ${post.title}`,
                 description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`,
@@ -688,6 +690,7 @@ export class PostsService {
             const { username } = await this.accountMySqlRepository.findOneBy({ accountId })
 
             await this.notificationMySqlRepository.save({
+                senderId: accountId,
                 receiverId: postComment.creatorId,
                 title: "You have new react on your comment",
                 description: `User ${username} has reacted to your comment at post : ${postComment.post.title}`
@@ -746,11 +749,13 @@ export class PostsService {
 
             const nottifications = [
                 {
+                    senderId: accountId,
                     receiverId: postComment.creatorId,
                     title: "You have new reply on your comment",
                     description: `User ${username} has replied to your comment at post : ${postComment.post.title}`
                 },
                 {
+                    senderId: accountId,
                     receiverId: postComment.post.creatorId,
                     title: "You have new comment on your post",
                     description: `${username} has replied to ${postComment.creator.username} at post : ${postComment.post.title}`,
@@ -875,6 +880,7 @@ export class PostsService {
             await this.postMySqlRepository.update(postId, { isCompleted: true })
 
             await this.notificationMySqlRepository.save({
+                senderId: postComment.post.creatorId,
                 receiverId: postComment.creatorId,
                 title: "Your comment has been marked as post's solution",
                 description: `

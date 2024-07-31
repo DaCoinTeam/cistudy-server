@@ -107,6 +107,8 @@ export class FindManyReceivedNotificationOutputData implements ResultsWithMetada
 export class FindManyReceivedNotificationOutput implements AuthOutput<FindManyReceivedNotificationOutputData>{
     @Field(() => FindManyReceivedNotificationOutputData)
         data: FindManyReceivedNotificationOutputData
+    @Field(() => AuthTokens,)
+        tokens: AuthTokens
 }
 
 @ObjectType()

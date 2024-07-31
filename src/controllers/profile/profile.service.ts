@@ -6,6 +6,7 @@ import {
 } from "@common"
 import {
     AccountMySqlEntity,
+    NotificationMySqlEntity,
     TransactionMongoEntity,
     TransactionMySqlEntity,
 } from "@database"
@@ -40,6 +41,8 @@ export class ProfileService {
     private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
     @InjectModel(TransactionMongoEntity.name)
     private readonly transactionMongoModel: Model<TransactionMongoEntity>,
+    @InjectRepository(NotificationMySqlEntity)
+    private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
     private readonly storageService: StorageService,
     private readonly blockchainService: BlockchainService,
     ) {}
@@ -199,6 +202,12 @@ export class ProfileService {
             amountOnChainChange: -amount,
             transactionHash,
             type: TransactionType.Deposit,
+        })
+
+        await this.notificationMySqlRepository.save({
+            receiverId: accountId,
+            title: "You have new update on your balance!",
+            description: `You have received ${amount} STARCI(s)`,
         })
 
         return {

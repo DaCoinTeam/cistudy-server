@@ -97,6 +97,7 @@ export class AccountsService {
         })
 
         await this.notificationMySqlRepository.save({
+            senderId: accountId,
             receiverId: followedAccountId,
             title: "You have new follower!",
             description: `User ${found.follower.username} has followed you`
@@ -237,6 +238,7 @@ export class AccountsService {
             const { username } = await this.accountMySqlRepository.findOneBy({accountId})
 
             await this.notificationMySqlRepository.save({
+                senderId: accountId,
                 receiverId: reviewedAccountId,
                 title: "You have new review by one of your learner",
                 description: `User ${username} has left you a ${rating}-star review. Check it out!`,

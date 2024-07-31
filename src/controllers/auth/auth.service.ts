@@ -95,8 +95,7 @@ export class AuthService {
             return {
                 data: {
                     message: "Account verified successfully!"
-                }
-               
+                } 
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()

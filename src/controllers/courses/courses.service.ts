@@ -303,6 +303,7 @@ export class CoursesService {
 
             const notifications = [
                 {
+                    senderId: accountId,
                     receiverId: creatorId,
                     title: "You have new enrollment to your course",
                     description: `User ${username} has enrolled to your course: ${title}`,
@@ -493,6 +494,7 @@ export class CoursesService {
 
             if (result) {
                 await this.notificationMySqlRepository.save({
+                    senderId: accountId,
                     receiverId: course.creatorId,
                     title: `Your course : ${course.title} has received a review!`,
                     description: `User ${enrolled.account.username} has wrote a ${rating} star(s) review on your course.`,
@@ -1293,7 +1295,8 @@ export class CoursesService {
         await this.notificationMySqlRepository.save({
             receiverId: accountId,
             title: "You have received a certificate!",
-            description: `You have been received a certificate for your completion on the course:${title} `
+            description: `You have been received a certificate for your completion on the course: ${title} `,
+            referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
         })
 
         return {

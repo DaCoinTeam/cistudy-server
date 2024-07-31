@@ -892,6 +892,7 @@ type FindManyReceivedNotificationOutputData {
 
 type FindManyReceivedNotificationOutput {
   data: FindManyReceivedNotificationOutputData!
+  tokens: AuthTokens!
 }
 
 type FindOneCertificateOutput {

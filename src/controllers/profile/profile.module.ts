@@ -17,6 +17,7 @@ import {
     TransactionMongoEntitySchema,
     TransactionMongoEntity,
     TransactionMySqlEntity,
+    NotificationMySqlEntity,
 } from "@database"
 import { ProfileService } from "./profile.service"
 import { MongooseModule } from "@nestjs/mongoose"
@@ -36,7 +37,8 @@ import { MongooseModule } from "@nestjs/mongoose"
             PostLikeMySqlEntity,
             PostCommentLikeMySqlEntity,
             FollowMySqlEnitity,
-            TransactionMySqlEntity
+            TransactionMySqlEntity,
+            NotificationMySqlEntity
         ]),
         MongooseModule.forFeature([
             {
