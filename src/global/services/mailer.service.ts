@@ -4,7 +4,7 @@ import { CourseMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
 import { createTransport } from "nodemailer"
-import { acceptCourseMail, rejectCourseMail, verifyAccountMail } from "../templates/mail.template"
+import { acceptCourseMail, rejectCourseMail, reportAccountMail, verifyAccountMail } from "../templates/mail.template"
 
 @Injectable()
 export class MailerService {
@@ -19,8 +19,8 @@ export class MailerService {
         },
     })
 
-    private verifyCourseMailOptions = (email: string, username: string, course : CourseMySqlEntity, note: string, verifyStatus: CourseVerifyStatus) => {
-        const  {title, courseId} = course
+    private verifyCourseMailOptions = (email: string, username: string, course: CourseMySqlEntity, note: string, verifyStatus: CourseVerifyStatus) => {
+        const { title, courseId } = course
         const acceptHTML = acceptCourseMail(username, email, title)
         const rejectHTML = rejectCourseMail(username, email, title, note, courseId)
         return {
@@ -28,7 +28,7 @@ export class MailerService {
             to: email,
             subject: "You have new updates on your submitted course",
             html: (verifyStatus === CourseVerifyStatus.Approved) ? acceptHTML : rejectHTML,
-               
+
         }
     }
 
@@ -43,15 +43,28 @@ export class MailerService {
             from: servicesConfig().mailer.user,
             to: email,
             subject: "REGISTRATION CONFIRMATION - CISTUDY",
-            html: verifyAccountMail(username,email, frontendUrl, token),
+            html: verifyAccountMail(username, email, frontendUrl, token),
         }
     }
 
+    private reportAccountMailOptions = (reportedUserEmail: string, reporterUsername: string, reportedUsername: string, reportedDate: Date, title: string, description: string) => {
+        return {
+            from: servicesConfig().mailer.user,
+            to: reportedUserEmail,
+            subject: "You have received a report.",
+            html: reportAccountMail(reporterUsername, reportedUsername, reportedDate, title, description),
+
+        }
+    }
     async sendVerifyRegistrationMail(accountId: string, email: string, username: string) {
         return await this.transporter.sendMail(this.verifyAccountMailOptions(accountId, email, username))
     }
 
-    async sendVerifyCourseMail(email: string, username: string, course : CourseMySqlEntity,note : string, verifyStatus: CourseVerifyStatus) {
+    async sendVerifyCourseMail(email: string, username: string, course: CourseMySqlEntity, note: string, verifyStatus: CourseVerifyStatus) {
         return await this.transporter.sendMail(this.verifyCourseMailOptions(email, username, course, note, verifyStatus))
+    }
+
+    async sendReportAccountMail(reportedUserEmail: string, reporterUsername: string, reportedUsername: string, reportedDate: Date, title: string, description: string) {
+        return await this.transporter.sendMail(this.reportAccountMailOptions(reportedUserEmail, reporterUsername, reportedUsername, reportedDate, title, description))
     }
 }

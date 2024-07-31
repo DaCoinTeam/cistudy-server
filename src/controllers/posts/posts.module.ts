@@ -3,6 +3,7 @@ import {
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     LessonMySqlEntity,
+    NotificationMySqlEntity,
     PostCommentLikeMySqlEntity,
     PostCommentMediaMySqlEntity,
     PostCommentMySqlEntity,
@@ -41,7 +42,8 @@ import { PostsService } from "./posts.service"
             PostCommentMediaMySqlEntity,
             PostCommentReplyMySqlEntity,
             ReportPostMySqlEntity,
-            ReportPostCommentMySqlEntity
+            ReportPostCommentMySqlEntity,
+            NotificationMySqlEntity,
         ]),
     ],
     controllers: [PostsController],

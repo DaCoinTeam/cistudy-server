@@ -64,7 +64,7 @@ const bootstrap = async () => {
     const config = new DocumentBuilder()
         .setTitle("CiStudy Server")
         .setDescription(
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50SWQiOiI2OWI0MzBlYS1kZWExLTRlNzQtOTg2YS0xMTY5NGUwMmJmNDIiLCJhY2NvdW50Um9sZSI6InVzZXIiLCJ0eXBlIjoiQWNjZXNzIiwiaWF0IjoxNzE4NzI3Nzg0LCJleHAiOjE3MTg3Mjg2ODR9.sUNPHNUPpCXvAHE3K-cAQE6B3cLjBM1Tw-ZssjBCXn8"
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50SWQiOiJkYzI2MTg0Zi1lNjMxLTQzNzEtYThiZC1mY2I3NzJmZjVmNTIiLCJ0eXBlIjoiUmVmcmVzaCIsImlhdCI6MTcyMjM2MjQ3NiwiZXhwIjoxNzI0OTU0NDc2fQ.RKwwZBBfMBgjUc7iBZ0Yy_0NdDJGbr6eUzKgRA--MAA"
         )
         .setVersion("1.0")
         .addBearerAuth()

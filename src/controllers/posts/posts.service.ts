@@ -4,6 +4,7 @@ import {
     AccountMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
+    NotificationMySqlEntity,
     PostCommentLikeMySqlEntity,
     PostCommentMediaMySqlEntity,
     PostCommentMySqlEntity,
@@ -86,6 +87,8 @@ export class PostsService {
         private readonly reportPostMySqlRepository: Repository<ReportPostMySqlEntity>,
         @InjectRepository(ReportPostCommentMySqlEntity)
         private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
+        @InjectRepository(NotificationMySqlEntity)
+        private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
         private readonly storageService: StorageService,
         private readonly dataSource: DataSource,
     ) { }
@@ -151,6 +154,12 @@ export class PostsService {
             )
 
             await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+
+            await this.notificationMySqlRepository.save({
+                receiverId: accountId,
+                title: "You have new update on your balance!",
+                description: `You have received ${earnAmount} STARCI(s)`,
+            })
         }
 
         const { postId } = await this.postMySqlRepository.save(post)
@@ -186,11 +195,11 @@ export class PostsService {
             throw new NotFoundException("Post not found or has been deleted.")
         }
 
-        if(updatePost.creatorId !== accountId){
+        if (updatePost.creatorId !== accountId) {
             throw new ConflictException("You are not the owner of this post")
         }
-        
-        if(updatePost.isCompleted){
+
+        if (updatePost.isCompleted) {
             throw new ConflictException("This post is closed.")
         }
 
@@ -289,7 +298,7 @@ export class PostsService {
         try {
             let earnAmount: number
 
-            const { courseId, creatorId, isRewardable, course, isCompleted } = await this.postMySqlRepository.findOne({
+            const { courseId, creatorId, isRewardable, course, isCompleted, title } = await this.postMySqlRepository.findOne({
                 where: {
                     postId
                 },
@@ -335,11 +344,22 @@ export class PostsService {
                     if (numberOfRewardedLike.length < 20) {
                         earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient)
                         await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+                        await this.notificationMySqlRepository.save({
+                            receiverId: accountId,
+                            title: "You have new update on your balance!",
+                            description: `You have received ${earnAmount} STARCI(s)`,
+                        })
                     }
                 }
             }
 
             const { postLikeId } = await this.postLikeMySqlRepository.save({ accountId, postId })
+
+            await this.notificationMySqlRepository.save({
+                receiverId: creatorId,
+                title: `You have new react on your post: ${title}`,
+                description: `User ${isEnrolled.account.username} has reaccted to your post ${title}`
+            })
 
             return {
                 message: "Post liked successfully.",
@@ -432,6 +452,9 @@ export class PostsService {
                 where: {
                     accountId,
                     courseId
+                },
+                relations: {
+                    account: true
                 }
             })
 
@@ -468,6 +491,11 @@ export class PostsService {
                         if (numberOfRewardedComments < 20) {
                             earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient)
                             await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+                            await this.notificationMySqlRepository.save({
+                                receiverId: accountId,
+                                title: "You have new update on your balance!",
+                                description: `You have received ${earnAmount} STARCI(s)`,
+                            })
                         }
                     } else {
                         alreadyRewarded = true
@@ -477,6 +505,13 @@ export class PostsService {
             }
 
             const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
+
+            await this.notificationMySqlRepository.save({
+                receiverId: post.creatorId,
+                title: `You have new comment on your post: ${post.title}`,
+                description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`
+            })
+
             return {
                 message: "Comment Posted Successfully",
                 others: {
@@ -506,7 +541,7 @@ export class PostsService {
             postCommentMedias: [],
         }
 
-        if(files){
+        if (files) {
             const promises: Array<Promise<void>> = []
 
             let mediaPosition = 0
@@ -530,7 +565,7 @@ export class PostsService {
 
             await Promise.all(promises)
         }
-        
+
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
@@ -540,20 +575,20 @@ export class PostsService {
                 where: {
                     postCommentId
                 },
-                relations:{
+                relations: {
                     post: true
                 }
             })
 
-            if(!accountPostComment){
+            if (!accountPostComment) {
                 throw new NotFoundException("Post comment not found or has been deleted.")
             }
 
-            if(accountPostComment.creatorId !== accountId){
+            if (accountPostComment.creatorId !== accountId) {
                 throw new ConflictException("You are not the owner of this comment.")
             }
 
-            if(accountPostComment.post.isCompleted){
+            if (accountPostComment.post.isCompleted) {
                 throw new ConflictException("This post is closed.")
             }
 
@@ -613,13 +648,27 @@ export class PostsService {
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction()
+
         try {
             let earnAmount: number
+            const postComment = await this.postCommentMySqlRepository.findOne({
+                where: {
+                    postCommentId
+                },
+                relations: {
+                    post: true
+                }
+            })
+
+            if (!postComment) {
+                throw new NotFoundException("Comment not found or has been deleted.")
+            }
+
             let found = await this.postCommentLikeMySqlRepository.findOne({
                 where: {
                     accountId,
                     postCommentId,
-                },
+                }
             })
 
             if (found === null) {
@@ -634,6 +683,14 @@ export class PostsService {
                 })
             }
             const { postCommentLikeId } = found
+            const { username } = await this.accountMySqlRepository.findOneBy({ accountId })
+
+            await this.notificationMySqlRepository.save({
+                receiverId: postComment.creatorId,
+                title: "You have new react on your comment",
+                description: `User ${username} has reacted to your comment at post : ${postComment.post.title}`
+            })
+
             return {
                 message: "",
                 others: {
@@ -664,20 +721,38 @@ export class PostsService {
                 where: {
                     postCommentId
                 },
-                relations:{
-                    post: true
+                relations: {
+                    post: true,
+                    creator: true
                 }
             })
 
-            if(!postComment){
+            if (!postComment) {
                 throw new NotFoundException("Post comment not found or has been deleted.")
             }
-            
+
             const { postCommentReplyId } = await this.postCommentReplyMySqlRepository.save({
                 content,
                 creatorId: accountId,
                 postCommentId,
             })
+
+            const { username } = await this.accountMySqlRepository.findOneBy({ accountId })
+
+            const nottifications = [
+                {
+                    receiverId: postComment.creatorId,
+                    title: "You have new reply on your comment",
+                    description: `User ${username} has replied to your comment at post : ${postComment.post.title}`
+                },
+                {
+                    receiverId: postComment.creatorId,
+                    title: "You have new comment on your post",
+                    description: `${username} has replied to ${postComment.creator.username} at post : ${postComment.post.title}`
+                }
+            ]
+
+            await this.notificationMySqlRepository.save(nottifications)
 
             return {
                 message: "Reply created successfully",
@@ -698,17 +773,17 @@ export class PostsService {
         const { content, postCommentReplyId } = data
 
         const commentReply = await this.postCommentReplyMySqlRepository.findOne({
-            where:{
+            where: {
                 postCommentReplyId
             },
-            relations:{
-                postComment:{
+            relations: {
+                postComment: {
                     post: true
                 }
             }
         })
 
-        if(!commentReply){
+        if (!commentReply) {
             throw new NotFoundException("Comment's reply not found or has been deleted")
         }
 
@@ -741,6 +816,9 @@ export class PostsService {
             const postComment = await this.postCommentMySqlRepository.findOne({
                 where: {
                     postCommentId
+                },
+                relations: {
+                    post: true
                 }
             })
 
@@ -748,7 +826,7 @@ export class PostsService {
                 throw new NotFoundException("Post comment not found")
             }
 
-            const {creatorId, isRewardable, courseId, postId} = await this.postMySqlRepository.findOneBy({ postId: postComment.postId })
+            const { creatorId, isRewardable, courseId, postId } = await this.postMySqlRepository.findOneBy({ postId: postComment.postId })
 
             if (creatorId !== accountId) {
                 throw new ConflictException("You aren't the creator of the post.")
@@ -777,12 +855,26 @@ export class PostsService {
                         courseId
                     }
                 })
-                
+
                 const earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.rewardCommentPostEarnCoefficient)
                 await this.accountMySqlRepository.increment({ accountId: postComment.creatorId }, "balance", earnAmount)
+
+                await this.notificationMySqlRepository.save({
+                    receiverId: postComment.creatorId,
+                    title: "You have new update on your balance!",
+                    description: `You have received ${earnAmount} STARCI(s)`,                   
+                })
             }
 
             await this.postMySqlRepository.update(postId, { isCompleted: true })
+
+            await this.notificationMySqlRepository.save({
+                receiverId: postComment.creatorId,
+                title: "Your comment has been marked as post's solution",
+                description: `
+                        Your comment on the post "${postComment.post.title}", with the content "${postComment.html}", has been marked as the solution by the post owner. 
+                        ${isRewardable ? "You will receive an amount of STARCI for this." : null} Keep up the great work!`
+            })
 
             return {
                 message: "Comment has been marked as a solution and no more comments are allowed to this post"
@@ -931,7 +1023,7 @@ export class PostsService {
             throw new NotFoundException("Report not found")
         }
 
-        if(found.processStatus !== ReportProcessStatus.Processing){
+        if (found.processStatus !== ReportProcessStatus.Processing) {
             throw new ConflictException("This report has already been resolved")
         }
 
@@ -951,8 +1043,8 @@ export class PostsService {
         if (!found) {
             throw new NotFoundException("Report not found")
         }
-        
-        if(found.processStatus !== ReportProcessStatus.Processing){
+
+        if (found.processStatus !== ReportProcessStatus.Processing) {
             throw new ConflictException("This report has already been resolved")
         }
 

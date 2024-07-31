@@ -5,6 +5,7 @@ import {
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
+    NotificationMySqlEntity,
     ReportAccountMySqlEntity,
     RoleMySqlEntity,
 } from "@database"
@@ -53,6 +54,8 @@ export class AccountsService {
         private readonly roleMySqlRepository: Repository<RoleMySqlEntity>,
         @InjectRepository(ReportAccountMySqlEntity)
         private readonly reportAccountMySqlRepository: Repository<ReportAccountMySqlEntity>,
+        @InjectRepository(NotificationMySqlEntity)
+        private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
         private readonly mailerService: MailerService,
         private readonly dataSource: DataSource,
         private readonly jwtService: JwtService
@@ -125,6 +128,17 @@ export class AccountsService {
                     name: SystemRoles.Instructor
                 })
             }
+            await this.notificationMySqlRepository.save({
+                receiverId: course.creatorId,
+                title: "You have new updates on your created course",
+                description: `Your course ${course.title} has been verified and it now available for learner to access. Thanks for choosing CiStudy!`
+            })
+        }else{
+            await this.notificationMySqlRepository.save({
+                receiverId: course.creatorId,
+                title: "You have new updates on your created course",
+                description: `Your course, "${course.title}", has been rejected due to issues identified by our moderation team. Please check your email for more details.`
+            })
         }
 
         return {
@@ -427,13 +441,16 @@ export class AccountsService {
             throw new ConflictException("You have reported this accout before and it is processing. Try update your report instead.")
         }
 
-        const { reportAccountId } = await this.reportAccountMySqlRepository.save({
+        const { reportAccountId, createdAt } = await this.reportAccountMySqlRepository.save({
             reporterAccountId: accountId,
             reportedAccountId,
             title,
             description
         })
+        const {username} = await this.accountMySqlRepository.findOneBy({accountId})
 
+        await this.mailerService.sendReportAccountMail(reportedAccount.email, username, reportedAccount.username, createdAt, title, description)
+        
         return {
             message: `A report to user ${reportedAccount.accountId} has been submitted.`,
             others: {

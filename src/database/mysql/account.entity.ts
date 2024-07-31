@@ -29,6 +29,7 @@ import { RoleEntity } from "./role.entity"
 import { SessionEntity } from "./session.entity"
 import { CompleteResourceEntity } from "./complete-resource.entity"
 import { ProgressEntity } from "./progress.entity"
+import { NotificationEntity } from "./notification.entity"
 
 
 @ObjectType()
@@ -209,10 +210,13 @@ export class AccountEntity {
     @OneToMany(() => ProgressEntity, (courseProgress) => courseProgress.account)
         courseProgress: Array<ProgressEntity>
         
-    // @Field(() => [ReportAccountEntity])
-    // @OneToMany(() => ReportAccountEntity, (accountReports) => accountReports.reporterAccount, { nullable: true })
-    //     viewedLessons?: Array<ReportAccountEntity>
+    @Field(() => [NotificationEntity])
+    @OneToMany(() => NotificationEntity, (notification) => notification.notificationSent, { nullable: true })
+        sentNotifications?: Array<NotificationEntity>
 
+    @Field(() => [NotificationEntity])
+    @OneToMany(() => NotificationEntity, (notification) => notification.notificationReceive, { nullable: true })
+        receiveNotifications?: Array<NotificationEntity>
     //graphql
     @Field(() => Boolean)
         followed?: boolean
