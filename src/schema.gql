@@ -476,7 +476,7 @@ type CourseEntity {
   posts: [PostEntity!]
   sections: [SectionEntity!]
   cartCourses: [CartCourseEntity!]!
-  certificate: [CertificateEntity!]!
+  certificates: [CertificateEntity!]!
   orderCourses: [OrderCourseEntity!]!
   courseReview: [CourseReviewEntity!]
   courseReports: [ReportCourseEntity!]
@@ -492,6 +492,7 @@ type CourseEntity {
   numberOfLessons: Int
   numberOfResources: Int
   certificateStatus: String
+  certificate: CertificateEntity!
 }
 
 type CartCourseEntity {
