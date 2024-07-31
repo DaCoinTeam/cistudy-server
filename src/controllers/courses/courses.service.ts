@@ -21,6 +21,7 @@ import {
     CourseTargetMySqlEntity,
     EnrolledInfoMySqlEntity,
     LessonMySqlEntity,
+    NotificationMySqlEntity,
     ProgressMySqlEntity,
     QuizAttemptAnswerMySqlEntity,
     QuizAttemptMySqlEntity,
@@ -179,6 +180,8 @@ export class CoursesService {
     private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
     @InjectRepository(CompleteResourceMySqlEntity)
     private readonly completeResourceMySqlRepository: Repository<CompleteResourceMySqlEntity>,
+    @InjectRepository(NotificationMySqlEntity)
+    private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
     private readonly storageService: StorageService,
     private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
     private readonly dataSource: DataSource,
@@ -193,6 +196,12 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
+            const account = await this.accountMySqlRepository.findOneBy({accountId})
+            
+            if(!account || account.verified == false){
+                throw new ConflictException("Account not found or not verified.")
+            }
+
             const course = await this.courseMySqlRepository.findOne({
                 where: {
                     courseId,
@@ -209,6 +218,7 @@ export class CoursesService {
             }
 
             const {
+                title,
                 enableDiscount,
                 discountPrice,
                 price: coursePrice,
@@ -244,9 +254,7 @@ export class CoursesService {
             const minimumBalanceRequired = computeDenomination(price)
             const courseCreatorShares = computeDenomination(price / BigInt(2))
 
-            const { balance } = await this.accountMySqlRepository.findOneBy({
-                accountId,
-            })
+            const { username,balance } = account
 
             if (balance < minimumBalanceRequired) {
                 throw new ConflictException(
@@ -291,6 +299,21 @@ export class CoursesService {
             }))
 
             await this.accountGradeMySqlRepository.save(accountGrades)
+
+            const notifications = [
+                {
+                    receiverId: creatorId,
+                    title: "You have new enrollment to your course",
+                    description: `User ${username} has enrolled to your course: ${title}`,
+                },
+                {
+                    receiverId: creatorId,
+                    title: "You have new update on your balance!",
+                    description: `You have received ${courseCreatorShares} STARCI(s)`,
+                },
+            ]
+              
+            await this.notificationMySqlRepository.save(notifications)
 
             await queryRunner.commitTransaction()
 
@@ -433,8 +456,13 @@ export class CoursesService {
             )
         }
 
-        const enrolled = await this.enrolledInfoMySqlRepository.findOneBy({
-            accountId,
+        const enrolled = await this.enrolledInfoMySqlRepository.findOne({
+            where:{
+                accountId,
+            },
+            relations:{
+                account: true
+            }
         })
 
         if (!enrolled) {
@@ -462,6 +490,11 @@ export class CoursesService {
             })
 
             if (result) {
+                await this.notificationMySqlRepository.save({
+                    receiverId: course.creatorId,
+                    title: `Your course : ${course.title} has received a review!`,
+                    description: `User ${enrolled.account.username} has wrote a ${rating} star(s) review on your course.`
+                })
                 return { message: "Review Created Successfully" }
             }
         } catch (error) {
@@ -1211,6 +1244,10 @@ export class CoursesService {
             },
         })
 
+        if(!enrollments){
+            throw new ConflictException("You haven't enrolled to the course")
+        }
+
         const now = new Date()
 
         const activeEnrollment = enrollments.some(
@@ -1222,7 +1259,7 @@ export class CoursesService {
                 where: {
                     accountId,
                     courseId,
-                },
+                }
             })
 
             if (found) {
@@ -1245,6 +1282,12 @@ export class CoursesService {
             courseId,
             achievedDate,
             expireDate,
+        })
+        const {title} = await this.courseMySqlRepository.findOneBy({courseId})
+        await this.notificationMySqlRepository.save({
+            receiverId: accountId,
+            title: "You have received a certificate!",
+            description: `You have been received a certificate for your completion on the course:${title} `
         })
 
         return {

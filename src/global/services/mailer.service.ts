@@ -64,7 +64,7 @@ export class MailerService {
         return await this.transporter.sendMail(this.verifyCourseMailOptions(email, username, course, note, verifyStatus))
     }
 
-    async sendReportAccountMail(reporterUserEmail: string, reporterUsername: string, reportedUsername: string, reportedDate: Date, title: string, description: string) {
-        return await this.transporter.sendMail(this.reportAccountMailOptions(reporterUserEmail, reporterUsername, reportedUsername, reportedDate, title, description))
+    async sendReportAccountMail(reportedUserEmail: string, reporterUsername: string, reportedUsername: string, reportedDate: Date, title: string, description: string) {
+        return await this.transporter.sendMail(this.reportAccountMailOptions(reportedUserEmail, reporterUsername, reportedUsername, reportedDate, title, description))
     }
 }

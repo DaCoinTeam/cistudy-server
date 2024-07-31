@@ -7,6 +7,7 @@ import {
     EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
     LessonMySqlEntity,
+    NotificationMySqlEntity,
     PostCommentLikeMySqlEntity,
     PostCommentMySqlEntity,
     PostLikeMySqlEntity,
@@ -49,7 +50,9 @@ import { AccountsService } from "./accounts.service"
             ReportAccountMySqlEntity,
             ReportCourseMySqlEntity,
             ReportPostMySqlEntity,
-            ReportPostCommentMySqlEntity
+            ReportPostCommentMySqlEntity,
+            NotificationMySqlEntity,
+            NotificationMySqlEntity
         ]),
     ],
     controllers: [AccountsController],

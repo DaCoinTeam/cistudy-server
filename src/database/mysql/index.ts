@@ -41,6 +41,7 @@ import { TransactionEntity as TransactionMySqlEntity } from "./transaction.enity
 import { SectionContentEntity as SectionContentMySqlEntity } from "./section_content.entity"
 import { AccountGradeEntity as AccountGradeMySqlEntity } from "./account-grade.entity"
 import { CompleteResourceEntity as CompleteResourceMySqlEntity } from "./complete-resource.entity"
+import { NotificationEntity as NotificationMySqlEntity } from "./notification.entity"
 
 export {
     AccountMySqlEntity,
@@ -85,5 +86,6 @@ export {
     TransactionMySqlEntity,
     SectionContentMySqlEntity,
     AccountGradeMySqlEntity,
-    CompleteResourceMySqlEntity
+    CompleteResourceMySqlEntity,
+    NotificationMySqlEntity
 }

@@ -553,6 +553,20 @@ type RoleEntity {
   accountRoles: AccountEntity!
 }
 
+type NotificationEntity {
+  notificationId: ID!
+  senderId: ID!
+  receiverId: ID!
+  title: String
+  description: String
+  referenceLink: String
+  viewed: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  notificationSent: AccountEntity!
+  notificationReceive: AccountEntity!
+}
+
 type AccountEntity {
   accountId: ID!
   email: String!
@@ -591,6 +605,8 @@ type AccountEntity {
   accountReports: [ReportAccountEntity!]!
   completeResources: [CompleteResourceEntity!]!
   courseProgress: [ProgressEntity!]!
+  sentNotifications: [NotificationEntity!]!
+  receiveNotifications: [NotificationEntity!]!
   followed: Boolean!
   numberOfFollowers: Int!
   accountRatings: AccountRating
