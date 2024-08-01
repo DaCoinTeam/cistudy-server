@@ -7,6 +7,7 @@ import {
     QuizAttemptStatus,
     ReportProcessStatus,
     SectionContentType,
+    shuffleArray,
     VideoType,
 } from "@common"
 import {
@@ -38,6 +39,7 @@ import {
 import { StorageService } from "@global"
 import {
     ConflictException,
+    Inject,
     Injectable,
     InternalServerErrorException,
     NotFoundException,
@@ -134,6 +136,7 @@ import {
     UpdateSectionOuput,
 } from "./courses.output"
 import { appConfig } from "@config"
+import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager"
 
 @Injectable()
 export class CoursesService {
@@ -186,6 +189,7 @@ export class CoursesService {
     private readonly completeResourceMySqlRepository: Repository<CompleteResourceMySqlEntity>,
     @InjectRepository(NotificationMySqlEntity)
     private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly storageService: StorageService,
     private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
     private readonly dataSource: DataSource,
@@ -200,9 +204,9 @@ export class CoursesService {
         await queryRunner.startTransaction()
 
         try {
-            const account = await this.accountMySqlRepository.findOneBy({accountId})
-            
-            if(!account || account.verified == false){
+            const account = await this.accountMySqlRepository.findOneBy({ accountId })
+
+            if (!account || account.verified == false) {
                 throw new ConflictException("Account not found or not verified.")
             }
 
@@ -258,7 +262,7 @@ export class CoursesService {
             const minimumBalanceRequired = computeDenomination(price)
             const courseCreatorShares = computeDenomination(price / BigInt(2))
 
-            const { username,balance } = account
+            const { username, balance } = account
 
             if (balance < minimumBalanceRequired) {
                 throw new ConflictException(
@@ -310,7 +314,7 @@ export class CoursesService {
                     receiverId: creatorId,
                     title: "You have new enrollment to your course",
                     description: `User ${username} has enrolled to your course: ${title}`,
-                    referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`
+                    referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`,
                 },
                 {
                     receiverId: creatorId,
@@ -318,7 +322,7 @@ export class CoursesService {
                     description: `You have received ${courseCreatorShares} STARCI(s)`,
                 },
             ]
-              
+
             await this.notificationMySqlRepository.save(notifications)
 
             await queryRunner.commitTransaction()
@@ -463,12 +467,12 @@ export class CoursesService {
         }
 
         const enrolled = await this.enrolledInfoMySqlRepository.findOne({
-            where:{
+            where: {
                 accountId,
             },
-            relations:{
-                account: true
-            }
+            relations: {
+                account: true,
+            },
         })
 
         if (!enrolled) {
@@ -501,7 +505,7 @@ export class CoursesService {
                     receiverId: course.creatorId,
                     title: `Your course : ${course.title} has received a review!`,
                     description: `User ${enrolled.account.username} has wrote a ${rating} star(s) review on your course.`,
-                    referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`
+                    referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`,
                 })
                 return { message: "Review Created Successfully" }
             }
@@ -1253,7 +1257,7 @@ export class CoursesService {
             },
         })
 
-        if(!enrollments){
+        if (!enrollments) {
             throw new ConflictException("You haven't enrolled to the course")
         }
 
@@ -1268,7 +1272,7 @@ export class CoursesService {
                 where: {
                     accountId,
                     courseId,
-                }
+                },
             })
 
             if (found) {
@@ -1293,13 +1297,13 @@ export class CoursesService {
             expireDate,
         })
 
-        const {title} = await this.courseMySqlRepository.findOneBy({courseId})
+        const { title } = await this.courseMySqlRepository.findOneBy({ courseId })
 
         await this.notificationMySqlRepository.save({
             receiverId: accountId,
             title: "You have received a certificate!",
             description: `You have been received a certificate for your completion on the course: ${title} `,
-            referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
+            referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`,
         })
 
         return {
@@ -1410,8 +1414,8 @@ export class CoursesService {
             throw new NotFoundException("Quiz Question Not Found.")
         }
 
-        if(files){
-            const { mediaIndex, mediaType} = questionMedia
+        if (files) {
+            const { mediaIndex, mediaType } = questionMedia
             const file = files.at(mediaIndex)
             const { assetId } = await this.storageService.upload({
                 rootFile: file,
@@ -1419,12 +1423,15 @@ export class CoursesService {
 
             await this.storageService.delete(quizQuestion.mediaId)
             await this.storageService.upload({
-                rootFile: file
+                rootFile: file,
             })
-            await this.quizQuestionMySqlRepository.update({quizQuestionId}, {
-                mediaId: assetId,
-                mediaType
-            })
+            await this.quizQuestionMySqlRepository.update(
+                { quizQuestionId },
+                {
+                    mediaId: assetId,
+                    mediaType,
+                },
+            )
         }
 
         await this.quizQuestionMySqlRepository.update(quizQuestionId, {
@@ -1657,19 +1664,41 @@ export class CoursesService {
                 where: {
                     attemptStatus: QuizAttemptStatus.Started,
                     accountId,
-                    quizId
+                    quizId,
                 },
             })
 
             if (attempt) {
-                throw new ConflictException(
-                    "An attempt has been started.",
-                )
+                throw new ConflictException("An attempt has been started.")
             }
+
+            const quiz = await this.quizMySqlRepository.findOne({
+                where: {
+                    quizId,
+                },
+                relations: {
+                    questions: {
+                        answers: true,
+                    },
+                },
+            })
+            const questions: Array<DeepPartial<QuizQuestionMySqlEntity>> =
+        shuffleArray(
+            quiz.questions.map(({ answers, quizQuestionId }) => ({
+                quizQuestionId,
+                answers: shuffleArray(
+                    answers.map(({ quizQuestionAnswerId }) => ({
+                        quizQuestionAnswerId,
+                    })),
+                ),
+            })),
+        )
+
+            await this.cacheManager.set(attempt.quizAttemptId, questions, 0)
 
             const { timeLimit } = await this.quizMySqlRepository.findOne({
                 where: {
-                    quizId
+                    quizId,
                 },
             })
 
@@ -1678,7 +1707,7 @@ export class CoursesService {
                 quizId,
                 timeLeft: timeLimit,
                 observedAt: new Date(),
-                timeLimitAtStart: timeLimit
+                timeLimitAtStart: timeLimit,
             })
 
             await queryRunner.commitTransaction()
@@ -1688,7 +1717,7 @@ export class CoursesService {
                     quizAttemptId,
                 },
             }
-        } catch (ex) {  
+        } catch (ex) {
             await queryRunner.rollbackTransaction()
             throw ex
         } finally {
@@ -1737,7 +1766,7 @@ export class CoursesService {
             let receivedPoints = 0
 
             for (const { answers, point } of questions) {
-                const correctAnswers = answers.filter(({ isCorrect }) => isCorrect) 
+                const correctAnswers = answers.filter(({ isCorrect }) => isCorrect)
                 if (!correctAnswers.length) {
                     receivedPoints += point
                     continue
@@ -1769,7 +1798,7 @@ export class CoursesService {
             const receivedPercent = (receivedPoints / totalPoints) * 100
             const isPassed = receivedPercent >= quiz.passingPercent
             const timeTaken = timeLimitAtStart - timeLeft
-                
+
             await this.quizAttemptMySqlRepository.update(quizAttemptId, {
                 isPassed,
                 receivedPercent,
@@ -1789,8 +1818,8 @@ export class CoursesService {
                     isPassed,
                     timeTaken,
                     receivedPoints,
-                    totalPoints
-                }
+                    totalPoints,
+                },
             }
         } catch (ex) {
             await queryRunner.rollbackTransaction()
@@ -1984,7 +2013,7 @@ export class CoursesService {
 
         await this.completeResourceMySqlRepository.save({
             accountId,
-            resourceId
+            resourceId,
         })
 
         return {
@@ -2001,8 +2030,8 @@ export class CoursesService {
         let progress = await this.progressMySqlRepository.findOne({
             where: {
                 lessonId,
-                accountId
-            }
+                accountId,
+            },
         })
 
         if (!progress) {
@@ -2010,12 +2039,12 @@ export class CoursesService {
                 lessonId,
                 accountId,
                 completeFirstWatch,
-                completePercent
+                completePercent,
             })
         } else {
             await this.progressMySqlRepository.update(progress.progressId, {
                 completeFirstWatch,
-                completePercent
+                completePercent,
             })
         }
 
@@ -2023,4 +2052,4 @@ export class CoursesService {
             message: "Watch lesson succesfully successfully",
         }
     }
-} 
+}
