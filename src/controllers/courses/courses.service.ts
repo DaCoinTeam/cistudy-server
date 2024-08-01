@@ -141,59 +141,59 @@ import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager"
 @Injectable()
 export class CoursesService {
     constructor(
-    @InjectRepository(CourseMySqlEntity)
-    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-    @InjectRepository(SectionMySqlEntity)
-    private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
-    @InjectRepository(SectionContentMySqlEntity)
-    private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
-    @InjectRepository(LessonMySqlEntity)
-    private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
-    @InjectRepository(CourseTargetMySqlEntity)
-    private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
-    @InjectRepository(ResourceMySqlEntity)
-    private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
-    @InjectRepository(ResourceAttachmentMySqlEntity)
-    private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
-    @InjectRepository(EnrolledInfoMySqlEntity)
-    private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
-    @InjectRepository(CategoryMySqlEntity)
-    private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
-    @InjectRepository(CourseCategoryMySqlEntity)
-    private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
-    @InjectRepository(CourseReviewMySqlEntity)
-    private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
-    @InjectRepository(CertificateMySqlEntity)
-    private readonly courseCertificateMySqlEntity: Repository<CertificateMySqlEntity>,
-    @InjectRepository(QuizMySqlEntity)
-    private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
-    @InjectRepository(QuizQuestionMySqlEntity)
-    private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
-    @InjectRepository(QuizQuestionAnswerMySqlEntity)
-    private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
-    @InjectRepository(ProgressMySqlEntity)
-    private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
-    @InjectRepository(QuizAttemptMySqlEntity)
-    private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
-    @InjectRepository(QuizAttemptAnswerMySqlEntity)
-    private readonly quizAttemptAnswerMySqlRepository: Repository<QuizAttemptAnswerMySqlEntity>,
-    @InjectRepository(QuizAttemptQuestionMySqlEntity)
-    private readonly quizAttemptQuestionMySqlRepository: Repository<QuizAttemptQuestionMySqlEntity>,
-    @InjectRepository(AccountMySqlEntity)
-    private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
-    @InjectRepository(AccountGradeMySqlEntity)
-    private readonly accountGradeMySqlRepository: Repository<AccountGradeMySqlEntity>,
-    @InjectRepository(ReportCourseMySqlEntity)
-    private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
-    @InjectRepository(CompleteResourceMySqlEntity)
-    private readonly completeResourceMySqlRepository: Repository<CompleteResourceMySqlEntity>,
-    @InjectRepository(NotificationMySqlEntity)
-    private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    private readonly storageService: StorageService,
-    private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
-    private readonly dataSource: DataSource,
-    ) {}
+        @InjectRepository(CourseMySqlEntity)
+        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(SectionMySqlEntity)
+        private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
+        @InjectRepository(SectionContentMySqlEntity)
+        private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
+        @InjectRepository(LessonMySqlEntity)
+        private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
+        @InjectRepository(CourseTargetMySqlEntity)
+        private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+        @InjectRepository(ResourceMySqlEntity)
+        private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+        @InjectRepository(ResourceAttachmentMySqlEntity)
+        private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
+        @InjectRepository(EnrolledInfoMySqlEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
+        @InjectRepository(CategoryMySqlEntity)
+        private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
+        @InjectRepository(CourseCategoryMySqlEntity)
+        private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
+        @InjectRepository(CourseReviewMySqlEntity)
+        private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
+        @InjectRepository(CertificateMySqlEntity)
+        private readonly courseCertificateMySqlEntity: Repository<CertificateMySqlEntity>,
+        @InjectRepository(QuizMySqlEntity)
+        private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+        @InjectRepository(QuizQuestionMySqlEntity)
+        private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
+        @InjectRepository(QuizQuestionAnswerMySqlEntity)
+        private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
+        @InjectRepository(ProgressMySqlEntity)
+        private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
+        @InjectRepository(QuizAttemptMySqlEntity)
+        private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
+        @InjectRepository(QuizAttemptAnswerMySqlEntity)
+        private readonly quizAttemptAnswerMySqlRepository: Repository<QuizAttemptAnswerMySqlEntity>,
+        @InjectRepository(QuizAttemptQuestionMySqlEntity)
+        private readonly quizAttemptQuestionMySqlRepository: Repository<QuizAttemptQuestionMySqlEntity>,
+        @InjectRepository(AccountMySqlEntity)
+        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+        @InjectRepository(AccountGradeMySqlEntity)
+        private readonly accountGradeMySqlRepository: Repository<AccountGradeMySqlEntity>,
+        @InjectRepository(ReportCourseMySqlEntity)
+        private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
+        @InjectRepository(CompleteResourceMySqlEntity)
+        private readonly completeResourceMySqlRepository: Repository<CompleteResourceMySqlEntity>,
+        @InjectRepository(NotificationMySqlEntity)
+        private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
+        private readonly storageService: StorageService,
+        private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
+        private readonly dataSource: DataSource,
+    ) { }
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
         const { data, accountId } = input
@@ -382,7 +382,7 @@ export class CoursesService {
         const promises: Array<Promise<void>> = []
 
         const { previewVideoId, thumbnailId } =
-      await this.courseMySqlRepository.findOneBy({ courseId })
+            await this.courseMySqlRepository.findOneBy({ courseId })
 
         if (Number.isInteger(previewVideoIndex)) {
             const promise = async () => {
@@ -687,10 +687,10 @@ export class CoursesService {
     async updateLesson(input: UpdateLessonInput): Promise<UpdateLessonOutput> {
         const { data, files } = input
         const { lessonId, description, lessonVideoIndex, thumbnailIndex, title } =
-      data
+            data
 
         const { thumbnailId, lessonVideoId } =
-      await this.lessonMySqlRepository.findOneBy({ lessonId })
+            await this.lessonMySqlRepository.findOneBy({ lessonId })
 
         const promises: Array<Promise<void>> = []
 
@@ -1404,7 +1404,7 @@ export class CoursesService {
         input: UpdateQuizQuestionInput,
     ): Promise<UpdateQuizQuestionOutput> {
         const { data, files } = input
-        const { quizQuestionId, question, point, position, questionMedia } = data
+        const { quizQuestionId, question, point, position, questionMedia, deleteMediaId } = data
 
         const quizQuestion = await this.quizQuestionMySqlRepository.findOneBy({
             quizQuestionId,
@@ -1425,6 +1425,7 @@ export class CoursesService {
             await this.storageService.upload({
                 rootFile: file,
             })
+
             await this.quizQuestionMySqlRepository.update(
                 { quizQuestionId },
                 {
@@ -1432,6 +1433,11 @@ export class CoursesService {
                     mediaType,
                 },
             )
+        }
+
+        if (deleteMediaId) {
+            await this.storageService.delete(quizQuestion.mediaId)
+            await this.quizQuestionMySqlRepository.update({ quizQuestionId: quizQuestion.quizQuestionId }, { mediaId: null, mediaType: null })
         }
 
         await this.quizQuestionMySqlRepository.update(quizQuestionId, {
@@ -1683,16 +1689,16 @@ export class CoursesService {
                 },
             })
             const questions: Array<DeepPartial<QuizQuestionMySqlEntity>> =
-        shuffleArray(
-            quiz.questions.map(({ answers, quizQuestionId }) => ({
-                quizQuestionId,
-                answers: shuffleArray(
-                    answers.map(({ quizQuestionAnswerId }) => ({
-                        quizQuestionAnswerId,
+                shuffleArray(
+                    quiz.questions.map(({ answers, quizQuestionId }) => ({
+                        quizQuestionId,
+                        answers: shuffleArray(
+                            answers.map(({ quizQuestionAnswerId }) => ({
+                                quizQuestionAnswerId,
+                            })),
+                        ),
                     })),
-                ),
-            })),
-        )
+                )
 
             await this.cacheManager.set(attempt.quizAttemptId, questions, 0)
 
@@ -1853,10 +1859,10 @@ export class CoursesService {
 
         if (
             processing &&
-      processing.some(
-          (processing) =>
-              processing.processStatus === ReportProcessStatus.Processing,
-      )
+            processing.some(
+                (processing) =>
+                    processing.processStatus === ReportProcessStatus.Processing,
+            )
         ) {
             throw new ConflictException(
                 "You have reported this course before and it is processing. Try update your report instead.",
@@ -1999,7 +2005,19 @@ export class CoursesService {
                 quizAttemptId,
             })),
         )
+        const { point } = await this.quizQuestionMySqlRepository.findOneBy({ quizQuestionId })
 
+        await this.quizAttemptQuestionMySqlRepository.delete({
+            quizAttemptId,
+            quizQuestionId,
+        })
+
+        await this.quizAttemptQuestionMySqlRepository.save({
+            quizAttemptId,
+            quizQuestionId,
+            actualPoints: point,
+            maxPoints: point,
+        })
         return {
             message: "Your attempt has been updated successfully",
         }

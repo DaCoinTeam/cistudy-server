@@ -711,6 +711,8 @@ export class UpdateQuizQuestionInputData {
         position: number
     @ApiProperty()
         questionMedia : UpdateQuizQuestionMediaInputData
+    @ApiProperty()
+        deleteMediaId? : string
 }
 
 export class UpdateQuizQuestionInput implements AuthInput<UpdateQuizQuestionInputData> {
