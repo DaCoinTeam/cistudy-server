@@ -173,6 +173,7 @@ type QuizQuestionAnswerEntity {
   position: Int!
   content: String!
   isCorrect: Boolean!
+  lastAnswer: Boolean!
   quizQuestion: [QuizQuestionEntity!]!
   attemptAnswers: QuizAttemptAnswerEntity!
   createdAt: DateTime!

@@ -1528,7 +1528,13 @@ export class CoursesService {
         input: UpdateQuizQuestionAnswerInput,
     ): Promise<UpdateQuizQuestionAnswerOutput> {
         const { data } = input
-        const { quizQuestionAnswerId, position, content, isCorrect } = data
+        const {
+            quizQuestionAnswerId,
+            content,
+            isCorrect,
+            lastAnswer,
+            swapPosition,
+        } = data
 
         const answer = await this.quizQuestionAnswerMySqlRepository.findOneBy({
             quizQuestionAnswerId,
@@ -1538,10 +1544,48 @@ export class CoursesService {
             throw new NotFoundException("Quiz Question Not Found.")
         }
 
+        let tempPosition: number
+
+        if (swapPosition !== undefined) {
+            const targetAnswer = await this.quizQuestionAnswerMySqlRepository.findOne(
+                {
+                    where: {
+                        quizQuestionId: answer.quizQuestionId,
+                        position: swapPosition,
+                    },
+                },
+            )
+
+            tempPosition = swapPosition
+
+            await this.quizQuestionAnswerMySqlRepository.update(
+                targetAnswer.quizQuestionAnswerId,
+                {
+                    position: answer.position,
+                },
+            )
+        }
+
+        if (lastAnswer !== undefined) {
+            const previousLastAnswer = await this.quizQuestionAnswerMySqlRepository.findOne(
+                {
+                    where: {
+                        lastAnswer,
+                    },
+                },
+            )
+            if (previousLastAnswer) {
+                await this.quizQuestionAnswerMySqlRepository.update(previousLastAnswer.quizQuestionAnswerId, {
+                    lastAnswer: false
+                })
+            }
+        }
+
         await this.quizQuestionAnswerMySqlRepository.update(quizQuestionAnswerId, {
             content,
             isCorrect,
-            position,
+            lastAnswer,
+            position: tempPosition
         })
 
         return {
@@ -1682,19 +1726,6 @@ export class CoursesService {
                     },
                 },
             })
-            const questions: Array<DeepPartial<QuizQuestionMySqlEntity>> =
-        shuffleArray(
-            quiz.questions.map(({ answers, quizQuestionId }) => ({
-                quizQuestionId,
-                answers: shuffleArray(
-                    answers.map(({ quizQuestionAnswerId }) => ({
-                        quizQuestionAnswerId,
-                    })),
-                ),
-            })),
-        )
-
-            await this.cacheManager.set(attempt.quizAttemptId, questions, 0)
 
             const { timeLimit } = await this.quizMySqlRepository.findOne({
                 where: {
@@ -1710,7 +1741,24 @@ export class CoursesService {
                 timeLimitAtStart: timeLimit,
             })
 
+            const questions: Array<DeepPartial<QuizQuestionMySqlEntity>> =
+        shuffleArray(
+            quiz.questions.map(({ answers, quizQuestionId, position }) => ({
+                quizQuestionId,
+                position,
+                answers: shuffleArray(
+                    answers.map(({ quizQuestionAnswerId, position }) => ({
+                        quizQuestionAnswerId,
+                        position,
+                    })),
+                ),
+            })),
+        )
+
+            await this.cacheManager.set(quizAttemptId, questions, 0)
+
             await queryRunner.commitTransaction()
+
             return {
                 message: "Attempt Started Successfully!",
                 others: {

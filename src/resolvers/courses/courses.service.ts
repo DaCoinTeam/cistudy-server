@@ -26,9 +26,9 @@ import {
     ResourceMySqlEntity,
     SectionContentMySqlEntity,
 } from "@database"
-import { Injectable, NotFoundException } from "@nestjs/common"
+import { Inject, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { DataSource, Like, Repository } from "typeorm"
+import { DataSource, DeepPartial, Like, Repository } from "typeorm"
 import {
     FindManyCourseReportsInput,
     FindManyCourseReviewsInput,
@@ -50,46 +50,48 @@ import {
     FindManyQuizAttemptsOutputData,
     FindOneQuizAttemptOutput,
 } from "./courses.output"
+import { CACHE_MANAGER, Cache } from "@nestjs/cache-manager"
 
 @Injectable()
 export class CoursesService {
     constructor(
-        @InjectRepository(CourseMySqlEntity)
-        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-        @InjectRepository(CertificateMySqlEntity)
-        private readonly certificateMySqlRepository: Repository<CertificateMySqlEntity>,
-        @InjectRepository(SectionContentMySqlEntity)
-        private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
-        @InjectRepository(LessonMySqlEntity)
-        private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
-        @InjectRepository(ResourceMySqlEntity)
-        private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
-        @InjectRepository(ResourceAttachmentMySqlEntity)
-        private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
-        @InjectRepository(CourseTargetMySqlEntity)
-        private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
-        @InjectRepository(CategoryMySqlEntity)
-        private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
-        @InjectRepository(CourseReviewMySqlEntity)
-        private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
-        @InjectRepository(EnrolledInfoMySqlEntity)
-        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
-        @InjectRepository(QuizAttemptMySqlEntity)
-        private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
-        @InjectRepository(QuizQuestionMySqlEntity)
-        private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
-        @InjectRepository(ReportCourseMySqlEntity)
-        private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
-        @InjectRepository(QuizMySqlEntity)
-        private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
-        @InjectRepository(ProgressMySqlEntity)
-        private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
-        @InjectRepository(FollowMySqlEnitity)
-        private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
-        @InjectRepository(CompleteResourceMySqlEntity)
-        private readonly completeResourceMySqlRepository: Repository<CompleteResourceMySqlEntity>,
-        private readonly dataSource: DataSource,
-    ) { }
+    @InjectRepository(CourseMySqlEntity)
+    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+    @InjectRepository(CertificateMySqlEntity)
+    private readonly certificateMySqlRepository: Repository<CertificateMySqlEntity>,
+    @InjectRepository(SectionContentMySqlEntity)
+    private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
+    @InjectRepository(LessonMySqlEntity)
+    private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
+    @InjectRepository(ResourceMySqlEntity)
+    private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+    @InjectRepository(ResourceAttachmentMySqlEntity)
+    private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
+    @InjectRepository(CourseTargetMySqlEntity)
+    private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+    @InjectRepository(CategoryMySqlEntity)
+    private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
+    @InjectRepository(CourseReviewMySqlEntity)
+    private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
+    @InjectRepository(EnrolledInfoMySqlEntity)
+    private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
+    @InjectRepository(QuizAttemptMySqlEntity)
+    private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
+    @InjectRepository(QuizQuestionMySqlEntity)
+    private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
+    @InjectRepository(ReportCourseMySqlEntity)
+    private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
+    @InjectRepository(QuizMySqlEntity)
+    private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+    @InjectRepository(ProgressMySqlEntity)
+    private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
+    @InjectRepository(FollowMySqlEnitity)
+    private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @InjectRepository(CompleteResourceMySqlEntity)
+    private readonly completeResourceMySqlRepository: Repository<CompleteResourceMySqlEntity>,
+    private readonly dataSource: DataSource,
+    ) {}
 
     async findManyCourseReviews(
         input: FindManyCourseReviewsInput,
@@ -197,11 +199,11 @@ export class CoursesService {
         })
 
         const numberOfEnrollmentsResult =
-            await this.enrolledInfoMySqlRepository.count({
-                where: {
-                    courseId,
-                },
-            })
+      await this.enrolledInfoMySqlRepository.count({
+          where: {
+              courseId,
+          },
+      })
 
         course.creator.numberOfFollowers = numberOfFollowersResult
         course.numberOfEnrollments = numberOfEnrollmentsResult
@@ -240,7 +242,7 @@ export class CoursesService {
         }
 
         const overallCourseRating =
-            totalNumberOfRatings > 0 ? totalNumStars() / totalNumberOfRatings : 0
+      totalNumberOfRatings > 0 ? totalNumStars() / totalNumberOfRatings : 0
 
         const courseRatings: CourseRating = {
             numberOf1StarRatings,
@@ -280,19 +282,19 @@ export class CoursesService {
         })
 
         const numberOfResources =
-            await this.resourceAttachmentMySqlRepository.count({
-                where: {
-                    resource: {
-                        sectionContent: {
-                            section: {
-                                course: {
-                                    courseId,
-                                },
-                            },
-                        },
-                    },
-                },
-            })
+      await this.resourceAttachmentMySqlRepository.count({
+          where: {
+              resource: {
+                  sectionContent: {
+                      section: {
+                          course: {
+                              courseId,
+                          },
+                      },
+                  },
+              },
+          },
+      })
         course.numberOfLessons = numberOfLessons
         course.numberOfResources = numberOfResources
         course.numberOfQuizzes = numberOfQuizzes
@@ -409,7 +411,7 @@ export class CoursesService {
         }
 
         const overallCourseRating =
-            totalNumberOfRatings > 0 ? totalNumStars() / totalNumberOfRatings : 0
+      totalNumberOfRatings > 0 ? totalNumStars() / totalNumberOfRatings : 0
 
         const courseRatings: CourseRating = {
             numberOf1StarRatings,
@@ -459,12 +461,12 @@ export class CoursesService {
                 },
             },
         })
-        
+
         const certificate = await this.certificateMySqlRepository.findOne({
-            where:{
+            where: {
                 accountId,
-                courseId
-            }
+                courseId,
+            },
         })
 
         course.numberOfLessons = numberOfLessons
@@ -567,9 +569,9 @@ export class CoursesService {
 
                 course.courseRatings = courseRatings
                 const numberOfEnrollments =
-                    await this.enrolledInfoMySqlRepository.findBy({
-                        courseId: course.courseId,
-                    })
+          await this.enrolledInfoMySqlRepository.findBy({
+              courseId: course.courseId,
+          })
                 const numberOfQuizzes = await this.quizMySqlRepository.count({
                     where: {
                         sectionContent: {
@@ -715,8 +717,8 @@ export class CoursesService {
 
             if (activeQuizAttempt) {
                 const currentTimeLeft =
-                        activeQuizAttempt.timeLeft -
-                        (Date.now() - activeQuizAttempt.observedAt.getTime())
+            activeQuizAttempt.timeLeft -
+            (Date.now() - activeQuizAttempt.observedAt.getTime())
 
                 if (currentTimeLeft <= 0) {
                     await this.quizAttemptMySqlRepository.update(
@@ -741,6 +743,25 @@ export class CoursesService {
 
                 sectionContent.quiz.activeQuizAttempt = activeQuizAttempt
 
+                const randomQuestions = (await this.cacheManager.get(
+                    activeQuizAttempt.quizAttemptId,
+                )) as Array<DeepPartial<QuizQuestionMySqlEntity>>
+
+                if (randomQuestions) {
+                    for (let index = 0; index < sectionContent.quiz.questions.length; index++) {
+                        sectionContent.quiz.questions[index].position =
+                randomQuestions[index].position
+                        for (
+                            let index2 = 0; 
+                            index2 < randomQuestions[index].answers.length;
+                            index2++
+                        ) {
+                            sectionContent.quiz.questions[index].answers[index2].position =
+                  randomQuestions[index].answers[index2].position
+                        }
+                    }
+                }
+
                 sectionContent.quiz.questions = sectionContent.quiz.questions.map(
                     (question) => {
                         const answered = question.answers
@@ -762,6 +783,10 @@ export class CoursesService {
                     },
                 )
             }
+
+            console.log(
+                "B" + sectionContent.quiz.questions.map(({ position }) => position),
+            )
 
             const quizAttempts = await this.quizAttemptMySqlRepository.find({
                 where: {
@@ -813,12 +838,12 @@ export class CoursesService {
             sectionContent.resource = resource
 
             const completeResource =
-                    await this.completeResourceMySqlRepository.findOne({
-                        where: {
-                            accountId,
-                            resourceId: sectionContent.sectionContentId!,
-                        },
-                    })
+          await this.completeResourceMySqlRepository.findOne({
+              where: {
+                  accountId,
+                  resourceId: sectionContent.sectionContentId!,
+              },
+          })
             if (!completeResource) {
                 sectionContent.completeState = CompleteState.Undone
             } else {
@@ -836,7 +861,7 @@ export class CoursesService {
         })
 
         sectionContent.section.course.creator.numberOfFollowers =
-            creatorFollow.length
+      creatorFollow.length
 
         sectionContent.section.course.creator.followed = creatorFollow.some(
             (followed) => followed.followerId === accountId,
@@ -867,7 +892,7 @@ export class CoursesService {
                         if (!doneAttempt) {
                             content.completeState = CompleteState.Undone
                             break
-                        } 
+                        }
 
                         const found = attempts.find((attempt) => attempt.isPassed)
 
@@ -892,12 +917,12 @@ export class CoursesService {
                     }
                     case SectionContentType.Resource: {
                         const completeResource =
-                                await this.completeResourceMySqlRepository.findOne({
-                                    where: {
-                                        accountId,
-                                        resourceId: content.sectionContentId!,
-                                    },
-                                })
+                await this.completeResourceMySqlRepository.findOne({
+                    where: {
+                        accountId,
+                        resourceId: content.sectionContentId!,
+                    },
+                })
                         if (!completeResource) {
                             content.completeState = CompleteState.Undone
                         } else {
@@ -936,10 +961,12 @@ export class CoursesService {
                     const certificate = await this.certificateMySqlRepository.findOne({
                         where: {
                             courseId: sectionContent.section.course.courseId,
-                            accountId
-                        }
+                            accountId,
+                        },
                     })
-                    sectionContent.section.course.certificateStatus = certificate ? CertificateStatus.Gotten : CertificateStatus.Getable
+                    sectionContent.section.course.certificateStatus = certificate
+                        ? CertificateStatus.Gotten
+                        : CertificateStatus.Getable
                 }
             } else {
                 break
@@ -949,13 +976,13 @@ export class CoursesService {
         const certificate = await this.certificateMySqlRepository.findOne({
             where: {
                 courseId: sectionContent.section.course.courseId,
-                accountId
-            }
+                accountId,
+            },
         })
 
         sectionContent.section.course.certificate = certificate
         sectionContent.section.course.sections = sections
-        
+
         return sectionContent
     }
 
@@ -1124,7 +1151,9 @@ export class CoursesService {
         }
     }
 
-    async findManyQuizAttempts(input: FindManyQuizAttemptsInput): Promise<FindManyQuizAttemptsOutputData> {
+    async findManyQuizAttempts(
+        input: FindManyQuizAttemptsInput,
+    ): Promise<FindManyQuizAttemptsOutputData> {
         const { data, accountId } = input
         const { params, options } = data
         const { quizId } = params
@@ -1134,23 +1163,23 @@ export class CoursesService {
             where: {
                 accountId,
                 quizId,
-                attemptStatus: QuizAttemptStatus.Ended
+                attemptStatus: QuizAttemptStatus.Ended,
             },
             skip,
             take,
             relations: {
                 quiz: {
                     questions: {
-                        answers: true
-                    }
+                        answers: true,
+                    },
                 },
                 attemptAnswers: {
-                    quizQuestionAnswer:true
-                }
+                    quizQuestionAnswer: true,
+                },
             },
-            order:{
-                observedAt: "DESC"
-            }
+            order: {
+                observedAt: "DESC",
+            },
         })
 
         for (const attempt of results) {
@@ -1160,16 +1189,18 @@ export class CoursesService {
             let numberOfQuestionsAnswered = 0
             for (const question of questions) {
                 const { answers } = question
-                
+
                 let questionCorrected = false
-        
+
                 answers.forEach((answer) => {
                     const selectedAttemptAnswer = attemptAnswers?.find(
-                        (attemptAnswer) => attemptAnswer.quizQuestionAnswerId === answer.quizQuestionAnswerId
+                        (attemptAnswer) =>
+                            attemptAnswer.quizQuestionAnswerId ===
+              answer.quizQuestionAnswerId,
                     )
-        
+
                     answer.selected = !!selectedAttemptAnswer
-        
+
                     if (selectedAttemptAnswer) {
                         numberOfQuestionsAnswered++
                         selectedAttemptAnswer.corrected = answer.isCorrect
@@ -1178,26 +1209,25 @@ export class CoursesService {
                         }
                     }
                 })
-        
+
                 question.corrected = questionCorrected
             }
             quiz.isPassed = attempt.receivedPercent >= quiz.passingPercent
             attempt.numberOfQuestionAnswered = numberOfQuestionsAnswered
         }
-        
+
         const numberOfAttempts = await this.quizAttemptMySqlRepository.count({
             where: {
                 accountId,
-                quizId
-            }
+                quizId,
+            },
         })
 
         return {
             results,
             metadata: {
-                count: numberOfAttempts
-            }
-
+                count: numberOfAttempts,
+            },
         }
     }
 }

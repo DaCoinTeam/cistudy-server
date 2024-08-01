@@ -58,7 +58,7 @@ import { CacheModule } from "@nestjs/cache-manager"
             password: databaseConfig().mysql.password,
             database: databaseConfig().mysql.schema,
             autoLoadEntities: true,
-            synchronize: false,
+            synchronize: true,
             poolSize: 1000000,    
             timezone: "Z",
             driver: require("mysql2"),
