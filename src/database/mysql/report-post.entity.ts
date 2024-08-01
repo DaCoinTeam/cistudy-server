@@ -53,12 +53,12 @@ export class ReportPostEntity {
 
     @Field(() => AccountEntity)
     @ManyToOne(() => AccountEntity, (course) => course.courseReview, { nullable: true })
-    @JoinColumn({ name: "reporterAccountId" })
+    @JoinColumn({ name: "accountId" })
         reporterAccount: AccountEntity
 
     @Field(() => PostEntity)
     @ManyToOne(() => PostEntity, (post) => post.postReports, { nullable: true , onDelete: "CASCADE"})
-    @JoinColumn({ name: "reportedPostId" })
+    @JoinColumn({ name: "postId" })
         reportedPost: PostEntity
 }
 

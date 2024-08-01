@@ -21,6 +21,7 @@ import {
     FindOnePostInput,
 } from "./posts.input"
 import { FindManyPostCommentRepliesOutputData, FindManyPostCommentReportsOutputData, FindManyPostCommentsOutputData, FindManyPostReportsOutputData, FindManyPostsOutputData, FindOnePostOutput } from "./posts.output"
+import { ReportProcessStatus } from "@common"
 
 
 @Injectable()
@@ -220,7 +221,7 @@ export class PostsService {
                 const numberOfComments = numberOfCommentsResults.find(result => result.postId === post.postId)?.count ?? 0
                 const liked = likedResults.some(result => result.postId === post.postId)
                 const isPostOwner = (post.creatorId === accountId)
-
+                post.isReported = (await this.reportPostMySqlRepository.findOneBy({postId: post.postId, accountId, processStatus: ReportProcessStatus.Processing})) ? true : false
                 let numberOfRewardableLikesLeft: number
                 let numberOfRewardableCommentsLeft: number
 

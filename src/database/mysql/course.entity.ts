@@ -184,4 +184,6 @@ export class CourseEntity {
 
     @Field(() => CertificateEntity, {nullable: true})
         certificate?: CertificateEntity
+    @Field(() => Boolean, {nullable : true})
+        isReported? : boolean
 }

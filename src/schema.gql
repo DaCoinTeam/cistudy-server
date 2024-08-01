@@ -454,6 +454,7 @@ type PostEntity {
   numberOfComments: Int
   numberOfRewardableLikesLeft: Int
   numberOfRewardableCommentsLeft: Int
+  isReported: Boolean
 }
 
 type ReportCourseEntity {
@@ -510,6 +511,7 @@ type CourseEntity {
   numberOfResources: Int
   certificateStatus: String
   certificate: CertificateEntity
+  isReported: Boolean
 }
 
 type CartCourseEntity {

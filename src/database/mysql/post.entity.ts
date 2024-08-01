@@ -96,4 +96,6 @@ export class PostEntity {
         numberOfRewardableLikesLeft?: number
     @Field(() => Int, { nullable: true })
         numberOfRewardableCommentsLeft?: number
+    @Field(() => Boolean, {nullable : true})
+        isReported? : boolean
 }

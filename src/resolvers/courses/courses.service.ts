@@ -4,6 +4,7 @@ import {
     CourseVerifyStatus,
     LockState,
     QuizAttemptStatus,
+    ReportProcessStatus,
     SectionContentType,
 } from "@common"
 import {
@@ -466,11 +467,13 @@ export class CoursesService {
                 courseId
             }
         })
+        const isReported = await this.reportCourseMySqlRepository.findOneBy({accountId,courseId,processStatus: ReportProcessStatus.Processing})
 
         course.numberOfLessons = numberOfLessons
         course.numberOfResources = numberOfResources
         course.numberOfQuizzes = numberOfQuizzes
         course.certificate = certificate
+        course.isReported = isReported ? true : false
 
         return course
     }
@@ -605,11 +608,11 @@ export class CoursesService {
                         },
                     },
                 })
-
                 course.numberOfEnrollments = numberOfEnrollments.length
                 course.numberOfResources = numberOfResources
                 course.numberOfQuizzes = numberOfQuizzes
                 course.numberOfLessons = numberOfLessons
+
             }
             promises.push(promise())
         }
