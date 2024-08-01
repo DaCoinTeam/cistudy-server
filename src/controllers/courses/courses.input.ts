@@ -597,7 +597,7 @@ export class GiftCourseInput implements AuthInput<GiftCourseInputData> {
 
 export class CreateCourseReportInputData {
     @ApiProperty()
-        reportedCourseId: string
+        courseId: string
     @ApiProperty()
     @MinLength(20)
         title: string

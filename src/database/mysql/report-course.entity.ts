@@ -21,11 +21,11 @@ export class ReportCourseEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        reporterAccountId: string
+        accountId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        reportedCourseId: string
+        courseId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 100, nullable: true })

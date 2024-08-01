@@ -573,10 +573,10 @@ export class CoursesService {
         })
 
         const maxSectionPosition = await this.sectionMySqlRepository.find({
-            where:{
+            where: {
                 courseId,
             },
-            order:{
+            order: {
                 position: "DESC"
             }
         })
@@ -852,7 +852,7 @@ export class CoursesService {
         const { data } = input
         const { content, courseId } = data
         const maxResult = await this.courseTargetMySqlRepository.count({
-            where:{
+            where: {
                 courseId,
             }
         })
@@ -1322,6 +1322,15 @@ export class CoursesService {
         const { data } = input
         const { quizId, passingPercent, timeLimit, title, description } = data
 
+        const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
+            quizId,
+            attemptStatus: QuizAttemptStatus.Started
+        })
+
+        if (activeAttempts) {
+            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+        }
+
         await this.quizMySqlRepository.update(quizId, {
             passingPercent,
             timeLimit,
@@ -1371,6 +1380,15 @@ export class CoursesService {
         const { data } = input
         const { quizId } = data
 
+        const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
+            quizId,
+            attemptStatus: QuizAttemptStatus.Started
+        })
+
+        if (activeAttempts) {
+            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+        }
+
         const quiz = await this.quizMySqlRepository.findOneBy({ quizId })
 
         if (!quiz) {
@@ -1416,6 +1434,15 @@ export class CoursesService {
 
         if (!quizQuestion) {
             throw new NotFoundException("Quiz Question Not Found.")
+        }
+
+        const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
+            quizId: quizQuestion.quizId,
+            attemptStatus: QuizAttemptStatus.Started
+        })
+
+        if (activeAttempts) {
+            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
         }
 
         if (files) {
@@ -1468,6 +1495,16 @@ export class CoursesService {
         if (!question) {
             throw new NotFoundException("Quiz question not found")
         }
+
+        const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
+            quizId: question.quizId,
+            attemptStatus: QuizAttemptStatus.Started
+        })
+
+        if (activeAttempts) {
+            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+        }
+
         const { position, quizId } = question
 
         const { questions } = await this.quizMySqlRepository.findOne({
@@ -1509,6 +1546,15 @@ export class CoursesService {
             throw new NotFoundException("Question not found")
         }
 
+        const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
+            quizId: question.quizId,
+            attemptStatus: QuizAttemptStatus.Started
+        })
+
+        if (activeAttempts) {
+            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+        }
+
         const answers = await this.quizQuestionAnswerMySqlRepository.find({
             where: {
                 quizQuestionId,
@@ -1540,12 +1586,26 @@ export class CoursesService {
         const { data } = input
         const { quizQuestionAnswerId, position, content, isCorrect } = data
 
-        const answer = await this.quizQuestionAnswerMySqlRepository.findOneBy({
-            quizQuestionAnswerId,
+        const answer = await this.quizQuestionAnswerMySqlRepository.findOne({
+            where: {
+                quizQuestionAnswerId,
+            },
+            relations:{
+                quizQuestion: true
+            }
         })
 
         if (!answer) {
             throw new NotFoundException("Quiz Question Not Found.")
+        }
+
+        const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
+            quizId: answer.quizQuestion.quizId,
+            attemptStatus: QuizAttemptStatus.Started
+        })
+
+        if (activeAttempts) {
+            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
         }
 
         await this.quizQuestionAnswerMySqlRepository.update(quizQuestionAnswerId, {
@@ -1572,6 +1632,16 @@ export class CoursesService {
         if (!answer) {
             throw new NotFoundException("Answer not found")
         }
+
+        const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
+            quizId: answer.quizQuestion.quizId,
+            attemptStatus: QuizAttemptStatus.Started
+        })
+
+        if (activeAttempts) {
+            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+        }
+
         const { position, quizQuestionId, isCorrect } = answer
 
         const { answers } = await this.quizQuestionMySqlRepository.findOne({
@@ -1843,10 +1913,10 @@ export class CoursesService {
         input: CreateCourseReportInput,
     ): Promise<CreateCourseReportOutput> {
         const { data, accountId } = input
-        const { reportedCourseId, title, description } = data
+        const { courseId, title, description } = data
 
         const reportedCourse = await this.courseMySqlRepository.findOneBy({
-            courseId: reportedCourseId,
+            courseId
         })
 
         if (!reportedCourse || reportedCourse.isDeleted) {
@@ -1857,7 +1927,7 @@ export class CoursesService {
 
         const processing = await this.reportCourseMySqlRepository.find({
             where: {
-                reportedCourseId,
+                courseId,
             },
         })
 
@@ -1874,8 +1944,8 @@ export class CoursesService {
         }
 
         const { reportCourseId } = await this.reportCourseMySqlRepository.save({
-            reporterAccountId: accountId,
-            reportedCourseId,
+            accountId,
+            courseId,
             title,
             description,
         })
@@ -1906,7 +1976,7 @@ export class CoursesService {
             throw new ConflictException("This report has been resolved and closed.")
         }
 
-        if (found.reporterAccountId !== accountId) {
+        if (found.accountId !== accountId) {
             throw new ConflictException("You aren't the owner of this report.")
         }
 

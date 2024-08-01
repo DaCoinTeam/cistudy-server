@@ -901,9 +901,9 @@ export class PostsService {
 
     async createPostReport(input: CreatePostReportInput): Promise<CreatePostReportOutput> {
         const { data, accountId } = input
-        const { reportedPostId, title, description } = data
+        const { postId, title, description } = data
 
-        const reportedPost = await this.postMySqlRepository.findOneBy({ postId: reportedPostId })
+        const reportedPost = await this.postMySqlRepository.findOneBy({ postId })
 
         if (!reportedPost) {
             throw new NotFoundException("Reported post is not found or has been deleted")
@@ -911,7 +911,7 @@ export class PostsService {
 
         const processing = await this.reportPostMySqlRepository.find({
             where: {
-                reportedPostId
+                postId
             }
         })
 
@@ -920,8 +920,8 @@ export class PostsService {
         }
 
         const { reportPostId } = await this.reportPostMySqlRepository.save({
-            reporterAccountId: accountId,
-            reportedPostId,
+            accountId,
+            postId,
             title,
             description
         })
@@ -948,7 +948,7 @@ export class PostsService {
             throw new ConflictException("This report has been resolved and closed.")
         }
 
-        if (found.reporterAccountId !== accountId) {
+        if (found.accountId !== accountId) {
             throw new ConflictException("You aren't the owner of this report.")
         }
 
@@ -964,9 +964,9 @@ export class PostsService {
 
     async createPostCommentReport(input: CreatePostCommentReportInput): Promise<CreatePostCommentReportOutput> {
         const { data, accountId } = input
-        const { reportedPostCommentId, title, description } = data
+        const { postCommentId, title, description } = data
 
-        const reportedPostComment = await this.postCommentMySqlRepository.findOneBy({ postCommentId: reportedPostCommentId })
+        const reportedPostComment = await this.postCommentMySqlRepository.findOneBy({ postCommentId })
 
         if (!reportedPostComment) {
             throw new NotFoundException("Reported post's comment is not found or has been deleted")
@@ -974,7 +974,7 @@ export class PostsService {
 
         const processing = await this.reportPostCommentMySqlRepository.find({
             where: {
-                reportedPostCommentId
+                postCommentId
             }
         })
 
@@ -983,8 +983,8 @@ export class PostsService {
         }
 
         const { reportPostCommentId } = await this.reportPostCommentMySqlRepository.save({
-            reporterAccountId: accountId,
-            reportedPostCommentId,
+            accountId,
+            postCommentId,
             title,
             description
         })
@@ -1011,7 +1011,7 @@ export class PostsService {
             throw new ConflictException("This report has been resolved and closed.")
         }
 
-        if (found.reporterAccountId !== accountId) {
+        if (found.accountId !== accountId) {
             throw new ConflictException("You aren't the owner of this report.")
         }
 

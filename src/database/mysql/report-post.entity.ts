@@ -21,11 +21,11 @@ export class ReportPostEntity {
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        reporterAccountId: string
+        accountId: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
-        reportedPostId: string
+        postId: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 100, nullable: true })
