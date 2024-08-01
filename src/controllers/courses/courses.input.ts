@@ -741,7 +741,7 @@ export class UpdateQuizQuestionInputData {
   @ApiProperty()
       questionMedia: UpdateQuizQuestionMediaInputData
   @ApiProperty()
-      deleteMediaId?: string
+      deleteMedia?: boolean
 }
 
 export class UpdateQuizQuestionInput

@@ -517,19 +517,24 @@ export class CoursesController {
             data
         })
     }
-    //
+
     @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
     @Patch("update-quiz-question")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
-    @UseInterceptors(AuthInterceptor)
+    @UseInterceptors(AuthInterceptor,
+        FileFieldsInterceptor([{ name: "files", maxCount: 10 }]),
+    )
     async updateQuizQuestion(
         @AccountId() accountId: string,
-        @Body() data: UpdateQuizQuestionInputData,
+        @DataFromBody() data: UpdateQuizQuestionInputData,
+        @UploadedFiles() { files }: Files,
     ) {
         return await this.coursesService.updateQuizQuestion({
             accountId,
-            data
+            data,
+            files
         })
     }
 
