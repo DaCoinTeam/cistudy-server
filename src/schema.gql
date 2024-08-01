@@ -369,8 +369,8 @@ type PostCommentReplyEntity {
 
 type ReportPostCommentEntity {
   reportPostCommentId: ID!
-  reporterAccountId: ID!
-  reportedPostCommentId: ID!
+  accountId: ID!
+  postCommentId: ID!
   title: String
   description: String
   processStatus: String!
@@ -421,8 +421,8 @@ type PostMediaEntity {
 
 type ReportPostEntity {
   reportPostId: ID!
-  reporterAccountId: ID!
-  reportedPostId: ID!
+  accountId: ID!
+  postId: ID!
   title: String
   description: String
   processStatus: String!
@@ -459,8 +459,8 @@ type PostEntity {
 
 type ReportCourseEntity {
   reportCourseId: ID!
-  reporterAccountId: ID!
-  reportedCourseId: ID!
+  accountId: ID!
+  courseId: ID!
   title: String
   description: String
   processStatus: String!
@@ -554,8 +554,8 @@ type FollowEntity {
 
 type ReportAccountEntity {
   reportAccountId: ID!
-  reporterAccountId: ID!
-  reportedAccountId: ID!
+  reporterId: ID!
+  reportedId: ID!
   title: String
   description: String
   processStatus: String!

@@ -438,13 +438,13 @@ export class AccountsService {
 
     async createAccountReport(input: CreateAccountReportInput): Promise<CreateAccountReportOutput> {
         const { data, accountId } = input
-        const { reportedAccountId, title, description } = data
+        const { reportedId, title, description } = data
 
-        if (accountId === reportedAccountId) {
+        if (accountId === reportedId) {
             throw new ConflictException("You cannot report yourself.")
         }
 
-        const reportedAccount = await this.accountMySqlRepository.findOneBy({ accountId: reportedAccountId })
+        const reportedAccount = await this.accountMySqlRepository.findOneBy({ accountId: reportedId })
 
         if (!reportedAccount) {
             throw new NotFoundException("Reported user is not found or has been deleted")
@@ -452,7 +452,7 @@ export class AccountsService {
 
         const processing = await this.reportAccountMySqlRepository.find({
             where: {
-                reportedAccountId
+                reportedId
             }
         })
 
@@ -461,8 +461,8 @@ export class AccountsService {
         }
 
         const { reportAccountId, createdAt } = await this.reportAccountMySqlRepository.save({
-            reporterAccountId: accountId,
-            reportedAccountId,
+            reporterId: accountId,
+            reportedId,
             title,
             description
         })
@@ -492,7 +492,7 @@ export class AccountsService {
             throw new ConflictException("This report has been resolved and closed.")
         }
 
-        if (found.reporterAccountId !== accountId) {
+        if (found.reporterId !== accountId) {
             throw new ConflictException("You isn't the owner of this report.")
         }
 

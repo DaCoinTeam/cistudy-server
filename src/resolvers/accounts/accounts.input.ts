@@ -14,7 +14,7 @@ export class FindOneAccountInputParams {
 export class FindOneAccountInputOptions {
     @Field(() => ID, { nullable: true })
     @IsOptional()
-        followerId?: string
+        followerId? : string
 }
 
 @InputType()

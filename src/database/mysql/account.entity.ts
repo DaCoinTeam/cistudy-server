@@ -195,7 +195,7 @@ export class AccountEntity {
         selfReviews?: Array<AccountReviewEntity>
 
     @Field(() => [ReportAccountEntity])
-    @OneToMany(() => ReportAccountEntity, (reportAccounts) => reportAccounts.reportedAccountId, { nullable: true })
+    @OneToMany(() => ReportAccountEntity, (reportAccounts) => reportAccounts.reportedAccount, { nullable: true })
         reportAccounts?: Array<ReportAccountEntity>
 
     @Field(() => [ReportAccountEntity])

@@ -267,7 +267,7 @@ export class CoursesController {
     }
 
     @ApiBearerAuth()
-    @Delete("delete-sectionContent/:sectionContentId")
+    @Delete("delete-section-content/:sectionContentId")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)

@@ -613,14 +613,14 @@ export class GiftCourseInput implements AuthInput<GiftCourseInputData> {
 }
 
 export class CreateCourseReportInputData {
-  @ApiProperty()
-      reportedCourseId: string
-  @ApiProperty()
-  @MinLength(20)
-      title: string
-  @ApiProperty()
-  @MinLength(20)
-      description: string
+    @ApiProperty()
+        courseId: string
+    @ApiProperty()
+    @MinLength(20)
+        title: string
+    @ApiProperty()
+    @MinLength(20)
+        description: string
 }
 
 export class CreateCourseReportInput
@@ -740,6 +740,8 @@ export class UpdateQuizQuestionInputData {
       position: number
   @ApiProperty()
       questionMedia: UpdateQuizQuestionMediaInputData
+    @ApiProperty()
+        deleteMediaId? : string
 }
 
 export class UpdateQuizQuestionInput

@@ -230,7 +230,7 @@ export class MarkPostCommentAsSolutionInput implements AuthInput<MarkPostComment
 
 export class CreatePostReportInputData {
     @ApiProperty()
-        reportedPostId: string
+        postId: string
     @ApiProperty()
     @MinLength(20)
         title: string
@@ -263,7 +263,7 @@ export class UpdatePostReportInput implements AuthInput<UpdatePostReportInputDat
 
 export class CreatePostCommentReportInputData {
     @ApiProperty()
-        reportedPostCommentId: string
+        postCommentId: string
     @ApiProperty()
     @MinLength(20)
         title: string

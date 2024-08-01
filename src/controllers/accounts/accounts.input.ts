@@ -159,8 +159,7 @@ export class UpdateAccountRoleInput implements AuthInput<UpdateAccountRoleInputD
 export class CreateAccountReportInputData {
     @IsUUID("4")
     @ApiProperty()
-        reportedAccountId: string
-
+        reportedId: string
     @ApiProperty()
     @MinLength(20)
         title: string
