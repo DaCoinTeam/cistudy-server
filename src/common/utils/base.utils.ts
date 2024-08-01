@@ -4,11 +4,12 @@ import mime from "mime-types"
 
 export const CLIENT_ID = "client-id"
 
-export const getClientId = (headers: Headers) => headers[CLIENT_ID] as string | undefined
+export const getClientId = (headers: Headers) =>
+  headers[CLIENT_ID] as string | undefined
 
-export const getEnvValue = <T=string>(values: {
-    development?: T;
-    production?: T;
+export const getEnvValue = <T = string>(values: {
+  development?: T
+  production?: T
 }): T => {
     const { development, production } = values
     switch (appConfig().node) {
@@ -39,5 +40,15 @@ export const getContentType = (filenameOrExt: string): string | undefined => {
     return contentType ? contentType : undefined
 }
 
-export const sleep = (ms : number = 0) => new Promise(resolve => setTimeout(resolve, ms))
-  
+export const sleep = (ms: number = 0) =>
+    new Promise((resolve) => setTimeout(resolve, ms))
+
+export const shuffleArray = <T>(array: Array<T>) : Array<T> => {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        const temp = array[i]
+        array[i] = array[j]
+        array[j] = temp
+    }
+    return array
+}
