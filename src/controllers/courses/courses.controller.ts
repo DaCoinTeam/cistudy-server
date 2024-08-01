@@ -23,7 +23,6 @@ import {
     JwtAuthGuard,
     DataFromBody,
     Roles,
-    QuizAttemptTimeGuard,
     RolesGuard
 } from "../shared"
 import {
@@ -684,7 +683,7 @@ export class CoursesController {
 
     @ApiBearerAuth()
     @Patch("update-quiz-attempt")
-    @UseGuards(JwtAuthGuard, RolesGuard, QuizAttemptTimeGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async updateQuizAttempt(
@@ -699,7 +698,7 @@ export class CoursesController {
 
     @ApiBearerAuth()
     @Patch("update-quiz-attempt-answers")
-    @UseGuards(JwtAuthGuard, RolesGuard, QuizAttemptTimeGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async updateQuizAttemptAnswers(

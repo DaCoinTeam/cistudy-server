@@ -584,6 +584,7 @@ type NotificationEntity {
   description: String
   referenceLink: String
   viewed: Boolean!
+  isPublished: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   sender: AccountEntity

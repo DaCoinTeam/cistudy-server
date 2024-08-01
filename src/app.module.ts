@@ -17,6 +17,7 @@ import { MongooseModule } from "@nestjs/mongoose"
 // import { WebsocketsModule } from "@websockets"
 import * as redisStore from "cache-manager-redis-store"
 import { CacheModule } from "@nestjs/cache-manager"
+import { WebsocketsModule } from "@websockets"
 
 
 @Module({
@@ -74,7 +75,7 @@ import { CacheModule } from "@nestjs/cache-manager"
             introspection: true,
         }),
 
-        //WebsocketsModule,
+        WebsocketsModule,
         SchedulersModule,
         ResolversModule,
         GlobalModule,

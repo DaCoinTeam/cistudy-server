@@ -716,51 +716,26 @@ export class CoursesService {
             )
 
             if (activeQuizAttempt) {
-                const currentTimeLeft =
-            activeQuizAttempt.timeLeft -
-            (Date.now() - activeQuizAttempt.observedAt.getTime())
-
-                if (currentTimeLeft <= 0) {
-                    await this.quizAttemptMySqlRepository.update(
-                        activeQuizAttempt.quizAttemptId,
-                        {
-                            attemptStatus: QuizAttemptStatus.Ended,
-                            timeLeft: 0,
-                            observedAt: new Date(),
-                        },
-                    )
-                    activeQuizAttempt.timeLeft = 0
-                } else {
-                    await this.quizAttemptMySqlRepository.update(
-                        activeQuizAttempt.quizAttemptId,
-                        {
-                            timeLeft: currentTimeLeft,
-                            observedAt: new Date(),
-                        },
-                    )
-                    activeQuizAttempt.timeLeft = currentTimeLeft
-                }
-
                 sectionContent.quiz.activeQuizAttempt = activeQuizAttempt
 
-                const randomQuestions = (await this.cacheManager.get(
-                    activeQuizAttempt.quizAttemptId,
-                )) as Array<DeepPartial<QuizQuestionMySqlEntity>>
+                // const randomQuestions = (await this.cacheManager.get(
+                //     activeQuizAttempt.quizAttemptId,
+                // )) as Array<DeepPartial<QuizQuestionMySqlEntity>>
 
-                if (randomQuestions) {
-                    for (let index = 0; index < sectionContent.quiz.questions.length; index++) {
-                        sectionContent.quiz.questions[index].position =
-                randomQuestions[index].position
-                        for (
-                            let index2 = 0; 
-                            index2 < randomQuestions[index].answers.length;
-                            index2++
-                        ) {
-                            sectionContent.quiz.questions[index].answers[index2].position =
-                  randomQuestions[index].answers[index2].position
-                        }
-                    }
-                }
+                // if (randomQuestions) {
+                //     for (let index = 0; index < sectionContent.quiz.questions.length; index++) {
+                //         sectionContent.quiz.questions[index].position =
+                // randomQuestions[index].position
+                //         for (
+                //             let index2 = 0; 
+                //             index2 < randomQuestions[index].answers.length;
+                //             index2++
+                //         ) {
+                //             sectionContent.quiz.questions[index].answers[index2].position =
+                //   randomQuestions[index].answers[index2].position
+                //         }
+                //     }
+                // }
 
                 sectionContent.quiz.questions = sectionContent.quiz.questions.map(
                     (question) => {
@@ -783,11 +758,7 @@ export class CoursesService {
                     },
                 )
             }
-
-            console.log(
-                "B" + sectionContent.quiz.questions.map(({ position }) => position),
-            )
-
+            
             const quizAttempts = await this.quizAttemptMySqlRepository.find({
                 where: {
                     quizId: quiz.quizId,

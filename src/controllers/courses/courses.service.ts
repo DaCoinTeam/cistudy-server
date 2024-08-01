@@ -1977,6 +1977,7 @@ export class CoursesService {
 
             await this.quizAttemptMySqlRepository.update(quizAttemptId, {
                 isPassed,
+                timeLeft: 0,
                 receivedPercent,
                 timeTaken,
                 receivedPoints,
