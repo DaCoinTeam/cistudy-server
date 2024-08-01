@@ -141,59 +141,59 @@ import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager"
 @Injectable()
 export class CoursesService {
     constructor(
-        @InjectRepository(CourseMySqlEntity)
-        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-        @InjectRepository(SectionMySqlEntity)
-        private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
-        @InjectRepository(SectionContentMySqlEntity)
-        private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
-        @InjectRepository(LessonMySqlEntity)
-        private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
-        @InjectRepository(CourseTargetMySqlEntity)
-        private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
-        @InjectRepository(ResourceMySqlEntity)
-        private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
-        @InjectRepository(ResourceAttachmentMySqlEntity)
-        private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
-        @InjectRepository(EnrolledInfoMySqlEntity)
-        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
-        @InjectRepository(CategoryMySqlEntity)
-        private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
-        @InjectRepository(CourseCategoryMySqlEntity)
-        private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
-        @InjectRepository(CourseReviewMySqlEntity)
-        private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
-        @InjectRepository(CertificateMySqlEntity)
-        private readonly courseCertificateMySqlEntity: Repository<CertificateMySqlEntity>,
-        @InjectRepository(QuizMySqlEntity)
-        private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
-        @InjectRepository(QuizQuestionMySqlEntity)
-        private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
-        @InjectRepository(QuizQuestionAnswerMySqlEntity)
-        private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
-        @InjectRepository(ProgressMySqlEntity)
-        private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
-        @InjectRepository(QuizAttemptMySqlEntity)
-        private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
-        @InjectRepository(QuizAttemptAnswerMySqlEntity)
-        private readonly quizAttemptAnswerMySqlRepository: Repository<QuizAttemptAnswerMySqlEntity>,
-        @InjectRepository(QuizAttemptQuestionMySqlEntity)
-        private readonly quizAttemptQuestionMySqlRepository: Repository<QuizAttemptQuestionMySqlEntity>,
-        @InjectRepository(AccountMySqlEntity)
-        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
-        @InjectRepository(AccountGradeMySqlEntity)
-        private readonly accountGradeMySqlRepository: Repository<AccountGradeMySqlEntity>,
-        @InjectRepository(ReportCourseMySqlEntity)
-        private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
-        @InjectRepository(CompleteResourceMySqlEntity)
-        private readonly completeResourceMySqlRepository: Repository<CompleteResourceMySqlEntity>,
-        @InjectRepository(NotificationMySqlEntity)
-        private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
-        @Inject(CACHE_MANAGER) private cacheManager: Cache,
-        private readonly storageService: StorageService,
-        private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
-        private readonly dataSource: DataSource,
-    ) { }
+    @InjectRepository(CourseMySqlEntity)
+    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+    @InjectRepository(SectionMySqlEntity)
+    private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
+    @InjectRepository(SectionContentMySqlEntity)
+    private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
+    @InjectRepository(LessonMySqlEntity)
+    private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
+    @InjectRepository(CourseTargetMySqlEntity)
+    private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+    @InjectRepository(ResourceMySqlEntity)
+    private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+    @InjectRepository(ResourceAttachmentMySqlEntity)
+    private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
+    @InjectRepository(EnrolledInfoMySqlEntity)
+    private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
+    @InjectRepository(CategoryMySqlEntity)
+    private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
+    @InjectRepository(CourseCategoryMySqlEntity)
+    private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
+    @InjectRepository(CourseReviewMySqlEntity)
+    private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
+    @InjectRepository(CertificateMySqlEntity)
+    private readonly courseCertificateMySqlEntity: Repository<CertificateMySqlEntity>,
+    @InjectRepository(QuizMySqlEntity)
+    private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+    @InjectRepository(QuizQuestionMySqlEntity)
+    private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
+    @InjectRepository(QuizQuestionAnswerMySqlEntity)
+    private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
+    @InjectRepository(ProgressMySqlEntity)
+    private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
+    @InjectRepository(QuizAttemptMySqlEntity)
+    private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
+    @InjectRepository(QuizAttemptAnswerMySqlEntity)
+    private readonly quizAttemptAnswerMySqlRepository: Repository<QuizAttemptAnswerMySqlEntity>,
+    @InjectRepository(QuizAttemptQuestionMySqlEntity)
+    private readonly quizAttemptQuestionMySqlRepository: Repository<QuizAttemptQuestionMySqlEntity>,
+    @InjectRepository(AccountMySqlEntity)
+    private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+    @InjectRepository(AccountGradeMySqlEntity)
+    private readonly accountGradeMySqlRepository: Repository<AccountGradeMySqlEntity>,
+    @InjectRepository(ReportCourseMySqlEntity)
+    private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
+    @InjectRepository(CompleteResourceMySqlEntity)
+    private readonly completeResourceMySqlRepository: Repository<CompleteResourceMySqlEntity>,
+    @InjectRepository(NotificationMySqlEntity)
+    private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly storageService: StorageService,
+    private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
+    private readonly dataSource: DataSource,
+    ) {}
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
         const { data, accountId } = input
@@ -382,7 +382,7 @@ export class CoursesService {
         const promises: Array<Promise<void>> = []
 
         const { previewVideoId, thumbnailId } =
-            await this.courseMySqlRepository.findOneBy({ courseId })
+      await this.courseMySqlRepository.findOneBy({ courseId })
 
         if (Number.isInteger(previewVideoIndex)) {
             const promise = async () => {
@@ -577,15 +577,17 @@ export class CoursesService {
                 courseId,
             },
             order: {
-                position: "DESC"
-            }
+                position: "DESC",
+            },
         })
 
         if (!course) throw new NotFoundException("Course not found.")
         const created = await this.sectionMySqlRepository.save({
             courseId,
             title,
-            position: maxSectionPosition.length ? maxSectionPosition[0].position + 1 : 1,
+            position: maxSectionPosition.length
+                ? maxSectionPosition[0].position + 1
+                : 1,
         })
 
         return {
@@ -691,10 +693,10 @@ export class CoursesService {
     async updateLesson(input: UpdateLessonInput): Promise<UpdateLessonOutput> {
         const { data, files } = input
         const { lessonId, description, lessonVideoIndex, thumbnailIndex, title } =
-            data
+      data
 
         const { thumbnailId, lessonVideoId } =
-            await this.lessonMySqlRepository.findOneBy({ lessonId })
+      await this.lessonMySqlRepository.findOneBy({ lessonId })
 
         const promises: Array<Promise<void>> = []
 
@@ -854,7 +856,7 @@ export class CoursesService {
         const maxResult = await this.courseTargetMySqlRepository.count({
             where: {
                 courseId,
-            }
+            },
         })
 
         const created = await this.courseTargetMySqlRepository.save({
@@ -1324,11 +1326,13 @@ export class CoursesService {
 
         const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
             quizId,
-            attemptStatus: QuizAttemptStatus.Started
+            attemptStatus: QuizAttemptStatus.Started,
         })
 
         if (activeAttempts) {
-            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+            throw new ConflictException(
+                "You cannot apply changes to the quiz content while learners are currently taking it.",
+            )
         }
 
         await this.quizMySqlRepository.update(quizId, {
@@ -1382,11 +1386,13 @@ export class CoursesService {
 
         const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
             quizId,
-            attemptStatus: QuizAttemptStatus.Started
+            attemptStatus: QuizAttemptStatus.Started,
         })
 
         if (activeAttempts) {
-            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+            throw new ConflictException(
+                "You cannot apply changes to the quiz content while learners are currently taking it.",
+            )
         }
 
         const quiz = await this.quizMySqlRepository.findOneBy({ quizId })
@@ -1426,7 +1432,14 @@ export class CoursesService {
         input: UpdateQuizQuestionInput,
     ): Promise<UpdateQuizQuestionOutput> {
         const { data, files } = input
-        const { quizQuestionId, question, point, position, questionMedia, deleteMediaId } = data
+        const {
+            quizQuestionId,
+            question,
+            point,
+            swapPosition,
+            questionMedia,
+            deleteMediaId,
+        } = data
 
         const quizQuestion = await this.quizQuestionMySqlRepository.findOneBy({
             quizQuestionId,
@@ -1438,11 +1451,13 @@ export class CoursesService {
 
         const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
             quizId: quizQuestion.quizId,
-            attemptStatus: QuizAttemptStatus.Started
+            attemptStatus: QuizAttemptStatus.Started,
         })
 
         if (activeAttempts) {
-            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+            throw new ConflictException(
+                "You cannot apply changes to the quiz content while learners are currently taking it.",
+            )
         }
 
         if (files) {
@@ -1468,13 +1483,35 @@ export class CoursesService {
 
         if (deleteMediaId) {
             await this.storageService.delete(quizQuestion.mediaId)
-            await this.quizQuestionMySqlRepository.update({ quizQuestionId: quizQuestion.quizQuestionId }, { mediaId: null, mediaType: null })
+            await this.quizQuestionMySqlRepository.update(
+                { quizQuestionId: quizQuestion.quizQuestionId },
+                { mediaId: null, mediaType: null },
+            )
+        }
+
+        let tempPosition: number
+        if (swapPosition !== undefined) {
+            const targetQuestion = await this.quizQuestionMySqlRepository.findOne({
+                where: {
+                    quizId: quizQuestion.quizId,
+                    position: swapPosition,
+                },
+            })
+
+            tempPosition = swapPosition
+
+            await this.quizQuestionMySqlRepository.update(
+                targetQuestion.quizQuestionId,
+                {
+                    position: quizQuestion.position,
+                },
+            )
         }
 
         await this.quizQuestionMySqlRepository.update(quizQuestionId, {
             question,
             point,
-            position,
+            position: tempPosition,
         })
 
         return {
@@ -1498,11 +1535,13 @@ export class CoursesService {
 
         const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
             quizId: question.quizId,
-            attemptStatus: QuizAttemptStatus.Started
+            attemptStatus: QuizAttemptStatus.Started,
         })
 
         if (activeAttempts) {
-            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+            throw new ConflictException(
+                "You cannot apply changes to the quiz content while learners are currently taking it.",
+            )
         }
 
         const { position, quizId } = question
@@ -1548,11 +1587,13 @@ export class CoursesService {
 
         const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
             quizId: question.quizId,
-            attemptStatus: QuizAttemptStatus.Started
+            attemptStatus: QuizAttemptStatus.Started,
         })
 
         if (activeAttempts) {
-            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+            throw new ConflictException(
+                "You cannot apply changes to the quiz content while learners are currently taking it.",
+            )
         }
 
         const answers = await this.quizQuestionAnswerMySqlRepository.find({
@@ -1596,9 +1637,9 @@ export class CoursesService {
             where: {
                 quizQuestionAnswerId,
             },
-            relations:{
-                quizQuestion: true
-            }
+            relations: {
+                quizQuestion: true,
+            },
         })
 
         if (!answer) {
@@ -1628,34 +1669,38 @@ export class CoursesService {
         }
 
         if (lastAnswer !== undefined) {
-            const previousLastAnswer = await this.quizQuestionAnswerMySqlRepository.findOne(
-                {
-                    where: {
-                        lastAnswer,
-                    },
-                },
-            )
+            const previousLastAnswer =
+        await this.quizQuestionAnswerMySqlRepository.findOne({
+            where: {
+                lastAnswer,
+            },
+        })
             if (previousLastAnswer) {
-                await this.quizQuestionAnswerMySqlRepository.update(previousLastAnswer.quizQuestionAnswerId, {
-                    lastAnswer: false
-                })
+                await this.quizQuestionAnswerMySqlRepository.update(
+                    previousLastAnswer.quizQuestionAnswerId,
+                    {
+                        lastAnswer: false,
+                    },
+                )
             }
         }
 
         const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
             quizId: answer.quizQuestion.quizId,
-            attemptStatus: QuizAttemptStatus.Started
+            attemptStatus: QuizAttemptStatus.Started,
         })
 
         if (activeAttempts) {
-            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+            throw new ConflictException(
+                "You cannot apply changes to the quiz content while learners are currently taking it.",
+            )
         }
 
         await this.quizQuestionAnswerMySqlRepository.update(quizQuestionAnswerId, {
             content,
             isCorrect,
             lastAnswer,
-            position: tempPosition
+            position: tempPosition,
         })
 
         return {
@@ -1679,11 +1724,13 @@ export class CoursesService {
 
         const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
             quizId: answer.quizQuestion.quizId,
-            attemptStatus: QuizAttemptStatus.Started
+            attemptStatus: QuizAttemptStatus.Started,
         })
 
         if (activeAttempts) {
-            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+            throw new ConflictException(
+                "You cannot apply changes to the quiz content while learners are currently taking it.",
+            )
         }
 
         const { position, quizQuestionId, isCorrect } = answer
@@ -1964,7 +2011,7 @@ export class CoursesService {
         const { courseId, title, description } = data
 
         const reportedCourse = await this.courseMySqlRepository.findOneBy({
-            courseId
+            courseId,
         })
 
         if (!reportedCourse || reportedCourse.isDeleted) {
@@ -1981,10 +2028,10 @@ export class CoursesService {
 
         if (
             processing &&
-            processing.some(
-                (processing) =>
-                    processing.processStatus === ReportProcessStatus.Processing,
-            )
+      processing.some(
+          (processing) =>
+              processing.processStatus === ReportProcessStatus.Processing,
+      )
         ) {
             throw new ConflictException(
                 "You have reported this course before and it is processing. Try update your report instead.",
@@ -2127,7 +2174,9 @@ export class CoursesService {
                 quizAttemptId,
             })),
         )
-        const { point } = await this.quizQuestionMySqlRepository.findOneBy({ quizQuestionId })
+        const { point } = await this.quizQuestionMySqlRepository.findOneBy({
+            quizQuestionId,
+        })
 
         await this.quizAttemptQuestionMySqlRepository.delete({
             quizAttemptId,
