@@ -572,16 +572,20 @@ export class CoursesService {
             courseId,
         })
 
-        const maxSectionPosition = await this.sectionMySqlRepository
-            .createQueryBuilder()
-            .select("MAX(position)", "count")
-            .getRawOne()
+        const maxSectionPosition = await this.sectionMySqlRepository.find({
+            where:{
+                courseId,
+            },
+            order:{
+                position: "DESC"
+            }
+        })
 
         if (!course) throw new NotFoundException("Course not found.")
         const created = await this.sectionMySqlRepository.save({
             courseId,
             title,
-            position: maxSectionPosition ? maxSectionPosition.count + 1 : 0,
+            position: maxSectionPosition ? maxSectionPosition[0].position + 1 : 0,
         })
 
         return {
