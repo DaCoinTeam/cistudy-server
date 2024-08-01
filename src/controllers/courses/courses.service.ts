@@ -585,7 +585,7 @@ export class CoursesService {
         const created = await this.sectionMySqlRepository.save({
             courseId,
             title,
-            position: maxSectionPosition ? maxSectionPosition[0].position + 1 : 0,
+            position: maxSectionPosition.length ? maxSectionPosition[0].position + 1 : 0,
         })
 
         return {
