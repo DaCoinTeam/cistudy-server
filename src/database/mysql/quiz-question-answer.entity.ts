@@ -26,6 +26,10 @@ export class QuizQuestionAnswerEntity {
     @Field(() => Boolean)
     @Column({ type: "boolean", default: false , nullable: true })
         isCorrect: boolean
+    
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: false , nullable: true })
+        lastAnswer: boolean
 
     @Field(() => [QuizQuestionEntity])
     @ManyToOne(() => QuizQuestionEntity, (quizQuestion) => quizQuestion.answers, { onDelete: "CASCADE" , onUpdate: "CASCADE"})

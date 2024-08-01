@@ -1,6 +1,20 @@
-import { AuthEmptyDataInput, AuthInput, MediaType, ReportProcessStatus, SectionContentType } from "@common"
+import {
+    AuthEmptyDataInput,
+    AuthInput,
+    MediaType,
+    ReportProcessStatus,
+    SectionContentType,
+} from "@common"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsNumber, IsOptional, IsUUID, Length, Max, Min, MinLength } from "class-validator"
+import {
+    IsNumber,
+    IsOptional,
+    IsUUID,
+    Length,
+    Max,
+    Min,
+    MinLength,
+} from "class-validator"
 
 export class CreateCourseInput implements AuthEmptyDataInput {
   @IsUUID("4")
@@ -102,7 +116,7 @@ export class UpdateCourseInputData {
       previewVideoIndex?: number
 
   @ApiProperty({ nullable: true })
-      categoryIds? : Array<string>
+      categoryIds?: Array<string>
 }
 
 export class UpdateCourseInput implements AuthInput<UpdateCourseInputData> {
@@ -135,22 +149,26 @@ export class CreateSectionContentInputData {
       type: SectionContentType
 }
 
-export class CreateSectionContentInput implements AuthInput<CreateSectionContentInputData> {
+export class CreateSectionContentInput
+implements AuthInput<CreateSectionContentInputData>
+{
   @IsUUID("4")
       accountId: string
   data: CreateSectionContentInputData
 }
 
 export class UpdateSectionContentInputData {
-    @IsUUID("4")
-    @ApiProperty()
-        sectionContentId: string
+  @IsUUID("4")
+  @ApiProperty()
+      sectionContentId: string
 
-    @ApiProperty()
-        title: string
+  @ApiProperty()
+      title: string
 }
 
-export class UpdateSectionContentInput implements AuthInput<UpdateSectionContentInputData> {
+export class UpdateSectionContentInput
+implements AuthInput<UpdateSectionContentInputData>
+{
     accountId: string
     data: UpdateSectionContentInputData
 }
@@ -161,7 +179,9 @@ export class DeleteSectionContentInputData {
       sectionContentId: string
 }
 
-export class DeleteSectionContentInput implements AuthInput<DeleteSectionContentInputData> {
+export class DeleteSectionContentInput
+implements AuthInput<DeleteSectionContentInputData>
+{
   @IsUUID("4")
       accountId: string
   @ApiProperty()
@@ -175,7 +195,6 @@ export class CreateSectionInputData {
 
   @ApiProperty()
       title: string
-
 }
 
 export class CreateSectionInput implements AuthInput<CreateSectionInputData> {
@@ -185,28 +204,25 @@ export class CreateSectionInput implements AuthInput<CreateSectionInputData> {
 }
 //
 export class ResourceAttachmentInputData {
-    @ApiProperty()
-        fileIndex: number
+  @ApiProperty()
+      fileIndex: number
 }
 
 export class UpdateResourceInputData {
-    @IsUUID("4")
-    @ApiProperty()
-        resourceId: string
-    @ApiProperty({ nullable: true})
-        title?: string
-    @ApiProperty({ nullable: true})
-        description?: string
+  @IsUUID("4")
+  @ApiProperty()
+      resourceId: string
+  @ApiProperty({ nullable: true })
+      title?: string
+  @ApiProperty({ nullable: true })
+      description?: string
 }
 
-export class UpdateResourceInput
-implements AuthInput<UpdateResourceInputData>
-{
-    @IsUUID("4")
-        accountId: string
-    data: UpdateResourceInputData
-    files?: Express.Multer.File[]
-
+export class UpdateResourceInput implements AuthInput<UpdateResourceInputData> {
+  @IsUUID("4")
+      accountId: string
+  data: UpdateResourceInputData
+  files?: Express.Multer.File[]
 }
 //
 export class CreateResourceInputData {
@@ -216,9 +232,7 @@ export class CreateResourceInputData {
   @ApiProperty()
       title: string
 }
-export class CreateResourceInput
-implements AuthInput<CreateResourceInputData>
-{
+export class CreateResourceInput implements AuthInput<CreateResourceInputData> {
   @IsUUID("4")
       accountId: string
   data: CreateResourceInputData
@@ -282,7 +296,9 @@ export class DeleteResourceAttachmentInputData {
       resourceAttachmentId: string
 }
 
-export class DeleteResourceAttachmentInput implements AuthInput<DeleteResourceAttachmentInputData> {
+export class DeleteResourceAttachmentInput
+implements AuthInput<DeleteResourceAttachmentInputData>
+{
   @IsUUID("4")
       accountId: string
   @ApiProperty()
@@ -309,16 +325,16 @@ export class CreateCategoryInput implements AuthInput<CreateCategoryInputData> {
 }
 
 export class UpdateCategoryInputData {
-    @IsUUID("4")
-    @ApiProperty()
-        categoryId: string
-    @ApiProperty()
-        name?: string
-    @ApiProperty({ nullable: true })
-        imageIndex?: number
+  @IsUUID("4")
+  @ApiProperty()
+      categoryId: string
+  @ApiProperty()
+      name?: string
+  @ApiProperty({ nullable: true })
+      imageIndex?: number
 }
 
-export class UpdateCategoryInput implements AuthInput<UpdateCategoryInputData>{
+export class UpdateCategoryInput implements AuthInput<UpdateCategoryInputData> {
     accountId: string
     data: UpdateCategoryInputData
     files?: Express.Multer.File[]
@@ -448,8 +464,6 @@ export class QuizQuestionAnswerInputData {
       isCorrect: boolean
 }
 
-
-
 export class CreateQuizInputData {
   @IsUUID("4")
   @ApiProperty()
@@ -485,7 +499,10 @@ export class UpdateQuizQuestionAnswerInputData {
       isCorrect?: boolean
 
   @ApiProperty()
-      position?: number
+      lastAnswer?: boolean
+
+  @ApiProperty()
+      swapPosition?: number
 }
 
 export class UpdateQuizInputData {
@@ -596,144 +613,160 @@ export class GiftCourseInput implements AuthInput<GiftCourseInputData> {
 }
 
 export class CreateCourseReportInputData {
-    @ApiProperty()
-        courseId: string
-    @ApiProperty()
-    @MinLength(20)
-        title: string
-    @ApiProperty()
-    @MinLength(20)
-        description: string
+  @ApiProperty()
+      courseId: string
+  @ApiProperty()
+  @MinLength(20)
+      title: string
+  @ApiProperty()
+  @MinLength(20)
+      description: string
 }
 
-export class CreateCourseReportInput implements AuthInput<CreateCourseReportInputData>{
+export class CreateCourseReportInput
+implements AuthInput<CreateCourseReportInputData>
+{
     accountId: string
     data: CreateCourseReportInputData
 }
 
 export class UpdateCourseReportInputData {
-    @IsUUID("4")
-    @ApiProperty()
-        reportCourseId : string
-    @ApiProperty()
-    @MinLength(20)
-        title: string
-    @ApiProperty()
-    @MinLength(20)
-        description: string
+  @IsUUID("4")
+  @ApiProperty()
+      reportCourseId: string
+  @ApiProperty()
+  @MinLength(20)
+      title: string
+  @ApiProperty()
+  @MinLength(20)
+      description: string
 }
 
-export class UpdateCourseReportInput implements AuthInput<UpdateCourseReportInputData> {
+export class UpdateCourseReportInput
+implements AuthInput<UpdateCourseReportInputData>
+{
     accountId: string
     data: UpdateCourseReportInputData
 }
 
 export class ResolveCourseReportInputData {
-    @ApiProperty()
-    @IsUUID("4")
-        reportCourseId : string
-    @ApiProperty()
-        processStatus : ReportProcessStatus
-    @ApiProperty()
-    @MinLength(20)
-        processNote : string
+  @ApiProperty()
+  @IsUUID("4")
+      reportCourseId: string
+  @ApiProperty()
+      processStatus: ReportProcessStatus
+  @ApiProperty()
+  @MinLength(20)
+      processNote: string
 }
 
-export class ResolveCourseReportInput implements AuthInput<ResolveCourseReportInputData> {
+export class ResolveCourseReportInput
+implements AuthInput<ResolveCourseReportInputData>
+{
     accountId: string
     data: ResolveCourseReportInputData
 }
 
 export class CreateQuestionInputData {
-    @IsUUID("4")
-    @ApiProperty()
-        quizId: string
+  @IsUUID("4")
+  @ApiProperty()
+      quizId: string
 }
 
-export class CreateQuestionInput
-implements AuthInput<CreateQuestionInputData>
-{
-    @IsUUID("4")
-        accountId: string
-    data: CreateQuestionInputData
+export class CreateQuestionInput implements AuthInput<CreateQuestionInputData> {
+  @IsUUID("4")
+      accountId: string
+  data: CreateQuestionInputData
 }
 
 export class CreateQuizQuestionAnswerInputData {
-    @ApiProperty()
-        quizQuestionId: string
+  @ApiProperty()
+      quizQuestionId: string
 }
 
-export class CreateQuizQuestionAnswerInput implements AuthInput<CreateQuizQuestionAnswerInputData> {
+export class CreateQuizQuestionAnswerInput
+implements AuthInput<CreateQuizQuestionAnswerInputData>
+{
     accountId: string
     data: CreateQuizQuestionAnswerInputData
 }
 
-export class UpdateQuizQuestionAnswerInput implements AuthInput<UpdateQuizQuestionAnswerInputData> {
+export class UpdateQuizQuestionAnswerInput
+implements AuthInput<UpdateQuizQuestionAnswerInputData>
+{
     accountId: string
     data: UpdateQuizQuestionAnswerInputData
 }
 
 export class DeleteQuizQuestionAnswerInputData {
-    @ApiProperty()
-        quizQuestionAnswerId: string
+  @ApiProperty()
+      quizQuestionAnswerId: string
 }
 
-export class DeleteQuizQuestionAnswerInput implements AuthInput<DeleteQuizQuestionAnswerInputData> {
+export class DeleteQuizQuestionAnswerInput
+implements AuthInput<DeleteQuizQuestionAnswerInputData>
+{
     accountId: string
     data: DeleteQuizQuestionAnswerInputData
 }
 
 export class CreateQuizQuestionInputData {
-    @ApiProperty()
-        quizId: string
+  @ApiProperty()
+      quizId: string
 }
 
-export class CreateQuizQuestionInput implements AuthInput<CreateQuizQuestionInputData> {
+export class CreateQuizQuestionInput
+implements AuthInput<CreateQuizQuestionInputData>
+{
     accountId: string
     data: CreateQuizQuestionInputData
 }
 
 export class UpdateQuizQuestionMediaInputData {
-    @ApiProperty()
-        mediaIndex : number
-    @ApiProperty()
-        mediaType: MediaType
+  @ApiProperty()
+      mediaIndex: number
+  @ApiProperty()
+      mediaType: MediaType
 }
 
 export class UpdateQuizQuestionInputData {
-    @ApiProperty()
-        quizQuestionId: string
-    @ApiProperty()
-        question: string
-    @ApiProperty()
-        point: number
-    @ApiProperty()
-        position: number
-    @ApiProperty()
-        questionMedia : UpdateQuizQuestionMediaInputData
-    @ApiProperty()
-        deleteMediaId? : string
+  @ApiProperty()
+      quizQuestionId: string
+  @ApiProperty()
+      question: string
+  @ApiProperty()
+      point: number
+  @ApiProperty()
+      swapPosition: number
+  @ApiProperty()
+      questionMedia: UpdateQuizQuestionMediaInputData
+  @ApiProperty()
+      deleteMediaId?: string
 }
 
-export class UpdateQuizQuestionInput implements AuthInput<UpdateQuizQuestionInputData> {
+export class UpdateQuizQuestionInput
+implements AuthInput<UpdateQuizQuestionInputData>
+{
     accountId: string
     data: UpdateQuizQuestionInputData
     files?: Express.Multer.File[]
 }
 
 export class DeleteQuizQuestionInputData {
-    @ApiProperty()
-        quizQuestionId: string
+  @ApiProperty()
+      quizQuestionId: string
 }
 
-export class DeleteQuizQuestionInput implements AuthInput<DeleteQuizQuestionInputData> {
+export class DeleteQuizQuestionInput
+implements AuthInput<DeleteQuizQuestionInputData>
+{
     accountId: string
     data: DeleteQuizQuestionInputData
 }
 
 export class PublishCourseInputData {
-    @ApiProperty()
-        courseId: string
+  @ApiProperty()
+      courseId: string
 }
 export class PublishCourseInput implements AuthInput<PublishCourseInputData> {
     accountId: string
@@ -741,57 +774,65 @@ export class PublishCourseInput implements AuthInput<PublishCourseInputData> {
 }
 
 export class UpdateQuizAttemptInputData {
-    @ApiProperty()
-        quizAttemptId: string
-    @ApiProperty()
-        currentQuestionPosition?: number
-    @ApiProperty()
-        quizId: string
+  @ApiProperty()
+      quizAttemptId: string
+  @ApiProperty()
+      currentQuestionPosition?: number
+  @ApiProperty()
+      quizId: string
 }
 
-export class UpdateQuizAttemptInput implements AuthInput<UpdateQuizAttemptInputData> {
+export class UpdateQuizAttemptInput
+implements AuthInput<UpdateQuizAttemptInputData>
+{
     accountId: string
     data: UpdateQuizAttemptInputData
 }
 
 export class UpdateQuizAttemptAnswersInputData {
-    @ApiProperty()
-        quizAttemptId: string
-    @ApiProperty()
-        quizQuestionId: string
-    @ApiProperty()
-        quizQuestionAnswerIds: Array<string>
-    @ApiProperty()
-        quizId: string
+  @ApiProperty()
+      quizAttemptId: string
+  @ApiProperty()
+      quizQuestionId: string
+  @ApiProperty()
+      quizQuestionAnswerIds: Array<string>
+  @ApiProperty()
+      quizId: string
 }
 
-export class UpdateQuizAttemptAnswersInput implements AuthInput<UpdateQuizAttemptAnswersInputData> {
+export class UpdateQuizAttemptAnswersInput
+implements AuthInput<UpdateQuizAttemptAnswersInputData>
+{
     accountId: string
     data: UpdateQuizAttemptAnswersInputData
 }
 
 export class MarkAsCompleteResourceInputData {
-    @IsUUID("4")
-    @ApiProperty()
-        resourceId : string
+  @IsUUID("4")
+  @ApiProperty()
+      resourceId: string
 }
 
-export class MarkAsCompletedResourceInput implements AuthInput<MarkAsCompleteResourceInputData> {
+export class MarkAsCompletedResourceInput
+implements AuthInput<MarkAsCompleteResourceInputData>
+{
     accountId: string
     data: MarkAsCompleteResourceInputData
 }
 
 export class UpdateLessonProgressInputData {
-    @IsUUID("4")
-    @ApiProperty()
-        lessonId: string
-    @ApiProperty()
-        completePercent?: number
-    @ApiProperty()
-        completeFirstWatch?: boolean
+  @IsUUID("4")
+  @ApiProperty()
+      lessonId: string
+  @ApiProperty()
+      completePercent?: number
+  @ApiProperty()
+      completeFirstWatch?: boolean
 }
 
-export class UpdateLessonProgressInput implements AuthInput<UpdateLessonProgressInputData> {
+export class UpdateLessonProgressInput
+implements AuthInput<UpdateLessonProgressInputData>
+{
     accountId: string
     data: UpdateLessonProgressInputData
 }
