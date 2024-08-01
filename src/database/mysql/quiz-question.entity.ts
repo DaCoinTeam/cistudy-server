@@ -12,6 +12,7 @@ import {
 import { QuizQuestionAnswerEntity } from "./quiz-question-answer.entity"
 import { QuizEntity } from "./quiz.entity"
 import { MediaType } from "@common"
+import { QuizAttemptQuestionEntity } from "./quiz-attempt-question.entity"
 
 
 
@@ -27,15 +28,16 @@ export class QuizQuestionEntity {
     @Column({ type: "uuid", length: 36 })
         quizId: string
 
-    @Field(() => ID)
-    @Column({ type: "uuid", length: 36 })
+    @Field(() => ID, {nullable: true})
+    @Column({ type: "uuid", length: 36 , nullable: true})
         mediaId: string
 
-    @Field(() => String)
+    @Field(() => String, {nullable: true})
     @Column({
         type: "enum",
         enum: MediaType,
         default: MediaType.Image,
+        nullable: true
     })
         mediaType: MediaType
 
@@ -76,4 +78,8 @@ export class QuizQuestionEntity {
 
     @Field(() => Boolean, { nullable: true })
         corrected?: boolean
+
+    @Field(() => QuizAttemptQuestionEntity)
+    @OneToMany(() => QuizAttemptQuestionEntity, (quizAttemptQuestions) => quizAttemptQuestions.quizQuestion)
+        attemptQuestions : QuizAttemptQuestionEntity
 }

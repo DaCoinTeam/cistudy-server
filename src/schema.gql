@@ -136,11 +136,24 @@ type LessonEntity {
   enableSeek: Boolean
 }
 
+type QuizAttemptQuestionEntity {
+  quizAttemptQuestionId: ID!
+  quizAttemptId: ID!
+  quizQuestionId: ID!
+  maxPoints: Int!
+  actualPoints: Int!
+  createdAt: DateTime!
+  observedAt: DateTime!
+  updatedAt: DateTime!
+  quizAttempt: QuizAttemptEntity!
+  quizQuestion: QuizQuestionEntity!
+}
+
 type QuizQuestionEntity {
   quizQuestionId: ID!
   quizId: ID!
-  mediaId: ID!
-  mediaType: String!
+  mediaId: ID
+  mediaType: String
   point: Float
   question: String!
   answers: [QuizQuestionAnswerEntity!]
@@ -151,6 +164,7 @@ type QuizQuestionEntity {
   answered: Boolean
   numberOfCorrectAnswers: Int
   corrected: Boolean
+  attemptQuestions: QuizAttemptQuestionEntity!
 }
 
 type QuizQuestionAnswerEntity {
@@ -198,6 +212,7 @@ type QuizAttemptEntity {
   quiz: QuizEntity!
   attemptAnswers: [QuizAttemptAnswerEntity!]!
   numberOfQuestionAnswered: Int
+  attemptQuestions: [QuizAttemptQuestionEntity!]!
 }
 
 type QuizEntity {
