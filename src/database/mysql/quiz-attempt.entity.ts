@@ -13,6 +13,7 @@ import {
 import { AccountEntity } from "./account.entity"
 import { QuizAttemptAnswerEntity } from "./quiz-attempt-answer.entity"
 import { QuizEntity } from "./quiz.entity"
+import { QuizAttemptQuestionEntity } from "./quiz-attempt-question.entity"
 
 @ObjectType()
 @Entity("quiz-attempt")
@@ -95,5 +96,9 @@ export class QuizAttemptEntity {
 
     @Field(() => Int, {nullable: true})
         numberOfQuestionAnswered? : number
+
+    @Field(() => [QuizAttemptQuestionEntity])
+    @OneToMany(() => QuizAttemptQuestionEntity, (attemptQuestions) => attemptQuestions.quizQuestion)
+        attemptQuestions : Array<QuizAttemptQuestionEntity>
     
 }

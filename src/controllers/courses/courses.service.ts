@@ -26,6 +26,7 @@ import {
     ProgressMySqlEntity,
     QuizAttemptAnswerMySqlEntity,
     QuizAttemptMySqlEntity,
+    QuizAttemptQuestionMySqlEntity,
     QuizMySqlEntity,
     QuizQuestionAnswerMySqlEntity,
     QuizQuestionMySqlEntity,
@@ -176,6 +177,8 @@ export class CoursesService {
     private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
     @InjectRepository(QuizAttemptAnswerMySqlEntity)
     private readonly quizAttemptAnswerMySqlRepository: Repository<QuizAttemptAnswerMySqlEntity>,
+    @InjectRepository(QuizAttemptQuestionMySqlEntity)
+    private readonly quizAttemptQuestionMySqlRepository: Repository<QuizAttemptQuestionMySqlEntity>,
     @InjectRepository(AccountMySqlEntity)
     private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
     @InjectRepository(AccountGradeMySqlEntity)
