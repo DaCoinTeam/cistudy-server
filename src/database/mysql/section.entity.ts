@@ -48,7 +48,7 @@ export class SectionEntity {
         course: CourseEntity
 
     @Field(() => [SectionContentEntity], {nullable : true})
-    @OneToMany(() => SectionContentEntity, (content) => content.section, { cascade: true })
+    @OneToMany(() => SectionContentEntity, (content) => content.section, { cascade: true, onDelete: "CASCADE" })
         contents: Array<SectionContentEntity>
 
     @Field(() => [AccountGradeEntity], {nullable : true})

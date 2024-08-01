@@ -1396,8 +1396,8 @@ export class CoursesService {
     async updateQuizQuestion(
         input: UpdateQuizQuestionInput,
     ): Promise<UpdateQuizQuestionOutput> {
-        const { data } = input
-        const { quizQuestionId, question, point, position } = data
+        const { data, files } = input
+        const { quizQuestionId, question, point, position, questionMedia } = data
 
         const quizQuestion = await this.quizQuestionMySqlRepository.findOneBy({
             quizQuestionId,
@@ -1405,6 +1405,23 @@ export class CoursesService {
 
         if (!quizQuestion) {
             throw new NotFoundException("Quiz Question Not Found.")
+        }
+
+        if(files){
+            const { mediaIndex, mediaType} = questionMedia
+            const file = files.at(mediaIndex)
+            const { assetId } = await this.storageService.upload({
+                rootFile: file,
+            })
+
+            await this.storageService.delete(quizQuestion.mediaId)
+            await this.storageService.upload({
+                rootFile: file
+            })
+            await this.quizQuestionMySqlRepository.update({quizQuestionId}, {
+                mediaId: assetId,
+                mediaType
+            })
         }
 
         await this.quizQuestionMySqlRepository.update(quizQuestionId, {

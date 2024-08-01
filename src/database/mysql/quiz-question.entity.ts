@@ -11,6 +11,7 @@ import {
 } from "typeorm"
 import { QuizQuestionAnswerEntity } from "./quiz-question-answer.entity"
 import { QuizEntity } from "./quiz.entity"
+import { MediaType } from "@common"
 
 
 
@@ -25,6 +26,18 @@ export class QuizQuestionEntity {
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })
         quizId: string
+
+    @Field(() => ID)
+    @Column({ type: "uuid", length: 36 })
+        mediaId: string
+
+    @Field(() => String)
+    @Column({
+        type: "enum",
+        enum: MediaType,
+        default: MediaType.Image,
+    })
+        mediaType: MediaType
 
     @Field(() => Float, { nullable: true })
     @Column({ type: "float", default: 10, nullable: true })

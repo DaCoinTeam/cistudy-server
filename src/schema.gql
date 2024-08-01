@@ -139,6 +139,8 @@ type LessonEntity {
 type QuizQuestionEntity {
   quizQuestionId: ID!
   quizId: ID!
+  mediaId: ID!
+  mediaType: String!
   point: Float
   question: String!
   answers: [QuizQuestionAnswerEntity!]

@@ -1,4 +1,4 @@
-import { AuthEmptyDataInput, AuthInput, ReportProcessStatus, SectionContentType } from "@common"
+import { AuthEmptyDataInput, AuthInput, MediaType, ReportProcessStatus, SectionContentType } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsNumber, IsOptional, IsUUID, Length, Max, Min, MinLength } from "class-validator"
 
@@ -693,6 +693,13 @@ export class CreateQuizQuestionInput implements AuthInput<CreateQuizQuestionInpu
     data: CreateQuizQuestionInputData
 }
 
+export class UpdateQuizQuestionMediaInputData {
+    @ApiProperty()
+        mediaIndex : number
+    @ApiProperty()
+        mediaType: MediaType
+}
+
 export class UpdateQuizQuestionInputData {
     @ApiProperty()
         quizQuestionId: string
@@ -702,11 +709,14 @@ export class UpdateQuizQuestionInputData {
         point: number
     @ApiProperty()
         position: number
+    @ApiProperty()
+        questionMedia : UpdateQuizQuestionMediaInputData
 }
 
 export class UpdateQuizQuestionInput implements AuthInput<UpdateQuizQuestionInputData> {
     accountId: string
     data: UpdateQuizQuestionInputData
+    files?: Express.Multer.File[]
 }
 
 export class DeleteQuizQuestionInputData {

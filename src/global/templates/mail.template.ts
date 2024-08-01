@@ -107,7 +107,7 @@ export const rejectCourseMail = (username: string, email: string, title: string,
             <h1>COURSE VERIFICATION RESULT</h1>
         </div>
         <div class="content">
-            <h3>Dear ${username ? username : email},</h3>
+            <h3>Dear ${username ?? email},</h3>
             <p>Thank you for your recent course submission on <span style="color: #14B8A6, font-weight:900">Ci</span><span style="color: #116761, font-weight:900">Study</span>. We appreciate your effort in contributing to our learning community.</p>
             <p>After a thorough review of your course titled <strong>"${title}"</strong>, we regret to inform you that it does not meet the necessary criteria and standards for approval.</p>
             ${note ? `
@@ -183,7 +183,7 @@ export const verifyAccountMail = (username: string, email: string, frontendUrl: 
             <h1>Welcome to <strong style="color: #14B8A6;">Ci</strong><strong style="color: #116761;">Study</strong>!</h1>
         </div>
         <div class="content">
-            <p>Hello <strong>${username ? username : email},</strong></p>
+            <p>Hello <strong>${username ?? email},</strong></p>
             <p>Thank you for registering on the CiStudy online learning platform. You have taken the first step towards expanding your knowledge and skills.</p>
             <p>To complete your registration, please confirm your email by clicking the button below: </p>
             <p style="text-align: center;">
@@ -294,7 +294,7 @@ export const reportAccountMail = (reporterUsername: string, reportedUsername:str
         <div class="footer">
             <p>Best regards,</p>
             <p>CiStudy Support Team</p>
-            <p><a href="mailto:support@cistudy.com">support@cistudy.com</a></p>
+            <p>support@cistudy.com</p>
             <p>&copy; 2024 <span class="highlight">Ci</span><span style="color: #116761;">Study</span>. All rights reserved.</p>
             <p>This email was sent from an automated system, please do not reply to this email.</p>
         </div>
