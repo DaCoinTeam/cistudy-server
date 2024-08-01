@@ -585,7 +585,7 @@ export class CoursesService {
         const created = await this.sectionMySqlRepository.save({
             courseId,
             title,
-            position: maxSectionPosition.length ? maxSectionPosition[0].position + 1 : 0,
+            position: maxSectionPosition.length ? maxSectionPosition[0].position + 1 : 1,
         })
 
         return {
@@ -851,16 +851,16 @@ export class CoursesService {
     ): Promise<CreateCourseTargetOuput> {
         const { data } = input
         const { content, courseId } = data
-        const maxResult = await this.courseTargetMySqlRepository
-            .createQueryBuilder()
-            .select("MAX(position)", "count")
-            .getRawOne()
-        const max = maxResult.count as number
+        const maxResult = await this.courseTargetMySqlRepository.count({
+            where:{
+                courseId,
+            }
+        })
 
         const created = await this.courseTargetMySqlRepository.save({
             courseId,
             content,
-            position: max + 1,
+            position: maxResult + 1,
         })
         if (created)
             return {
