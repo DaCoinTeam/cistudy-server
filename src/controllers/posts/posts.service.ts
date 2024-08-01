@@ -509,7 +509,7 @@ export class PostsService {
             const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
 
             await this.notificationMySqlRepository.save({
-                senderId: isEnrolled.account.username,
+                senderId: isEnrolled.account.accountId,
                 receiverId: post.creatorId,
                 title: `You have new comment on your post: ${post.title}`,
                 description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`,
