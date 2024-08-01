@@ -1605,6 +1605,52 @@ export class CoursesService {
             throw new NotFoundException("Quiz Question Not Found.")
         }
 
+        let tempPosition: number
+
+        if (swapPosition !== undefined) {
+            const targetAnswer = await this.quizQuestionAnswerMySqlRepository.findOne(
+                {
+                    where: {
+                        quizQuestionId: answer.quizQuestionId,
+                        position: swapPosition,
+                    },
+                },
+            )
+
+            tempPosition = swapPosition
+
+            await this.quizQuestionAnswerMySqlRepository.update(
+                targetAnswer.quizQuestionAnswerId,
+                {
+                    position: answer.position,
+                },
+            )
+        }
+
+        if (lastAnswer !== undefined) {
+            const previousLastAnswer = await this.quizQuestionAnswerMySqlRepository.findOne(
+                {
+                    where: {
+                        lastAnswer,
+                    },
+                },
+            )
+            if (previousLastAnswer) {
+                await this.quizQuestionAnswerMySqlRepository.update(previousLastAnswer.quizQuestionAnswerId, {
+                    lastAnswer: false
+                })
+            }
+        }
+
+        const activeAttempts = await this.quizAttemptMySqlRepository.findOneBy({
+            quizId: answer.quizQuestion.quizId,
+            attemptStatus: QuizAttemptStatus.Started
+        })
+
+        if (activeAttempts) {
+            throw new ConflictException("You cannot apply changes to the quiz content while learners are currently taking it.")
+        }
+
         await this.quizQuestionAnswerMySqlRepository.update(quizQuestionAnswerId, {
             content,
             isCorrect,
@@ -1760,19 +1806,6 @@ export class CoursesService {
                     },
                 },
             })
-            const questions: Array<DeepPartial<QuizQuestionMySqlEntity>> =
-        shuffleArray(
-            quiz.questions.map(({ answers, quizQuestionId }) => ({
-                quizQuestionId,
-                answers: shuffleArray(
-                    answers.map(({ quizQuestionAnswerId }) => ({
-                        quizQuestionAnswerId,
-                    })),
-                ),
-            })),
-        )
-
-            await this.cacheManager.set(attempt.quizAttemptId, questions, 0)
 
             const { timeLimit } = await this.quizMySqlRepository.findOne({
                 where: {
