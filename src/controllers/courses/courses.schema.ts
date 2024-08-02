@@ -112,7 +112,72 @@ export const createCategorySchema: SchemaObject = {
         },
     }
 }
+/*
+export class UpdateQuizQuestionMediaInputData {
+    @ApiProperty()
+        mediaIndex : number
+    @ApiProperty()
+        mediaType: MediaType
+}
 
+export class UpdateQuizQuestionInputData {
+    @ApiProperty()
+        quizQuestionId: string
+    @ApiProperty()
+        question: string
+    @ApiProperty()
+        point: number
+    @ApiProperty()
+        position: number
+    @ApiProperty()
+        questionMedia : UpdateQuizQuestionMediaInputData
+    @ApiProperty()
+        deleteMediaId? : string
+}
+*/
+export const updateQuizQuestionSchema : SchemaObject ={
+    type: "object",
+    properties: {
+        data: {
+            type: "object",
+            properties: {
+                quizQuestionId: {
+                    type: "string",
+                },
+                question: {
+                    type: "string",
+                },
+                point: {
+                    type: "number",
+                },
+                position: {
+                    type: "number",
+                },
+                deleteMediaId: {
+                    type: "string",
+                },
+                questionMedia: {
+                    type: "object",
+                    properties: {
+                        mediaIndex: {
+                            type: "number",
+                        },
+                        mediaType: {
+                            type: "string",
+                        },
+                    }
+                },
+            },
+        },
+        files: {
+            type: "array",
+            items: {
+                type: "string",
+                format: "binary"
+            },
+        },
+    } 
+}
 export const updateCategorySchema: SchemaObject = {
     type: "object",
     properties: {

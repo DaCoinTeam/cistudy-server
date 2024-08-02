@@ -11,7 +11,6 @@ import {
 } from "./profile.input"
 import { FindManyEnrolledCoursesOutputData, FindManyReceivedNotificationsOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData } from "./profile.output"
 
-
 @Injectable()
 export class ProfileService {
     constructor(
@@ -175,8 +174,9 @@ export class ProfileService {
             relations: {
                 sender: true,
                 receiver: true,
+                course: true
             },
-            order: {
+            order:{
                 createdAt: "DESC"
             }
         })

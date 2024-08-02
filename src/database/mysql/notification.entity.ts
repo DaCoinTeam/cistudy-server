@@ -9,6 +9,8 @@ import {
     UpdateDateColumn
 } from "typeorm"
 import { AccountEntity } from "./account.entity"
+import { NotificationType } from "@common"
+import { CourseEntity } from "./course.entity"
 
 @ObjectType()
 @Entity("notification")
@@ -25,9 +27,13 @@ export class NotificationEntity {
     @Column({ type: "uuid", length: 36 })
         receiverId: string
 
-    // @Field(() => String, { nullable: true })
-    // @Column({ type: "enum", enum: QuizAttemptStatus, default: QuizAttemptStatus.Started })
-    //     type: QuizAttemptStatus
+    @Field(() => ID, { nullable: true})
+    @Column({ type: "uuid", length: 36 , nullable: true })
+        courseId: string
+
+    @Field(() => String, { nullable: true })
+    @Column({ type: "enum", enum: NotificationType, nullable: true })
+        type: NotificationType
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 100, nullable: true })
@@ -66,4 +72,9 @@ export class NotificationEntity {
     @ManyToOne(() => AccountEntity, (account) => account.receiveNotifications, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "receiverId" })
         receiver: AccountEntity
+
+    @Field(() => CourseEntity, { nullable: true })
+    @ManyToOne(() => CourseEntity, (course) => course.courseNotifications, { nullable: true, onDelete: "CASCADE" })
+    @JoinColumn({ name: "courseId" })
+        course: CourseEntity
 }

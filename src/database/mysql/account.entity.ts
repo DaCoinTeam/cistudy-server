@@ -224,4 +224,6 @@ export class AccountEntity {
         numberOfFollowers?: number
     @Field(() => AccountRating, {nullable : true})
         accountRatings : AccountRating
+    @Field(() => Boolean, {nullable : true})
+        isReported? : boolean
 }
