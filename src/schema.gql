@@ -398,7 +398,6 @@ type PostCommentEntity {
   liked: Boolean
   isCommentOwner: Boolean
   isRewardable: Boolean
-  isReported: Boolean
 }
 
 type PostLikeEntity {
@@ -456,7 +455,6 @@ type PostEntity {
   numberOfComments: Int
   numberOfRewardableLikesLeft: Int
   numberOfRewardableCommentsLeft: Int
-  isReported: Boolean
 }
 
 type ReportCourseEntity {
@@ -471,24 +469,6 @@ type ReportCourseEntity {
   updatedAt: DateTime!
   reporterAccount: AccountEntity!
   reportedCourse: CourseEntity!
-}
-
-type NotificationEntity {
-  notificationId: ID!
-  senderId: ID
-  receiverId: ID
-  courseId: ID
-  type: String
-  title: String
-  description: String
-  referenceLink: String
-  viewed: Boolean!
-  isPublished: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  sender: AccountEntity
-  receiver: AccountEntity
-  course: CourseEntity
 }
 
 type CourseEntity {
@@ -518,7 +498,6 @@ type CourseEntity {
   orderCourses: [OrderCourseEntity!]!
   courseReview: [CourseReviewEntity!]
   courseReports: [ReportCourseEntity!]
-  courseNotifications: [NotificationEntity!]
   numberOfEnrollments: Int
   enrolled: Boolean
   isReviewed: Boolean
@@ -532,7 +511,6 @@ type CourseEntity {
   numberOfResources: Int
   certificateStatus: String
   certificate: CertificateEntity
-  isReported: Boolean
 }
 
 type CartCourseEntity {
@@ -598,6 +576,21 @@ type RoleEntity {
   accountRoles: AccountEntity!
 }
 
+type NotificationEntity {
+  notificationId: ID!
+  senderId: ID
+  receiverId: ID
+  title: String
+  description: String
+  referenceLink: String
+  viewed: Boolean!
+  isPublished: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  sender: AccountEntity
+  receiver: AccountEntity
+}
+
 type AccountEntity {
   accountId: ID!
   email: String!
@@ -641,7 +634,6 @@ type AccountEntity {
   followed: Boolean!
   numberOfFollowers: Int!
   accountRatings: AccountRating
-  isReported: Boolean
 }
 
 type TransactionEntity {
