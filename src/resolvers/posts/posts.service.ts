@@ -451,6 +451,7 @@ export class PostsService {
                 reportedPost: {
                     postMedias: true,
                     creator: true,
+                    course: true,
                 }
             },
             skip,
