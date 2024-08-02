@@ -365,6 +365,8 @@ export class PostsService {
                 description: `User ${isEnrolled.account.username} has reaccted to your post ${title}`,
                 referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
             })
+            
+            await queryRunner.commitTransaction()
 
             return {
                 message: "Post liked successfully.",
