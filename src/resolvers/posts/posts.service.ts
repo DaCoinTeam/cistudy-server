@@ -449,7 +449,8 @@ export class PostsService {
             relations: {
                 reporterAccount: true,
                 reportedPost: {
-                    postMedias: true
+                    postMedias: true,
+                    creator: true,
                 }
             },
             skip,
