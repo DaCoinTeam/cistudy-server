@@ -1,5 +1,5 @@
 
-import { AccountMySqlEntity, CertificateMySqlEntity, CourseMySqlEntity, CourseRating, CourseReviewMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, NotificationMySqlEntity, PostMySqlEntity, TransactionMySqlEntity } from "@database"
+import { CertificateMySqlEntity, CourseMySqlEntity, CourseRating, CourseReviewMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, NotificationMySqlEntity, PostMySqlEntity, TransactionMySqlEntity } from "@database"
 import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository } from "typeorm"
@@ -66,7 +66,7 @@ export class ProfileService {
         const { data, accountId } = input
         const { options } = data
         const { take, skip } = { ...options }
-
+    
         const courses = await this.courseMySqlRepository.find({
             relations: {
                 creator: true,
@@ -86,17 +86,21 @@ export class ProfileService {
                 }
             }
         })
-
-        const numberOfFollowersResults = 
-                await this.courseMySqlRepository.createQueryBuilder()
-                    .select("COUNT(follow.followerId)", "count")
-                    .addSelect("course.courseId", "courseId")
-                    .innerJoin(CourseMySqlEntity, "course")
-                    .innerJoin(AccountMySqlEntity, "account", "course.creatorId = account.accountId")
-                    .innerJoin(FollowMySqlEnitity, "follow", "account.accountId = follow.followerId")
-                    .where("followed = :followed", { followed: true })
-                    .groupBy("course.courseId")
-                    .getRawMany()
+    
+        const creatorIds = courses.map(course => course.creator.accountId)
+    
+        const numberOfFollowersResults = await this.followMySqlRepository
+            .createQueryBuilder("follow")
+            .select("follow.followedAccountId, COUNT(follow.followedAccountId) as count")
+            .where("follow.followedAccountId IN (:...creatorIds)", { creatorIds })
+            .groupBy("follow.followedAccountId")
+            .getRawMany()
+    
+        const followerCountMap = numberOfFollowersResults.reduce((map, item) => {
+            map[item.followedAccountId] = parseInt(item.count, 10)
+            return map
+        }, {})
+    
 
         const numberOfEnrolledCoursesResult = await this.courseMySqlRepository.createQueryBuilder()
             .select("COUNT(*)", "count")
@@ -105,6 +109,7 @@ export class ProfileService {
             .where("enrolledInfo.accountId = :accountId", { accountId })
             .andWhere("enrolledInfo.enrolled = :enrolled", { enrolled: true })
             .getRawOne()
+    
 
         const numberOfRewardedPosts = await this.postMySqlRepository.find({
             where: {
@@ -114,25 +119,22 @@ export class ProfileService {
                 createdAt: "ASC"
             }
         })
-
+    
         const numberOfRewardedPostsLeft = 3 - Math.min(numberOfRewardedPosts.length, 3)
-
+    
         return {
             results: courses.map(course => {
-                const numberOfFollowers = numberOfFollowersResults.find(
-                    result => result.courseId === course.courseId,
-                )?.count ?? 0
-                course.creator.numberOfFollowers = numberOfFollowers
+                course.creator.numberOfFollowers = followerCountMap[course.creator.accountId] || 0
                 course.numberOfRewardedPostsLeft = numberOfRewardedPostsLeft
-
+    
                 return course
             }),
             metadata: {
                 count: numberOfEnrolledCoursesResult.count
             }
         }
-       
     }
+    
 
     // async findManySubmittedReports(input: FindManySubmittedReportsInput): Promise<FindManySubmittedReportsOutputData> {
     //     const { accountId, data } = input

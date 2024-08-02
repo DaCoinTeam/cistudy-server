@@ -162,6 +162,7 @@ export class AuthService {
                 }
 
                 course.courseRatings = courseRatings
+                course.numberOfEnrollments = course.enrolledInfos.length
             }
 
             const highRatedCourses = totalNumberOfAvailableCourses
