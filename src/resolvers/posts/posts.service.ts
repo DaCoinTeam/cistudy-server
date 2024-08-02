@@ -39,6 +39,8 @@ export class PostsService {
         private readonly reportPostMySqlRepository: Repository<ReportPostMySqlEntity>,
         @InjectRepository(ReportPostCommentMySqlEntity)
         private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
+        @InjectRepository(PostCommentLikeMySqlEntity)
+        private readonly postCommentLikeMySqlRepository: Repository<PostCommentLikeMySqlEntity>,
         private readonly dataSource: DataSource,
     ) { }
 
@@ -501,36 +503,78 @@ export class PostsService {
         const { options } = data
         const { skip, take } = options
 
-        const results = await this.reportPostCommentMySqlRepository.find({
-            relations: {
-                reporterAccount: true,
-                reportedPostComment: true,
-            },
-            skip,
-            take
-        })
+        const queryRunner = this.dataSource.createQueryRunner()
+        await queryRunner.connect()
+        await queryRunner.startTransaction()
 
-        const numberOfPostCommentReports = await this.reportPostCommentMySqlRepository.count()
+        try {
+            const results = await this.reportPostCommentMySqlRepository.find({
+                relations: {
+                    reporterAccount: true,
+                    reportedPostComment: {
+                        postCommentMedias: true,
+                        post: true,
+                        creator: true
+                    },
+                
+                },
+                skip,
+                take
+            })
 
-        const promises: Array<Promise<void>> = []
-        for(const {reportedPostComment} of results) {
-            const promise = async () => {
-                reportedPostComment.numberOfReports = await this.reportPostCommentMySqlRepository.count({
-                    where:{
-                        postCommentId: reportedPostComment.postCommentId
+            const numberOfPostCommentReports = await this.reportPostCommentMySqlRepository.count()
+            
+            const promises: Array<Promise<void>> = []
+            for(const { reportedPostComment } of results) {
+                const promise = async () => {
+                    reportedPostComment.numberOfReports = await this.reportPostCommentMySqlRepository.count({
+                        where:{
+                            postCommentId: reportedPostComment.postCommentId
+                        }
+                    })
+                    reportedPostComment.numberOfLikes = await this.postCommentLikeMySqlRepository.count({
+                        where:{
+                            postCommentId: reportedPostComment.postCommentId
+                        }
+                    })
+                    
+                    const rewardedComments = await queryRunner.manager
+                        .createQueryBuilder(PostCommentMySqlEntity, "post_comment")
+                        .where("post_comment.postId = :postId", { postId: reportedPostComment.postId })
+                        .andWhere("post_comment.creatorId != :creatorId", { creatorId: reportedPostComment.post.creatorId })
+                        .orderBy("post_comment.createdAt", "ASC")
+                        .getMany()
+
+                    const uniqueRewardedComments = []
+                    const seenCreators = new Set()
+
+                    for (const comment of rewardedComments) {
+                        if (!seenCreators.has(comment.creatorId)) {
+                            uniqueRewardedComments.push(comment)
+                            seenCreators.add(comment.creatorId)
+                            if (uniqueRewardedComments.length === 20) {
+                                break
+                            }
+                        }
                     }
-                })
+                    reportedPostComment.isRewardable = uniqueRewardedComments.some(
+                        comment => comment.postCommentId === reportedPostComment.postCommentId
+                    )
+                }
+                promises.push(promise())   
             }
-            promises.push(promise())   
-        }
-        await Promise.all(promises)
+            await Promise.all(promises)
 
-        return {
-            results,
-            metadata: {
-                count: numberOfPostCommentReports
+            return {
+                results,
+                metadata: {
+                    count: numberOfPostCommentReports
+                }
             }
+        } catch (ex) {
+            await queryRunner.rollbackTransaction()
+        } finally {
+            await queryRunner.release()
         }
-
     }
 }
