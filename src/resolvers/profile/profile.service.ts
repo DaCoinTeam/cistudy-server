@@ -152,7 +152,6 @@ export class ProfileService {
                 }
             }
         } catch (ex) {
-            console.log(ex)
             await queryRunner.rollbackTransaction()
             throw ex
         } finally {
@@ -218,10 +217,6 @@ export class ProfileService {
         const { data, accountId } = input
         const { options } = data
         const { take, skip } = { ...options }
-
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
 
         const transactions = await this.transactionMySqlRepository.find({
             relations: {

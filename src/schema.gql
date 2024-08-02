@@ -399,6 +399,7 @@ type PostCommentEntity {
   isCommentOwner: Boolean
   isRewardable: Boolean
   isReported: Boolean
+  numberOfReports: Int
 }
 
 type PostLikeEntity {
@@ -457,6 +458,7 @@ type PostEntity {
   numberOfRewardableLikesLeft: Int
   numberOfRewardableCommentsLeft: Int
   isReported: Boolean
+  numberOfReports: Int
 }
 
 type ReportCourseEntity {
@@ -533,6 +535,7 @@ type CourseEntity {
   certificateStatus: String
   certificate: CertificateEntity
   isReported: Boolean
+  numberOfReports: Int
 }
 
 type CartCourseEntity {
@@ -642,6 +645,7 @@ type AccountEntity {
   numberOfFollowers: Int!
   accountRatings: AccountRating
   isReported: Boolean
+  numberOfReports: Int
 }
 
 type TransactionEntity {

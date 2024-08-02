@@ -226,4 +226,6 @@ export class AccountEntity {
         accountRatings : AccountRating
     @Field(() => Boolean, {nullable : true})
         isReported? : boolean
+    @Field(() => Int, { nullable: true })
+        numberOfReports?: number
 }

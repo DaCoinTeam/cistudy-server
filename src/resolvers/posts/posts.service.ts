@@ -393,7 +393,7 @@ export class PostsService {
                 }
             })
             )
-
+            await queryRunner.commitTransaction()
             return {
                 results,
                 metadata: {
@@ -463,38 +463,38 @@ export class PostsService {
         const { options } = data
         const { skip, take } = options
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const results = await this.reportPostMySqlRepository.find({
+            relations: {
+                reporterAccount: true,
+                reportedPost: true,
+            },
+            skip,
+            take
+        })
 
-        try {
-            const results = await this.reportPostMySqlRepository.find({
-                relations: {
-                    reporterAccount: true,
-                    reportedPost: true,
-                },
-                skip,
-                take
-            })
+        const numberOfPostReports = await this.reportPostMySqlRepository.count()
 
-            const numberOfPostReports = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(ReportPostMySqlEntity, "report-post")
-                .getRawOne()
+        const promises: Array<Promise<void>> = []
 
-            return {
-                results,
-                metadata: {
-                    count: numberOfPostReports.count
-                }
+        for(const {reportedPost} of results) {
+            const promise = async () => {
+                reportedPost.numberOfReports = await this.reportPostMySqlRepository.count({
+                    where:{
+                        postId: reportedPost.postId
+                    }
+                })
             }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+            promises.push(promise())   
         }
+        await Promise.all(promises)
+
+        return {
+            results,
+            metadata: {
+                count: numberOfPostReports
+            }
+        }
+
     }
 
     async findManyPostCommentReports(input: FindManyPostCommentReportsInput): Promise<FindManyPostCommentReportsOutputData> {
@@ -516,16 +516,25 @@ export class PostsService {
                 take
             })
 
-            const numberOfPostCommentReports = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(ReportPostCommentMySqlEntity, "report-post-comment")
-                .getRawOne()
+            const numberOfPostCommentReports = await this.reportPostCommentMySqlRepository.count()
+
+            const promises: Array<Promise<void>> = []
+            for(const {reportedPostComment} of results) {
+                const promise = async () => {
+                    reportedPostComment.numberOfReports = await this.reportPostCommentMySqlRepository.count({
+                        where:{
+                            postCommentId: reportedPostComment.postCommentId
+                        }
+                    })
+                }
+                promises.push(promise())   
+            }
+            await Promise.all(promises)
 
             return {
                 results,
                 metadata: {
-                    count: numberOfPostCommentReports.count
+                    count: numberOfPostCommentReports
                 }
             }
         } catch (ex) {

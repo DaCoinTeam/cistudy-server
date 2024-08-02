@@ -155,38 +155,37 @@ export class AccountsService {
         const { options } = data
         const { skip, take } = options
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const results = await this.reportAccountMySqlRepository.find({
+            relations: {
+                reporterAccount: true,
+                reportedAccount: true,
+            },
+            skip,
+            take
+        })
 
-        try {
-            const results = await this.reportAccountMySqlRepository.find({
-                relations: {
-                    reporterAccount: true,
-                    reportedAccount: true,
-                },
-                skip,
-                take
-            })
+        const numberOfAccountReports = await this.reportAccountMySqlRepository.count()
 
-            const numberOfAccountReports = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(ReportAccountMySqlEntity, "report-account")
-                .getRawOne()
-
-            return {
-                results,
-                metadata: {
-                    count: numberOfAccountReports.count
-                }
+        const promises: Array<Promise<void>> = []
+        for (const {reportedAccount} of results) {
+            const promise = async () => {
+                reportedAccount.numberOfReports = await this.reportAccountMySqlRepository.count({
+                    where:{
+                        reportedId: reportedAccount.accountId
+                    }
+                })
             }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+            promises.push(promise())
         }
+        await Promise.all(promises)
+        
+        return {
+            results,
+            metadata: {
+                count: numberOfAccountReports
+            }
+        }
+        
     }
 
     async findManyPendingCourse(input: FindManyPendingCourseInput): Promise<FindManyPendingCourseOutputData> {
