@@ -310,32 +310,18 @@ export class CoursesService {
                 senderId: accountId,
                 receiverId: creatorId,
                 title: "You have new enrollment to your course",
+                type: NotificationType.Course,
+                courseId,
                 description: `User ${username} has enrolled to your course: ${title}`,
                 referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`,
             },
             {
                 receiverId: creatorId,
                 title: "You have new update on your balance!",
+                type: NotificationType.Transaction,
                 description: `You have received ${courseCreatorShares} STARCI(s)`,
             },
         ]
-            const notifications = [
-                {
-                    senderId: accountId,
-                    receiverId: creatorId,
-                    title: "You have new enrollment to your course",
-                    type: NotificationType.Course,
-                    courseId,
-                    description: `User ${username} has enrolled to your course: ${title}`,
-                    referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`,
-                },
-                {
-                    receiverId: creatorId,
-                    title: "You have new update on your balance!",
-                    type: NotificationType.Transaction,
-                    description: `You have received ${courseCreatorShares} STARCI(s)`,
-                },
-            ]
 
         await this.notificationMySqlRepository.save(notifications)
 
