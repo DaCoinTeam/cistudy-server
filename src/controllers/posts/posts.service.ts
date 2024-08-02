@@ -1021,8 +1021,11 @@ export class PostsService {
         }
 
         await this.reportPostCommentMySqlRepository.update(reportPostCommentId, { processStatus, processNote })
-        const { reportedPostComment, reporterAccount, createdAt, title, description } = found
+        const { reportedPostComment, reporterAccount, createdAt, title, description, postCommentId } = found
 
+        if (processStatus === ReportProcessStatus.Approved) {
+            await this.postCommentMySqlRepository.update(postCommentId , { isDisabled: true })
+        }
         await this.mailerService.sendReportPostCommentMail(
             reportedPostComment.creator.email,
             reporterAccount.username,

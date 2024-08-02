@@ -47,6 +47,10 @@ export class PostCommentEntity {
     @Column({ type: "boolean", default: false })
         isSolution: boolean
 
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: false })
+        isDisabled: boolean
+
     @Field(() => PostEntity)
     @ManyToOne(() => PostEntity, (post) => post.postComments, { onDelete: "CASCADE" })
     @JoinColumn({ name: "postId" })

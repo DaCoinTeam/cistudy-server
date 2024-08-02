@@ -389,6 +389,7 @@ type PostCommentEntity {
   updatedAt: DateTime!
   html: String!
   isSolution: Boolean!
+  isDisabled: Boolean!
   post: PostEntity!
   creator: AccountEntity!
   postCommentMedias: [PostCommentMediaEntity!]!

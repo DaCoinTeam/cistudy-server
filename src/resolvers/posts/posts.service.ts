@@ -283,7 +283,10 @@ export class PostsService {
 
         try {
             const postComments = await this.postCommentMySqlRepository.find({
-                where: { postId },
+                where: { 
+                    postId, 
+                    isDisabled: false
+                },
                 relations: {
                     creator: true,
                     postCommentMedias: true,
