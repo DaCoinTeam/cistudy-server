@@ -442,6 +442,7 @@ type PostEntity {
   courseId: ID!
   isCompleted: Boolean!
   isRewardable: Boolean!
+  isDisabled: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   html: String!

@@ -162,6 +162,7 @@ export class PostsService {
             const posts = await this.postMySqlRepository.find({
                 where: {
                     courseId,
+                    isDisabled: false
                 },
                 take,
                 skip,

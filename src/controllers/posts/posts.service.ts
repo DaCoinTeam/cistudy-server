@@ -93,7 +93,7 @@ export class PostsService {
         private readonly dataSource: DataSource,
         private readonly mailerService: MailerService
     ) { }
-    
+
     async createPost(input: CreatePostInput): Promise<CreatePostOutput> {
         const { data, files, accountId } = input
         const { postMedias, title, courseId, html } = data
@@ -339,7 +339,7 @@ export class PostsService {
             description: `User ${isEnrolled.account.username} has reaccted to your post ${title}`,
             referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
         })
-            
+
 
 
         return {
@@ -487,7 +487,7 @@ export class PostsService {
                 referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
             })
         }
-            
+
 
         return {
             message: "Comment Posted Successfully",
@@ -560,7 +560,7 @@ export class PostsService {
         }
 
         const deletedPostCommentMedias =
-                await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
+            await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
         await this.postCommentMediaMySqlRepository.delete({ postCommentId })
         await this.postCommentMySqlRepository.save(postComment)
 
@@ -580,7 +580,7 @@ export class PostsService {
         const { postCommentId } = data
 
         const deletedPostCommentMedias =
-                await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
+            await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
         await this.postCommentMySqlRepository.delete({ postCommentId })
 
         const mediaIds = deletedPostCommentMedias.map(
@@ -665,7 +665,7 @@ export class PostsService {
                     course: true
                 },
                 creator: true,
-                    
+
             }
         })
 
@@ -800,7 +800,7 @@ export class PostsService {
                 receiverId: postComment.creatorId,
                 title: "You have new update on your balance!",
                 type: NotificationType.Transaction,
-                description: `You have received ${earnAmount} STARCI(s)`,                   
+                description: `You have received ${earnAmount} STARCI(s)`,
             })
         }
 
@@ -950,12 +950,12 @@ export class PostsService {
         const { data } = input
         const { reportPostId, processNote, processStatus } = data
 
-        const found = await this.reportPostMySqlRepository.findOne({ 
-            where:{
+        const found = await this.reportPostMySqlRepository.findOne({
+            where: {
                 reportPostId
             },
-            relations:{
-                reportedPost:{
+            relations: {
+                reportedPost: {
                     creator: true
                 },
                 reporterAccount: true
@@ -970,8 +970,15 @@ export class PostsService {
             throw new ConflictException("This report has already been resolved")
         }
 
+
+
         await this.reportPostMySqlRepository.update(reportPostId, { processStatus, processNote })
-        const { reportedPost, reporterAccount, createdAt, title, description } = found
+
+        const { reportedPost, reporterAccount, createdAt, title, description, postId } = found
+
+        if (processStatus === ReportProcessStatus.Approved) {
+            await this.postMySqlRepository.update(postId , { isDisabled: true })
+        }
 
         await this.mailerService.sendReportPostMail(
             reportedPost.creator.email,
@@ -993,13 +1000,13 @@ export class PostsService {
         const { data } = input
         const { reportPostCommentId, processNote, processStatus } = data
 
-        const found = await this.reportPostCommentMySqlRepository.findOne({ 
-            where:{
+        const found = await this.reportPostCommentMySqlRepository.findOne({
+            where: {
                 reportPostCommentId
             },
-            relations:{
-                reportedPostComment:{
-                    creator : true
+            relations: {
+                reportedPostComment: {
+                    creator: true
                 },
                 reporterAccount: true
             }
@@ -1026,7 +1033,7 @@ export class PostsService {
             processStatus,
             processNote
         )
-        
+
         return {
             message: "Report successfully resolved and closed."
         }

@@ -43,6 +43,10 @@ export class PostEntity {
     @Column({ type: "boolean", default: false })
         isRewardable: boolean
 
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: false })
+        isDisabled: boolean
+
     @Field(() => Date)
     @CreateDateColumn()
         createdAt: Date
