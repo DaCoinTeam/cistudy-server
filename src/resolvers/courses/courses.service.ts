@@ -101,41 +101,30 @@ export class CoursesService {
         const { courseId } = params
         const { skip, take } = options
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const results = await this.courseReviewMySqlRepository.find({
+            where: { courseId },
+            relations: {
+                course: true,
+                account: true,
+            },
+            skip,
+            take,
+            order: { createdAt: "DESC" },
+        })
 
-        try {
-            const results = await this.courseReviewMySqlRepository.find({
-                where: { courseId },
-                relations: {
-                    course: true,
-                    account: true,
-                },
-                skip,
-                take,
-                order: { createdAt: "DESC" },
-            })
-
-            const numberOfCourseReviewsResult = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(CourseReviewMySqlEntity, "course-review")
-                .where("courseId = :courseId ", { courseId })
-                .getRawOne()
-
-            return {
-                results,
-                metadata: {
-                    count: numberOfCourseReviewsResult.count,
-                },
+        const numberOfCourseReviewsResult = await this.courseReviewMySqlRepository.count({
+            where: {
+                courseId
             }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        })
+
+        return {
+            results,
+            metadata: {
+                count: numberOfCourseReviewsResult,
+            },
         }
+
     }
 
     async findOneCourse(input: FindOneCourseInput): Promise<CourseMySqlEntity> {
@@ -718,24 +707,30 @@ export class CoursesService {
             if (activeQuizAttempt) {
                 sectionContent.quiz.activeQuizAttempt = activeQuizAttempt
 
-                // const randomQuestions = (await this.cacheManager.get(
-                //     activeQuizAttempt.quizAttemptId,
-                // )) as Array<DeepPartial<QuizQuestionMySqlEntity>>
+                const randomQuestions = (await this.cacheManager.get(
+                    activeQuizAttempt.quizAttemptId,
+                )) as Array<DeepPartial<QuizQuestionMySqlEntity>>
 
-                // if (randomQuestions) {
-                //     for (let index = 0; index < sectionContent.quiz.questions.length; index++) {
-                //         sectionContent.quiz.questions[index].position =
-                // randomQuestions[index].position
-                //         for (
-                //             let index2 = 0; 
-                //             index2 < randomQuestions[index].answers.length;
-                //             index2++
-                //         ) {
-                //             sectionContent.quiz.questions[index].answers[index2].position =
-                //   randomQuestions[index].answers[index2].position
-                //         }
-                //     }
-                // }
+                if (randomQuestions) {
+                    for (let index = 0; index < randomQuestions.length; index++) {
+                        sectionContent.quiz.questions[index].position =
+                randomQuestions[index].position
+
+                        const correspondingAnswers = randomQuestions.find(
+                            ({ quizQuestionId }) =>
+                                quizQuestionId ===
+                  sectionContent.quiz.questions[index].quizQuestionId,
+                        ).answers
+                        for (
+                            let index2 = 0;
+                            index2 < correspondingAnswers.length;
+                            index2++
+                        ) {
+                            sectionContent.quiz.questions[index].answers[index2].position =
+                  correspondingAnswers[index2].position
+                        }
+                    }
+                }
 
                 sectionContent.quiz.questions = sectionContent.quiz.questions.map(
                     (question) => {
@@ -758,7 +753,7 @@ export class CoursesService {
                     },
                 )
             }
-            
+
             const quizAttempts = await this.quizAttemptMySqlRepository.find({
                 where: {
                     quizId: quiz.quizId,
