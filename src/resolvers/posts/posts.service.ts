@@ -557,6 +557,7 @@ export class PostsService {
                             }
                         }
                     }
+                    
                     reportedPostComment.isRewardable = uniqueRewardedComments.some(
                         comment => comment.postCommentId === reportedPostComment.postCommentId
                     )

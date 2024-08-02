@@ -226,7 +226,7 @@ export class ProfileService {
         const results = await this.notificationMySqlRepository.find({
             where: {
                 receiverId: accountId,
-                isPublished: true
+                //isPublished: true
             },
             skip,
             take,
