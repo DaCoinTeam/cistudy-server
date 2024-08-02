@@ -96,4 +96,6 @@ export class PostCommentEntity {
         isCommentOwner?: boolean
     @Field(() => Boolean, { nullable: true })
         isRewardable?: boolean
+    @Field(() => Boolean, {nullable : true})
+        isReported? : boolean
 }

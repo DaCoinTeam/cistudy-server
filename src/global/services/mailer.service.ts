@@ -4,7 +4,7 @@ import { CourseMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
 import { createTransport } from "nodemailer"
-import { acceptCourseMail, rejectCourseMail, reportAccountMail, verifyAccountMail } from "../templates/mail.template"
+import { acceptCourseMail, rejectCourseMail, reportAccountMail, reportCourseMail, reportPostCommentMail, reportPostMail, verifyAccountMail } from "../templates/mail.template"
 
 @Injectable()
 export class MailerService {
@@ -38,7 +38,7 @@ export class MailerService {
             { accountId, type: TokenType.Verify },
             { secret: jwtConfig().secret },
         )
-        console.log(frontendUrl)
+
         return {
             from: servicesConfig().mailer.user,
             to: email,
@@ -56,15 +56,156 @@ export class MailerService {
 
         }
     }
-    async sendVerifyRegistrationMail(accountId: string, email: string, username: string) {
-        return await this.transporter.sendMail(this.verifyAccountMailOptions(accountId, email, username))
+
+    private reportCourseMailOptions = (reportedCourseCreatorEmail: string, reporterUsername: string, courseTitle: string, reportedDate: Date, title: string, description: string, processStatus: string ,processNote: string) => {
+        return {
+            from: servicesConfig().mailer.user,
+            to: reportedCourseCreatorEmail,
+            subject: "You have received a report.",
+            html: reportCourseMail(reportedCourseCreatorEmail, reporterUsername, courseTitle, reportedDate, title, description, processStatus, processNote),
+
+        }
     }
 
-    async sendVerifyCourseMail(email: string, username: string, course: CourseMySqlEntity, note: string, verifyStatus: CourseVerifyStatus) {
-        return await this.transporter.sendMail(this.verifyCourseMailOptions(email, username, course, note, verifyStatus))
+    private reportPostMailOptions = (reportedPostCreatorEmail: string, reporterUsername: string, postTitle: string, reportedDate: Date, title: string, description: string, processStatus: string ,processNote: string) => {
+        return {
+            from: servicesConfig().mailer.user,
+            to: reportedPostCreatorEmail,
+            subject: "You have received a report.",
+            html: reportPostMail(reportedPostCreatorEmail, reporterUsername, postTitle, reportedDate, title, description, processStatus, processNote),
+
+        }
     }
 
-    async sendReportAccountMail(reportedUserEmail: string, reporterUsername: string, reportedUsername: string, reportedDate: Date, title: string, description: string, processStatus: string, processNote: string) {
-        return await this.transporter.sendMail(this.reportAccountMailOptions(reportedUserEmail, reporterUsername, reportedUsername, reportedDate, title, description, processStatus, processNote))
+    private reportPostCommentMailOptions = (reportedPostCommentCreatorEmail: string, reporterUsername: string, postCommentContent: string, reportedDate: Date, title: string, description: string, processStatus: string ,processNote: string) => {
+        return {
+            from: servicesConfig().mailer.user,
+            to: reportedPostCommentCreatorEmail,
+            subject: "You have received a report.",
+            html: reportPostCommentMail(reportedPostCommentCreatorEmail, reporterUsername, postCommentContent, reportedDate, title, description, processStatus, processNote),
+
+        }
+    }
+
+    async sendVerifyRegistrationMail(
+        accountId: string, 
+        email: string, 
+        username: string
+    ) {
+        return await this.transporter.sendMail(
+            this.verifyAccountMailOptions(
+                accountId, 
+                email, 
+                username
+            ))
+    }
+
+    async sendVerifyCourseMail(
+        email: string, 
+        username: string, 
+        course: CourseMySqlEntity, 
+        note: string, 
+        verifyStatus: CourseVerifyStatus
+    ) {
+        return await this.transporter.sendMail(
+            this.verifyCourseMailOptions(
+                email, 
+                username, 
+                course, 
+                note, 
+                verifyStatus
+            ))
+    }
+
+    async sendReportAccountMail(
+        reportedUserEmail: string, 
+        reporterUsername: string, 
+        reportedUsername: string, 
+        reportedDate: Date, 
+        title: string, 
+        description: string, 
+        processStatus: string, 
+        processNote: string
+    ) {
+        return await this.transporter.sendMail(
+            this.reportAccountMailOptions(
+                reportedUserEmail, 
+                reporterUsername, 
+                reportedUsername, 
+                reportedDate, 
+                title, 
+                description, 
+                processStatus, 
+                processNote
+            ))
+    }
+
+    async sendReportCourseMail(
+        reportedCourseCreatorEmail: string, 
+        reporterUsername: string, 
+        courseTitle: string, 
+        reportedDate: Date, 
+        title: string, 
+        description: string, 
+        processStatus: string ,
+        processNote: string
+    ) {
+        return await this.transporter.sendMail(
+            this.reportCourseMailOptions(
+                reportedCourseCreatorEmail, 
+                reporterUsername, 
+                courseTitle, 
+                reportedDate, 
+                title, 
+                description, 
+                processStatus, 
+                processNote
+            ))
+    }
+
+    async sendReportPostMail(
+        reportedPostCreatorEmail: string, 
+        reporterUsername: string, 
+        postTitle: string, 
+        reportedDate: Date, 
+        title: string, 
+        description: string, 
+        processStatus: string ,
+        processNote: string
+    ) {
+        return await this.transporter.sendMail(
+            this.reportPostMailOptions(
+                reportedPostCreatorEmail, 
+                reporterUsername, 
+                postTitle, 
+                reportedDate, 
+                title, 
+                description, 
+                processStatus, 
+                processNote
+            ))
+    }
+
+    async sendReportPostCommentMail(
+        reportedPostCommentCreatorEmail: string, 
+        reporterUsername: string, 
+        postCommentContent: string, 
+        reportedDate: Date, 
+        title: string, 
+        description: string, 
+        processStatus: string ,
+        processNote: string
+    ) {
+        return await this.transporter.sendMail(
+            this.reportPostCommentMailOptions(
+                reportedPostCommentCreatorEmail, 
+                reporterUsername, 
+                postCommentContent, 
+                reportedDate, 
+                title, 
+                description, 
+                processStatus, 
+                processNote
+            ))
     }
 }

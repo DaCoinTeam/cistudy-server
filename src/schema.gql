@@ -398,6 +398,7 @@ type PostCommentEntity {
   liked: Boolean
   isCommentOwner: Boolean
   isRewardable: Boolean
+  isReported: Boolean
 }
 
 type PostLikeEntity {
@@ -637,6 +638,7 @@ type AccountEntity {
   followed: Boolean!
   numberOfFollowers: Int!
   accountRatings: AccountRating
+  isReported: Boolean
 }
 
 type TransactionEntity {

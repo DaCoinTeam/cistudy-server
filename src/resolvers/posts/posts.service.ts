@@ -108,7 +108,7 @@ export class PostsService {
             }
 
             const liked = await this.postLikeMySqlRepository.findOne({
-                where:{
+                where: {
                     postId,
                     accountId
                 }
@@ -221,7 +221,7 @@ export class PostsService {
                 const numberOfComments = numberOfCommentsResults.find(result => result.postId === post.postId)?.count ?? 0
                 const liked = likedResults.some(result => result.postId === post.postId)
                 const isPostOwner = (post.creatorId === accountId)
-                post.isReported = (await this.reportPostMySqlRepository.findOneBy({postId: post.postId, accountId, processStatus: ReportProcessStatus.Processing})) ? true : false
+                post.isReported = (await this.reportPostMySqlRepository.findOneBy({ postId: post.postId, accountId, processStatus: ReportProcessStatus.Processing })) ? true : false
                 let numberOfRewardableLikesLeft: number
                 let numberOfRewardableCommentsLeft: number
 
@@ -301,7 +301,7 @@ export class PostsService {
                     }
                 }
             })
-            const { creatorId } = await this.postMySqlRepository.findOneBy({postId})
+            const { creatorId } = await this.postMySqlRepository.findOneBy({ postId })
 
             const numberOfLikesResults = await queryRunner.manager
                 .createQueryBuilder()
@@ -364,7 +364,7 @@ export class PostsService {
                     }
                 }
             }
-            const results = postComments.map((postComment) => {
+            const results = await Promise.all(postComments.map(async (postComment) => {
                 const numberOfLikes = numberOfLikesResults.find(
                     result => result.postCommentId === postComment.postCommentId,
                 )?.count ?? 0
@@ -379,6 +379,8 @@ export class PostsService {
                 const isRewardable = uniqueRewardedComments.some(
                     comment => comment.postCommentId === postComment.postCommentId
                 )
+                const isReported = await this.reportPostCommentMySqlRepository.findOneBy({ accountId, postCommentId: postComment.postCommentId, processStatus: ReportProcessStatus.Processing })
+                postComment.isReported = isReported ? true : false
 
                 return {
                     ...postComment,
@@ -390,6 +392,7 @@ export class PostsService {
                     isRewardable
                 }
             })
+            )
 
             return {
                 results,
@@ -466,7 +469,7 @@ export class PostsService {
 
         try {
             const results = await this.reportPostMySqlRepository.find({
-                relations:{
+                relations: {
                     reporterAccount: true,
                     reportedPost: true,
                 },
@@ -505,7 +508,7 @@ export class PostsService {
 
         try {
             const results = await this.reportPostCommentMySqlRepository.find({
-                relations:{
+                relations: {
                     reporterAccount: true,
                     reportedPostComment: true,
                 },
