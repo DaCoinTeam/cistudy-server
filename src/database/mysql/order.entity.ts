@@ -16,7 +16,7 @@ import { OrderCourseEntity } from "./order-course.entity"
 @ObjectType()
 @Entity("order")
 export class OrderEntity {
-    //Order Details (OrderId and CreateDate)
+    
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
         orderId: string
