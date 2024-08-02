@@ -40,7 +40,7 @@ export class NotificationEntity {
         title: string
 
     @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", length: 200, nullable: true })
+    @Column({ type: "varchar", length: 500, nullable: true })
         description: string
 
     @Field(() => String, { nullable: true })

@@ -334,16 +334,15 @@ export class PostsService {
         }
 
         const { postLikeId } = await this.postLikeMySqlRepository.save({ accountId, postId })
-
-        await this.notificationMySqlRepository.save({
-            senderId: accountId,
-            receiverId: creatorId,
-            title: `You have new react on your post: ${title}`,
-            description: `User ${isEnrolled.account.username} has reaccted to your post ${title}`,
-            referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
-        })
-
-
+        if (creatorId !== accountId) {
+            await this.notificationMySqlRepository.save({
+                senderId: accountId,
+                receiverId: creatorId,
+                title: `You have new react on your post: ${title}`,
+                description: `User ${isEnrolled.account.username} has reaccted to your post ${title}`,
+                referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
+            })
+        }
 
         return {
             message: "Post liked successfully.",
