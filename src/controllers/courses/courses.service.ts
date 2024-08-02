@@ -1438,7 +1438,7 @@ export class CoursesService {
             point,
             swapPosition,
             questionMedia,
-            deleteMediaId,
+            deleteMedia,
         } = data
 
         const quizQuestion = await this.quizQuestionMySqlRepository.findOneBy({
@@ -1463,12 +1463,13 @@ export class CoursesService {
         if (files) {
             const { mediaIndex, mediaType } = questionMedia
             const file = files.at(mediaIndex)
-            const { assetId } = await this.storageService.upload({
-                rootFile: file,
-            })
+           
 
-            await this.storageService.delete(quizQuestion.mediaId)
-            await this.storageService.upload({
+            if (quizQuestion.mediaId) {
+                await this.storageService.delete(quizQuestion.mediaId)
+            }
+            
+            const { assetId } = await this.storageService.upload({
                 rootFile: file,
             })
 
@@ -1481,7 +1482,7 @@ export class CoursesService {
             )
         }
 
-        if (deleteMediaId) {
+        if (deleteMedia) {
             await this.storageService.delete(quizQuestion.mediaId)
             await this.quizQuestionMySqlRepository.update(
                 { quizQuestionId: quizQuestion.quizQuestionId },
@@ -1976,6 +1977,7 @@ export class CoursesService {
 
             await this.quizAttemptMySqlRepository.update(quizAttemptId, {
                 isPassed,
+                timeLeft: 0,
                 receivedPercent,
                 timeTaken,
                 receivedPoints,

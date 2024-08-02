@@ -45,6 +45,10 @@ export class NotificationEntity {
     @Column({ type: "boolean", default: false })
         viewed: boolean
 
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: false })
+        isPublished: boolean
+
     @Field(() => Date)
     @CreateDateColumn()
         createdAt: Date

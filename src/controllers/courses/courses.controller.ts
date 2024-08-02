@@ -23,7 +23,6 @@ import {
     JwtAuthGuard,
     DataFromBody,
     Roles,
-    QuizAttemptTimeGuard,
     RolesGuard
 } from "../shared"
 import {
@@ -517,12 +516,13 @@ export class CoursesController {
             data
         })
     }
-    //
+
     @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
     @Patch("update-quiz-question")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
+<<<<<<< HEAD
     @UseInterceptors(
         AuthInterceptor,
         FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
@@ -530,6 +530,14 @@ export class CoursesController {
     async updateQuizQuestion(
         @AccountId() accountId: string,
         @Body() data: UpdateQuizQuestionInputData,
+=======
+    @UseInterceptors(AuthInterceptor,
+        FileFieldsInterceptor([{ name: "files", maxCount: 10 }]),
+    )
+    async updateQuizQuestion(
+        @AccountId() accountId: string,
+        @DataFromBody() data: UpdateQuizQuestionInputData,
+>>>>>>> c9b50de70fd5a30249d96b38457528530aa180c3
         @UploadedFiles() { files }: Files,
     ) {
         return await this.coursesService.updateQuizQuestion({
@@ -685,7 +693,7 @@ export class CoursesController {
 
     @ApiBearerAuth()
     @Patch("update-quiz-attempt")
-    @UseGuards(JwtAuthGuard, RolesGuard, QuizAttemptTimeGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async updateQuizAttempt(
@@ -700,7 +708,7 @@ export class CoursesController {
 
     @ApiBearerAuth()
     @Patch("update-quiz-attempt-answers")
-    @UseGuards(JwtAuthGuard, RolesGuard, QuizAttemptTimeGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async updateQuizAttemptAnswers(
