@@ -81,31 +81,21 @@ export class AccountsService {
         const { options } = data
         const { skip, take } = { ...options }
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-        try {
-            const results = await this.accountMySqlRepository.find(
-                {
-                    skip,
-                    take,
-                })
+        const results = await this.accountMySqlRepository.find(
+            {
+                skip,
+                take,
+            })
 
-            const count = await this.accountMySqlRepository.count()
+        const count = await this.accountMySqlRepository.count()
 
-            await queryRunner.commitTransaction()
-
-            return {
-                results,
-                metadata: {
-                    count,
-                }
+        return {
+            results,
+            metadata: {
+                count,
             }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
         }
+
     }
 
     async findManyAccountReviews(input: FindManyAccountReviewsInput): Promise<FindManyAccountReviewsOutputData> {
@@ -114,40 +104,26 @@ export class AccountsService {
         const { accountId } = params
         const { skip, take } = options
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const results = await this.accountReviewMySqlRepository.find({
+            where: { accountId },
+            relations: {
+                account: true,
+                reviewedAccount: true
+            },
+            skip,
+            take,
+            order: { createdAt: "DESC" }
+        })
 
-        try {
-            const results = await this.accountReviewMySqlRepository.find({
-                where: { accountId },
-                relations: {
-                    account: true,
-                    reviewedAccount: true
-                },
-                skip,
-                take,
-                order: { createdAt: "DESC" }
-            })
-            const numberOfAccountReviewsResult = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(AccountReviewMySqlEntity, "account-review")
-                .where("accountId = :accountId ", { accountId })
-                .getRawOne()
+        const numberOfAccountReviewsResult = await this.accountReviewMySqlRepository.count()
 
-            return {
-                results,
-                metadata: {
-                    count: numberOfAccountReviewsResult.count,
-                }
+        return {
+            results,
+            metadata: {
+                count: numberOfAccountReviewsResult,
             }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
         }
+
     }
 
     async findManyAccountReports(input: FindManyAccountReportsInput): Promise<FindManyAccountReportsOutputData> {
@@ -193,41 +169,30 @@ export class AccountsService {
         const { options } = data
         const { skip, take } = options
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            const results = await this.courseMySqlRepository.find({
-                where: {
-                    verifyStatus: CourseVerifyStatus.Pending
-                },
-                skip,
-                take,
-                relations:{
-                    creator : true
-                }
-            })
-
-            const numberOfPendingCourse = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(CourseMySqlEntity, "course")
-                .where("course.verifyStatus = :verifyStatus", {verifyStatus : CourseVerifyStatus.Pending})
-                .getRawOne()
-
-            return {
-                results,
-                metadata: {
-                    count: numberOfPendingCourse.count
-                }
+        const results = await this.courseMySqlRepository.find({
+            where: {
+                verifyStatus: CourseVerifyStatus.Pending
+            },
+            skip,
+            take,
+            relations:{
+                creator : true
             }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        })
+
+        const numberOfPendingCourse = await this.courseMySqlRepository.count({
+            where:{
+                verifyStatus : CourseVerifyStatus.Pending
+            }
+        })
+
+        return {
+            results,
+            metadata: {
+                count: numberOfPendingCourse
+            }
         }
+
     }
 
 }

@@ -60,44 +60,32 @@ export class CartService {
         const { options } = data
         const { skip, take, orderStatus } = { ...options }
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            const results = await this.orderMySqlEntity.find(
-                {
-                    where: {
-                        accountId,
-                        orderStatus
-                    },
-                    skip,
-                    take,
-                    relations: {
-                        orderCourses: {
-                            course: true
-                        }
-                    },
-                })
-            const numberOfAccountOrdersResult = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(OrderMySqlEntity, "order")
-                .where("order.orderStatus = :orderStatus", { orderStatus })
-                .getRawOne()
-            return {
-                results,
-                metadata: {
-                    count: numberOfAccountOrdersResult.count,
-                }
+        const results = await this.orderMySqlEntity.find(
+            {
+                where: {
+                    accountId,
+                    orderStatus
+                },
+                skip,
+                take,
+                relations: {
+                    orderCourses: {
+                        course: true
+                    }
+                },
+            })
+        const numberOfAccountOrdersResult = await this.orderMySqlEntity.count({
+            where:{
+                orderStatus,
+                accountId
             }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
+        })
+        return {
+            results,
+            metadata: {
+                count: numberOfAccountOrdersResult,
+            }
         }
-
-        return
 
     }
 }

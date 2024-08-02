@@ -834,6 +834,7 @@ export class CoursesService {
     ): Promise<CreateCourseTargetOuput> {
         const { data } = input
         const { content, courseId } = data
+        
         const maxResult = await this.courseTargetMySqlRepository.count({
             where: {
                 courseId,

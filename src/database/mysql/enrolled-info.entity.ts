@@ -54,7 +54,7 @@ export class EnrolledInfoEntity {
         priceAtEnrolled: number
 
     @Field(() => CourseEntity)
-    @ManyToOne(() => CourseEntity, (course) => course.enrolledInfos)
+    @ManyToOne(() => CourseEntity, (course) => course.enrolledInfos, {onDelete: "CASCADE"})
     @JoinColumn({ name: "courseId" })
         course: CourseEntity
 

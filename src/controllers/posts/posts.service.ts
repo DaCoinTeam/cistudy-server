@@ -229,62 +229,40 @@ export class PostsService {
             await Promise.all(promises)
         }
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const deletedPostMedias = await this.postMediaMySqlRepository.findBy({
+            postId,
+        })
+        await this.postMediaMySqlRepository.delete({ postId })
+        await this.postMySqlRepository.save(post)
 
-        try {
-            const deletedPostMedias = await this.postMediaMySqlRepository.findBy({
-                postId,
-            })
-            await this.postMediaMySqlRepository.delete({ postId })
-            await this.postMySqlRepository.save(post)
 
-            await queryRunner.commitTransaction()
 
-            const mediaIds = deletedPostMedias.map(
-                (deletedPostMedia) => deletedPostMedia.mediaId,
-            )
+        const mediaIds = deletedPostMedias.map(
+            (deletedPostMedia) => deletedPostMedia.mediaId,
+        )
 
-            await this.storageService.delete(...mediaIds)
+        await this.storageService.delete(...mediaIds)
 
-            return { message: "Post Updated Successfully" }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
-        }
+        return { message: "Post Updated Successfully" }
+
     }
 
     async deletePost(input: DeletePostInput): Promise<DeletePostOutput> {
         const { data } = input
         const { postId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-        try {
+        const deletedPostMedias = await this.postMediaMySqlRepository.findBy({
+            postId,
+        })
 
-            const deletedPostMedias = await this.postMediaMySqlRepository.findBy({
-                postId,
-            })
+        await this.postMySqlRepository.delete({ postId })
 
-            await this.postMySqlRepository.delete({ postId })
+        const mediaIds = deletedPostMedias.map(
+            (deletedPostMedia) => deletedPostMedia.mediaId,
+        )
+        await this.storageService.delete(...mediaIds)
 
-            await queryRunner.commitTransaction()
-
-            const mediaIds = deletedPostMedias.map(
-                (deletedPostMedia) => deletedPostMedia.mediaId,
-            )
-            await this.storageService.delete(...mediaIds)
-
-            return { message: "Post Deleted Successfully" }
-
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
-        }
+        return { message: "Post Deleted Successfully" }
     }
 
     //like
@@ -294,93 +272,84 @@ export class PostsService {
         const { accountId, data } = input
         const { postId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-        try {
-            let earnAmount: number
+        let earnAmount: number
 
-            const { courseId, creatorId, isRewardable, course, isCompleted, title } = await this.postMySqlRepository.findOne({
-                where: {
-                    postId
-                },
-                relations: {
-                    course: true
-                }
-            })
-
-            if (isCompleted == true) {
-                throw new ConflictException("This post is closed")
+        const { courseId, creatorId, isRewardable, course, isCompleted, title } = await this.postMySqlRepository.findOne({
+            where: {
+                postId
+            },
+            relations: {
+                course: true
             }
+        })
 
-            const isEnrolled = await this.enrolledInfoMySqlRepository.findOne({
-                where: {
-                    accountId,
-                    courseId
-                }
-            })
-
-            if (!isEnrolled) {
-                throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
-            }
-
-            const isLiked = await this.postLikeMySqlRepository.findOne({
-                where: {
-                    accountId,
-                    postId
-                }
-            })
-
-            if (isLiked) {
-                throw new ConflictException("You have already liked this post.")
-            }
-
-            const numberOfPostLike = await this.postLikeMySqlRepository.findBy({ postId })
-
-            const numberOfRewardedLike = numberOfPostLike.filter(likeCount => likeCount.accountId !== creatorId)
-
-
-            if (isRewardable) {
-                if (creatorId !== accountId) {
-                    const { priceAtEnrolled } = isEnrolled
-                    if (numberOfRewardedLike.length < 20) {
-                        earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient)
-                        await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
-                        await this.notificationMySqlRepository.save({
-                            receiverId: accountId,
-                            title: "You have new update on your balance!",
-                            type: NotificationType.Interact,
-                            description: `You have received ${earnAmount} STARCI(s)`,
-                        })
-                    }
-                }
-            }
-
-            const { postLikeId } = await this.postLikeMySqlRepository.save({ accountId, postId })
-
-            await this.notificationMySqlRepository.save({
-                senderId: accountId,
-                receiverId: creatorId,
-                title: `You have new react on your post: ${title}`,
-                description: `User ${isEnrolled.account.username} has reaccted to your post ${title}`,
-                referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
-            })
-            
-            await queryRunner.commitTransaction()
-
-            return {
-                message: "Post liked successfully.",
-                others: {
-                    postLikeId,
-                    earnAmount,
-                }
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        if (isCompleted == true) {
+            throw new ConflictException("This post is closed")
         }
+
+        const isEnrolled = await this.enrolledInfoMySqlRepository.findOne({
+            where: {
+                accountId,
+                courseId
+            }
+        })
+
+        if (!isEnrolled) {
+            throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
+        }
+
+        const isLiked = await this.postLikeMySqlRepository.findOne({
+            where: {
+                accountId,
+                postId
+            }
+        })
+
+        if (isLiked) {
+            throw new ConflictException("You have already liked this post.")
+        }
+
+        const numberOfPostLike = await this.postLikeMySqlRepository.findBy({ postId })
+
+        const numberOfRewardedLike = numberOfPostLike.filter(likeCount => likeCount.accountId !== creatorId)
+
+
+        if (isRewardable) {
+            if (creatorId !== accountId) {
+                const { priceAtEnrolled } = isEnrolled
+                if (numberOfRewardedLike.length < 20) {
+                    earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient)
+                    await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+                    await this.notificationMySqlRepository.save({
+                        receiverId: accountId,
+                        title: "You have new update on your balance!",
+                        type: NotificationType.Interact,
+                        description: `You have received ${earnAmount} STARCI(s)`,
+                    })
+                }
+            }
+        }
+
+        const { postLikeId } = await this.postLikeMySqlRepository.save({ accountId, postId })
+
+        await this.notificationMySqlRepository.save({
+            senderId: accountId,
+            receiverId: creatorId,
+            title: `You have new react on your post: ${title}`,
+            description: `User ${isEnrolled.account.username} has reaccted to your post ${title}`,
+            referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
+        })
+            
+
+
+        return {
+            message: "Post liked successfully.",
+            others: {
+                postLikeId,
+                earnAmount,
+            }
+        }
+
     }
 
     async createPostComment(
@@ -440,106 +409,96 @@ export class PostsService {
             await Promise.all(promises)
         }
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        let earnAmount: number
+        let isOwner: boolean
+        let alreadyRewarded: boolean
 
-        try {
-            let earnAmount: number
-            let isOwner: boolean
-            let alreadyRewarded: boolean
+        if (creatorId == accountId) {
+            isOwner = true
+        } else {
+            alreadyRewarded = false
+        }
 
-            if (creatorId == accountId) {
-                isOwner = true
-            } else {
-                alreadyRewarded = false
+        const isEnrolled = await this.enrolledInfoMySqlRepository.findOne({
+            where: {
+                accountId,
+                courseId
+            },
+            relations: {
+                account: true
             }
+        })
 
-            const isEnrolled = await this.enrolledInfoMySqlRepository.findOne({
-                where: {
-                    accountId,
-                    courseId
-                },
-                relations: {
-                    account: true
-                }
-            })
+        if (!isEnrolled) {
+            throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
+        }
 
-            if (!isEnrolled) {
-                throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
+        const numberOfPostComments = await this.postCommentMySqlRepository.findBy({ postId })
+        const creatorIdsSeen = new Set()
+
+        const filteredComments = numberOfPostComments.filter(comment => {
+            if (comment.creatorId === creatorId) {
+                return false
             }
-
-            const numberOfPostComments = await this.postCommentMySqlRepository.findBy({ postId })
-            const creatorIdsSeen = new Set()
-
-            const filteredComments = numberOfPostComments.filter(comment => {
-                if (comment.creatorId === creatorId) {
-                    return false
-                }
-                if (creatorIdsSeen.has(comment.creatorId)) {
-                    return false
-                }
-                creatorIdsSeen.add(comment.creatorId)
-                return true
-            })
-
-            const numberOfRewardedComments = filteredComments.length
-
-            if (isRewardable) {
-                if (creatorId !== accountId) {
-                    const isCommented = await this.postCommentMySqlRepository.find({
-                        where: {
-                            creatorId: accountId,
-                            postId
-                        }
-                    })
-                    if (!isCommented || isCommented.length < 1) {
-                        const { priceAtEnrolled } = isEnrolled
-                        if (numberOfRewardedComments < 20) {
-                            earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient)
-                            await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
-                            await this.notificationMySqlRepository.save({
-                                receiverId: accountId,
-                                title: "You have new update on your balance!",
-                                type: NotificationType.Transaction,
-                                description: `You have received ${earnAmount} STARCI(s)`,
-                            })
-                        }
-                    } else {
-                        alreadyRewarded = true
-                    }
-
-                }
+            if (creatorIdsSeen.has(comment.creatorId)) {
+                return false
             }
+            creatorIdsSeen.add(comment.creatorId)
+            return true
+        })
 
-            const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
+        const numberOfRewardedComments = filteredComments.length
 
+        if (isRewardable) {
             if (creatorId !== accountId) {
-                await this.notificationMySqlRepository.save({
-                    senderId: isEnrolled.account.accountId,
-                    receiverId: post.creatorId,
-                    title: `You have new comment on your post: ${post.title}`,
-                    description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`,
-                    referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
+                const isCommented = await this.postCommentMySqlRepository.find({
+                    where: {
+                        creatorId: accountId,
+                        postId
+                    }
                 })
+                if (!isCommented || isCommented.length < 1) {
+                    const { priceAtEnrolled } = isEnrolled
+                    if (numberOfRewardedComments < 20) {
+                        earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient)
+                        await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+                        await this.notificationMySqlRepository.save({
+                            receiverId: accountId,
+                            title: "You have new update on your balance!",
+                            type: NotificationType.Transaction,
+                            description: `You have received ${earnAmount} STARCI(s)`,
+                        })
+                    }
+                } else {
+                    alreadyRewarded = true
+                }
+
             }
+        }
+
+        const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
+
+        if (creatorId !== accountId) {
+            await this.notificationMySqlRepository.save({
+                senderId: isEnrolled.account.accountId,
+                receiverId: post.creatorId,
+                title: `You have new comment on your post: ${post.title}`,
+                description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`,
+                referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
+            })
+        }
             
 
-            return {
-                message: "Comment Posted Successfully",
-                others: {
-                    postCommentId,
-                    alreadyRewarded,
-                    earnAmount,
-                    isOwner,
-                }
+        return {
+            message: "Comment Posted Successfully",
+            others: {
+                postCommentId,
+                alreadyRewarded,
+                earnAmount,
+                isOwner,
             }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
         }
+
     }
 
     async updatePostComment(
@@ -579,50 +538,39 @@ export class PostsService {
             await Promise.all(promises)
         }
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            const accountPostComment = await this.postCommentMySqlRepository.findOne({
-                where: {
-                    postCommentId
-                },
-                relations: {
-                    post: true
-                }
-            })
-
-            if (!accountPostComment) {
-                throw new NotFoundException("Post comment not found or has been deleted.")
+        const accountPostComment = await this.postCommentMySqlRepository.findOne({
+            where: {
+                postCommentId
+            },
+            relations: {
+                post: true
             }
+        })
 
-            if (accountPostComment.creatorId !== accountId) {
-                throw new ConflictException("You are not the owner of this comment.")
-            }
-
-            if (accountPostComment.post.isCompleted) {
-                throw new ConflictException("This post is closed.")
-            }
-
-            const deletedPostCommentMedias =
-                await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
-            await this.postCommentMediaMySqlRepository.delete({ postCommentId })
-            await this.postCommentMySqlRepository.save(postComment)
-
-            await queryRunner.commitTransaction()
-
-            const mediaIds = deletedPostCommentMedias.map(
-                (deletedPostCommentMedia) => deletedPostCommentMedia.mediaId,
-            )
-            await this.storageService.delete(...mediaIds)
-
-            return { message: "Comment updated successfully" }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
+        if (!accountPostComment) {
+            throw new NotFoundException("Post comment not found or has been deleted.")
         }
+
+        if (accountPostComment.creatorId !== accountId) {
+            throw new ConflictException("You are not the owner of this comment.")
+        }
+
+        if (accountPostComment.post.isCompleted) {
+            throw new ConflictException("This post is closed.")
+        }
+
+        const deletedPostCommentMedias =
+                await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
+        await this.postCommentMediaMySqlRepository.delete({ postCommentId })
+        await this.postCommentMySqlRepository.save(postComment)
+
+        const mediaIds = deletedPostCommentMedias.map(
+            (deletedPostCommentMedia) => deletedPostCommentMedia.mediaId,
+        )
+        await this.storageService.delete(...mediaIds)
+
+        return { message: "Comment updated successfully" }
+
     }
 
     async deletePostComment(
@@ -631,94 +579,75 @@ export class PostsService {
         const { data } = input
         const { postCommentId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-        try {
-            const deletedPostCommentMedias =
+        const deletedPostCommentMedias =
                 await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
-            await this.postCommentMySqlRepository.delete({ postCommentId })
+        await this.postCommentMySqlRepository.delete({ postCommentId })
 
-            await queryRunner.commitTransaction()
+        const mediaIds = deletedPostCommentMedias.map(
+            (deletedPostCommentMedia) => deletedPostCommentMedia.mediaId,
+        )
+        await this.storageService.delete(...mediaIds)
 
-            const mediaIds = deletedPostCommentMedias.map(
-                (deletedPostCommentMedia) => deletedPostCommentMedia.mediaId,
-            )
-            await this.storageService.delete(...mediaIds)
+        return { message: "Comment deleted successfully" }
 
-            return { message: "Comment deleted successfully" }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
-        }
     }
 
     async toggleLikePostComment(input: ToggleLikePostCommentInput): Promise<ToggleCommentLikePostOutputData> {
         const { accountId, data } = input
         const { postCommentId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            let earnAmount: number
-            const postComment = await this.postCommentMySqlRepository.findOne({
-                where: {
-                    postCommentId
-                },
-                relations: {
-                    post: true
-                }
-            })
-
-            if (!postComment) {
-                throw new NotFoundException("Comment not found or has been deleted.")
+        let earnAmount: number
+        const postComment = await this.postCommentMySqlRepository.findOne({
+            where: {
+                postCommentId
+            },
+            relations: {
+                post: true
             }
+        })
 
-            let found = await this.postCommentLikeMySqlRepository.findOne({
-                where: {
-                    accountId,
-                    postCommentId,
-                }
-            })
-
-            if (found === null) {
-                found = await this.postCommentLikeMySqlRepository.save({
-                    accountId,
-                    postCommentId,
-                })
-            } else {
-                const { postCommentLikeId, liked } = found
-                await this.postCommentLikeMySqlRepository.update(postCommentLikeId, {
-                    liked: !liked,
-                })
-            }
-            const { postCommentLikeId } = found
-            const { username } = await this.accountMySqlRepository.findOneBy({ accountId })
-
-            await this.notificationMySqlRepository.save({
-                senderId: accountId,
-                receiverId: postComment.creatorId,
-                title: "You have new react on your comment",
-                type: NotificationType.Interact,
-                description: `User ${username} has reacted to your comment at post : ${postComment.post.title}`
-            })
-
-            return {
-                message: "",
-                others: {
-                    postCommentLikeId,
-                    earnAmount
-                }
-
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
+        if (!postComment) {
+            throw new NotFoundException("Comment not found or has been deleted.")
         }
+
+        let found = await this.postCommentLikeMySqlRepository.findOne({
+            where: {
+                accountId,
+                postCommentId,
+            }
+        })
+
+        if (found === null) {
+            found = await this.postCommentLikeMySqlRepository.save({
+                accountId,
+                postCommentId,
+            })
+        } else {
+            const { postCommentLikeId, liked } = found
+            await this.postCommentLikeMySqlRepository.update(postCommentLikeId, {
+                liked: !liked,
+            })
+        }
+        const { postCommentLikeId } = found
+        const { username } = await this.accountMySqlRepository.findOneBy({ accountId })
+
+        await this.notificationMySqlRepository.save({
+            senderId: accountId,
+            receiverId: postComment.creatorId,
+            title: "You have new react on your comment",
+            type: NotificationType.Interact,
+            description: `User ${username} has reacted to your comment at post : ${postComment.post.title}`
+        })
+
+        return {
+            message: "",
+            others: {
+                postCommentLikeId,
+                earnAmount
+            }
+
+        }
+
     }
 
     async createPostCommentReply(
@@ -727,65 +656,54 @@ export class PostsService {
         const { data, accountId } = input
         const { content, postCommentId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            const postComment = await this.postCommentMySqlRepository.findOne({
-                where: {
-                    postCommentId
+        const postComment = await this.postCommentMySqlRepository.findOne({
+            where: {
+                postCommentId
+            },
+            relations: {
+                post: {
+                    course: true
                 },
-                relations: {
-                    post: {
-                        course: true
-                    },
-                    creator: true,
+                creator: true,
                     
-                }
-            })
-
-            if (!postComment) {
-                throw new NotFoundException("Post comment not found or has been deleted.")
             }
+        })
 
-            const { postCommentReplyId } = await this.postCommentReplyMySqlRepository.save({
-                content,
-                creatorId: accountId,
-                postCommentId,
-            })
+        if (!postComment) {
+            throw new NotFoundException("Post comment not found or has been deleted.")
+        }
 
-            const { username } = await this.accountMySqlRepository.findOneBy({ accountId })
+        const { postCommentReplyId } = await this.postCommentReplyMySqlRepository.save({
+            content,
+            creatorId: accountId,
+            postCommentId,
+        })
 
-            const nottifications = [
-                {
-                    senderId: accountId,
-                    receiverId: postComment.creatorId,
-                    title: "You have new reply on your comment",
-                    type: NotificationType.Interact,
-                    description: `User ${username} has replied to your comment at post : ${postComment.post.title}`
-                },
-                {
-                    senderId: accountId,
-                    receiverId: postComment.post.creatorId,
-                    title: "You have new comment on your post",
-                    type: NotificationType.Interact,
-                    description: `User ${username} has replied to ${postComment.creator.username} at post : ${postComment.post.title}`,
-                    referenceLink: `${appConfig().frontendUrl}/courses/${postComment.post.course.courseId}/home`
-                }
-            ]
+        const { username } = await this.accountMySqlRepository.findOneBy({ accountId })
 
-            await this.notificationMySqlRepository.save(nottifications)
-
-            return {
-                message: "Reply created successfully",
-                others: { postCommentReplyId }
+        const nottifications = [
+            {
+                senderId: accountId,
+                receiverId: postComment.creatorId,
+                title: "You have new reply on your comment",
+                type: NotificationType.Interact,
+                description: `User ${username} has replied to your comment at post : ${postComment.post.title}`
+            },
+            {
+                senderId: accountId,
+                receiverId: postComment.post.creatorId,
+                title: "You have new comment on your post",
+                type: NotificationType.Interact,
+                description: `User ${username} has replied to ${postComment.creator.username} at post : ${postComment.post.title}`,
+                referenceLink: `${appConfig().frontendUrl}/courses/${postComment.post.course.courseId}/home`
             }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        ]
+
+        await this.notificationMySqlRepository.save(nottifications)
+
+        return {
+            message: "Reply created successfully",
+            others: { postCommentReplyId }
         }
     }
 
@@ -831,84 +749,74 @@ export class PostsService {
     async markPostCommentAsSolution(input: MarkPostCommentAsSolutionInput): Promise<MarkPostCommentAsSolutionOutput> {
         const { data, accountId } = input
         const { postCommentId } = data
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
 
-        try {
-            const postComment = await this.postCommentMySqlRepository.findOne({
+        const postComment = await this.postCommentMySqlRepository.findOne({
+            where: {
+                postCommentId
+            },
+            relations: {
+                post: true
+            }
+        })
+
+        if (!postComment) {
+            throw new NotFoundException("Post comment not found")
+        }
+
+        const { creatorId, isRewardable, courseId, postId } = await this.postMySqlRepository.findOneBy({ postId: postComment.postId })
+
+        if (creatorId !== accountId) {
+            throw new ConflictException("You aren't the creator of the post.")
+        }
+
+        if (postComment.creatorId == creatorId) {
+            throw new ConflictException("You can't mark your comment as a solution.")
+        }
+
+        const hasRewardedComment = await this.postCommentMySqlRepository.find({
+            where: {
+                postId: postComment.postId
+            }
+        })
+
+        if (hasRewardedComment.some(accountComment => accountComment.isSolution === true)) {
+            throw new ConflictException("There's already exist a solution comment")
+        }
+
+        await this.postCommentMySqlRepository.update(postCommentId, { isSolution: true })
+
+        if (isRewardable) {
+            const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOne({
                 where: {
-                    postCommentId
-                },
-                relations: {
-                    post: true
+                    accountId: postComment.creatorId,
+                    courseId
                 }
             })
 
-            if (!postComment) {
-                throw new NotFoundException("Post comment not found")
-            }
-
-            const { creatorId, isRewardable, courseId, postId } = await this.postMySqlRepository.findOneBy({ postId: postComment.postId })
-
-            if (creatorId !== accountId) {
-                throw new ConflictException("You aren't the creator of the post.")
-            }
-
-            if (postComment.creatorId == creatorId) {
-                throw new ConflictException("You can't mark your comment as a solution.")
-            }
-
-            const hasRewardedComment = await this.postCommentMySqlRepository.find({
-                where: {
-                    postId: postComment.postId
-                }
-            })
-
-            if (hasRewardedComment.some(accountComment => accountComment.isSolution === true)) {
-                throw new ConflictException("There's already exist a solution comment")
-            }
-
-            await this.postCommentMySqlRepository.update(postCommentId, { isSolution: true })
-
-            if (isRewardable) {
-                const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOne({
-                    where: {
-                        accountId: postComment.creatorId,
-                        courseId
-                    }
-                })
-
-                const earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.rewardCommentPostEarnCoefficient)
-                await this.accountMySqlRepository.increment({ accountId: postComment.creatorId }, "balance", earnAmount)
-
-                await this.notificationMySqlRepository.save({
-                    receiverId: postComment.creatorId,
-                    title: "You have new update on your balance!",
-                    type: NotificationType.Transaction,
-                    description: `You have received ${earnAmount} STARCI(s)`,                   
-                })
-            }
-
-            await this.postMySqlRepository.update(postId, { isCompleted: true })
+            const earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.rewardCommentPostEarnCoefficient)
+            await this.accountMySqlRepository.increment({ accountId: postComment.creatorId }, "balance", earnAmount)
 
             await this.notificationMySqlRepository.save({
-                senderId: postComment.post.creatorId,
                 receiverId: postComment.creatorId,
-                title: "Your comment has been marked as post's solution",
-                description: `
+                title: "You have new update on your balance!",
+                type: NotificationType.Transaction,
+                description: `You have received ${earnAmount} STARCI(s)`,                   
+            })
+        }
+
+        await this.postMySqlRepository.update(postId, { isCompleted: true })
+
+        await this.notificationMySqlRepository.save({
+            senderId: postComment.post.creatorId,
+            receiverId: postComment.creatorId,
+            title: "Your comment has been marked as post's solution",
+            description: `
                         Your comment on the post "${postComment.post.title}", with the content "${postComment.html}", has been marked as the solution by the post owner. 
                         ${isRewardable ? "You will receive an amount of STARCI for this." : null} Keep up the great work!`
-            })
+        })
 
-            return {
-                message: "Comment has been marked as a solution and no more comments are allowed to this post"
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        return {
+            message: "Comment has been marked as a solution and no more comments are allowed to this post"
         }
     }
 

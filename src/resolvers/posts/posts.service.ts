@@ -411,46 +411,33 @@ export class PostsService {
         const { postCommentId } = params
         const { take, skip } = { ...options }
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            const postCommentReplies = await this.postCommentReplyMySqlRepository.find({
-                where: { postCommentId },
-                relations: {
-                    creator: true,
-                },
-                take,
-                skip,
-                order: {
-                    createdAt: {
-                        direction: "DESC"
-                    }
-                }
-            })
-
-            const numberOfPostCommentRepliesResult = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(PostCommentReplyMySqlEntity, "post_comment_reply")
-                .where("post_comment_reply.postCommentId = :postCommentId", { postCommentId })
-                .getRawOne()
-
-            await queryRunner.commitTransaction()
-
-            return {
-                results: postCommentReplies,
-                metadata: {
-                    count: numberOfPostCommentRepliesResult.count
+        const postCommentReplies = await this.postCommentReplyMySqlRepository.find({
+            where: { postCommentId },
+            relations: {
+                creator: true,
+            },
+            take,
+            skip,
+            order: {
+                createdAt: {
+                    direction: "DESC"
                 }
             }
-        } catch (ex) {
-            console.log(ex)
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
+        })
+
+        const numberOfPostCommentRepliesResult = await this.postCommentReplyMySqlRepository.count({
+            where:{
+                postCommentId,
+            }
+        })
+
+        return {
+            results: postCommentReplies,
+            metadata: {
+                count: numberOfPostCommentRepliesResult
+            }
         }
+
     }
 
     async findManyPostReports(input: FindManyPostReportsInput): Promise<FindManyPostReportsOutputData> {
@@ -461,7 +448,9 @@ export class PostsService {
         const results = await this.reportPostMySqlRepository.find({
             relations: {
                 reporterAccount: true,
-                reportedPost: true,
+                reportedPost: {
+                    postMedias: true
+                }
             },
             skip,
             take
@@ -471,9 +460,19 @@ export class PostsService {
 
         const promises: Array<Promise<void>> = []
 
-        for(const {reportedPost} of results) {
+        for(const { reportedPost } of results) {
             const promise = async () => {
                 reportedPost.numberOfReports = await this.reportPostMySqlRepository.count({
+                    where:{
+                        postId: reportedPost.postId
+                    }
+                })
+                reportedPost.numberOfComments = await this.postCommentMySqlRepository.count({
+                    where:{
+                        postId: reportedPost.postId
+                    }
+                })
+                reportedPost.numberOfLikes = await this. postLikeMySqlRepository.count({
                     where:{
                         postId: reportedPost.postId
                     }
@@ -497,46 +496,36 @@ export class PostsService {
         const { options } = data
         const { skip, take } = options
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const results = await this.reportPostCommentMySqlRepository.find({
+            relations: {
+                reporterAccount: true,
+                reportedPostComment: true,
+            },
+            skip,
+            take
+        })
 
-        try {
-            const results = await this.reportPostCommentMySqlRepository.find({
-                relations: {
-                    reporterAccount: true,
-                    reportedPostComment: true,
-                },
-                skip,
-                take
-            })
+        const numberOfPostCommentReports = await this.reportPostCommentMySqlRepository.count()
 
-            const numberOfPostCommentReports = await this.reportPostCommentMySqlRepository.count()
-
-            const promises: Array<Promise<void>> = []
-            for(const {reportedPostComment} of results) {
-                const promise = async () => {
-                    reportedPostComment.numberOfReports = await this.reportPostCommentMySqlRepository.count({
-                        where:{
-                            postCommentId: reportedPostComment.postCommentId
-                        }
-                    })
-                }
-                promises.push(promise())   
+        const promises: Array<Promise<void>> = []
+        for(const {reportedPostComment} of results) {
+            const promise = async () => {
+                reportedPostComment.numberOfReports = await this.reportPostCommentMySqlRepository.count({
+                    where:{
+                        postCommentId: reportedPostComment.postCommentId
+                    }
+                })
             }
-            await Promise.all(promises)
-
-            return {
-                results,
-                metadata: {
-                    count: numberOfPostCommentReports
-                }
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+            promises.push(promise())   
         }
+        await Promise.all(promises)
+
+        return {
+            results,
+            metadata: {
+                count: numberOfPostCommentReports
+            }
+        }
+
     }
 }
