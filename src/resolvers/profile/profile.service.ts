@@ -261,6 +261,9 @@ export class ProfileService {
             relations: {
                 sender: true,
                 receiver: true,
+            },
+            order:{
+                createdAt: "DESC"
             }
         })
 
