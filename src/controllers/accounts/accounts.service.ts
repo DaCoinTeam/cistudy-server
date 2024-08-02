@@ -1,4 +1,4 @@
-import { CourseVerifyStatus, ReportProcessStatus, SystemRoles } from "@common"
+import { CourseVerifyStatus, NotificationType, ReportProcessStatus, SystemRoles } from "@common"
 import {
     AccountMySqlEntity,
     AccountReviewMySqlEntity,
@@ -100,6 +100,7 @@ export class AccountsService {
             senderId: accountId,
             receiverId: followedAccountId,
             title: "You have new follower!",
+            type: NotificationType.Interact,
             description: `User ${found.follower.username} has followed you`
         })
 
@@ -142,12 +143,14 @@ export class AccountsService {
             await this.notificationMySqlRepository.save({
                 receiverId: course.creatorId,
                 title: "You have new updates on your created course",
+                type: NotificationType.Course,
                 description: `Your course ${course.title} has been verified and it now available for learner to access. Thanks for choosing CiStudy!`
             })
         }else{
             await this.notificationMySqlRepository.save({
                 receiverId: course.creatorId,
                 title: "You have new updates on your created course",
+                type: NotificationType.Course,
                 description: `Your course, "${course.title}", has been rejected due to issues identified by our moderation team. Please check your email for more details.`
             })
         }
@@ -240,6 +243,7 @@ export class AccountsService {
             await this.notificationMySqlRepository.save({
                 senderId: accountId,
                 receiverId: reviewedAccountId,
+                type: NotificationType.Interact,
                 title: "You have new review by one of your learner",
                 description: `User ${username} has left you a ${rating}-star review. Check it out!`,
             })
@@ -460,16 +464,13 @@ export class AccountsService {
             throw new ConflictException("You have reported this accout before and it is processing. Try update your report instead.")
         }
 
-        const { reportAccountId, createdAt } = await this.reportAccountMySqlRepository.save({
+        const { reportAccountId } = await this.reportAccountMySqlRepository.save({
             reporterId: accountId,
             reportedId,
             title,
             description
         })
-        const {username} = await this.accountMySqlRepository.findOneBy({accountId})
 
-        await this.mailerService.sendReportAccountMail(reportedAccount.email, username, reportedAccount.username, createdAt, title, description)
-        
         return {
             message: `A report to user ${reportedAccount.accountId} has been submitted.`,
             others: {
@@ -493,7 +494,7 @@ export class AccountsService {
         }
 
         if (found.reporterId !== accountId) {
-            throw new ConflictException("You isn't the owner of this report.")
+            throw new ConflictException("You aren't the owner of this report.")
         }
 
         await this.reportAccountMySqlRepository.update(reportAccountId, { title, description })
@@ -510,7 +511,15 @@ export class AccountsService {
         const { data } = input
         const { reportAccountId, processNote, processStatus } = data
 
-        const found = await this.reportAccountMySqlRepository.findOneBy({ reportAccountId })
+        const found = await this.reportAccountMySqlRepository.findOne({ 
+            where:{
+                reportAccountId 
+            },
+            relations:{
+                reporterAccount: true,
+                reportedAccount: true
+            }
+        })
 
         if (!found) {
             throw new NotFoundException("Report not found")
@@ -521,6 +530,10 @@ export class AccountsService {
         }
 
         await this.reportAccountMySqlRepository.update(reportAccountId, { processStatus, processNote })
+
+        const { reportedAccount, reporterAccount, createdAt, title, description } = found
+
+        await this.mailerService.sendReportAccountMail(reportedAccount.email, reporterAccount.username, reportedAccount.username, createdAt, title, description, processStatus, processNote)
 
         return {
             message: "Report successfully resolved and closed."

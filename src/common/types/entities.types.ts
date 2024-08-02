@@ -148,6 +148,10 @@ export enum CertificateStatus {
   Gotten = "gotten"
 }
 
-// export enum NotificationType {
-
-// }
+export enum NotificationType {
+  System = "system",
+  Transaction = "transaction",
+  Interact = "interact",
+  Course = "course",
+  Certificate = "certificate"
+}

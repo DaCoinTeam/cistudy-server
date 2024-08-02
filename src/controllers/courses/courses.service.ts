@@ -3,6 +3,7 @@ import {
     computeRaw,
     CourseVerifyStatus,
     existKeyNotUndefined,
+    NotificationType,
     ProcessStatus,
     QuizAttemptStatus,
     ReportProcessStatus,
@@ -313,12 +314,14 @@ export class CoursesService {
                     senderId: accountId,
                     receiverId: creatorId,
                     title: "You have new enrollment to your course",
+                    type: NotificationType.Course,
                     description: `User ${username} has enrolled to your course: ${title}`,
                     referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`,
                 },
                 {
                     receiverId: creatorId,
                     title: "You have new update on your balance!",
+                    type: NotificationType.Transaction,
                     description: `You have received ${courseCreatorShares} STARCI(s)`,
                 },
             ]
@@ -504,6 +507,7 @@ export class CoursesService {
                     senderId: accountId,
                     receiverId: course.creatorId,
                     title: `Your course : ${course.title} has received a review!`,
+                    type: NotificationType.Course,
                     description: `User ${enrolled.account.username} has wrote a ${rating} star(s) review on your course.`,
                     referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`,
                 })
@@ -1308,6 +1312,7 @@ export class CoursesService {
         await this.notificationMySqlRepository.save({
             receiverId: accountId,
             title: "You have received a certificate!",
+            type: NotificationType.Certificate,
             description: `You have been received a certificate for your completion on the course: ${title} `,
             referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`,
         })
@@ -2127,10 +2132,18 @@ export class CoursesService {
         if (!course) {
             throw new NotFoundException("Course not found or has been deleted")
         }
+
         await this.courseMySqlRepository.update(courseId, {
             verifyStatus: CourseVerifyStatus.Pending,
         })
-
+        await this.notificationMySqlRepository.save({
+            receiverId: course.creatorId,
+            title: "Course Submitted for Verification",
+            type: NotificationType.Course,
+            description: `Your newly created course, "${course.title}", has been submitted to our moderation team for verification. Thank you for choosing CiStudy as the place to realize your teaching dreams.`,
+            referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`, 
+        })
+        
         return {
             message: "Your course has been submitted for review, thank you.",
         }

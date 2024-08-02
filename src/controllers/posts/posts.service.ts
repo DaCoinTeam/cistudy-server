@@ -1,4 +1,4 @@
-import { ReportProcessStatus, computeFixedFloor } from "@common"
+import { NotificationType, ReportProcessStatus, computeFixedFloor } from "@common"
 import { appConfig, blockchainConfig } from "@config"
 import {
     AccountMySqlEntity,
@@ -158,6 +158,7 @@ export class PostsService {
             await this.notificationMySqlRepository.save({
                 receiverId: accountId,
                 title: "You have new update on your balance!",
+                type: NotificationType.Transaction,
                 description: `You have received ${earnAmount} STARCI(s)`,
             })
         }
@@ -347,6 +348,7 @@ export class PostsService {
                         await this.notificationMySqlRepository.save({
                             receiverId: accountId,
                             title: "You have new update on your balance!",
+                            type: NotificationType.Interact,
                             description: `You have received ${earnAmount} STARCI(s)`,
                         })
                     }
@@ -496,6 +498,7 @@ export class PostsService {
                             await this.notificationMySqlRepository.save({
                                 receiverId: accountId,
                                 title: "You have new update on your balance!",
+                                type: NotificationType.Transaction,
                                 description: `You have received ${earnAmount} STARCI(s)`,
                             })
                         }
@@ -508,13 +511,16 @@ export class PostsService {
 
             const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
 
-            await this.notificationMySqlRepository.save({
-                senderId: isEnrolled.account.accountId,
-                receiverId: post.creatorId,
-                title: `You have new comment on your post: ${post.title}`,
-                description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`,
-                referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
-            })
+            if (creatorId !== accountId) {
+                await this.notificationMySqlRepository.save({
+                    senderId: isEnrolled.account.accountId,
+                    receiverId: post.creatorId,
+                    title: `You have new comment on your post: ${post.title}`,
+                    description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`,
+                    referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
+                })
+            }
+            
 
             return {
                 message: "Comment Posted Successfully",
@@ -693,6 +699,7 @@ export class PostsService {
                 senderId: accountId,
                 receiverId: postComment.creatorId,
                 title: "You have new react on your comment",
+                type: NotificationType.Interact,
                 description: `User ${username} has reacted to your comment at post : ${postComment.post.title}`
             })
 
@@ -752,13 +759,15 @@ export class PostsService {
                     senderId: accountId,
                     receiverId: postComment.creatorId,
                     title: "You have new reply on your comment",
+                    type: NotificationType.Interact,
                     description: `User ${username} has replied to your comment at post : ${postComment.post.title}`
                 },
                 {
                     senderId: accountId,
                     receiverId: postComment.post.creatorId,
                     title: "You have new comment on your post",
-                    description: `${username} has replied to ${postComment.creator.username} at post : ${postComment.post.title}`,
+                    type: NotificationType.Interact,
+                    description: `User ${username} has replied to ${postComment.creator.username} at post : ${postComment.post.title}`,
                     referenceLink: `${appConfig().frontendUrl}/courses/${postComment.post.course.courseId}/home`
                 }
             ]
@@ -873,6 +882,7 @@ export class PostsService {
                 await this.notificationMySqlRepository.save({
                     receiverId: postComment.creatorId,
                     title: "You have new update on your balance!",
+                    type: NotificationType.Transaction,
                     description: `You have received ${earnAmount} STARCI(s)`,                   
                 })
             }

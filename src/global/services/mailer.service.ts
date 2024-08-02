@@ -47,12 +47,12 @@ export class MailerService {
         }
     }
 
-    private reportAccountMailOptions = (reportedUserEmail: string, reporterUsername: string, reportedUsername: string, reportedDate: Date, title: string, description: string) => {
+    private reportAccountMailOptions = (reportedUserEmail: string, reporterUsername: string, reportedUsername: string, reportedDate: Date, title: string, description: string, processStatus: string ,processNote: string) => {
         return {
             from: servicesConfig().mailer.user,
             to: reportedUserEmail,
             subject: "You have received a report.",
-            html: reportAccountMail(reporterUsername, reportedUsername, reportedDate, title, description),
+            html: reportAccountMail(reporterUsername, reportedUsername, reportedDate, title, description, processStatus, processNote),
 
         }
     }
@@ -64,7 +64,7 @@ export class MailerService {
         return await this.transporter.sendMail(this.verifyCourseMailOptions(email, username, course, note, verifyStatus))
     }
 
-    async sendReportAccountMail(reportedUserEmail: string, reporterUsername: string, reportedUsername: string, reportedDate: Date, title: string, description: string) {
-        return await this.transporter.sendMail(this.reportAccountMailOptions(reportedUserEmail, reporterUsername, reportedUsername, reportedDate, title, description))
+    async sendReportAccountMail(reportedUserEmail: string, reporterUsername: string, reportedUsername: string, reportedDate: Date, title: string, description: string, processStatus: string, processNote: string) {
+        return await this.transporter.sendMail(this.reportAccountMailOptions(reportedUserEmail, reporterUsername, reportedUsername, reportedDate, title, description, processStatus, processNote))
     }
 }

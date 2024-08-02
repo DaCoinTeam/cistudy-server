@@ -29,7 +29,7 @@ import {
 } from "@database"
 import { Inject, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { DataSource, DeepPartial, Like, Repository } from "typeorm"
+import { DataSource, Like, Repository } from "typeorm"
 import {
     FindManyCourseReportsInput,
     FindManyCourseReviewsInput,

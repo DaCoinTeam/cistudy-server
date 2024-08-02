@@ -582,6 +582,7 @@ type NotificationEntity {
   notificationId: ID!
   senderId: ID
   receiverId: ID
+  type: String
   title: String
   description: String
   referenceLink: String

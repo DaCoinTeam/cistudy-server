@@ -1,4 +1,4 @@
-import { Inject, Logger, } from "@nestjs/common"
+import { Inject, Logger } from "@nestjs/common"
 
 import {
     ConnectedSocket,
@@ -33,10 +33,11 @@ implements OnGatewayConnection, OnGatewayDisconnect
     private readonly logger = new Logger(InitializationGateway.name)
 
     constructor(
-        @InjectRepository(NotificationMySqlEntity) 
-        private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
-        @Inject(CACHE_MANAGER) 
-        private readonly cacheManager: Cache) {}
+    @InjectRepository(NotificationMySqlEntity)
+    private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
+    ) {}
 
   @WebSocketServer()
     private readonly server: Server
@@ -46,10 +47,10 @@ implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   async handleDisconnect(client: Socket) {
-      const accountId = await this.cacheManager.get(client.id) as string
+      const accountId = (await this.cacheManager.get(client.id)) as string
       if (accountId) {
-          let clientIds = await this.cacheManager.get(accountId) as Array<string>
-          clientIds = clientIds.filter(clientId => clientId !== client.id)
+          let clientIds = (await this.cacheManager.get(accountId)) as Array<string>
+          clientIds = clientIds.filter((clientId) => clientId !== client.id)
           await this.cacheManager.set(accountId, clientIds)
       }
       await this.cacheManager.del(client.id)
@@ -61,8 +62,9 @@ implements OnGatewayConnection, OnGatewayDisconnect
     @MessageBody() body: InitializeBody,
   ): Promise<WsResponse<InitializeOutputData>> {
       const { accountId } = body
-      const clientIds = (await this.cacheManager.get(accountId) as Array<string>) ?? []
-      await this.cacheManager.set(accountId, [ ...clientIds, client.id])
+      const clientIds =
+      ((await this.cacheManager.get(accountId)) as Array<string>) ?? []
+      await this.cacheManager.set(accountId, [...clientIds, client.id])
       await this.cacheManager.set(client.id, accountId)
       return { event: INITIALIZED, data: "Connected" }
   }
@@ -71,20 +73,33 @@ implements OnGatewayConnection, OnGatewayDisconnect
   async publish() {
       const notifications = await this.notificationMySqlRepository.find({
           where: {
-              isPublished: false
-          }
+              isPublished: false,
+          },
       })
 
       for (const notification of notifications) {
           const { receiverId } = notification
-          const clientIds = (await this.cacheManager.get(receiverId) as Array<string>)  ?? []
+          const clientIds =
+        ((await this.cacheManager.get(receiverId)) as Array<string>) ?? []
+
+          const promises: Array<Promise<void>> = []
           for (const clientId of clientIds) {
-              this.server.to(clientId).emit("notifications", uuidV4())
+              const promise = async () => {
+                  await this.notificationMySqlRepository.update(
+                      notification.notificationId,
+                      {
+                          isPublished: true,
+                      },
+                  )
+                  this.server.to(clientId).emit("notifications", uuidV4())
+              }
+              promises.push(promise())
           }
+          await Promise.all(promises)
       }
   }
 }
 
 export interface InitializeBody {
-    accountId: string
+  accountId: string
 }

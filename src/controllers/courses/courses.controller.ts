@@ -522,22 +522,12 @@ export class CoursesController {
     @Patch("update-quiz-question")
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(SystemRoles.User)
-<<<<<<< HEAD
-    @UseInterceptors(
-        AuthInterceptor,
-        FileFieldsInterceptor([{ name: "files", maxCount: 2 }]),
-    )
-    async updateQuizQuestion(
-        @AccountId() accountId: string,
-        @Body() data: UpdateQuizQuestionInputData,
-=======
     @UseInterceptors(AuthInterceptor,
         FileFieldsInterceptor([{ name: "files", maxCount: 10 }]),
     )
     async updateQuizQuestion(
         @AccountId() accountId: string,
         @DataFromBody() data: UpdateQuizQuestionInputData,
->>>>>>> c9b50de70fd5a30249d96b38457528530aa180c3
         @UploadedFiles() { files }: Files,
     ) {
         return await this.coursesService.updateQuizQuestion({

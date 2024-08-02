@@ -1,4 +1,5 @@
 import {
+    NotificationType,
     TransactionType,
     computeDenomination,
     computeRaw,
@@ -207,6 +208,7 @@ export class ProfileService {
         await this.notificationMySqlRepository.save({
             receiverId: accountId,
             title: "You have new update on your balance!",
+            type: NotificationType.Transaction,
             description: `You have received ${amount} STARCI(s)`,
         })
 

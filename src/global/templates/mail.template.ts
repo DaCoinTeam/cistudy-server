@@ -204,7 +204,7 @@ export const verifyAccountMail = (username: string, email: string, frontendUrl: 
 </html>
             `
 
-export const reportAccountMail = (reporterUsername: string, reportedUsername:string, reportedDate: Date, title: string, description: string) => `
+export const reportAccountMail = (reporterUsername: string, reportedUsername:string, reportedDate: Date, title: string, description: string, processStatus: string, processNote: string) => `
                 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -274,17 +274,18 @@ export const reportAccountMail = (reporterUsername: string, reportedUsername:str
             <p><strong>Reason for Report:</strong> ${title}</p>
             <p><strong>Description:</strong> ${description}</p>
 
-            <h4>Next Steps:</h4>
-            <ol>
-                <li><strong>Review:</strong> Our moderation team will review the report and investigate the situation.</li>
-                <li><strong>Contact:</strong> If we require any additional information from you, we will reach out to you via email.</li>
-                <li><strong>Outcome:</strong> Once our investigation is complete, we will take appropriate action as necessary. This could range from no action to various levels of account restrictions.</li>
-            </ol>
-
-            <h4>Your Responsibilities:</h4>
+            ${processStatus === "approved" ? `
+            <h4>Our Actions:</h4>
+            <p>${processNote}</p>
+            <h4>Recommendations:</h4>
             <p>- Ensure that your activities comply with our community guidelines and terms of service.</p>
             <p>- Refrain from engaging in any retaliatory behavior against the reporting user.</p>
-
+            ` : `
+            <h4>Recommendations:</h4>
+            <p>- Ensure that your activities comply with our community guidelines and terms of service.</p>
+            <p>- Review our guidelines to avoid future reports.</p>
+            `}
+            
             <p>We take all reports seriously and aim to maintain a safe and respectful environment for all our users. We appreciate your cooperation and understanding during this process.</p>
 
             <p>If you have any questions or need further clarification, please do not hesitate to contact our support team at <a href="mailto:support@cistudy.com">support@cistudy.com</a>.</p>
