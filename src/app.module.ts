@@ -59,7 +59,7 @@ import { WebsocketsModule } from "@websockets"
             password: databaseConfig().mysql.password,
             database: databaseConfig().mysql.schema,
             autoLoadEntities: true,
-            synchronize: true,
+            synchronize: false,
             poolSize: 1000000,    
             timezone: "Z",
             driver: require("mysql2"),

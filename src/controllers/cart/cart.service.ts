@@ -1,7 +1,7 @@
-import { AccountMySqlEntity, CartCourseMySqlEntity, CartMySqlEntity, CourseMySqlEntity, OrderCourseMySqlEntity, OrderMySqlEntity } from "@database"
+import { AccountMySqlEntity, CartCourseMySqlEntity, CartMySqlEntity, OrderCourseMySqlEntity, OrderMySqlEntity } from "@database"
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { DataSource, In, Repository } from "typeorm"
+import { In, Repository } from "typeorm"
 import { AddToCartInput, CheckOutInput, DeleteFromCartInput } from "./cart.input"
 import { AddToCartOutput, CheckOutOutput, DeleteFromCartOutput } from "./cart.output"
 
@@ -12,15 +12,12 @@ export class CartService {
         private readonly cartMySqlRepository: Repository<CartMySqlEntity>,
         @InjectRepository(CartCourseMySqlEntity)
         private readonly cartCourseMySqlRepository: Repository<CartCourseMySqlEntity>,
-        @InjectRepository(CourseMySqlEntity)
-        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
         @InjectRepository(OrderMySqlEntity)
         private readonly orderMySqlRepository: Repository<OrderMySqlEntity>,
         @InjectRepository(AccountMySqlEntity)
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
         @InjectRepository(OrderCourseMySqlEntity)
         private readonly orderCoursesMySqlRepository: Repository<OrderCourseMySqlEntity>,
-        private readonly dataSource: DataSource,
     ) { }
 
 
@@ -77,60 +74,47 @@ export class CartService {
         const { data, accountId } = input
         const { cartCourseIds } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const now = new Date()
+        const paymentDue = new Date(now)
+        paymentDue.setDate(paymentDue.getDate() + 1)
 
-        try {
-            const now = new Date()
-            const paymentDue = new Date(now)
-            paymentDue.setDate(paymentDue.getDate() + 1)
+        const order = await this.orderMySqlRepository.save({
+            accountId,
+            paymentDue
+        })
 
-            const order = await queryRunner.manager.save(OrderMySqlEntity, {
-                accountId,
-                paymentDue
+        const cartCourses = await this.cartCourseMySqlRepository.find({
+            where: {
+                cartCourseId: In(cartCourseIds)
+            },
+            relations: {
+                course: true
+            }
+        })
+
+        const orderCourses = []
+        const deleteCartCourses = []
+
+        for (const course of cartCourses) {
+            orderCourses.push({
+                courseId: course.courseId,
+                orderId: order.orderId,
+                discountedPrice: course.course.discountPrice,
+                price: course.course.price,
             })
 
-            const cartCourses = await this.cartCourseMySqlRepository.find({
-                where: {
-                    cartCourseId: In(cartCourseIds)
-                },
-                relations: {
-                    course: true
-                }
-            })
-
-            const orderCourses = []
-            const deleteCartCourses = []
-
-            for (const course of cartCourses) {
-                orderCourses.push({
-                    courseId: course.courseId,
-                    orderId: order.orderId,
-                    discountedPrice: course.course.discountPrice,
-                    price: course.course.price,
-                })
-
-                deleteCartCourses.push({ cartCourseId: course.cartCourseId })
-            }
-
-            await queryRunner.manager.save(OrderCourseMySqlEntity, orderCourses)
-
-            await queryRunner.commitTransaction()
-
-            await this.cartCourseMySqlRepository.delete(deleteCartCourses)
-
-            return {
-                message: "Order Created",
-                others: {
-                    orderId: order.orderId
-                }
-            }
-        } catch (ex) {
-            console.log(ex)
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
+            deleteCartCourses.push({ cartCourseId: course.cartCourseId })
         }
+
+        await this.orderCoursesMySqlRepository.save(orderCourses)
+        await this.cartCourseMySqlRepository.delete(deleteCartCourses)
+
+        return {
+            message: "Order Created",
+            others: {
+                orderId: order.orderId
+            }
+        }
+
     }
 }

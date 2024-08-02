@@ -3,14 +3,15 @@ import { QuizAttemptMySqlEntity } from "@database"
 import { Injectable, Logger } from "@nestjs/common"
 import { Interval } from "@nestjs/schedule"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository } from "typeorm"
+import { DataSource, Repository } from "typeorm"
 
 @Injectable()
 export class QuizAttemptsService {
     private readonly logger = new Logger(QuizAttemptsService.name)
     constructor(
         @InjectRepository(QuizAttemptMySqlEntity)
-        private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>
+        private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
+        private readonly dataSource: DataSource
     ) {
 
     }

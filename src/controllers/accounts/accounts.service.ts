@@ -48,6 +48,8 @@ export class AccountsService {
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
         @InjectRepository(CourseMySqlEntity)
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(EnrolledInfoMySqlEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         @InjectRepository(AccountReviewMySqlEntity)
         private readonly accountReviewMySqlRepository: Repository<AccountReviewMySqlEntity>,
         @InjectRepository(RoleMySqlEntity)
@@ -169,99 +171,78 @@ export class AccountsService {
         const { data } = input
         const { courseIds } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const course = await this.courseMySqlRepository.find({ where: { courseId: In(courseIds) } })
 
-        try {
-
-            const course = await this.courseMySqlRepository.find({ where: { courseId: In(courseIds) } })
-
-            if (!course) {
-                throw new NotFoundException("Course not found or have been already disabled")
-            }
-
-            await this.courseMySqlRepository.update(courseIds, { isDeleted: true })
-
-            return "Course(s) has been disabled"
-        } catch (ex) {
-            console.log(ex)
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
+        if (!course) {
+            throw new NotFoundException("Course not found or have been already disabled")
         }
+
+        await this.courseMySqlRepository.update(courseIds, { isDeleted: true })
+
+        return "Course(s) has been disabled"
     }
 
     async createAccountReview(input: CreateAccountReviewInput): Promise<CreateAccountReviewOutput> {
         const { accountId, data } = input
         const { content, rating, reviewedAccountId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        if (accountId === reviewedAccountId) {
+            throw new ConflictException("You can't post a review of yourself")
+        }
 
-        try {
-
-            if (accountId === reviewedAccountId) {
-                throw new ConflictException("You can't post a review of yourself")
+        const exist = await this.accountReviewMySqlRepository.findOne({
+            where: {
+                reviewedAccountId,
+                accountId
             }
+        })
 
-            const exist = await this.accountReviewMySqlRepository.findOne({
-                where: {
-                    reviewedAccountId,
-                    accountId
-                }
-            })
+        if (exist) {
+            throw new ConflictException("You have already posted a review on this account")
+        }
 
-            if (exist) {
-                throw new ConflictException("You have already posted a review on this account")
+        const numberOfAccountCreatedCourses = await this.courseMySqlRepository.count({
+            where: {
+                creatorId: reviewedAccountId
+            },
+        })
+    
+        if (numberOfAccountCreatedCourses < 1) {
+            throw new ConflictException("This account didn't have any course yet")
+        }
+
+        const hasEnrolledCourse = await this.enrolledInfoMySqlRepository.count({
+            where: {
+                course: {
+                    creatorId: reviewedAccountId,
+                },
+                accountId
+            },
+            relations: {
+                course: true
             }
+        })
 
-            const numberOfAccountCreatedCourses = await queryRunner.manager.createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(CourseMySqlEntity, "course")
-                .where("course.creatorId = :reviewedAccountId", { reviewedAccountId })
-                .getRawOne()
+        if (hasEnrolledCourse < 1) {
+            throw new ConflictException("You must enroll in at least one course created by this account to write a review.")
+        }
 
-            if (numberOfAccountCreatedCourses.count < 1) {
-                throw new ConflictException("This account didn't have any course yet")
+        const { accountReviewId } = await this.accountReviewMySqlRepository.save({ content, rating, reviewedAccountId, accountId })
+        const { username } = await this.accountMySqlRepository.findOneBy({accountId})
+
+        await this.notificationMySqlRepository.save({
+            senderId: accountId,
+            receiverId: reviewedAccountId,
+            type: NotificationType.Interact,
+            title: "You have new review by one of your learner",
+            description: `User ${username} has left you a ${rating}-star review. Check it out!`,
+        })
+
+        return {
+            message: "Account Review Created Successfully",
+            others: {
+                accountReviewId,
             }
-
-            const hasEnrolledCourse = await queryRunner.manager.createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(EnrolledInfoMySqlEntity, "enrolled_info")
-                .leftJoin("enrolled_info.course", "course")
-                .where("course.creatorId = :reviewedAccountId", { reviewedAccountId })
-                .andWhere("enrolled_info.accountId = :accountId", { accountId })
-                .getRawOne()
-
-            if (hasEnrolledCourse.count < 1) {
-                throw new ConflictException("You must enroll in at least one course created by this account to write a review.")
-            }
-
-            const { accountReviewId } = await this.accountReviewMySqlRepository.save({ content, rating, reviewedAccountId, accountId })
-            const { username } = await this.accountMySqlRepository.findOneBy({accountId})
-
-            await this.notificationMySqlRepository.save({
-                senderId: accountId,
-                receiverId: reviewedAccountId,
-                type: NotificationType.Interact,
-                title: "You have new review by one of your learner",
-                description: `User ${username} has left you a ${rating}-star review. Check it out!`,
-            })
-
-            return {
-                message: "Account Review Created Successfully",
-                others: {
-                    accountReviewId,
-                }
-            }
-        } catch (ex) {
-            console.log(ex)
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
         }
     }
 
@@ -269,74 +250,51 @@ export class AccountsService {
         const { data, accountId } = input
         const { accountReviewId, content, rating } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-        try {
 
-            const found = await this.accountReviewMySqlRepository.findOne({
-                where: {
-                    accountReviewId,
-                    accountId,
-                }
-            })
-
-            if (!found) {
-                throw new NotFoundException("This review is not found or not owned by sender")
+        const found = await this.accountReviewMySqlRepository.findOne({
+            where: {
+                accountReviewId,
+                accountId,
             }
+        })
 
-            const dateReviewed = new Date(found.createdAt)
-            const restrictUpdate = new Date(dateReviewed)
-            restrictUpdate.setMinutes(restrictUpdate.getMinutes() + 30)
-
-            const currentDate = new Date()
-            if (currentDate.getTime() < restrictUpdate.getTime()) {
-                throw new ConflictException("You can only update the review after 30 minutes")
-            }
-
-            await this.accountReviewMySqlRepository.update(accountReviewId, { content, rating })
-
-            return "Account review updated successfully"
-        } catch (ex) {
-            console.log(ex)
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        if (!found) {
+            throw new NotFoundException("This review is not found or not owned by sender")
         }
+
+        const dateReviewed = new Date(found.createdAt)
+        const restrictUpdate = new Date(dateReviewed)
+        restrictUpdate.setMinutes(restrictUpdate.getMinutes() + 30)
+
+        const currentDate = new Date()
+        if (currentDate.getTime() < restrictUpdate.getTime()) {
+            throw new ConflictException("You can only update the review after 30 minutes")
+        }
+
+        await this.accountReviewMySqlRepository.update(accountReviewId, { content, rating })
+
+        return "Account review updated successfully"
     }
 
     async deleteAccountReview(input: DeleteAccountReviewInput): Promise<string> {
         const { data, accountId } = input
         const { accountReviewId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-        try {
-
-            const review = await this.accountReviewMySqlRepository.findOne({
-                where: {
-                    accountReviewId,
-                    accountId
-                }
-            })
-
-            if (!review) {
-                // nó chỉ quăng lỗi khi mà cái review không tìm thấy hoặc nó không thuộc về người đó
-                throw new NotFoundException("This review is not found or not owned by sender.")
+        const review = await this.accountReviewMySqlRepository.findOne({
+            where: {
+                accountReviewId,
+                accountId
             }
+        })
 
-            await this.accountReviewMySqlRepository.delete({ accountReviewId })
-
-            return "Account review deleted successfully"
-        } catch (ex) {
-            console.log(ex)
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        if (!review) {
+            // nó chỉ quăng lỗi khi mà cái review không tìm thấy hoặc nó không thuộc về người đó
+            throw new NotFoundException("This review is not found or not owned by sender.")
         }
+
+        await this.accountReviewMySqlRepository.delete({ accountReviewId })
+
+        return "Account review deleted successfully"
     }
 
     async createAccountRole(input: CreateAccountRoleInput): Promise<CreateAccountRoleOutput> {
@@ -391,54 +349,38 @@ export class AccountsService {
             throw new NotFoundException("This account doesn't have any roles.")
         }
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        if (deleteRoleIds && deleteRoleIds.length > 0) {
 
-        try {
+            const userRoles = await this.roleMySqlRepository.find({
+                where: { roleId: In(deleteRoleIds) },
+            })
+            const existUserRole = userRoles.some((role) => role.name === SystemRoles.User)
+            if (existUserRole) {
+                throw new ConflictException(`Cannot delete role ${SystemRoles.User} from this account.`)
+            }
 
-            if (deleteRoleIds && deleteRoleIds.length > 0) {
+            await this.roleMySqlRepository.delete({ accountId, roleId: In(deleteRoleIds) })
+        }
 
-                const userRoles = await this.roleMySqlRepository.find({
-                    where: { roleId: In(deleteRoleIds) },
-                })
-                const existUserRole = userRoles.some((role) => role.name === SystemRoles.User)
-                if (existUserRole) {
-                    throw new ConflictException(`Cannot delete role ${SystemRoles.User} from this account.`)
+        if (roles && roles.length > 0) {
+            const existingRoles = await this.roleMySqlRepository.find({
+                where: { accountId, name: In(roles) },
+            })
+            const existingRolesSet = new Set(existingRoles.map((role) => role.name))
+
+            // Thêm role mới nếu chưa có, lọc ra role có rồi thì k thêm lại
+            const rolesToAdd = roles.filter((role) => !existingRolesSet.has(role))
+            for (const role of rolesToAdd) {
+                const newRole: Partial<RoleMySqlEntity> = {
+                    accountId,
+                    name: role,
                 }
-
-                await this.roleMySqlRepository.delete({ accountId, roleId: In(deleteRoleIds) })
+                await this.roleMySqlRepository.save(newRole)
             }
+        }
 
-            if (roles && roles.length > 0) {
-                const existingRoles = await this.roleMySqlRepository.find({
-                    where: { accountId, name: In(roles) },
-                })
-                const existingRolesSet = new Set(existingRoles.map((role) => role.name))
-
-                // Thêm role mới nếu chưa có, lọc ra role có rồi thì k thêm lại
-                const rolesToAdd = roles.filter((role) => !existingRolesSet.has(role))
-                for (const role of rolesToAdd) {
-                    const newRole: Partial<RoleMySqlEntity> = {
-                        accountId,
-                        name: role,
-                    }
-                    await this.roleMySqlRepository.save(newRole)
-                }
-            }
-
-            await queryRunner.commitTransaction()
-
-            return {
-                message: "Account roles updated successfully.",
-            }
-        } catch (error) {
-            // Rollback transaction on error
-            await queryRunner.rollbackTransaction()
-            throw error
-        } finally {
-            // Release query runner
-            await queryRunner.release()
+        return {
+            message: "Account roles updated successfully.",
         }
     }
 

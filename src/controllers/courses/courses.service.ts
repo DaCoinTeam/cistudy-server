@@ -201,146 +201,133 @@ export class CoursesService {
         const { data, accountId } = input
         const { courseId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const account = await this.accountMySqlRepository.findOneBy({ accountId })
 
-        try {
-            const account = await this.accountMySqlRepository.findOneBy({ accountId })
+        if (!account || account.verified == false) {
+            throw new ConflictException("Account not found or not verified.")
+        }
 
-            if (!account || account.verified == false) {
-                throw new ConflictException("Account not found or not verified.")
-            }
-
-            const course = await this.courseMySqlRepository.findOne({
-                where: {
-                    courseId,
-                },
-                relations: {
-                    sections: {
-                        contents: true,
-                    },
-                },
-            })
-
-            if (!course || course.isDeleted) {
-                throw new NotFoundException("Course not found or has been deleted")
-            }
-
-            const {
-                title,
-                enableDiscount,
-                discountPrice,
-                price: coursePrice,
-                duration,
-                sections,
-                creatorId,
-            } = course
-
-            if (accountId === creatorId) {
-                throw new ConflictException("You cannot enroll to your created course.")
-            }
-
-            const enrollments = await this.enrolledInfoMySqlRepository.find({
-                where: {
-                    accountId,
-                    courseId,
-                },
-            })
-
-            const now = new Date()
-
-            const enrolled = enrollments.some(
-                (enrollment) => new Date(enrollment.endDate) > now,
-            )
-
-            if (enrolled) {
-                throw new ConflictException(
-                    "This user is already enrolled in that course.",
-                )
-            }
-
-            const price = computeRaw(enableDiscount ? discountPrice : coursePrice)
-            const minimumBalanceRequired = computeDenomination(price)
-            const courseCreatorShares = computeDenomination(price / BigInt(2))
-
-            const { username, balance } = account
-
-            if (balance < minimumBalanceRequired) {
-                throw new ConflictException(
-                    "Your account does not have sufficient balance to enroll in this course.",
-                )
-            }
-
-            await this.accountMySqlRepository.update(accountId, {
-                balance: balance - minimumBalanceRequired,
-            })
-            await this.accountMySqlRepository.increment(
-                { accountId: creatorId },
-                "balance",
-                courseCreatorShares,
-            )
-
-            const enrollDate = new Date()
-            const endDate = new Date(enrollDate)
-            endDate.setMonth(endDate.getMonth() + duration)
-
-            const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
+        const course = await this.courseMySqlRepository.findOne({
+            where: {
                 courseId,
+            },
+            relations: {
+                sections: {
+                    contents: true,
+                },
+            },
+        })
+
+        if (!course || course.isDeleted) {
+            throw new NotFoundException("Course not found or has been deleted")
+        }
+
+        const {
+            title,
+            enableDiscount,
+            discountPrice,
+            price: coursePrice,
+            duration,
+            sections,
+            creatorId,
+        } = course
+
+        if (accountId === creatorId) {
+            throw new ConflictException("You cannot enroll to your created course.")
+        }
+
+        const enrollments = await this.enrolledInfoMySqlRepository.find({
+            where: {
                 accountId,
-                enrolled: true,
-                priceAtEnrolled: minimumBalanceRequired,
-                endDate,
-            })
+                courseId,
+            },
+        })
 
-            const gradedSectionIds = sections
-                .flatMap((section) =>
-                    section.contents.some(
-                        (content) => content.type === SectionContentType.Quiz,
-                    )
-                        ? [section.sectionId]
-                        : [],
+        const now = new Date()
+
+        const enrolled = enrollments.some(
+            (enrollment) => new Date(enrollment.endDate) > now,
+        )
+
+        if (enrolled) {
+            throw new ConflictException(
+                "This user is already enrolled in that course.",
+            )
+        }
+
+        const price = computeRaw(enableDiscount ? discountPrice : coursePrice)
+        const minimumBalanceRequired = computeDenomination(price)
+        const courseCreatorShares = computeDenomination(price / BigInt(2))
+
+        const { username, balance } = account
+
+        if (balance < minimumBalanceRequired) {
+            throw new ConflictException(
+                "Your account does not have sufficient balance to enroll in this course.",
+            )
+        }
+
+        await this.accountMySqlRepository.update(accountId, {
+            balance: balance - minimumBalanceRequired,
+        })
+        await this.accountMySqlRepository.increment(
+            { accountId: creatorId },
+            "balance",
+            courseCreatorShares,
+        )
+
+        const enrollDate = new Date()
+        const endDate = new Date(enrollDate)
+        endDate.setMonth(endDate.getMonth() + duration)
+
+        const { enrolledInfoId } = await this.enrolledInfoMySqlRepository.save({
+            courseId,
+            accountId,
+            enrolled: true,
+            priceAtEnrolled: minimumBalanceRequired,
+            endDate,
+        })
+
+        const gradedSectionIds = sections
+            .flatMap((section) =>
+                section.contents.some(
+                    (content) => content.type === SectionContentType.Quiz,
                 )
-                .filter((sectionId) => sectionId !== undefined)
+                    ? [section.sectionId]
+                    : [],
+            )
+            .filter((sectionId) => sectionId !== undefined)
 
-            const accountGrades = gradedSectionIds.map((sectionId) => ({
-                enrolledInfoId,
-                sectionId,
-            }))
+        const accountGrades = gradedSectionIds.map((sectionId) => ({
+            enrolledInfoId,
+            sectionId,
+        }))
 
-            await this.accountGradeMySqlRepository.save(accountGrades)
+        await this.accountGradeMySqlRepository.save(accountGrades)
 
-            const notifications = [
-                {
-                    senderId: accountId,
-                    receiverId: creatorId,
-                    title: "You have new enrollment to your course",
-                    type: NotificationType.Course,
-                    courseId,
-                    description: `User ${username} has enrolled to your course: ${title}`,
-                    referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`,
-                },
-                {
-                    receiverId: creatorId,
-                    title: "You have new update on your balance!",
-                    type: NotificationType.Transaction,
-                    description: `You have received ${courseCreatorShares} STARCI(s)`,
-                },
-            ]
+        const notifications = [
+            {
+                senderId: accountId,
+                receiverId: creatorId,
+                title: "You have new enrollment to your course",
+                type: NotificationType.Course,
+                courseId,
+                description: `User ${username} has enrolled to your course: ${title}`,
+                referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`,
+            },
+            {
+                receiverId: creatorId,
+                title: "You have new update on your balance!",
+                type: NotificationType.Transaction,
+                description: `You have received ${courseCreatorShares} STARCI(s)`,
+            },
+        ]
 
-            await this.notificationMySqlRepository.save(notifications)
+        await this.notificationMySqlRepository.save(notifications)
 
-            await queryRunner.commitTransaction()
-
-            return {
-                message: "Enrolled successfully",
-                others: { enrolledInfoId },
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        return {
+            message: "Enrolled successfully",
+            others: { enrolledInfoId },
         }
     }
 
@@ -424,33 +411,20 @@ export class CoursesService {
         }
         await Promise.all(promises)
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            if (categoryIds?.length) {
-                await this.courseCategoryMySqlRepository.delete({ courseId })
-                const newCategories = categoryIds?.map((categoryId) => ({
-                    categoryId,
-                    courseId,
-                }))
-                await this.courseCategoryMySqlRepository.save(newCategories)
-            }
-
-            if (existKeyNotUndefined(course)) {
-                await this.courseMySqlRepository.save(course)
-            }
-
-            await queryRunner.commitTransaction()
-
-            return { message: "Course Updated Successfully" }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        if (categoryIds?.length) {
+            await this.courseCategoryMySqlRepository.delete({ courseId })
+            const newCategories = categoryIds?.map((categoryId) => ({
+                categoryId,
+                courseId,
+            }))
+            await this.courseCategoryMySqlRepository.save(newCategories)
         }
+
+        if (existKeyNotUndefined(course)) {
+            await this.courseMySqlRepository.save(course)
+        }
+
+        return { message: "Course Updated Successfully" }
     }
 
     async createCourseReview(
@@ -907,57 +881,45 @@ export class CoursesService {
         const { files, data } = input
         const { resourceId, description, title } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const resource = await this.resourceMySqlRepository.findOne({
+            where: {
+                resourceId,
+            },
+            relations: {
+                attachments: true,
+            },
+        })
 
-        try {
-            const resource = await this.resourceMySqlRepository.findOne({
-                where: {
-                    resourceId,
-                },
-                relations: {
-                    attachments: true,
-                },
-            })
+        resource.description = description
+        const attachments = resource.attachments
 
-            resource.description = description
-            const attachments = resource.attachments
-
-            if (files) {
-                const promises: Array<Promise<void>> = []
-                for (const file of files) {
-                    const promise = async () => {
-                        const { assetId } = await this.storageService.upload({
-                            rootFile: file,
-                        })
-                        attachments.push({
-                            resourceId,
-                            name: file.originalname,
-                            fileId: assetId,
-                        } as ResourceAttachmentMySqlEntity)
-                    }
-                    promises.push(promise())
+        if (files) {
+            const promises: Array<Promise<void>> = []
+            for (const file of files) {
+                const promise = async () => {
+                    const { assetId } = await this.storageService.upload({
+                        rootFile: file,
+                    })
+                    attachments.push({
+                        resourceId,
+                        name: file.originalname,
+                        fileId: assetId,
+                    } as ResourceAttachmentMySqlEntity)
                 }
-                await Promise.all(promises)
+                promises.push(promise())
             }
+            await Promise.all(promises)
+        }
 
-            resource.attachments = attachments
+        resource.attachments = attachments
 
-            await this.resourceMySqlRepository.save(resource)
-            await this.sectionContentMySqlRepository.update(resourceId, {
-                title,
-            })
+        await this.resourceMySqlRepository.save(resource)
+        await this.sectionContentMySqlRepository.update(resourceId, {
+            title,
+        })
 
-            await queryRunner.commitTransaction()
-
-            return {
-                message: "Resource updated sucessfully",
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
+        return {
+            message: "Resource updated sucessfully",
         }
     }
 
@@ -1013,108 +975,95 @@ export class CoursesService {
         const { data, files } = input
         const { name, categoryParentIds, categoryIds, imageIndex } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        let imageId: string | undefined
 
-        try {
-            let imageId: string | undefined
+        if (Number.isInteger(imageIndex)) {
+            const { assetId } = await this.storageService.upload({
+                rootFile: files.at(imageIndex),
+            })
+            imageId = assetId
+        }
 
-            if (Number.isInteger(imageIndex)) {
-                const { assetId } = await this.storageService.upload({
-                    rootFile: files.at(imageIndex),
-                })
-                imageId = assetId
+        let level = 0
+
+        let parentLevels: number[] = []
+        if (categoryParentIds && categoryParentIds.length > 0) {
+            const parentCategories = await this.categoryMySqlRepository.find({
+                where: {
+                    categoryId: In(categoryParentIds),
+                },
+            })
+            parentLevels = parentCategories.map((category) => category.level)
+
+            if (new Set(parentLevels).size !== 1) {
+                throw new ConflictException(
+                    "All parent categories must be at the same level",
+                )
+            }
+            level = parentLevels[0] + 1
+        }
+
+        let childLevels: number[] = []
+        if (categoryIds && categoryIds.length > 0) {
+            const childCategories = await this.categoryMySqlRepository.find({
+                where: {
+                    categoryId: In(categoryIds),
+                },
+            })
+            childLevels = childCategories.map((category) => category.level)
+
+            if (new Set(childLevels).size !== 1) {
+                throw new ConflictException(
+                    "All child categories must be at the same level",
+                )
             }
 
-            let level = 0
-
-            let parentLevels: number[] = []
-            if (categoryParentIds && categoryParentIds.length > 0) {
-                const parentCategories = await this.categoryMySqlRepository.find({
-                    where: {
-                        categoryId: In(categoryParentIds),
-                    },
-                })
-                parentLevels = parentCategories.map((category) => category.level)
-
-                if (new Set(parentLevels).size !== 1) {
-                    throw new ConflictException(
-                        "All parent categories must be at the same level",
-                    )
+            if (!categoryParentIds) {
+                if (childLevels[0] !== 1) {
+                    throw new ConflictException("Child categories must be at level 1")
                 }
-                level = parentLevels[0] + 1
+                level = 0
             }
+        }
 
-            let childLevels: number[] = []
-            if (categoryIds && categoryIds.length > 0) {
-                const childCategories = await this.categoryMySqlRepository.find({
-                    where: {
-                        categoryId: In(categoryIds),
-                    },
-                })
-                childLevels = childCategories.map((category) => category.level)
-
-                if (new Set(childLevels).size !== 1) {
-                    throw new ConflictException(
-                        "All child categories must be at the same level",
-                    )
-                }
-
-                if (!categoryParentIds) {
-                    if (childLevels[0] !== 1) {
-                        throw new ConflictException("Child categories must be at level 1")
-                    }
-                    level = 0
-                }
+        if (categoryParentIds && categoryIds) {
+            if (childLevels[0] - parentLevels[0] !== 2) {
+                throw new ConflictException(
+                    "The level difference between child and parent categories must be 2",
+                )
             }
-
-            if (categoryParentIds && categoryIds) {
-                if (childLevels[0] - parentLevels[0] !== 2) {
-                    throw new ConflictException(
-                        "The level difference between child and parent categories must be 2",
-                    )
-                }
-                const found = await this.categoryMySqlRepository.find({
-                    where: {
-                        level,
-                    },
-                })
-
-                if (found.some((categoryName) => categoryName.name === name)) {
-                    throw new ConflictException(
-                        `There's already existed category named ${name} at this level`,
-                    )
-                }
-            }
-
-            const createdCategory = await this.categoryMySqlRepository.save({
-                name,
-                imageId,
-                level,
-                categoryParentRelations: categoryIds
-                    ? categoryIds.map((categoryId) => ({
-                        categoryId,
-                    }))
-                    : [],
-                categoryRelations: categoryParentIds
-                    ? categoryParentIds.map((categoryParentId) => ({
-                        categoryParentId,
-                    }))
-                    : [],
+            const found = await this.categoryMySqlRepository.find({
+                where: {
+                    level,
+                },
             })
 
-            await queryRunner.commitTransaction()
-
-            return {
-                message: `Category ${createdCategory.name} has been created successfully`,
-                others: { categoryId: createdCategory.categoryId },
+            if (found.some((categoryName) => categoryName.name === name)) {
+                throw new ConflictException(
+                    `There's already existed category named ${name} at this level`,
+                )
             }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        }
+
+        const createdCategory = await this.categoryMySqlRepository.save({
+            name,
+            imageId,
+            level,
+            categoryParentRelations: categoryIds
+                ? categoryIds.map((categoryId) => ({
+                    categoryId,
+                }))
+                : [],
+            categoryRelations: categoryParentIds
+                ? categoryParentIds.map((categoryParentId) => ({
+                    categoryParentId,
+                }))
+                : [],
+        })
+
+        return {
+            message: `Category ${createdCategory.name} has been created successfully`,
+            others: { categoryId: createdCategory.categoryId },
         }
     }
 
@@ -1162,24 +1111,12 @@ export class CoursesService {
         const { data } = input
         const { categoryId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        await this.categoryMySqlRepository.delete({
+            categoryId,
+        })
 
-        try {
-            await this.categoryMySqlRepository.delete({
-                categoryId,
-            })
-
-            await queryRunner.commitTransaction()
-            return {
-                message: `Category ${categoryId} has been deleted successfully`,
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        return {
+            message: `Category ${categoryId} has been deleted successfully`,
         }
     }
 
@@ -1189,31 +1126,17 @@ export class CoursesService {
         const { data } = input
         const { courseId, categoryIds } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const courseCategories = categoryIds.map((categoryId) => ({
+            courseId,
+            categoryId,
+        }))
 
-        try {
-            const courseCategories = categoryIds.map((categoryId) => ({
-                courseId,
-                categoryId,
-            }))
+        //await this.courseCategoryMySqlRepository.save(courseCategories);
+        await this.courseCategoryMySqlRepository.save(courseCategories,
+        )
 
-            //await this.courseCategoryMySqlRepository.save(courseCategories);
-            await queryRunner.manager.save(
-                CourseCategoryMySqlEntity,
-                courseCategories,
-            )
-
-            await queryRunner.commitTransaction()
-            return {
-                message: "Course Category has been created successfully",
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        return {
+            message: "Course Category has been created successfully",
         }
     }
 
@@ -1223,37 +1146,25 @@ export class CoursesService {
         const { data } = input
         const { categoryId, courseId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            const found = await this.courseCategoryMySqlRepository.findOne({
-                where: {
-                    courseId,
-                    categoryId,
-                },
-            })
-
-            if (!found)
-                throw new NotFoundException(
-                    "No specified course found in this category",
-                )
-
-            await this.courseCategoryMySqlRepository.delete({
-                categoryId,
+        const found = await this.courseCategoryMySqlRepository.findOne({
+            where: {
                 courseId,
-            })
+                categoryId,
+            },
+        })
 
-            await queryRunner.commitTransaction()
-            return {
-                message: "Course has been deleted from category successfully",
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        if (!found)
+            throw new NotFoundException(
+                "No specified course found in this category",
+            )
+
+        await this.courseCategoryMySqlRepository.delete({
+            categoryId,
+            courseId,
+        })
+
+        return {
+            message: "Course has been deleted from category successfully",
         }
     }
 
@@ -1785,48 +1696,38 @@ export class CoursesService {
         const { data } = input
         const { sectionContentId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
 
-        try {
-            console.log(sectionContentId)
-            // const progress = await this.progressMySqlRepository.findOne({
-            //     where: { sectionContentId },
-            //     relations: { enrolledInfo: true },
-            // })
+        console.log(sectionContentId)
+        // const progress = await this.progressMySqlRepository.findOne({
+        //     where: { sectionContentId },
+        //     relations: { enrolledInfo: true },
+        // })
 
-            // if (!progress) {
-            //     throw new NotFoundException("Content not found")
-            // }
+        // if (!progress) {
+        //     throw new NotFoundException("Content not found")
+        // }
 
-            // const { enrolledInfo } = progress
+        // const { enrolledInfo } = progress
 
-            // if (!enrolledInfo || enrolledInfo.accountId !== accountId) {
-            //     throw new NotFoundException(
-            //         "You haven't enrolled to course that has this content",
-            //     )
-            // }
+        // if (!enrolledInfo || enrolledInfo.accountId !== accountId) {
+        //     throw new NotFoundException(
+        //         "You haven't enrolled to course that has this content",
+        //     )
+        // }
 
-            // const now = new Date()
+        // const now = new Date()
 
-            // if (now > enrolledInfo.endDate)
-            //     throw new ConflictException("This Course has expired")
+        // if (now > enrolledInfo.endDate)
+        //     throw new ConflictException("This Course has expired")
 
-            // await this.progressMySqlRepository.update(
-            //     { sectionContentId },
-            //     { completeState: CompleteState.Completed },
-            // )
+        // await this.progressMySqlRepository.update(
+        //     { sectionContentId },
+        //     { completeState: CompleteState.Completed },
+        // )
 
-            // await queryRunner.commitTransaction()
+        // await queryRunner.commitTransaction()
 
-            return { message: "You have completed this content" }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
-        }
+        return { message: "You have completed this content" }
     }
 
     async createQuizAttempt(
@@ -1835,49 +1736,44 @@ export class CoursesService {
         const { data, accountId } = input
         const { quizId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            const attempt = await this.quizAttemptMySqlRepository.findOne({
-                where: {
-                    attemptStatus: QuizAttemptStatus.Started,
-                    accountId,
-                    quizId,
-                },
-            })
-
-            if (attempt) {
-                throw new ConflictException("An attempt has been started.")
-            }
-
-            const quiz = await this.quizMySqlRepository.findOne({
-                where: {
-                    quizId,
-                },
-                relations: {
-                    questions: {
-                        answers: true,
-                    },
-                },
-            })
-
-            const { timeLimit } = await this.quizMySqlRepository.findOne({
-                where: {
-                    quizId,
-                },
-            })
-
-            const { quizAttemptId } = await this.quizAttemptMySqlRepository.save({
+        const attempt = await this.quizAttemptMySqlRepository.findOne({
+            where: {
+                attemptStatus: QuizAttemptStatus.Started,
                 accountId,
                 quizId,
-                timeLeft: timeLimit,
-                observedAt: new Date(),
-                timeLimitAtStart: timeLimit,
-            })
+            },
+        })
 
-            const questions: Array<DeepPartial<QuizQuestionMySqlEntity>> =
+        if (attempt) {
+            throw new ConflictException("An attempt has been started.")
+        }
+
+        const quiz = await this.quizMySqlRepository.findOne({
+            where: {
+                quizId,
+            },
+            relations: {
+                questions: {
+                    answers: true,
+                },
+            },
+        })
+
+        const { timeLimit } = await this.quizMySqlRepository.findOne({
+            where: {
+                quizId,
+            },
+        })
+
+        const { quizAttemptId } = await this.quizAttemptMySqlRepository.save({
+            accountId,
+            quizId,
+            timeLeft: timeLimit,
+            observedAt: new Date(),
+            timeLimitAtStart: timeLimit,
+        })
+
+        const questions: Array<DeepPartial<QuizQuestionMySqlEntity>> =
         shuffleArray(
             quiz.questions.map(({ answers, quizQuestionId, position }) => ({
                 quizQuestionId,
@@ -1891,21 +1787,14 @@ export class CoursesService {
             })),
         )
 
-            await this.cacheManager.set(quizAttemptId, questions, 0)
+        await this.cacheManager.set(quizAttemptId, questions, 0)
 
-            await queryRunner.commitTransaction()
-
-            return {
-                message: "Attempt Started Successfully!",
-                others: {
-                    quizAttemptId,
-                },
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+           
+        return {
+            message: "Attempt Started Successfully!",
+            others: {
+                quizAttemptId,
+            },
         }
     }
 
@@ -1915,102 +1804,90 @@ export class CoursesService {
         const { data } = input
         const { quizAttemptId } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            const attempt = await this.quizAttemptMySqlRepository.findOne({
-                where: {
-                    quizAttemptId,
+        const attempt = await this.quizAttemptMySqlRepository.findOne({
+            where: {
+                quizAttemptId,
+            },
+            relations: {
+                attemptAnswers: {
+                    quizQuestionAnswer: true,
                 },
-                relations: {
-                    attemptAnswers: {
-                        quizQuestionAnswer: true,
-                    },
-                    quiz: {
-                        questions: {
-                            answers: true,
-                        },
+                quiz: {
+                    questions: {
+                        answers: true,
                     },
                 },
-            })
+            },
+        })
 
-            if (!attempt) {
-                throw new NotFoundException("Attempt not found")
+        if (!attempt) {
+            throw new NotFoundException("Attempt not found")
+        }
+
+        if (attempt.attemptStatus === QuizAttemptStatus.Ended) {
+            throw new NotFoundException("Attempt already ended")
+        }
+
+        const { attemptAnswers, quiz, timeLeft, timeLimitAtStart } = attempt
+        const { questions } = quiz
+
+        let receivedPoints = 0
+
+        for (const { answers, point } of questions) {
+            const correctAnswers = answers.filter(({ isCorrect }) => isCorrect)
+            if (!correctAnswers.length) {
+                receivedPoints += point
+                continue
             }
-
-            if (attempt.attemptStatus === QuizAttemptStatus.Ended) {
-                throw new NotFoundException("Attempt already ended")
-            }
-
-            const { attemptAnswers, quiz, timeLeft, timeLimitAtStart } = attempt
-            const { questions } = quiz
-
-            let receivedPoints = 0
-
-            for (const { answers, point } of questions) {
-                const correctAnswers = answers.filter(({ isCorrect }) => isCorrect)
-                if (!correctAnswers.length) {
-                    receivedPoints += point
-                    continue
+            const pointEachCorrectAnswer = point / correctAnswers.length
+            const attemptAnswersInThisQuestion = attemptAnswers.filter(
+                ({ quizQuestionAnswerId }) =>
+                    answers
+                        .map(({ quizQuestionAnswerId }) => quizQuestionAnswerId)
+                        .includes(quizQuestionAnswerId),
+            )
+            if (attemptAnswersInThisQuestion.length > correctAnswers.length)
+                continue
+            for (const { quizQuestionAnswerId } of attemptAnswersInThisQuestion) {
+                if (
+                    correctAnswers
+                        .map(({ quizQuestionAnswerId }) => quizQuestionAnswerId)
+                        .includes(quizQuestionAnswerId)
+                ) {
+                    receivedPoints += pointEachCorrectAnswer
                 }
-                const pointEachCorrectAnswer = point / correctAnswers.length
-                const attemptAnswersInThisQuestion = attemptAnswers.filter(
-                    ({ quizQuestionAnswerId }) =>
-                        answers
-                            .map(({ quizQuestionAnswerId }) => quizQuestionAnswerId)
-                            .includes(quizQuestionAnswerId),
-                )
-                if (attemptAnswersInThisQuestion.length > correctAnswers.length)
-                    continue
-                for (const { quizQuestionAnswerId } of attemptAnswersInThisQuestion) {
-                    if (
-                        correctAnswers
-                            .map(({ quizQuestionAnswerId }) => quizQuestionAnswerId)
-                            .includes(quizQuestionAnswerId)
-                    ) {
-                        receivedPoints += pointEachCorrectAnswer
-                    }
-                }
             }
+        }
 
-            const totalPoints = questions.reduce((accumulator, { point }) => {
-                return accumulator + point
-            }, 0)
+        const totalPoints = questions.reduce((accumulator, { point }) => {
+            return accumulator + point
+        }, 0)
 
-            const receivedPercent = (receivedPoints / totalPoints) * 100
-            const isPassed = receivedPercent >= quiz.passingPercent
-            const timeTaken = timeLimitAtStart - timeLeft
+        const receivedPercent = (receivedPoints / totalPoints) * 100
+        const isPassed = receivedPercent >= quiz.passingPercent
+        const timeTaken = timeLimitAtStart - timeLeft
 
-            await this.quizAttemptMySqlRepository.update(quizAttemptId, {
-                isPassed,
-                timeLeft: 0,
+        await this.quizAttemptMySqlRepository.update(quizAttemptId, {
+            isPassed,
+            timeLeft: 0,
+            receivedPercent,
+            timeTaken,
+            receivedPoints,
+            totalPoints,
+            observedAt: new Date(),
+            attemptStatus: QuizAttemptStatus.Ended,
+        })
+
+
+        return {
+            message: "Quiz ended successfully!",
+            others: {
                 receivedPercent,
+                isPassed,
                 timeTaken,
                 receivedPoints,
                 totalPoints,
-                observedAt: new Date(),
-                attemptStatus: QuizAttemptStatus.Ended,
-            })
-
-            await queryRunner.commitTransaction()
-
-            return {
-                message: "Quiz ended successfully!",
-                others: {
-                    receivedPercent,
-                    isPassed,
-                    timeTaken,
-                    receivedPoints,
-                    totalPoints,
-                },
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+            },
         }
     }
 
@@ -2229,9 +2106,12 @@ export class CoursesService {
             actualPoints: point,
             maxPoints: point,
         })
+            
         return {
             message: "Your attempt has been updated successfully",
         }
+
+       
     }
 
     async markAsCompletedResource(

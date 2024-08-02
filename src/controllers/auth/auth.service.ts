@@ -70,46 +70,33 @@ export class AuthService {
         const {  data } = input
         const { token } = data
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
-
-        try {
-            const { accountId } = await this.authManagerService.verifyToken(token)
+        const { accountId } = await this.authManagerService.verifyToken(token)
             
-            const account = await this.accountMySqlRepository.findOne({
-                where: {
-                    accountId
-                },
-            })
+        const account = await this.accountMySqlRepository.findOne({
+            where: {
+                accountId
+            },
+        })
 
-            if (!account) {
-                throw new NotFoundException("Account not found")
-            }
+        if (!account) {
+            throw new NotFoundException("Account not found")
+        }
 
-            if (account.verified) {
-                throw new ConflictException("Account already verified")
-            }
+        if (account.verified) {
+            throw new ConflictException("Account already verified")
+        }
 
-            await this.roleMySqlRepository.save({
-                accountId,
-                name: SystemRoles.User
-            })
+        await this.roleMySqlRepository.save({
+            accountId,
+            name: SystemRoles.User
+        })
 
-            await this.accountMySqlRepository.update(accountId, {verified: true})
-            await queryRunner.commitTransaction()
-
-            return {
-                data: {
-                    message: "Account verified successfully!"
-                } 
-            }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-            throw ex
-        } finally {
-            await queryRunner.release()
+        await this.accountMySqlRepository.update(accountId, {verified: true})
+           
+        return {
+            data: {
+                message: "Account verified successfully!"
+            } 
         }
     }
-
 }

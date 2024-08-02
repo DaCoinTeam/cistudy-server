@@ -47,89 +47,84 @@ export class PostsService {
         const { params } = data
         const { postId } = params
 
-        const queryRunner = this.dataSource.createQueryRunner()
-        await queryRunner.connect()
-        await queryRunner.startTransaction()
+        const post = await this.postMySqlRepository.findOne({
+            where: {
+                postId
+            },
+            relations: {
+                creator: true,
+                course: true,
+                postReacts: true,
+                postComments: {
+                    creator: true,
+                    postCommentMedias: true,
+                },
+                postMedias: true,
+            },
+        })
 
-        try {
-            const post = await this.postMySqlRepository.findOne({
+        const numberOfLikes = await this.postLikeMySqlRepository.count(
+            {
                 where: {
                     postId
-                },
-                relations: {
-                    creator: true,
-                    course: true,
-                    postReacts: true,
-                    postComments: {
-                        creator: true,
-                        postCommentMedias: true,
-                    },
-                    postMedias: true,
-                },
-            })
+                }
+            }   
+        )
+        const numberOfComments = await this.postCommentMySqlRepository.count(
+            {
+                where: {
+                    postId
+                }
+            }   
+        )
+        let numberOfRewardableLikesLeft: number
+        let numberOfRewardableCommentsLeft: number
 
-            const numberOfLikes = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(PostLikeMySqlEntity, "post_like")
-                .where("post_like.postId = :postId", { postId })
-                .getRawOne()
-            const numberOfComments = await queryRunner.manager
-                .createQueryBuilder()
-                .select("COUNT(*)", "count")
-                .from(PostCommentMySqlEntity, "post_comment")
-                .where("post_comment.postId = :postId", { postId })
-                .getRawOne()
-
-            let numberOfRewardableLikesLeft: number
-            let numberOfRewardableCommentsLeft: number
-
-            if (post.isRewardable) {
-                const rewardedLikes = await queryRunner.manager
-                    .createQueryBuilder(PostLikeMySqlEntity, "post_like")
-                    .where("post_like.postId = :postId", { postId: post.postId })
-                    .andWhere("post_like.accountId != :creatorId", { creatorId: post.creatorId })
-                    .orderBy("post_like.createdAt", "ASC")
-                    .getMany()
-
-                const rewardedLikesCount = rewardedLikes.length
-                numberOfRewardableLikesLeft = Math.max(20 - rewardedLikesCount, 0)
-
-                const rewardedComments = await queryRunner.manager
-                    .createQueryBuilder(PostCommentMySqlEntity, "post_comment")
-                    .where("post_comment.postId = :postId", { postId: post.postId })
-                    .andWhere("post_comment.creatorId != :creatorId", { creatorId: post.creatorId })
-                    .orderBy("post_comment.createdAt", "ASC")
-                    .getMany()
-
-                const uniqueRewardedCommentors = new Set(rewardedComments.map(comment => comment.creatorId))
-                const rewardedCommentsCount = uniqueRewardedCommentors.size
-                numberOfRewardableCommentsLeft = Math.max(20 - rewardedCommentsCount, 0)
-            }
-
-            const liked = await this.postLikeMySqlRepository.findOne({
+        if (post.isRewardable) {
+            const rewardedLikes = await this.postLikeMySqlRepository.find({
                 where: {
                     postId,
-                    accountId
+                    accountId: post.creatorId
+                },
+                order: {
+                    createdAt: "ASC"
                 }
             })
 
-            await queryRunner.commitTransaction()
+            const rewardedLikesCount = rewardedLikes.length
+            numberOfRewardableLikesLeft = Math.max(20 - rewardedLikesCount, 0)
 
-            post.numberOfLikes = numberOfLikes.count
-            post.numberOfComments = numberOfComments.count
-            post.numberOfRewardableLikesLeft = numberOfRewardableLikesLeft
-            post.numberOfRewardableCommentsLeft = numberOfRewardableCommentsLeft
-            post.liked = liked ? true : false
-            post.isPostOwner = (accountId === post.creatorId)
+            const rewardedComments = await this.postCommentMySqlRepository.find({
+                where: {
+                    postId: post.postId,
+                    creatorId: post.creatorId
+                },
+                order: {
+                    createdAt: "ASC"
+                }
+            })
+                
+            const uniqueRewardedCommentors = new Set(rewardedComments.map(comment => comment.creatorId))
+            const rewardedCommentsCount = uniqueRewardedCommentors.size
+            numberOfRewardableCommentsLeft = Math.max(20 - rewardedCommentsCount, 0)
+        }
 
-            return {
-                data: post,
+        const liked = await this.postLikeMySqlRepository.findOne({
+            where: {
+                postId,
+                accountId
             }
-        } catch (ex) {
-            await queryRunner.rollbackTransaction()
-        } finally {
-            await queryRunner.release()
+        })
+
+        post.numberOfLikes = numberOfLikes
+        post.numberOfComments = numberOfComments
+        post.numberOfRewardableLikesLeft = numberOfRewardableLikesLeft
+        post.numberOfRewardableCommentsLeft = numberOfRewardableCommentsLeft
+        post.liked = liked ? true : false
+        post.isPostOwner = (accountId === post.creatorId)
+
+        return {
+            data: post,
         }
     }
 
