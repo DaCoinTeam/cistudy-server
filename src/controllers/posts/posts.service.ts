@@ -291,6 +291,9 @@ export class PostsService {
             where: {
                 accountId,
                 courseId
+            },
+            relations:{
+                account: true
             }
         })
 
