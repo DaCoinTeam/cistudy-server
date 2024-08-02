@@ -397,7 +397,6 @@ export class PostsService {
                 }
             }
         } catch (ex) {
-            console.log(ex)
             await queryRunner.rollbackTransaction()
         } finally {
             await queryRunner.release()
