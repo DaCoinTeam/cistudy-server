@@ -303,3 +303,302 @@ export const reportAccountMail = (reporterUsername: string, reportedUsername:str
 </body>
 </html>
 `
+
+export const reportCourseMail = (reportedCourseCreatorEmail: string, reporterUsername: string, courseTitle: string, reportedDate: Date, title: string, description: string, processStatus: string, processNote: string) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #116761;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            font-size: 1.5em;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+            text-align: center;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .highlight {
+            color: #14B8A6;
+        }
+        h1 {
+            font-size: 1.5em;
+        }
+        h3 {
+            font-size: 1.2em;
+        }
+        p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Notification of Report Received</h1>
+        </div>
+        <div class="content">
+            <h3>Dear ${reportedCourseCreatorEmail},</h3>
+            <p>We hope this message finds you well. We are writing to inform you that a report has been submitted regarding your course titled "<strong>${courseTitle}</strong>" on <span class="highlight">Ci</span><span style="color: #116761;">Study</span>.</p>
+
+            <h4>Details of the Report:</h4>
+            <p><strong>Reported By:</strong> ${reporterUsername}</p>
+            <p><strong>Date of Report:</strong> ${reportedDate}</p>
+            <p><strong>Reason for Report:</strong> ${title}</p>
+            <p><strong>Description:</strong> ${description}</p>
+
+            ${processStatus === "approved" ? `
+            <h4>Our Actions:</h4>
+            <p>${processNote}</p>
+            <h4>Recommendations:</h4>
+            <p>- Ensure that your course content complies with our community guidelines and terms of service.</p>
+            <p>- Refrain from engaging in any retaliatory behavior against the reporting user.</p>
+            ` : `
+            <h4>Recommendations:</h4>
+            <p>- Ensure that your course content complies with our community guidelines and terms of service.</p>
+            <p>- Review our guidelines to avoid future reports.</p>
+            `}
+            
+            <p>We take all reports seriously and aim to maintain a safe and respectful environment for all our users. We appreciate your cooperation and understanding during this process.</p>
+
+            <p>If you have any questions or need further clarification, please do not hesitate to contact our support team at <a href="mailto:support@cistudy.com">support@cistudy.com</a>.</p>
+
+            <p>Thank you for your attention to this matter.</p>
+        </div>
+        <div class="footer">
+            <p>Best regards,</p>
+            <p>CiStudy Support Team</p>
+            <p>support@cistudy.com</p>
+            <p>&copy; 2024 <span class="highlight">Ci</span><span style="color: #116761;">Study</span>. All rights reserved.</p>
+            <p>This email was sent from an automated system, please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>
+`
+
+export const reportPostMail = (reportedPostCreatorEmail: string, reporterUsername: string, postTitle: string, reportedDate: Date, title: string, description: string, processStatus: string, processNote: string) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #116761;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            font-size: 1.5em;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+            text-align: center;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .highlight {
+            color: #14B8A6;
+        }
+        h1 {
+            font-size: 1.5em;
+        }
+        h3 {
+            font-size: 1.2em;
+        }
+        p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Notification of Report Received</h1>
+        </div>
+        <div class="content">
+            <h3>Dear ${reportedPostCreatorEmail},</h3>
+            <p>We hope this message finds you well. We are writing to inform you that a report has been submitted regarding your post titled "<strong>${postTitle}</strong>" on <span class="highlight">Ci</span><span style="color: #116761;">Study</span>.</p>
+
+            <h4>Details of the Report:</h4>
+            <p><strong>Reported By:</strong> ${reporterUsername}</p>
+            <p><strong>Date of Report:</strong> ${reportedDate}</p>
+            <p><strong>Reason for Report:</strong> ${title}</p>
+            <p><strong>Description:</strong> ${description}</p>
+
+            ${processStatus === "approved" ? `
+            <h4>Our Actions:</h4>
+            <p>${processNote}</p>
+            <h4>Recommendations:</h4>
+            <p>- Ensure that your post content complies with our community guidelines and terms of service.</p>
+            <p>- Refrain from engaging in any retaliatory behavior against the reporting user.</p>
+            ` : `
+            <h4>Recommendations:</h4>
+            <p>- Ensure that your post content complies with our community guidelines and terms of service.</p>
+            <p>- Review our guidelines to avoid future reports.</p>
+            `}
+            
+            <p>We take all reports seriously and aim to maintain a safe and respectful environment for all our users. We appreciate your cooperation and understanding during this process.</p>
+
+            <p>If you have any questions or need further clarification, please do not hesitate to contact our support team at <a href="mailto:support@cistudy.com">support@cistudy.com</a>.</p>
+
+            <p>Thank you for your attention to this matter.</p>
+        </div>
+        <div class="footer">
+            <p>Best regards,</p>
+            <p>CiStudy Support Team</p>
+            <p>support@cistudy.com</p>
+            <p>&copy; 2024 <span class="highlight">Ci</span><span style="color: #116761;">Study</span>. All rights reserved.</p>
+            <p>This email was sent from an automated system, please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>
+`
+export const reportPostCommentMail = (reportedPostCommentCreatorEmail: string, reporterUsername: string, postCommentContent: string, reportedDate: Date, title: string, description: string, processStatus: string, processNote: string) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #116761;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            font-size: 1.5em;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+            text-align: center;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .highlight {
+            color: #14B8A6;
+        }
+        h1 {
+            font-size: 1.5em;
+        }
+        h3 {
+            font-size: 1.2em;
+        }
+        p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Notification of Report Received</h1>
+        </div>
+        <div class="content">
+            <h3>Dear ${reportedPostCommentCreatorEmail},</h3>
+            <p>We hope this message finds you well. We are writing to inform you that a report has been submitted regarding your comment on a post with the content "<strong>${postCommentContent}</strong>" on <span class="highlight">Ci</span><span style="color: #116761;">Study</span>.</p>
+
+            <h4>Details of the Report:</h4>
+            <p><strong>Reported By:</strong> ${reporterUsername}</p>
+            <p><strong>Date of Report:</strong> ${reportedDate}</p>
+            <p><strong>Reason for Report:</strong> ${title}</p>
+            <p><strong>Description:</strong> ${description}</p>
+
+            ${processStatus === "approved" ? `
+            <h4>Our Actions:</h4>
+            <p>${processNote}</p>
+            <h4>Recommendations:</h4>
+            <p>- Ensure that your comments comply with our community guidelines and terms of service.</p>
+            <p>- Refrain from engaging in any retaliatory behavior against the reporting user.</p>
+            ` : `
+            <h4>Recommendations:</h4>
+            <p>- Ensure that your comments comply with our community guidelines and terms of service.</p>
+            <p>- Review our guidelines to avoid future reports.</p>
+            `}
+            
+            <p>We take all reports seriously and aim to maintain a safe and respectful environment for all our users. We appreciate your cooperation and understanding during this process.</p>
+
+            <p>If you have any questions or need further clarification, please do not hesitate to contact our support team at <a href="mailto:support@cistudy.com">support@cistudy.com</a>.</p>
+
+            <p>Thank you for your attention to this matter.</p>
+        </div>
+        <div class="footer">
+            <p>Best regards,</p>
+            <p>CiStudy Support Team</p>
+            <p>support@cistudy.com</p>
+            <p>&copy; 2024 <span class="highlight">Ci</span><span style="color: #116761;">Study</span>. All rights reserved.</p>
+            <p>This email was sent from an automated system, please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>
+`

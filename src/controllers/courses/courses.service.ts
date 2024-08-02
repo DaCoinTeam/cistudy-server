@@ -37,7 +37,7 @@ import {
     SectionContentMySqlEntity,
     SectionMySqlEntity,
 } from "@database"
-import { StorageService } from "@global"
+import { MailerService, StorageService } from "@global"
 import {
     ConflictException,
     Inject,
@@ -194,6 +194,7 @@ export class CoursesService {
     private readonly storageService: StorageService,
     private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
     private readonly dataSource: DataSource,
+    private readonly mailerService: MailerService,
     ) {}
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
@@ -2101,8 +2102,16 @@ export class CoursesService {
         const { data } = input
         const { reportCourseId, processNote, processStatus } = data
 
-        const found = await this.reportCourseMySqlRepository.findOneBy({
-            reportCourseId,
+        const found = await this.reportCourseMySqlRepository.findOne({
+            where:{
+                reportCourseId
+            },
+            relations:{
+                reportedCourse:{
+                    creator: true
+                },
+                reporterAccount: true
+            }
         })
 
         if (!found) {
@@ -2117,6 +2126,19 @@ export class CoursesService {
             processStatus,
             processNote,
         })
+
+        const {reportedCourse, reporterAccount, createdAt, title, description } = found
+
+        await this.mailerService.sendReportCourseMail(
+            reportedCourse.creator.email,
+            reporterAccount.username,
+            reportedCourse.title,
+            createdAt,
+            title,
+            description,
+            processStatus,
+            processNote
+        )
 
         return {
             message: "Report successfully resolved and closed.",
@@ -2143,7 +2165,7 @@ export class CoursesService {
             description: `Your newly created course, "${course.title}", has been submitted to our moderation team for verification. Thank you for choosing CiStudy as the place to realize your teaching dreams.`,
             referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`, 
         })
-        
+
         return {
             message: "Your course has been submitted for review, thank you.",
         }
