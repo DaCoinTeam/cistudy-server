@@ -1,7 +1,9 @@
-import { Files } from "@common"
+import { Files, SystemRoles } from "@common"
 import {
     Body,
     Controller,
+    Delete,
+    Param,
     Patch,
     Put,
     UploadedFiles,
@@ -10,8 +12,8 @@ import {
 } from "@nestjs/common"
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
-import { AccountId, AuthInterceptor, DataFromBody, JwtAuthGuard } from "../shared"
-import { DepositData, UpdateProfileData, WithdrawData } from "./profile.input"
+import { AccountId, AuthInterceptor, DataFromBody, JwtAuthGuard, Roles } from "../shared"
+import { DepositData, MarkNotificationAsReadInputData, UpdateProfileData, WithdrawData } from "./profile.input"
 import { updateProfileSchema } from "./profile.schema"
 import { ProfileService } from "./profile.service"
 
@@ -77,5 +79,35 @@ export class ProfileController{
     	}) 
     }
 
+    @ApiBearerAuth()
+    @Patch("mark-notification-as-read")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+        AuthInterceptor
+    )
+    async markNotificationAsRead(
+        @AccountId() accountId: string,
+        @Body() data: MarkNotificationAsReadInputData,
+    ) {     
+    	return this.profileService.markNotificationAsRead({
+    		accountId,
+            data
+    	}) 
+    }
 
+    @ApiBearerAuth()
+    @Delete("delete-notification/:notificationId")
+    @UseGuards(JwtAuthGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async deleteNotification(
+        @AccountId() accountId: string, 
+        @Param("notificationId") notificationId: string
+    ) {
+        return await this.profileService.deleteNotification({
+            accountId, data: {
+                notificationId
+            }
+        })
+    }
 }

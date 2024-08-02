@@ -20,15 +20,19 @@ import {
 import { InjectModel } from "@nestjs/mongoose"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Model } from "mongoose"
-import { DeepPartial, Repository } from "typeorm"
+import { DeepPartial, In, Repository } from "typeorm"
 import Web3 from "web3"
 import {
+    DeleteNotificationInput,
     DepositInput,
+    MarkNotificationAsReadInput,
     UpdateProfileInput,
     WithdrawInput,
 } from "./profile.input"
 import {
+    DeleteNotificationOutput,
     DepositOutput,
+    MarkNotificationAsReadOutput,
     UpdateProfileOutput,
     WithdrawOutput,
 } from "./profile.output"
@@ -36,26 +40,26 @@ import {
 @Injectable()
 export class ProfileService {
     constructor(
-    @InjectRepository(AccountMySqlEntity)
-    private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
-    @InjectRepository(TransactionMySqlEntity)
-    private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
-    @InjectModel(TransactionMongoEntity.name)
-    private readonly transactionMongoModel: Model<TransactionMongoEntity>,
-    @InjectRepository(NotificationMySqlEntity)
-    private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
-    private readonly storageService: StorageService,
-    private readonly blockchainService: BlockchainService,
-    ) {}
+        @InjectRepository(AccountMySqlEntity)
+        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+        @InjectRepository(TransactionMySqlEntity)
+        private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
+        @InjectModel(TransactionMongoEntity.name)
+        private readonly transactionMongoModel: Model<TransactionMongoEntity>,
+        @InjectRepository(NotificationMySqlEntity)
+        private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+        private readonly storageService: StorageService,
+        private readonly blockchainService: BlockchainService,
+    ) { }
 
     async updateProfile(input: UpdateProfileInput): Promise<UpdateProfileOutput> {
         const { accountId, data, files } = input
         const { username, birthdate, avatarIndex, coverPhotoIndex, walletAddress } =
-      data
+            data
         //validate to ensure it is image
 
         const { avatarId, coverPhotoId } =
-      await this.accountMySqlRepository.findOneBy({ accountId })
+            await this.accountMySqlRepository.findOneBy({ accountId })
 
         const profile: DeepPartial<AccountMySqlEntity> = {
             username,
@@ -136,7 +140,7 @@ export class ProfileService {
         })
 
         return { message: "Withdraw successfully." }
-    } 
+    }
 
     async deposit(input: DepositInput): Promise<DepositOutput> {
         const { accountId, data } = input
@@ -217,6 +221,30 @@ export class ProfileService {
             others: {
                 amount,
             },
+        }
+    }
+
+    async markNotificationAsRead(input: MarkNotificationAsReadInput): Promise<MarkNotificationAsReadOutput> {
+        const { data } = input
+        const { notificationIds } = data
+
+        await this.notificationMySqlRepository.update({
+            notificationId: In(notificationIds)
+        }, { viewed: true })
+
+        return {
+            message: "Marked successfully"
+        }
+    }
+
+    async deleteNotification(input : DeleteNotificationInput) : Promise<DeleteNotificationOutput> {
+        const { data } = input
+        const {notificationId } = data
+
+        await this.notificationMySqlRepository.delete({ notificationId })
+
+        return {
+            message: "Notification deleted successfully"
         }
     }
 }

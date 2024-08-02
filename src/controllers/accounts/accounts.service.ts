@@ -144,6 +144,7 @@ export class AccountsService {
                 receiverId: course.creatorId,
                 title: "You have new updates on your created course",
                 type: NotificationType.Course,
+                courseId,
                 description: `Your course ${course.title} has been verified and it now available for learner to access. Thanks for choosing CiStudy!`
             })
         }else{
@@ -151,6 +152,7 @@ export class AccountsService {
                 receiverId: course.creatorId,
                 title: "You have new updates on your created course",
                 type: NotificationType.Course,
+                courseId,
                 description: `Your course, "${course.title}", has been rejected due to issues identified by our moderation team. Please check your email for more details.`
             })
         }

@@ -316,6 +316,7 @@ export class CoursesService {
                     receiverId: creatorId,
                     title: "You have new enrollment to your course",
                     type: NotificationType.Course,
+                    courseId,
                     description: `User ${username} has enrolled to your course: ${title}`,
                     referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`,
                 },
@@ -509,6 +510,7 @@ export class CoursesService {
                     receiverId: course.creatorId,
                     title: `Your course : ${course.title} has received a review!`,
                     type: NotificationType.Course,
+                    courseId,
                     description: `User ${enrolled.account.username} has wrote a ${rating} star(s) review on your course.`,
                     referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`,
                 })
@@ -2162,6 +2164,7 @@ export class CoursesService {
             receiverId: course.creatorId,
             title: "Course Submitted for Verification",
             type: NotificationType.Course,
+            courseId,
             description: `Your newly created course, "${course.title}", has been submitted to our moderation team for verification. Thank you for choosing CiStudy as the place to realize your teaching dreams.`,
             referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`, 
         })

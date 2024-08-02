@@ -473,6 +473,24 @@ type ReportCourseEntity {
   reportedCourse: CourseEntity!
 }
 
+type NotificationEntity {
+  notificationId: ID!
+  senderId: ID
+  receiverId: ID
+  courseId: ID
+  type: String
+  title: String
+  description: String
+  referenceLink: String
+  viewed: Boolean!
+  isPublished: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  sender: AccountEntity
+  receiver: AccountEntity
+  course: CourseEntity
+}
+
 type CourseEntity {
   courseId: ID!
   title: String
@@ -500,6 +518,7 @@ type CourseEntity {
   orderCourses: [OrderCourseEntity!]!
   courseReview: [CourseReviewEntity!]
   courseReports: [ReportCourseEntity!]
+  courseNotifications: [NotificationEntity!]
   numberOfEnrollments: Int
   enrolled: Boolean
   isReviewed: Boolean
@@ -577,22 +596,6 @@ type RoleEntity {
   createdAt: DateTime!
   updatedAt: DateTime!
   accountRoles: AccountEntity!
-}
-
-type NotificationEntity {
-  notificationId: ID!
-  senderId: ID
-  receiverId: ID
-  type: String
-  title: String
-  description: String
-  referenceLink: String
-  viewed: Boolean!
-  isPublished: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  sender: AccountEntity
-  receiver: AccountEntity
 }
 
 type AccountEntity {

@@ -47,3 +47,25 @@ export class DepositInput implements AuthInput<DepositData> {
     data: DepositData
 }
 
+export class MarkNotificationAsReadInputData {
+    @ApiProperty()
+        notificationIds : Array<string>
+}
+
+export class MarkNotificationAsReadInput implements AuthInput<MarkNotificationAsReadInputData> {
+    accountId: string
+    data: MarkNotificationAsReadInputData
+}
+
+
+export class DeleteNotificationInputData {
+    @ApiProperty()
+        notificationId : string
+}
+
+export class DeleteNotificationInput implements AuthInput<DeleteNotificationInputData> {
+    accountId: string
+    data: DeleteNotificationInputData
+}
+
+

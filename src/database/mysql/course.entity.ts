@@ -22,6 +22,7 @@ import { OrderCourseEntity } from "./order-course.entity"
 import { PostEntity } from "./post.entity"
 import { ReportCourseEntity } from "./report-course.entity"
 import { SectionEntity } from "./section.entity"
+import { NotificationEntity } from "./notification.entity"
 
 
 interface CourseIncludes {
@@ -145,6 +146,9 @@ export class CourseEntity {
     @OneToMany(() => ReportCourseEntity, (reportCourse) => reportCourse.reportedCourse, {nullable: true})
         courseReports?: Array<ReportCourseEntity>
 
+    @Field(() => [NotificationEntity], { nullable: true })
+    @OneToMany(() => NotificationEntity, (notification) => notification.course, {nullable: true})
+        courseNotifications?: Array<NotificationEntity>
     //graphql
     @Field(() => Int, { nullable: true })
         numberOfEnrollments?: number
