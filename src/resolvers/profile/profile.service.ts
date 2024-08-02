@@ -91,6 +91,7 @@ export class ProfileService {
                 await this.courseMySqlRepository.createQueryBuilder()
                     .select("COUNT(follow.followerId)", "count")
                     .addSelect("course.courseId", "courseId")
+                    .innerJoin(CourseMySqlEntity, "course")
                     .innerJoin(AccountMySqlEntity, "account", "course.creatorId = account.accountId")
                     .innerJoin(FollowMySqlEnitity, "follow", "account.accountId = follow.followerId")
                     .where("followed = :followed", { followed: true })
@@ -99,6 +100,7 @@ export class ProfileService {
 
         const numberOfEnrolledCoursesResult = await this.courseMySqlRepository.createQueryBuilder()
             .select("COUNT(*)", "count")
+            .innerJoin(CourseMySqlEntity, "course")
             .innerJoin(EnrolledInfoMySqlEntity, "enrolledInfo", "course.courseId = enrolledInfo.courseId")
             .where("enrolledInfo.accountId = :accountId", { accountId })
             .andWhere("enrolledInfo.enrolled = :enrolled", { enrolled: true })
