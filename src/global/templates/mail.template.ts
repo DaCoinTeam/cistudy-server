@@ -171,7 +171,7 @@ export const verifyAccountMail = (username: string, email: string, frontendUrl: 
             display: inline-block;
             padding: 10px 20px;
             margin: 10px 0;
-            color: #000 !important;
+            color: #fff !important;
             background-color: #006FEE;
             text-decoration: none;
             border-radius: 5px;

@@ -335,6 +335,7 @@ export class CoursesService {
         const { accountId } = input
         const created = await this.courseMySqlRepository.save({
             creatorId: accountId,
+            title: "Untitled"
         })
 
         if (!created) {
