@@ -38,7 +38,7 @@ export class CourseTargetEntity {
       courseId: string
 
   @Field(() => CourseEntity)
-  @ManyToOne(() => CourseEntity, (course) => course.courseTargets)
+  @ManyToOne(() => CourseEntity, (course) => course.courseTargets, {onDelete: "CASCADE"})
   @JoinColumn({ name: "courseId" })
       course: CourseEntity
 }

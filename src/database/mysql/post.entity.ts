@@ -43,6 +43,10 @@ export class PostEntity {
     @Column({ type: "boolean", default: false })
         isRewardable: boolean
 
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: false })
+        isDisabled: boolean
+
     @Field(() => Date)
     @CreateDateColumn()
         createdAt: Date
@@ -98,4 +102,6 @@ export class PostEntity {
         numberOfRewardableCommentsLeft?: number
     @Field(() => Boolean, {nullable : true})
         isReported? : boolean
+    @Field(() => Int, { nullable: true })
+        numberOfReports?: number
 }

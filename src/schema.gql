@@ -391,6 +391,7 @@ type PostCommentEntity {
   updatedAt: DateTime!
   html: String!
   isSolution: Boolean!
+  isDisabled: Boolean!
   post: PostEntity!
   creator: AccountEntity!
   postCommentMedias: [PostCommentMediaEntity!]!
@@ -401,6 +402,7 @@ type PostCommentEntity {
   isCommentOwner: Boolean
   isRewardable: Boolean
   isReported: Boolean
+  numberOfReports: Int
 }
 
 type PostLikeEntity {
@@ -443,6 +445,7 @@ type PostEntity {
   courseId: ID!
   isCompleted: Boolean!
   isRewardable: Boolean!
+  isDisabled: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   html: String!
@@ -459,6 +462,7 @@ type PostEntity {
   numberOfRewardableLikesLeft: Int
   numberOfRewardableCommentsLeft: Int
   isReported: Boolean
+  numberOfReports: Int
 }
 
 type ReportCourseEntity {
@@ -535,6 +539,7 @@ type CourseEntity {
   certificateStatus: String
   certificate: CertificateEntity
   isReported: Boolean
+  numberOfReports: Int
 }
 
 type CartCourseEntity {
@@ -644,6 +649,7 @@ type AccountEntity {
   numberOfFollowers: Int!
   accountRatings: AccountRating
   isReported: Boolean
+  numberOfReports: Int
 }
 
 type TransactionEntity {

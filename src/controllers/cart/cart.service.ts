@@ -1,7 +1,7 @@
-import { AccountMySqlEntity, CartCourseMySqlEntity, CartMySqlEntity, CourseMySqlEntity, OrderCourseMySqlEntity, OrderMySqlEntity } from "@database"
+import { AccountMySqlEntity, CartCourseMySqlEntity, CartMySqlEntity, OrderCourseMySqlEntity, OrderMySqlEntity } from "@database"
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { DataSource, In, Repository } from "typeorm"
+import { In, Repository } from "typeorm"
 import { AddToCartInput, CheckOutInput, DeleteFromCartInput } from "./cart.input"
 import { AddToCartOutput, CheckOutOutput, DeleteFromCartOutput } from "./cart.output"
 

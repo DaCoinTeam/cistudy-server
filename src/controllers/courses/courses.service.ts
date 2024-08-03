@@ -834,6 +834,7 @@ export class CoursesService {
     ): Promise<CreateCourseTargetOuput> {
         const { data } = input
         const { content, courseId } = data
+
         const maxResult = await this.courseTargetMySqlRepository.count({
             where: {
                 courseId,
@@ -931,7 +932,7 @@ export class CoursesService {
             position,
         })
         return {
-            message: `A section with id  ${sectionId} has been updated successfully.`,
+            message: "Section has been updated successfully.",
         }
     }
 
