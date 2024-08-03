@@ -132,6 +132,7 @@ type LessonEntity {
   createdAt: DateTime!
   progresses: [ProgressEntity!]
   updatedAt: DateTime!
+  isTrial: Boolean!
   sectionContent: SectionContentEntity!
   enableSeek: Boolean
 }

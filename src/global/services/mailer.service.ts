@@ -26,7 +26,7 @@ export class MailerService {
         return {
             from: servicesConfig().mailer.user,
             to: email,
-            subject: "You have new updates on your submitted course",
+            subject: "YOU HAVE NEW UPDATES ON YOUR SUBMITTED COURSE",
             html: (verifyStatus === CourseVerifyStatus.Approved) ? acceptHTML : rejectHTML,
 
         }

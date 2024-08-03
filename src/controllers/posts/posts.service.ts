@@ -484,12 +484,12 @@ export class PostsService {
             await this.notificationMySqlRepository.save({
                 senderId: isEnrolled.account.accountId,
                 receiverId: post.creatorId,
+                type: NotificationType.Interact,
                 title: `You have new comment on your post: ${post.title}`,
                 description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`,
-                referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
+                referenceLink: `/posts/${post.postId}`,
             })
         }
-
 
         return {
             message: "Comment Posted Successfully",
@@ -633,13 +633,16 @@ export class PostsService {
         const { postCommentLikeId } = found
         const { username } = await this.accountMySqlRepository.findOneBy({ accountId })
 
-        await this.notificationMySqlRepository.save({
-            senderId: accountId,
-            receiverId: postComment.creatorId,
-            title: "You have new react on your comment",
-            type: NotificationType.Interact,
-            description: `User ${username} has reacted to your comment at post : ${postComment.post.title}`
-        })
+        if (accountId !== postComment.creatorId) {
+            await this.notificationMySqlRepository.save({
+                senderId: accountId,
+                receiverId: postComment.creatorId,
+                title: "You have new react on your comment",
+                type: NotificationType.Interact,
+                description: `User ${username} has reacted to your comment at post : ${postComment.post.title}`,
+                referenceLink: `posts/${postComment.post.postId}`
+            })
+        }
 
         return {
             message: "",
@@ -683,26 +686,17 @@ export class PostsService {
 
         const { username } = await this.accountMySqlRepository.findOneBy({ accountId })
 
-        const nottifications = [
-            {
+        if (accountId !== postComment.creatorId) {
+            await this.notificationMySqlRepository.save({
                 senderId: accountId,
                 receiverId: postComment.creatorId,
                 title: "You have new reply on your comment",
                 type: NotificationType.Interact,
-                description: `User ${username} has replied to your comment at post : ${postComment.post.title}`
-            },
-            {
-                senderId: accountId,
-                receiverId: postComment.post.creatorId,
-                title: "You have new comment on your post",
-                type: NotificationType.Interact,
-                description: `User ${username} has replied to ${postComment.creator.username} at post : ${postComment.post.title}`,
-                referenceLink: `${appConfig().frontendUrl}/courses/${postComment.post.course.courseId}/home`
-            }
-        ]
-
-        await this.notificationMySqlRepository.save(nottifications)
-
+                description: `User ${username} has replied to your comment at post : ${postComment.post.title}`,
+                referenceLink: `/posts/${postComment.post.postId}`
+            },)
+        }
+      
         return {
             message: "Reply created successfully",
             others: { postCommentReplyId }

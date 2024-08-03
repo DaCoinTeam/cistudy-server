@@ -46,6 +46,9 @@ export class ProfileService {
             },
             take,
             skip,
+            order: {
+                updatedAt: "DESC"
+            }
         })
 
         const numberOfCoursesResult = await this.courseMySqlRepository.count({

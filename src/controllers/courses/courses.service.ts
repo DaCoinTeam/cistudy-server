@@ -9,6 +9,7 @@ import {
     ReportProcessStatus,
     SectionContentType,
     shuffleArray,
+    SystemRoles,
     VideoType,
 } from "@common"
 import {
@@ -335,7 +336,7 @@ export class CoursesService {
         const { accountId } = input
         const created = await this.courseMySqlRepository.save({
             creatorId: accountId,
-            title: "Untitled"
+            title: "Untitled",
         })
 
         if (!created) {
@@ -820,7 +821,9 @@ export class CoursesService {
                 const mediaIds = attachments.map(({ fileId }) => fileId)
                 await this.storageService.delete(...mediaIds)
             }
-            await this.resourceMySqlRepository.delete({ resourceId: sectionContentId })
+            await this.resourceMySqlRepository.delete({
+                resourceId: sectionContentId,
+            })
             break
         }
         default:
@@ -1137,8 +1140,7 @@ export class CoursesService {
         }))
 
         //await this.courseCategoryMySqlRepository.save(courseCategories);
-        await this.courseCategoryMySqlRepository.save(courseCategories,
-        )
+        await this.courseCategoryMySqlRepository.save(courseCategories)
 
         return {
             message: "Course Category has been created successfully",
@@ -1159,9 +1161,7 @@ export class CoursesService {
         })
 
         if (!found)
-            throw new NotFoundException(
-                "No specified course found in this category",
-            )
+            throw new NotFoundException("No specified course found in this category")
 
         await this.courseCategoryMySqlRepository.delete({
             categoryId,
@@ -1387,12 +1387,11 @@ export class CoursesService {
         if (files) {
             const { mediaIndex, mediaType } = questionMedia
             const file = files.at(mediaIndex)
-           
 
             if (quizQuestion.mediaId) {
                 await this.storageService.delete(quizQuestion.mediaId)
             }
-            
+
             const { assetId } = await this.storageService.upload({
                 rootFile: file,
             })
@@ -1701,7 +1700,6 @@ export class CoursesService {
         const { data } = input
         const { sectionContentId } = data
 
-
         console.log(sectionContentId)
         // const progress = await this.progressMySqlRepository.findOne({
         //     where: { sectionContentId },
@@ -1778,8 +1776,7 @@ export class CoursesService {
             timeLimitAtStart: timeLimit,
         })
 
-        const questions: Array<DeepPartial<QuizQuestionMySqlEntity>> =
-        shuffleArray(
+        const questions: Array<DeepPartial<QuizQuestionMySqlEntity>> = shuffleArray(
             quiz.questions.map(({ answers, quizQuestionId, position }) => ({
                 quizQuestionId,
                 position,
@@ -1794,7 +1791,6 @@ export class CoursesService {
 
         await this.cacheManager.set(quizAttemptId, questions, 0)
 
-           
         return {
             message: "Attempt Started Successfully!",
             others: {
@@ -1851,8 +1847,7 @@ export class CoursesService {
                         .map(({ quizQuestionAnswerId }) => quizQuestionAnswerId)
                         .includes(quizQuestionAnswerId),
             )
-            if (attemptAnswersInThisQuestion.length > correctAnswers.length)
-                continue
+            if (attemptAnswersInThisQuestion.length > correctAnswers.length) continue
             for (const { quizQuestionAnswerId } of attemptAnswersInThisQuestion) {
                 if (
                     correctAnswers
@@ -1882,7 +1877,6 @@ export class CoursesService {
             observedAt: new Date(),
             attemptStatus: QuizAttemptStatus.Ended,
         })
-
 
         return {
             message: "Quiz ended successfully!",
@@ -1987,15 +1981,15 @@ export class CoursesService {
         const { reportCourseId, processNote, processStatus } = data
 
         const found = await this.reportCourseMySqlRepository.findOne({
-            where:{
-                reportCourseId
+            where: {
+                reportCourseId,
             },
-            relations:{
-                reportedCourse:{
-                    creator: true
+            relations: {
+                reportedCourse: {
+                    creator: true,
                 },
-                reporterAccount: true
-            }
+                reporterAccount: true,
+            },
         })
 
         if (!found) {
@@ -2011,7 +2005,8 @@ export class CoursesService {
             processNote,
         })
 
-        const {reportedCourse, reporterAccount, createdAt, title, description } = found
+        const { reportedCourse, reporterAccount, createdAt, title, description } =
+      found
 
         await this.mailerService.sendReportCourseMail(
             reportedCourse.creator.email,
@@ -2021,7 +2016,7 @@ export class CoursesService {
             title,
             description,
             processStatus,
-            processNote
+            processNote,
         )
 
         return {
@@ -2042,14 +2037,38 @@ export class CoursesService {
         await this.courseMySqlRepository.update(courseId, {
             verifyStatus: CourseVerifyStatus.Pending,
         })
+
         await this.notificationMySqlRepository.save({
             receiverId: course.creatorId,
             title: "Course Submitted for Verification",
             type: NotificationType.Course,
             courseId,
             description: `Your newly created course, "${course.title}", has been submitted to our moderation team for verification. Thank you for choosing CiStudy as the place to realize your teaching dreams.`,
-            referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`, 
+            referenceLink: `/courses/${courseId}/management`,
         })
+
+        const moderators = (
+            await this.accountMySqlRepository.find({
+                relations: {
+                    roles: true,
+                },
+            })
+        ).filter(({ roles }) =>
+            roles.map(({ name }) => name).includes(SystemRoles.Moderator),
+        )
+
+        const notificationsToModerator: Array<
+      DeepPartial<NotificationMySqlEntity>
+    > = moderators.map(({ accountId }) => ({
+        receiverId: accountId,
+        title: "Course Submitted for Verification",
+        type: NotificationType.Course,
+        courseId,
+        description: `A new course "${course.title}" has been submitted. Please take a look to resolve.`,
+        referenceLink: `/moderator/course-preview/${courseId}`,
+    }))
+
+        await this.notificationMySqlRepository.save(notificationsToModerator)
 
         return {
             message: "Your course has been submitted for review, thank you.",
@@ -2111,12 +2130,10 @@ export class CoursesService {
             actualPoints: point,
             maxPoints: point,
         })
-            
+
         return {
             message: "Your attempt has been updated successfully",
         }
-
-       
     }
 
     async markAsCompletedResource(

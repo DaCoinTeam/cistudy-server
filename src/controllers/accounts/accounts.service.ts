@@ -103,7 +103,8 @@ export class AccountsService {
             receiverId: followedAccountId,
             title: "You have new follower!",
             type: NotificationType.Interact,
-            description: `User ${found.follower.username} has followed you`
+            description: `User ${found.follower.username} has followed you`,
+            referenceLink: `/accounts/${accountId}`
         })
 
         return responseMessage(followId, !followed)
@@ -149,7 +150,7 @@ export class AccountsService {
                 courseId,
                 description: `Your course ${course.title} has been verified and it now available for learner to access. Thanks for choosing CiStudy!`
             })
-        }else{
+        } else {
             await this.notificationMySqlRepository.save({
                 receiverId: course.creatorId,
                 title: "You have new updates on your created course",

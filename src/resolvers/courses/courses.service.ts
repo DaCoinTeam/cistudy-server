@@ -631,6 +631,9 @@ export class CoursesService {
                 },
                 courseTargets: true,
             },
+            order: {
+                updatedAt: "DESC"
+            }
         })
 
         if (categoryIds?.length) {

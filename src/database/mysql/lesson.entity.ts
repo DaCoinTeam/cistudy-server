@@ -60,6 +60,10 @@ export class LessonEntity {
     @Field(() => Date)
     @UpdateDateColumn()
         updatedAt: Date
+    
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: false })
+        isTrial: boolean
 
     @Field(() => SectionContentEntity)
     @OneToOne(() => SectionContentEntity, (sectionContent) => sectionContent.lesson, {
