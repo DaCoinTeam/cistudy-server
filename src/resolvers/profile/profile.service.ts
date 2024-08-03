@@ -246,10 +246,18 @@ export class ProfileService {
             }
         })
 
+        const notViewedCount = await this.notificationMySqlRepository.count({
+            where: {
+                receiverId: accountId,
+                viewed: false
+            }
+        })
+
         return {
             results,
             metadata: {
-                count: numberOfNotifications
+                count: numberOfNotifications,
+                notViewedCount
             }
         }
     }

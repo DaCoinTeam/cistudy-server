@@ -921,6 +921,7 @@ type FindManyTransactionsOutput {
 
 type FindManyReceivedNotificationsOutputMetadata {
   count: Int
+  notViewedCount: Int
 }
 
 type FindManyReceivedNotificationsOutputData {

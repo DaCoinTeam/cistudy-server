@@ -93,6 +93,8 @@ implements AuthOutput<FindManyTransactionsOutputData>
 export class FindManyReceivedNotificationsOutputMetadata {
     @Field(() => Int, { nullable: true })
         count?: number
+    @Field(() => Int, { nullable: true })
+        notViewedCount?: number
 }
 
 @ObjectType()
