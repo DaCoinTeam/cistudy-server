@@ -140,7 +140,7 @@ export class CourseEntity {
 
     @Field(() => [CourseReviewEntity], { nullable: true })
     @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.course)
-        courseReview?: Array<CourseReviewEntity>
+        courseReviews?: Array<CourseReviewEntity>
 
     @Field(() => [ReportCourseEntity], { nullable: true })
     @OneToMany(() => ReportCourseEntity, (reportCourse) => reportCourse.reportedCourse, {nullable: true})

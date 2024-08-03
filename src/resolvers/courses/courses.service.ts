@@ -154,6 +154,9 @@ export class CoursesService {
                 courseCategories: {
                     category: true,
                 },
+                courseReviews: {
+                    account: true
+                }
             },
             order: {
                 courseTargets: {
@@ -537,13 +540,16 @@ export class CoursesService {
 
         course.certificateStatus = CertificateStatus.Cannot
 
-        for (const section of course.sections) {
+        const sections = Object.assign(course.sections, [])
+        sections.sort((prev, next) => prev.position - next.position)
+
+        for (const section of sections) {
             section.lockState = LockState.Locked
         }
-        for (let i = 0; i < course.sections.length; i++) {
-            course.sections[i].lockState = LockState.InProgress
+        for (let i = 0; i < sections.length; i++) {
+            sections[i].lockState = LockState.InProgress
             let allCompleted = true
-            for (const content of course.sections[i].contents) {
+            for (const content of sections[i].contents) {
                 if (content.completeState !== CompleteState.Completed) {
                     allCompleted = false
                     break
@@ -551,8 +557,8 @@ export class CoursesService {
             }
 
             if (allCompleted) {
-                course.sections[i].lockState = LockState.Completed
-                if (i === course.sections.length - 1) {
+                sections[i].lockState = LockState.Completed
+                if (i === sections.length - 1) {
                     const certificate = await this.certificateMySqlRepository.findOne({
                         where: {
                             courseId,
@@ -566,6 +572,8 @@ export class CoursesService {
             } else {
                 break
             }
+
+            course.sections = sections
 
             const certificate = await this.certificateMySqlRepository.findOne({
                 where: {

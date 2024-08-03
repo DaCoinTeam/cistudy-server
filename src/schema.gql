@@ -83,6 +83,7 @@ type CertificateEntity {
   courseId: ID!
   accountId: ID!
   createdAt: DateTime!
+  achievedDate: DateTime
   expiredDate: DateTime
   account: AccountEntity!
   course: CourseEntity
@@ -523,7 +524,7 @@ type CourseEntity {
   cartCourses: [CartCourseEntity!]!
   certificates: [CertificateEntity!]!
   orderCourses: [OrderCourseEntity!]!
-  courseReview: [CourseReviewEntity!]
+  courseReviews: [CourseReviewEntity!]
   courseReports: [ReportCourseEntity!]
   courseNotifications: [NotificationEntity!]
   numberOfEnrollments: Int

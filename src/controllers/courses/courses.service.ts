@@ -137,8 +137,9 @@ import {
     UpdateSectionContentOuput,
     UpdateSectionOuput,
 } from "./courses.output"
-import { appConfig } from "@config"
+import { appConfig, blockchainConfig } from "@config"
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager"
+import numeral from "numeral"
 
 @Injectable()
 export class CoursesService {
@@ -1192,38 +1193,50 @@ export class CoursesService {
 
         const now = new Date()
 
-        const activeEnrollment = enrollments.some(
+        const activeEnrollment = enrollments.find(
             (enrollment) => new Date(enrollment.endDate) > now,
         )
 
-        if (activeEnrollment) {
-            const found = await this.courseCertificateMySqlEntity.findOne({
-                where: {
-                    accountId,
-                    courseId,
-                },
-            })
-
-            if (found) {
-                throw new ConflictException(
-                    "You have already get certificate of this course",
-                )
-            }
-        } // Báo lỗi người dùng không có lượt đăng kí khóa học nào còn hạn sử dụng
-        else
+        if (!activeEnrollment) {
             throw new NotFoundException(
                 "You do not have any active enrollments in this course that remain valid. ",
             )
+        }
+
+        const found = await this.courseCertificateMySqlEntity.findOne({
+            where: {
+                accountId,
+                courseId,
+            },
+        }) 
+
+        if (found) {
+            throw new ConflictException(
+                "You have already get certificate of this course",
+            )
+        }
+
+        const { balance } = await this.accountMySqlRepository.findOne({
+            where: {
+                accountId
+            }
+        })
+
+        const earnAmount = blockchainConfig().earns.percentage * activeEnrollment.priceAtEnrolled
+
+        await this.accountMySqlRepository.update(accountId, {
+            balance: balance + earnAmount
+        }) 
 
         const achievedDate = new Date()
-        const expireDate = new Date(achievedDate)
-        expireDate.setDate(expireDate.getDate() + 90)
+        const expiredDate = new Date(achievedDate)
+        expiredDate.setDate(expiredDate.getDate() + 90)
 
         const { certificateId } = await this.courseCertificateMySqlEntity.save({
             accountId,
             courseId,
             achievedDate,
-            expireDate,
+            expiredDate,
         })
 
         const { title } = await this.courseMySqlRepository.findOneBy({ courseId })
@@ -1232,12 +1245,20 @@ export class CoursesService {
             receiverId: accountId,
             title: "You have received a certificate!",
             type: NotificationType.Certificate,
+            courseId,
             description: `You have been received a certificate for your completion on the course: ${title} `,
-            referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`,
+            referenceLink: `/certificate/${certificateId}`,
+        })
+
+        await this.notificationMySqlRepository.save({
+            receiverId: accountId,
+            title: "You have new update on your balance!",
+            type: NotificationType.Transaction,
+            description: `You have received ${numeral(earnAmount).format("0.00")} STARCI(s)`,
         })
 
         return {
-            message: "Certificate Created Successfully",
+            message: "Certificate created successfully",
             others: {
                 certificateId,
             },

@@ -43,7 +43,7 @@ export class CourseReviewEntity {
         updatedAt: Date
 
     @Field(() => CourseEntity)
-    @ManyToOne(() => CourseEntity,(course) => course.courseReview ,{ nullable: true })
+    @ManyToOne(() => CourseEntity,(course) => course.courseReviews ,{ nullable: true })
     @JoinColumn({ name: "courseId" })
         course: CourseEntity
 

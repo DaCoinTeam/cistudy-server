@@ -72,7 +72,7 @@ implements OnGatewayConnection, OnGatewayDisconnect
       return { event: INITIALIZED, data: "Connected" }
   }
 
-  @Interval(1000)
+  //@Interval(1000)
   async publish() {
       const notifications = await this.notificationMySqlRepository.find({
           where: {
@@ -102,7 +102,7 @@ implements OnGatewayConnection, OnGatewayDisconnect
       }
   }
 
-  @Interval(1000)
+  //@Interval(1000)
   async processAttempts() {
       const attempts = await this.quizAttemptMySqlRepository.find({
           where: {

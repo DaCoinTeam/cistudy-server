@@ -33,6 +33,10 @@ export class CertificateEntity {
 
     @Field(() => Date, { nullable: true })
     @Column({ type: "datetime" , nullable: true })
+        achievedDate: Date
+
+    @Field(() => Date, { nullable: true })
+    @Column({ type: "datetime" , nullable: true })
         expiredDate: Date
     //relations
 

@@ -212,7 +212,11 @@ export class ProfileService {
             }
         })
 
-        const count = await this.transactionMySqlRepository.count()
+        const count = await this.transactionMySqlRepository.count({
+            where: {
+                accountId
+            },
+        })
         return {
             results: transactions,
             metadata: {
@@ -277,7 +281,8 @@ export class ProfileService {
                 account: true,
                 course: {
                     creator : true,
-                    courseTargets: true
+                    courseTargets: true,
+                    sections: true
                 }
             }
         })
