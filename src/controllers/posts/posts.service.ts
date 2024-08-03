@@ -326,7 +326,7 @@ export class PostsService {
                     await this.notificationMySqlRepository.save({
                         receiverId: accountId,
                         title: "You have new update on your balance!",
-                        type: NotificationType.Interact,
+                        type: NotificationType.Transaction,
                         description: `You have received ${earnAmount} STARCI(s)`,
                     })
                 }
@@ -805,9 +805,10 @@ export class PostsService {
         await this.notificationMySqlRepository.save({
             senderId: postComment.post.creatorId,
             receiverId: postComment.creatorId,
+            referenceLink: `/posts/${postId}`,
             title: "Your comment has been marked as post's solution",
             description: `
-                        Your comment on the post "${postComment.post.title}", with the content "${postComment.html}", has been marked as the solution by the post owner. 
+                        Your comment on the post "${postComment.post.title}" has been marked as the solution by the post owner. 
                         ${isRewardable ? "You will receive an amount of STARCI for this." : null} Keep up the great work!`
         })
 

@@ -148,6 +148,7 @@ export class AccountsService {
                 title: "You have new updates on your created course",
                 type: NotificationType.Course,
                 courseId,
+                referenceLink: `/courses/${courseId}`,
                 description: `Your course ${course.title} has been verified and it now available for learner to access. Thanks for choosing CiStudy!`
             })
         } else {
@@ -156,6 +157,7 @@ export class AccountsService {
                 title: "You have new updates on your created course",
                 type: NotificationType.Course,
                 courseId,
+                referenceLink: `/courses/${courseId}/management`,
                 description: `Your course, "${course.title}", has been rejected due to issues identified by our moderation team. Please check your email for more details.`
             })
         }

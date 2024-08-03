@@ -25,6 +25,7 @@ import Web3 from "web3"
 import {
     DeleteNotificationInput,
     DepositInput,
+    MarkAllNotificationsAsReadInput,
     MarkNotificationAsReadInput,
     UpdateProfileInput,
     WithdrawInput,
@@ -32,6 +33,7 @@ import {
 import {
     DeleteNotificationOutput,
     DepositOutput,
+    MarkAllNotificationsAsReadOutput,
     MarkNotificationAsReadOutput,
     UpdateProfileOutput,
     WithdrawOutput,
@@ -236,6 +238,26 @@ export class ProfileService {
             message: "Marked successfully"
         }
     }
+
+    async markAllNotificationsAsRead(input: MarkAllNotificationsAsReadInput): Promise<MarkAllNotificationsAsReadOutput> {
+        const { accountId } = input
+
+        const notifications = await this.notificationMySqlRepository.find({
+            where: {
+                receiverId: accountId
+            }
+        })
+
+        await this.notificationMySqlRepository.save(notifications.map(notification => {
+            notification.viewed = true 
+            return notification
+        }))
+
+        return {
+            message: "Marked all notifications successfully"
+        }
+    }
+
 
     async deleteNotification(input : DeleteNotificationInput) : Promise<DeleteNotificationOutput> {
         const { data } = input

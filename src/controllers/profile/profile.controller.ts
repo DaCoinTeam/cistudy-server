@@ -96,6 +96,20 @@ export class ProfileController{
     }
 
     @ApiBearerAuth()
+    @Patch("mark-all-notifications-as-read")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+        AuthInterceptor
+    )
+    async markAllNotificationsAsRead(
+        @AccountId() accountId: string,
+    ) {     
+    	return this.profileService.markAllNotificationsAsRead({
+    		accountId
+    	}) 
+    }
+
+    @ApiBearerAuth()
     @Delete("delete-notification/:notificationId")
     @UseGuards(JwtAuthGuard)
     @Roles(SystemRoles.User)

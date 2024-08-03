@@ -1,4 +1,4 @@
-import { AccountMySqlEntity, CartCourseMySqlEntity, CartMySqlEntity, OrderCourseMySqlEntity, OrderMySqlEntity } from "@database"
+import { AccountMySqlEntity, CartCourseMySqlEntity, CartMySqlEntity, EnrolledInfoMySqlEntity, OrderCourseMySqlEntity, OrderMySqlEntity } from "@database"
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { In, Repository } from "typeorm"
@@ -18,6 +18,8 @@ export class CartService {
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
         @InjectRepository(OrderCourseMySqlEntity)
         private readonly orderCoursesMySqlRepository: Repository<OrderCourseMySqlEntity>,
+        @InjectRepository(EnrolledInfoMySqlEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
     ) { }
 
 
@@ -74,15 +76,6 @@ export class CartService {
         const { data, accountId } = input
         const { cartCourseIds } = data
 
-        const now = new Date()
-        const paymentDue = new Date(now)
-        paymentDue.setDate(paymentDue.getDate() + 1)
-
-        const order = await this.orderMySqlRepository.save({
-            accountId,
-            paymentDue
-        })
-
         const cartCourses = await this.cartCourseMySqlRepository.find({
             where: {
                 cartCourseId: In(cartCourseIds)
@@ -92,29 +85,38 @@ export class CartService {
             }
         })
 
-        const orderCourses = []
-        const deleteCartCourses = []
+        let totalPay = 0
 
-        for (const course of cartCourses) {
-            orderCourses.push({
-                courseId: course.courseId,
-                orderId: order.orderId,
-                discountedPrice: course.course.discountPrice,
-                price: course.course.price,
+        for (const { course : { price, discountPrice, enableDiscount, courseId}} of cartCourses) {
+            const eachPrice = enableDiscount ? discountPrice : price
+            totalPay += eachPrice
+
+            const now = new Date()
+            now.setFullYear(now.getFullYear() + 1)
+            await this.enrolledInfoMySqlRepository.save({
+                priceAtEnrolled: eachPrice,
+                courseId,
+                accountId,
+                endDate: now
             })
-
-            deleteCartCourses.push({ cartCourseId: course.cartCourseId })
         }
 
-        await this.orderCoursesMySqlRepository.save(orderCourses)
-        await this.cartCourseMySqlRepository.delete(deleteCartCourses)
+        const { balance } = await this.accountMySqlRepository.findOne({ where: {
+            accountId
+        }})
+
+        if (balance < totalPay) throw new ConflictException("Your balance is not enough.")
+        await this.accountMySqlRepository.update(accountId, { 
+            balance: balance - totalPay
+        })
+
+        await this.cartCourseMySqlRepository.delete(cartCourseIds)
 
         return {
-            message: "Order Created",
+            message: "Check out successfully",
             others: {
-                orderId: order.orderId
+                orderId: ""
             }
         }
-
     }
 }

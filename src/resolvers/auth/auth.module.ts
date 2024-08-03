@@ -5,7 +5,10 @@ import {
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
     EnrolledInfoMySqlEntity,
+    LessonMySqlEntity,
     PostMySqlEntity,
+    QuizMySqlEntity,
+    ResourceMySqlEntity,
     RoleMySqlEntity,
 } from "@database"
 import { Module } from "@nestjs/common"
@@ -23,7 +26,10 @@ import { AuthService } from "./auth.service"
             PostMySqlEntity,
             CourseReviewMySqlEntity,
             AccountReviewMySqlEntity,
-            EnrolledInfoMySqlEntity
+            EnrolledInfoMySqlEntity,
+            QuizMySqlEntity,
+            LessonMySqlEntity,
+            ResourceMySqlEntity
         ]),
     ],
     providers: [AuthResolver, AuthService],

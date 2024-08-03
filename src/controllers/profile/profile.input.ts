@@ -1,4 +1,4 @@
-import { AuthInput } from "@common"
+import { AuthEmptyDataInput, AuthInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID } from "class-validator"
 import { Address } from "web3"
@@ -68,4 +68,8 @@ export class DeleteNotificationInput implements AuthInput<DeleteNotificationInpu
     data: DeleteNotificationInputData
 }
 
+
+export class MarkAllNotificationsAsReadInput implements AuthEmptyDataInput {
+    accountId: string
+}
 

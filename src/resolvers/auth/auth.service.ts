@@ -1,5 +1,5 @@
 import { AccountKind, CourseVerifyStatus, SystemRoles } from "@common"
-import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, CourseRating, CourseReviewMySqlEntity, PostMySqlEntity, RoleMySqlEntity } from "@database"
+import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, CourseRating, CourseReviewMySqlEntity, EnrolledInfoMySqlEntity, LessonMySqlEntity, PostMySqlEntity, QuizMySqlEntity, ResourceMySqlEntity, RoleMySqlEntity } from "@database"
 import { FirebaseService, Sha256Service } from "@global"
 import {
     Injectable,
@@ -31,8 +31,15 @@ export class AuthService {
         private readonly accountReviewMySqlRepository: Repository<AccountReviewMySqlEntity>,
         @InjectRepository(PostMySqlEntity)
         private readonly postMySqlRepository: Repository<PostMySqlEntity>,
+        @InjectRepository(QuizMySqlEntity)
+        private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+        @InjectRepository(ResourceMySqlEntity)
+        private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+        @InjectRepository(LessonMySqlEntity)
+        private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
+        @InjectRepository(EnrolledInfoMySqlEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         private readonly firebaseService: FirebaseService,
-
     ) { }
 
     async init(input: InitInput): Promise<AccountMySqlEntity> {
@@ -44,13 +51,67 @@ export class AuthService {
                 cart: {
                     cartCourses: {
                         course: {
-                            creator: true
+                            creator: true,
+                            sections: true
                         }
                     }
                 },
                 roles: true
             }
         })
+
+        const promises : Array<Promise<void>> = []
+        for (const cartCourse of (account.cart?.cartCourses ?? [])) {
+            const promise = async () => {
+                const numberOfEnrollments =
+          await this.enrolledInfoMySqlRepository.findBy({
+              courseId: cartCourse.course.courseId,
+          })
+                const numberOfQuizzes = await this.quizMySqlRepository.count({
+                    where: {
+                        sectionContent: {
+                            section: {
+                                course: {
+                                    courseId: cartCourse.course.courseId,
+                                },
+                            },
+                        },
+                    },
+                })
+
+                const numberOfResources = await this.resourceMySqlRepository.count({
+                    where: {
+                        sectionContent: {
+                            section: {
+                                course: {
+                                    courseId: cartCourse.course.courseId,
+                                },
+                            },
+                        },
+                    },
+                })
+
+                const numberOfLessons = await this.lessonMySqlRepository.count({
+                    where: {
+                        sectionContent: {
+                            section: {
+                                course: {
+                                    courseId: cartCourse.course.courseId,
+                                },
+                            },
+                        },
+                    },
+                })
+                cartCourse.course.numberOfEnrollments = numberOfEnrollments.length
+                cartCourse.course.numberOfResources = numberOfResources
+                cartCourse.course.numberOfQuizzes = numberOfQuizzes
+                cartCourse.course.numberOfLessons = numberOfLessons
+
+            }
+            promises.push(promise())
+        }
+
+        await Promise.all(promises)
         return account
     }
 

@@ -21,6 +21,11 @@ export class MarkNotificationAsReadOutput implements Output {
     message: string
 }
 
+export class MarkAllNotificationsAsReadOutput implements Output {
+    message: string
+}
+
+
 export class DeleteNotificationOutput implements Output {
     message: string
 }

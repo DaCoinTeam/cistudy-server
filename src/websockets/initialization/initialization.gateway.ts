@@ -52,9 +52,13 @@ implements OnGatewayConnection, OnGatewayDisconnect
   async handleDisconnect(client: Socket) {
       const accountId = (await this.cacheManager.get(client.id)) as string
       if (accountId) {
-          let clientIds = (await this.cacheManager.get(accountId)) as Array<string>
+          let clientIds = ((await this.cacheManager.get(accountId)) ?? []) as Array<string>
           clientIds = clientIds.filter((clientId) => clientId !== client.id)
-          await this.cacheManager.set(accountId, clientIds)
+          if (!clientIds.length) {
+              await this.cacheManager.set(accountId, clientIds, 0)
+          } else {
+              await this.cacheManager.del(accountId)
+          }
       }
       await this.cacheManager.del(client.id)
   }
@@ -67,12 +71,12 @@ implements OnGatewayConnection, OnGatewayDisconnect
       const { accountId } = body
       const clientIds =
       ((await this.cacheManager.get(accountId)) as Array<string>) ?? []
-      await this.cacheManager.set(accountId, [...clientIds, client.id])
-      await this.cacheManager.set(client.id, accountId)
+      await this.cacheManager.set(accountId, [...clientIds, client.id], 0)
+      await this.cacheManager.set(client.id, accountId, 0)
       return { event: INITIALIZED, data: "Connected" }
   }
 
-  //@Interval(1000)
+  @Interval(1000)
   async publish() {
       const notifications = await this.notificationMySqlRepository.find({
           where: {
@@ -80,29 +84,22 @@ implements OnGatewayConnection, OnGatewayDisconnect
           },
       })
 
+      await this.notificationMySqlRepository.save(notifications.map(notification => {
+          notification.isPublished = true
+          return notification
+      }))
+      
       for (const notification of notifications) {
           const { receiverId } = notification
           const clientIds =
         ((await this.cacheManager.get(receiverId)) as Array<string>) ?? []
-
-          const promises: Array<Promise<void>> = []
           for (const clientId of clientIds) {
-              const promise = async () => {
-                  await this.notificationMySqlRepository.update(
-                      notification.notificationId,
-                      {
-                          isPublished: true,
-                      },
-                  )
-                  this.server.to(clientId).emit("notifications", uuidV4())
-              }
-              promises.push(promise())
+              this.server.to(clientId).emit("notifications", uuidV4())
           }
-          await Promise.all(promises)
       }
   }
 
-  //@Interval(1000)
+  @Interval(1000)
   async processAttempts() {
       const attempts = await this.quizAttemptMySqlRepository.find({
           where: {

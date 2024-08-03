@@ -233,7 +233,7 @@ export class ProfileService {
         const results = await this.notificationMySqlRepository.find({
             where: {
                 receiverId: accountId,
-                //isPublished: true
+                isPublished: true
             },
             skip,
             take,
@@ -249,14 +249,16 @@ export class ProfileService {
 
         const numberOfNotifications = await this.notificationMySqlRepository.count({
             where: {
-                receiverId: accountId
+                receiverId: accountId,
+                isPublished: true
             }
         })
 
         const notViewedCount = await this.notificationMySqlRepository.count({
             where: {
                 receiverId: accountId,
-                viewed: false
+                viewed: false,
+                isPublished: true
             }
         })
 
