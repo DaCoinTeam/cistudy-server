@@ -466,6 +466,134 @@ export class CoursesService {
         course.certificate = certificate
         course.isReported = isReported ? true : false
 
+        const promises: Array<Promise<void>> = []
+        for (const section of course.sections) {
+            for (const content of section.contents) {
+                const promise = async () => {
+                    //quiz based
+                    switch (content.type) {
+                    case SectionContentType.Quiz: {
+                        const attempts = await this.quizAttemptMySqlRepository.find({
+                            where: {
+                                quizId: content.quizId,
+                                accountId,
+                            },
+                        })
+                        if (!attempts.length) {
+                            content.completeState = CompleteState.Undone
+                            break
+                        }
+
+                        const doneAttempt = attempts.find(
+                            ({ attemptStatus }) =>
+                                attemptStatus === QuizAttemptStatus.Ended,
+                        )
+                        if (!doneAttempt) {
+                            content.completeState = CompleteState.Undone
+                            break
+                        }
+
+                        const found = attempts.find((attempt) => attempt.isPassed)
+
+                        content.completeState = found
+                            ? CompleteState.Completed
+                            : CompleteState.Failed
+                        break
+                    }
+                    case SectionContentType.Lesson: {
+                        const found = await this.progressMySqlRepository.findOne({
+                            where: {
+                                lessonId: content.sectionContentId,
+                                accountId,
+                                completeFirstWatch: true,
+                            },
+                        })
+
+                        content.completeState = found
+                            ? CompleteState.Completed
+                            : CompleteState.Undone
+                        break
+                    }
+                    case SectionContentType.Resource: {
+                        const completeResource =
+                await this.completeResourceMySqlRepository.findOne({
+                    where: {
+                        accountId,
+                        resourceId: content.sectionContentId!,
+                    },
+                })
+                        if (!completeResource) {
+                            content.completeState = CompleteState.Undone
+                        } else {
+                            content.completeState = CompleteState.Completed
+                        }
+                    }
+                    }
+                }
+                promises.push(promise())
+            }
+        }
+        await Promise.all(promises)
+
+        course.certificateStatus = CertificateStatus.Cannot
+
+        for (const section of course.sections) {
+            section.lockState = LockState.Locked
+        }
+        for (let i = 0; i < course.sections.length; i++) {
+            course.sections[i].lockState = LockState.InProgress
+            let allCompleted = true
+            for (const content of course.sections[i].contents) {
+                if (content.completeState !== CompleteState.Completed) {
+                    allCompleted = false
+                    break
+                }
+            }
+
+            if (allCompleted) {
+                course.sections[i].lockState = LockState.Completed
+                if (i === course.sections.length - 1) {
+                    const certificate = await this.certificateMySqlRepository.findOne({
+                        where: {
+                            courseId,
+                            accountId,
+                        },
+                    })
+                    course.certificateStatus = certificate
+                        ? CertificateStatus.Gotten
+                        : CertificateStatus.Getable
+                }
+            } else {
+                break
+            }
+
+            const certificate = await this.certificateMySqlRepository.findOne({
+                where: {
+                    courseId,
+                    accountId,
+                },
+            })
+            course.certificate = certificate
+        }
+
+        let totalContents = 0
+        course.sections.forEach(({ contents }) => {
+            totalContents += contents.length ?? 0
+        })
+
+        let completedContents = 0
+        course.sections.forEach(({ contents, lockState }) => {
+            contents.forEach(({ completeState }) => {
+                if (completeState === CompleteState.Completed && lockState !== LockState.Locked) {
+                    completedContents += 1
+                }
+            })
+            
+        })
+
+        course.totalContents = totalContents
+        course.completedContents = completedContents
+
         return course
     }
 

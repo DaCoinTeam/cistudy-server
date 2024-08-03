@@ -540,6 +540,8 @@ type CourseEntity {
   certificate: CertificateEntity
   isReported: Boolean
   numberOfReports: Int
+  totalContents: Int
+  completedContents: Int
 }
 
 type CartCourseEntity {
