@@ -168,7 +168,8 @@ export class StorageService {
         try {
             if (!options?.keepDirectoryContent) await this.clearDirectory(assetId)
         } catch(ex) {
-            //
+            const dirPath = join(pathsConfig().storageDirectory, assetId)
+            await makeDirectoryIfNotExisted(dirname(dirPath))
         }
 
         if (rootFile) {
