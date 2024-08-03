@@ -150,6 +150,7 @@ export const verifyAccountMail = (username: string, email: string, frontendUrl: 
         .container {
             padding: 20px;
             background-color: #f9f9f9;
+            color: #000 !important;
         }
         .header {
             background-color: #D9D9DB;
@@ -170,8 +171,8 @@ export const verifyAccountMail = (username: string, email: string, frontendUrl: 
             display: inline-block;
             padding: 10px 20px;
             margin: 10px 0;
-            color: white;
-            background-color: rgb(20, 183, 164);
+            color: #000 !important;
+            background-color: #006FEE;
             text-decoration: none;
             border-radius: 5px;
         }
@@ -180,7 +181,7 @@ export const verifyAccountMail = (username: string, email: string, frontendUrl: 
 <body>
     <div class="container">
         <div class="header">
-            <h1>Welcome to <strong style="color: #14B8A6;">Ci</strong><strong style="color: #116761;">Study</strong>!</h1>
+            <h1>Welcome to <strong style="color: #60A5FA;">Ci</strong><strong style="color: #006FEE;">Study</strong>!</h1>
         </div>
         <div class="content">
             <p>Hello <strong>${username ?? email},</strong></p>
