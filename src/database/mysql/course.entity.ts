@@ -199,4 +199,6 @@ export class CourseEntity {
         totalContents?: number
     @Field(() => Int, { nullable: true })
         completedContents?: number
+    @Field(() => [AccountEntity], { nullable: true })
+        students?: Array<AccountEntity>
 }

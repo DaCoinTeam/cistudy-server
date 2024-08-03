@@ -542,6 +542,7 @@ type CourseEntity {
   numberOfReports: Int
   totalContents: Int
   completedContents: Int
+  students: [AccountEntity!]
 }
 
 type CartCourseEntity {

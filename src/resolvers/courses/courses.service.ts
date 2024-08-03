@@ -594,6 +594,16 @@ export class CoursesService {
         course.totalContents = totalContents
         course.completedContents = completedContents
 
+        const enrolledInfos = await this.enrolledInfoMySqlRepository.find({
+            where: {
+                courseId
+            },
+            relations: {
+                account: true
+            }
+        })
+
+        course.students = enrolledInfos.map(({account}) => account)
         return course
     }
 

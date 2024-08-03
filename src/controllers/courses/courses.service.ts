@@ -804,9 +804,11 @@ export class CoursesService {
                     await this.storageService.delete(...lessonMedia)
                 }
             }
+            await this.lessonMySqlRepository.delete({ lessonId: sectionContentId })
             break
         }
         case SectionContentType.Quiz: {
+            await this.quizMySqlRepository.delete({ quizId: sectionContentId })
             break
         }
         case SectionContentType.Resource: {
@@ -817,6 +819,7 @@ export class CoursesService {
                 const mediaIds = attachments.map(({ fileId }) => fileId)
                 await this.storageService.delete(...mediaIds)
             }
+            await this.resourceMySqlRepository.delete({ resourceId: sectionContentId })
             break
         }
         default:
