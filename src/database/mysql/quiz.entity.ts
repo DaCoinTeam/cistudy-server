@@ -60,4 +60,8 @@ export class QuizEntity {
         isLocked?: boolean
     @Field(() => QuizAttemptEntity, { nullable: true })
         activeQuizAttempt?: QuizAttemptEntity
+    @Field(() => Boolean, { nullable: true })
+        blockAttempt?: boolean
+    @Field(() => Date, { nullable: true })
+        blockAttemptTimeWait?: Date
 }

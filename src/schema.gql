@@ -233,6 +233,8 @@ type QuizEntity {
   isPassed: Boolean
   isLocked: Boolean!
   activeQuizAttempt: QuizAttemptEntity
+  blockAttempt: Boolean
+  blockAttemptTimeWait: DateTime
 }
 
 type ResourceAttachmentEntity {

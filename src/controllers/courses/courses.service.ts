@@ -2158,7 +2158,7 @@ export class CoursesService {
         }
 
         return {
-            message: "Watch lesson succesfully successfully",
+            message: "Update progress succesfully.",
         }
     }
 }

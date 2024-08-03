@@ -609,21 +609,10 @@ export class CoursesService {
         }
 
         await Promise.all(promises)
-
-        // const relativeTopics = searchValue
-        //     ? await this.categoryMySqlRepository.find({
-        //         where: {
-        //             level: 2,
-        //             name: searchValue ? Like(`%${searchValue}%`) : undefined,
-        //         },
-        //     })
-        //     : undefined
-
         return {
             results,
             metadata: {
-                count,
-                //relativeTopics,
+                count
             },
         }
     }
@@ -694,6 +683,26 @@ export class CoursesService {
 
             sectionContent.quiz = quiz
 
+            const last3Attempts = await this.quizAttemptMySqlRepository.find({
+                where: {
+                    accountId,
+                    quizId: quiz.quizId
+                },
+                take: 3,
+                order: {
+                    observedAt: "DESC"
+                }
+            })
+
+            if (last3Attempts.length >= 3) {
+                const earliestAttempt = last3Attempts.at(2)
+                const timeWait = Date.now() - earliestAttempt.observedAt.getTime()
+                if (timeWait < 1000 * 60 * 60 * 8) {
+                    sectionContent.quiz.blockAttempt = true
+                    sectionContent.quiz.blockAttemptTimeWait = new Date(earliestAttempt.observedAt.getTime() +  1000 * 60 * 60 * 8)
+                } 
+            } 
+
             const activeQuizAttempt = await this.quizAttemptMySqlRepository.findOne(
                 {
                     where: {
@@ -724,6 +733,7 @@ export class CoursesService {
                                 quizQuestionId ===
                   sectionContent.quiz.questions[index].quizQuestionId,
                         ).answers
+
                         for (
                             let index2 = 0;
                             index2 < correspondingAnswers.length;

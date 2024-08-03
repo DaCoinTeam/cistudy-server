@@ -3,6 +3,7 @@ import { InitializationGateway } from "./initialization.gateway"
 import {
     AccountMySqlEntity,
     NotificationMySqlEntity,
+    QuizAttemptMySqlEntity,
     SessionMySqlEntity,
 } from "@database"
 import { TypeOrmModule } from "@nestjs/typeorm"
@@ -13,6 +14,7 @@ import { TypeOrmModule } from "@nestjs/typeorm"
             AccountMySqlEntity,
             SessionMySqlEntity,
             NotificationMySqlEntity,
+            QuizAttemptMySqlEntity
         ]),
     ],
     providers: [InitializationGateway],
