@@ -250,6 +250,8 @@ export class UpdateLessonInputData {
       thumbnailIndex?: number
   @ApiProperty({ nullable: true })
       lessonVideoIndex?: number
+  @ApiProperty({ nullable: true })
+      isTrial?: boolean
 }
 
 export class UpdateLessonInput implements AuthInput<UpdateLessonInputData> {

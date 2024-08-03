@@ -675,7 +675,7 @@ export class CoursesService {
 
     async updateLesson(input: UpdateLessonInput): Promise<UpdateLessonOutput> {
         const { data, files } = input
-        const { lessonId, description, lessonVideoIndex, thumbnailIndex, title } =
+        const { lessonId, description, lessonVideoIndex, thumbnailIndex, title, isTrial } =
       data
 
         const { thumbnailId, lessonVideoId } =
@@ -683,7 +683,7 @@ export class CoursesService {
 
         const promises: Array<Promise<void>> = []
 
-        const lesson: DeepPartial<LessonMySqlEntity> = { description }
+        const lesson: DeepPartial<LessonMySqlEntity> = { description, isTrial }
 
         if (Number.isInteger(lessonVideoIndex)) {
             const promise = async () => {
