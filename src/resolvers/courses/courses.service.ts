@@ -1261,6 +1261,9 @@ export class CoursesService {
         const { skip, take } = options
 
         const results = await this.reportCourseMySqlRepository.find({
+            where: {
+                processStatus: ReportProcessStatus.Processing
+            },
             relations: {
                 reporterAccount: true,
                 reportedCourse: {
@@ -1269,6 +1272,9 @@ export class CoursesService {
             },
             skip,
             take,
+            order: {
+                createdAt: "DESC"
+            }
         })
 
         const numberOfCourseReports = await this.reportCourseMySqlRepository.count()

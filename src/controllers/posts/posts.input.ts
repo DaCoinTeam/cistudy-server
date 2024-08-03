@@ -317,7 +317,6 @@ export class ResolvePostCommentReportInputData {
     @ApiProperty()
         processStatus : ReportProcessStatus
     @ApiProperty()
-    @MinLength(20)
         processNote : string
 }
 

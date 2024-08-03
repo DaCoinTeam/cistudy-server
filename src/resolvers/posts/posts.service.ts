@@ -451,6 +451,9 @@ export class PostsService {
         const { skip, take } = options
 
         const results = await this.reportPostMySqlRepository.find({
+            where: {
+                processStatus: ReportProcessStatus.Processing               
+            },
             relations: {
                 reporterAccount: true,
                 reportedPost: {
@@ -460,10 +463,17 @@ export class PostsService {
                 }
             },
             skip,
-            take
+            take,
+            order: {
+                createdAt: "DESC"
+            }
         })
 
-        const numberOfPostReports = await this.reportPostMySqlRepository.count()
+        const numberOfPostReports = await this.reportPostMySqlRepository.count({
+            where: {
+                processStatus: ReportProcessStatus.Processing               
+            },
+        })
 
         const promises: Array<Promise<void>> = []
 
