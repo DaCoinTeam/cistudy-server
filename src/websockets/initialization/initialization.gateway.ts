@@ -21,7 +21,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { NotificationMySqlEntity, QuizAttemptMySqlEntity } from "@database"
 import { Repository } from "typeorm"
 import { uuidV4 } from "web3-utils"
-import { QuizAttemptStatus, parseDuration } from "@common"
+import { QuizAttemptStatus } from "@common"
 
 @WebSocketGateway({
     cors: {
@@ -121,7 +121,6 @@ implements OnGatewayConnection, OnGatewayDisconnect
       })
 
       const promises: Array<Promise<void>> = []
-      let messages: Array<string> = []
 
       for (const attempt of attempts) {
           const promise = async () => {
@@ -182,7 +181,6 @@ implements OnGatewayConnection, OnGatewayDisconnect
                       observedAt: new Date(),
                       attemptStatus: QuizAttemptStatus.Ended,
                   })
-                  messages.push(`Quiz ${quizAttemptId} has been finished.`)
 
                   const clientIds =
                   ((await this.cacheManager.get(accountId)) as Array<string>) ?? []
@@ -200,14 +198,11 @@ implements OnGatewayConnection, OnGatewayDisconnect
                   await this.quizAttemptMySqlRepository.update(quizAttemptId, {
                       timeLeft: timeLeft - 1000,
                   })
-                  messages.push(`Quiz ${quizAttemptId} has been reduced time limit by 1s. Now ${parseDuration(timeLeft/1000 - 1)}`)
               }
           }
           promises.push(promise())
       }
       await Promise.all(promises)
-      this.logger.verbose(messages)
-      messages = []
   }
 }
 
