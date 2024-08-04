@@ -21,7 +21,7 @@ export class ResourceEntity {
         resourceId: string
 
     @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", nullable: true })
+    @Column({ type: "varchar", length: 2000, nullable: true })
         description: string
         
     @Field(() => Date)

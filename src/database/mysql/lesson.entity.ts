@@ -46,7 +46,7 @@ export class LessonEntity {
         durationInSeconds: number
 
     @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", nullable: true })
+    @Column({ type: "varchar", length: 2000, nullable: true })
         description: string
         
     @Field(() => Date)
