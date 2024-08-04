@@ -485,7 +485,7 @@ export class PostsService {
                 senderId: isEnrolled.account.accountId,
                 receiverId: post.creatorId,
                 type: NotificationType.Interact,
-                title: `You have new comment on your post: ${post.title}`,
+                title: "You have new comment on your post",
                 description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`,
                 referenceLink: `/posts/${post.postId}`,
             })
