@@ -36,7 +36,7 @@ export class NotificationEntity {
         type: NotificationType
 
     @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", length: 100, nullable: true })
+    @Column({ type: "varchar", length: 200, nullable: true })
         title: string
 
     @Field(() => String, { nullable: true })
