@@ -161,6 +161,7 @@ export class AuthService {
     
         const totalNumberOfAvailableCourses = await this.courseMySqlRepository.find({
             where: {
+                isDeleted: false,
                 verifyStatus: CourseVerifyStatus.Approved
             },
             relations:{
@@ -173,7 +174,7 @@ export class AuthService {
         for(const course of totalNumberOfAvailableCourses) {
             const courseReviews = await this.courseReviewMySqlRepository.find({
                 where: {
-                    courseId: course.courseId
+                    courseId: course.courseId,
                 }
             })
             const countWithNumStars = (numStars: number) => {
