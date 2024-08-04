@@ -626,6 +626,7 @@ export class CoursesService {
             where: {
                 title: searchValue ? Like(`%${searchValue}%`) : undefined,
                 verifyStatus: CourseVerifyStatus.Approved,
+                isDeleted: false
             },
             relations: {
                 creator: true,
