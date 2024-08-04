@@ -231,6 +231,7 @@ export class AuthService {
 
         const recentlyAddedCourses = await this.courseMySqlRepository.find({
             where: {
+                isDeleted: false,
                 verifyStatus: CourseVerifyStatus.Approved
             },
 
