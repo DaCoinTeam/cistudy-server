@@ -57,7 +57,7 @@ import {
     UpdateQuizAttemptInputData,
     UpdateQuizAttemptAnswersInputData,
     MarkAsCompleteResourceInputData,
-    UpdateLessonProgressInputData
+    UpdateLessonProgressInputData,
 } from "./courses.input"
 
 import {
@@ -738,6 +738,21 @@ export class CoursesController {
         return this.coursesService.updateLessonProgress({
             accountId,
             data,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Delete("delete-course/:courseId")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async deleteCourse(
+        @AccountId() accountId: string,
+        @Param("courseId") courseId: string,
+    ) {
+        return this.coursesService.deleteCourse({
+            accountId,
+            data: { courseId },
         })
     }
 }

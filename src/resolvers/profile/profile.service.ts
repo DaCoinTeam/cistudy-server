@@ -43,6 +43,7 @@ export class ProfileService {
         const courses = await this.courseMySqlRepository.find({
             where: {
                 creatorId: accountId,
+                isDeleted: false
             },
             take,
             skip,
@@ -83,6 +84,7 @@ export class ProfileService {
             take,
             skip,
             where: {
+                isDeleted: false,
                 enrolledInfos: {
                     accountId,
                     enrolled: true

@@ -838,3 +838,18 @@ implements AuthInput<UpdateLessonProgressInputData>
     accountId: string
     data: UpdateLessonProgressInputData
 }
+
+
+export class DeleteCourseInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        courseId: string
+}
+  
+export class DeleteCourseInput
+implements AuthInput<DeleteCourseInputData>
+{
+    accountId: string
+    data: DeleteCourseInputData
+}
+

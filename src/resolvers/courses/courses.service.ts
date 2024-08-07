@@ -134,7 +134,7 @@ export class CoursesService {
         const { courseId, accountId } = params
 
         const course = await this.courseMySqlRepository.findOne({
-            where: { courseId },
+            where: { courseId, isDeleted: false },
             relations: {
                 sections: {
                     contents: {
@@ -306,7 +306,7 @@ export class CoursesService {
         await queryRunner.connect()
 
         const course = await this.courseMySqlRepository.findOne({
-            where: { courseId },
+            where: { courseId, isDeleted: false },
             relations: {
                 sections: {
                     contents: {

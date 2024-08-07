@@ -274,3 +274,7 @@ export class MarkAsCompletedResourceOutput implements Output {
 export class UpdateLessonProgressOutput implements Output {
     message: string
 }
+
+export class DeleteCourseOutput implements Output {
+    message: string
+}

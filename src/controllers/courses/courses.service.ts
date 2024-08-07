@@ -65,6 +65,7 @@ import {
     CreateSectionInput,
     DeleteCategoryInput,
     DeleteCourseCategoryInput,
+    DeleteCourseInput,
     DeleteCourseReviewInput,
     DeleteCourseTargetInput,
     DeleteQuizQuestionAnswerInput,
@@ -109,6 +110,7 @@ import {
     CreateSectionOutput,
     DeleteCategoryOutput,
     DeleteCourseCategoryOutput,
+    DeleteCourseOutput,
     DeleteCourseReviewOutput,
     DeleteCourseTargetOuput,
     DeleteQuizQuestionAnswerOutput,
@@ -2202,6 +2204,31 @@ export class CoursesService {
 
         return {
             message: "Update progress succesfully.",
+        }
+    }
+
+    async deleteCourse(input: DeleteCourseInput): Promise<DeleteCourseOutput> {
+        const { data, accountId } = input
+        const { courseId } = data
+
+        const course = await this.courseMySqlRepository.findOneBy({ courseId })
+
+        if (!course) {
+            throw new NotFoundException("Course not found or have been already disabled")
+        }
+
+        if(accountId !== course.creatorId){
+            throw new ConflictException("You are not the creator of the course")
+        }
+
+        if(course.verifyStatus === CourseVerifyStatus.Approved || course.verifyStatus === CourseVerifyStatus.Pending){
+            throw new ConflictException("You cannot delete course once it has been submitted for reviewing or are being approved")
+        }
+        
+        await this.courseMySqlRepository.update(courseId, { isDeleted: true })
+
+        return {
+            message: "Course has been deleted"
         }
     }
 }
