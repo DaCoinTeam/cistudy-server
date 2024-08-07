@@ -70,14 +70,14 @@ export class PostsService {
                 where: {
                     postId
                 }
-            }   
+            }
         )
         const numberOfComments = await this.postCommentMySqlRepository.count(
             {
                 where: {
                     postId
                 }
-            }   
+            }
         )
         let numberOfRewardableLikesLeft: number
         let numberOfRewardableCommentsLeft: number
@@ -105,7 +105,7 @@ export class PostsService {
                     createdAt: "ASC"
                 }
             })
-                
+
             const uniqueRewardedCommentors = new Set(rewardedComments.map(comment => comment.creatorId))
             const rewardedCommentsCount = uniqueRewardedCommentors.size
             numberOfRewardableCommentsLeft = Math.max(20 - rewardedCommentsCount, 0)
@@ -285,8 +285,8 @@ export class PostsService {
 
         try {
             const postComments = await this.postCommentMySqlRepository.find({
-                where: { 
-                    postId, 
+                where: {
+                    postId,
                     isDisabled: false
                 },
                 relations: {
@@ -346,25 +346,29 @@ export class PostsService {
                 .groupBy("post_comment.postCommentId")
                 .getRawMany()
 
-            const rewardedComments = await queryRunner.manager
-                .createQueryBuilder(PostCommentMySqlEntity, "post_comment")
-                .where("post_comment.postId = :postId", { postId })
-                .andWhere("post_comment.creatorId != :creatorId", { creatorId })
-                .orderBy("post_comment.createdAt", "ASC")
-                .getMany()
-
+            const { isRewardable } = await this.postMySqlRepository.findOneBy({ postId })
+            
             const uniqueRewardedComments = []
-            const seenCreators = new Set()
-
-            for (const comment of rewardedComments) {
-                if (!seenCreators.has(comment.creatorId)) {
-                    uniqueRewardedComments.push(comment)
-                    seenCreators.add(comment.creatorId)
-                    if (uniqueRewardedComments.length === 20) {
-                        break
+            
+            if (isRewardable) {
+                const rewardedComments = await queryRunner.manager
+                    .createQueryBuilder(PostCommentMySqlEntity, "post_comment")
+                    .where("post_comment.postId = :postId", { postId })
+                    .andWhere("post_comment.creatorId != :creatorId", { creatorId })
+                    .orderBy("post_comment.createdAt", "ASC")
+                    .getMany()
+                const seenCreators = new Set()
+                for (const comment of rewardedComments) {
+                    if (!seenCreators.has(comment.creatorId)) {
+                        uniqueRewardedComments.push(comment)
+                        seenCreators.add(comment.creatorId)
+                        if (uniqueRewardedComments.length === 20) {
+                            break
+                        }
                     }
                 }
             }
+
             const results = await Promise.all(postComments.map(async (postComment) => {
                 const numberOfLikes = numberOfLikesResults.find(
                     result => result.postCommentId === postComment.postCommentId,
@@ -377,9 +381,9 @@ export class PostsService {
                 )?.liked ?? false
                 const isCommentOwner = (postComment.creatorId === accountId)
                 const isSolution = postComment.isSolution === true
-                const isRewardable = uniqueRewardedComments.some(
+                const isRewardable = (uniqueRewardedComments.length > 0) ? uniqueRewardedComments.some(
                     comment => comment.postCommentId === postComment.postCommentId
-                )
+                ) : false
                 const isReported = await this.reportPostCommentMySqlRepository.findOneBy({ accountId, postCommentId: postComment.postCommentId, processStatus: ReportProcessStatus.Processing })
                 postComment.isReported = isReported ? true : false
 
@@ -431,7 +435,7 @@ export class PostsService {
         })
 
         const numberOfPostCommentRepliesResult = await this.postCommentReplyMySqlRepository.count({
-            where:{
+            where: {
                 postCommentId,
             }
         })
@@ -452,7 +456,7 @@ export class PostsService {
 
         const results = await this.reportPostMySqlRepository.find({
             where: {
-                processStatus: ReportProcessStatus.Processing               
+                processStatus: ReportProcessStatus.Processing
             },
             relations: {
                 reporterAccount: true,
@@ -471,31 +475,31 @@ export class PostsService {
 
         const numberOfPostReports = await this.reportPostMySqlRepository.count({
             where: {
-                processStatus: ReportProcessStatus.Processing               
+                processStatus: ReportProcessStatus.Processing
             },
         })
 
         const promises: Array<Promise<void>> = []
 
-        for(const { reportedPost } of results) {
+        for (const { reportedPost } of results) {
             const promise = async () => {
                 reportedPost.numberOfReports = await this.reportPostMySqlRepository.count({
-                    where:{
+                    where: {
                         postId: reportedPost.postId
                     }
                 })
                 reportedPost.numberOfComments = await this.postCommentMySqlRepository.count({
-                    where:{
+                    where: {
                         postId: reportedPost.postId
                     }
                 })
-                reportedPost.numberOfLikes = await this. postLikeMySqlRepository.count({
-                    where:{
+                reportedPost.numberOfLikes = await this.postLikeMySqlRepository.count({
+                    where: {
                         postId: reportedPost.postId
                     }
                 })
             }
-            promises.push(promise())   
+            promises.push(promise())
         }
         await Promise.all(promises)
 
@@ -526,28 +530,28 @@ export class PostsService {
                         post: true,
                         creator: true
                     },
-                
+
                 },
                 skip,
                 take
             })
 
             const numberOfPostCommentReports = await this.reportPostCommentMySqlRepository.count()
-            
+
             const promises: Array<Promise<void>> = []
-            for(const { reportedPostComment } of results) {
+            for (const { reportedPostComment } of results) {
                 const promise = async () => {
                     reportedPostComment.numberOfReports = await this.reportPostCommentMySqlRepository.count({
-                        where:{
+                        where: {
                             postCommentId: reportedPostComment.postCommentId
                         }
                     })
                     reportedPostComment.numberOfLikes = await this.postCommentLikeMySqlRepository.count({
-                        where:{
+                        where: {
                             postCommentId: reportedPostComment.postCommentId
                         }
                     })
-                    
+
                     const rewardedComments = await queryRunner.manager
                         .createQueryBuilder(PostCommentMySqlEntity, "post_comment")
                         .where("post_comment.postId = :postId", { postId: reportedPostComment.postId })
@@ -567,12 +571,12 @@ export class PostsService {
                             }
                         }
                     }
-                    
+
                     reportedPostComment.isRewardable = uniqueRewardedComments.some(
                         comment => comment.postCommentId === reportedPostComment.postCommentId
                     )
                 }
-                promises.push(promise())   
+                promises.push(promise())
             }
             await Promise.all(promises)
 
