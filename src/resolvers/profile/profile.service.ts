@@ -54,7 +54,8 @@ export class ProfileService {
 
         const numberOfCoursesResult = await this.courseMySqlRepository.count({
             where: {
-                creatorId: accountId
+                creatorId: accountId,
+                isDeleted: false
             }
         })
 
