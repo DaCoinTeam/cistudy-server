@@ -8,6 +8,7 @@ import {
     SectionContentType,
 } from "@common"
 import {
+    CartCourseMySqlEntity,
     CategoryMySqlEntity,
     CertificateMySqlEntity,
     CompleteResourceMySqlEntity,
@@ -70,6 +71,8 @@ export class CoursesService {
     private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
     @InjectRepository(CourseTargetMySqlEntity)
     private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+    @InjectRepository(CartCourseMySqlEntity)
+    private readonly cartCourseMySqlRepository: Repository<CartCourseMySqlEntity>,
     @InjectRepository(CategoryMySqlEntity)
     private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
     @InjectRepository(CourseReviewMySqlEntity)
@@ -620,7 +623,7 @@ export class CoursesService {
     ): Promise<FindManyCoursesOutputData> {
         const { data } = input
         const { options } = data
-        const { skip, take, searchValue, categoryIds } = { ...options }
+        const { skip, take, searchValue, categoryIds, accountId } = { ...options }
 
         let results = await this.courseMySqlRepository.find({
             where: {
@@ -749,11 +752,17 @@ export class CoursesService {
                         },
                     },
                 })
+
+                if(accountId){
+                    course.enrolled = (await this.enrolledInfoMySqlRepository.findOneBy({accountId, courseId: course.courseId})) ? true : false
+                    course.isCreator = (accountId === course.creatorId)
+                    course.isAddedToCart = (await this.cartCourseMySqlRepository.findOneBy({cartId: accountId, courseId: course.courseId}) ? true : false)
+                }
+
                 course.numberOfEnrollments = numberOfEnrollments.length
                 course.numberOfResources = numberOfResources
                 course.numberOfQuizzes = numberOfQuizzes
                 course.numberOfLessons = numberOfLessons
-
             }
             promises.push(promise())
         }

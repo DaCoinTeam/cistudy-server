@@ -201,4 +201,6 @@ export class CourseEntity {
         completedContents?: number
     @Field(() => [AccountEntity], { nullable: true })
         students?: Array<AccountEntity>
+    @Field(() => Boolean, {nullable : true})
+        isAddedToCart? : boolean
 }

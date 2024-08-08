@@ -1,5 +1,6 @@
 import {
     AccountMySqlEntity,
+    CartCourseMySqlEntity,
     CategoryMySqlEntity,
     CertificateMySqlEntity,
     CompleteResourceMySqlEntity,
@@ -53,7 +54,8 @@ import { CoursesService } from "./courses.service"
             ProgressMySqlEntity,
             FollowMySqlEnitity,
             CompleteResourceMySqlEntity,
-            CertificateMySqlEntity
+            CertificateMySqlEntity,
+            CartCourseMySqlEntity
         ]),
     ],
     providers: [CoursesResolver, CoursesService],

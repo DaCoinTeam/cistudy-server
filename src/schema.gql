@@ -545,6 +545,7 @@ type CourseEntity {
   totalContents: Int
   completedContents: Int
   students: [AccountEntity!]
+  isAddedToCart: Boolean
 }
 
 type CartCourseEntity {
@@ -1074,6 +1075,7 @@ input FindManyCoursesInputOptions {
   skip: Int
   searchValue: String
   categoryIds: [String!]
+  accountId: ID
 }
 
 input FindOneSectionContentInputData {

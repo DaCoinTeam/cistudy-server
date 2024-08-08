@@ -85,6 +85,8 @@ export class FindManyCoursesInputOptions {
     @IsUUID("4")
     @Field(() => [String], { nullable: true })
         categoryIds?: Array<string>
+    @Field(() => ID, { nullable: true })
+        accountId?: string
 }
 
 @InputType()
