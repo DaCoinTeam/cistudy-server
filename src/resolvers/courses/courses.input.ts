@@ -73,6 +73,11 @@ export class FindManyLessonsInput implements AuthInput<FindManyLessonsInputData>
     accountId: string
     data: FindManyLessonsInputData
 }
+@InputType()
+export class FindManyCoursesInputParams {
+    @Field(() => ID, { nullable: true })
+        accountId?: string
+}
 
 @InputType()
 export class FindManyCoursesInputOptions {
@@ -85,14 +90,15 @@ export class FindManyCoursesInputOptions {
     @IsUUID("4")
     @Field(() => [String], { nullable: true })
         categoryIds?: Array<string>
-    @Field(() => ID, { nullable: true })
-        accountId?: string
+
 }
 
 @InputType()
 export class FindManyCoursesInputData
 implements
-    OptionsOnly<FindManyCoursesInputOptions> {
+    ParamsWithOptions<FindManyCoursesInputParams, FindManyCoursesInputOptions> {
+    @Field(() => FindManyCoursesInputParams, { nullable: true })
+        params: FindManyCoursesInputParams
     @Field(() => FindManyCoursesInputOptions, { nullable: true })
         options?: FindManyCoursesInputOptions
 }

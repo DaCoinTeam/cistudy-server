@@ -1067,7 +1067,12 @@ input FindOneCourseAuthInputParams {
 }
 
 input FindManyCoursesInputData {
+  params: FindManyCoursesInputParams
   options: FindManyCoursesInputOptions
+}
+
+input FindManyCoursesInputParams {
+  accountId: ID
 }
 
 input FindManyCoursesInputOptions {
@@ -1075,7 +1080,6 @@ input FindManyCoursesInputOptions {
   skip: Int
   searchValue: String
   categoryIds: [String!]
-  accountId: ID
 }
 
 input FindOneSectionContentInputData {

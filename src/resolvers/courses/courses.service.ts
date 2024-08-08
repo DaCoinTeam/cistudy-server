@@ -622,8 +622,9 @@ export class CoursesService {
         input: FindManyCoursesInput,
     ): Promise<FindManyCoursesOutputData> {
         const { data } = input
-        const { options } = data
-        const { skip, take, searchValue, categoryIds, accountId } = { ...options }
+        const { params, options } = data
+        const { accountId } = params
+        const { skip, take, searchValue, categoryIds } = { ...options }
 
         let results = await this.courseMySqlRepository.find({
             where: {
