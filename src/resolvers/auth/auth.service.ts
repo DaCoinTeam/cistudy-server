@@ -272,21 +272,8 @@ export class AuthService {
             .sort((a, b) => b.enrolledInfos.length - a.enrolledInfos.length)
             .slice(0, 10)
 
-        const recentlyAddedCourses = await this.courseMySqlRepository.find({
-            where: {
-                isDeleted: false,
-                verifyStatus: CourseVerifyStatus.Approved
-            },
+        const recentlyAddedCourses = totalNumberOfAvailableCourses.sort((prev, next) => new Date(next.createdAt).getTime() - new Date(prev.createdAt).getTime())
 
-            relations:{
-                creator: true,
-                courseTargets: true
-            },
-
-            order: {
-                createdAt: "DESC"
-            }
-        })
     
         return {
             totalNumberOfVerifiedAccounts: totalNumberOfVerifiedAccounts.length,
