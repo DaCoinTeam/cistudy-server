@@ -255,7 +255,7 @@ export class CoursesService {
 
         if (enrolled) {
             throw new ConflictException(
-                "This user is already enrolled in that course.",
+                "You are already enrolled in that course.",
             )
         }
 
@@ -2224,7 +2224,7 @@ export class CoursesService {
         if(course.verifyStatus === CourseVerifyStatus.Approved || course.verifyStatus === CourseVerifyStatus.Pending){
             throw new ConflictException("You cannot delete course once it has been submitted for reviewing or are being approved")
         }
-        
+
         await this.courseMySqlRepository.update(courseId, { isDeleted: true })
 
         return {
