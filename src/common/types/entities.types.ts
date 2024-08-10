@@ -110,6 +110,9 @@ export enum TransactionType {
   Buy = "buy",
   Deposit = "deposit",
   Withdraw = "withdraw",
+  Earn = "earn",
+  CheckOut = "checkout",
+  Received = "received"
 }
 
 export enum SectionContentType {

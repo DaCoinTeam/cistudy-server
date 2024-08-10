@@ -1,4 +1,4 @@
-import { NotificationType, ReportProcessStatus, computeFixedFloor } from "@common"
+import { NotificationType, ReportProcessStatus, TransactionType, computeFixedFloor } from "@common"
 import { appConfig, blockchainConfig } from "@config"
 import {
     AccountMySqlEntity,
@@ -14,6 +14,7 @@ import {
     PostMySqlEntity,
     ReportPostCommentMySqlEntity,
     ReportPostMySqlEntity,
+    TransactionMySqlEntity,
 } from "@database"
 import { MailerService, StorageService } from "@global"
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
@@ -89,6 +90,8 @@ export class PostsService {
         private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
         @InjectRepository(NotificationMySqlEntity)
         private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+        @InjectRepository(TransactionMySqlEntity)
+        private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
         private readonly storageService: StorageService,
         private readonly dataSource: DataSource,
         private readonly mailerService: MailerService
@@ -155,6 +158,12 @@ export class PostsService {
             )
 
             await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+
+            await this.transactionMySqlRepository.save({
+                accountId,
+                type: TransactionType.Earn,
+                amountDepositedChange: earnAmount
+            })
 
             await this.notificationMySqlRepository.save({
                 receiverId: accountId,
@@ -329,6 +338,11 @@ export class PostsService {
                         type: NotificationType.Transaction,
                         description: `You have received ${earnAmount} STARCI(s)`,
                     })
+                    await this.transactionMySqlRepository.save({
+                        accountId,
+                        type: TransactionType.Earn,
+                        amountDepositedChange: earnAmount
+                    })
                 }
             }
         }
@@ -469,6 +483,12 @@ export class PostsService {
                             title: "You have new update on your balance!",
                             type: NotificationType.Transaction,
                             description: `You have received ${earnAmount} STARCI(s)`,
+                        })
+
+                        await this.transactionMySqlRepository.save({
+                            accountId,
+                            type: TransactionType.Earn,
+                            amountDepositedChange: earnAmount
                         })
                     }
                 } else {
@@ -791,6 +811,12 @@ export class PostsService {
 
             const earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.rewardCommentPostEarnCoefficient)
             await this.accountMySqlRepository.increment({ accountId: postComment.creatorId }, "balance", earnAmount)
+
+            await this.transactionMySqlRepository.save({
+                accountId,
+                type: TransactionType.Earn,
+                amountDepositedChange: earnAmount
+            })
 
             await this.notificationMySqlRepository.save({
                 receiverId: postComment.creatorId,
