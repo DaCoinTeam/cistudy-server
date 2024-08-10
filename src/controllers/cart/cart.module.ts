@@ -10,6 +10,7 @@ import {
     RoleMySqlEntity,
     TransactionMongoEntity,
     TransactionMongoEntitySchema,
+    TransactionMySqlEntity,
 } from "@database"
 import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
@@ -30,7 +31,8 @@ import { CartService } from "./cart.service"
             AccountMySqlEntity,
             RoleMySqlEntity,
             EnrolledInfoMySqlEntity,
-            NotificationMySqlEntity
+            NotificationMySqlEntity,
+            TransactionMySqlEntity
         ]),
     ],
     controllers: [CartController],
