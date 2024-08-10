@@ -1,10 +1,11 @@
-import { AccountMySqlEntity, CartCourseMySqlEntity, CartMySqlEntity, EnrolledInfoMySqlEntity, OrderCourseMySqlEntity, OrderMySqlEntity } from "@database"
+import { AccountMySqlEntity, CartCourseMySqlEntity, CartMySqlEntity, EnrolledInfoMySqlEntity, NotificationMySqlEntity, OrderCourseMySqlEntity, OrderMySqlEntity } from "@database"
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { In, Repository } from "typeorm"
 import { AddToCartInput, CheckOutInput, DeleteFromCartInput } from "./cart.input"
 import { AddToCartOutput, CheckOutOutput, DeleteFromCartOutput } from "./cart.output"
-import { OrderStatus } from "@common"
+import { NotificationType, OrderStatus } from "@common"
+import { appConfig } from "@config"
 
 @Injectable()
 export class CartService {
@@ -21,6 +22,8 @@ export class CartService {
         private readonly orderCoursesMySqlRepository: Repository<OrderCourseMySqlEntity>,
         @InjectRepository(EnrolledInfoMySqlEntity)
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
+        @InjectRepository(NotificationMySqlEntity)
+        private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
     ) { }
 
 
@@ -90,7 +93,7 @@ export class CartService {
             return sum + (enableDiscount ? discountPrice : price)
         }, 0)
 
-        const { balance } = await this.accountMySqlRepository.findOne({ where: {
+        const { balance, username } = await this.accountMySqlRepository.findOne({ where: {
             accountId
         }})
 
@@ -99,20 +102,24 @@ export class CartService {
         await this.accountMySqlRepository.update(accountId, { 
             balance: balance - totalPay
         })
-        
+
         const now = new Date()
-        const {orderId} = await this.orderMySqlRepository.save({
+        const { orderId } = await this.orderMySqlRepository.save({
             accountId,
             orderStatus: OrderStatus.Completed,
             completeDate: now,
         })
 
-        const promises : Array<Promise<void>> = []
-        for (const { course : { price, discountPrice, enableDiscount, courseId, duration}} of cartCourses) {
+        const promises: Array<Promise<void>> = []
+        const earningsMap: { [creatorId: string]: number } = {}
+
+        for (const { course: { price, discountPrice, enableDiscount, courseId, duration, creatorId, title } } of cartCourses) {
             const promise = async () => {
                 now.setMonth(now.getMonth() + duration)
+                const priceAtEnrolled = enableDiscount ? discountPrice : price
+        
                 await this.enrolledInfoMySqlRepository.save({
-                    priceAtEnrolled: enableDiscount ? discountPrice : price,
+                    priceAtEnrolled,
                     courseId,
                     accountId,
                     endDate: now
@@ -124,10 +131,39 @@ export class CartService {
                     price,
                     discountedPrice: discountPrice,
                 })
+
+                if (earningsMap[creatorId]) {
+                    earningsMap[creatorId] += priceAtEnrolled / 2
+                } else {
+                    earningsMap[creatorId] = priceAtEnrolled / 2
+                }
+
+                await this.notificationMySqlRepository.save({
+                    senderId: accountId,
+                    receiverId: creatorId,
+                    title: "You have a new enrollment in your course",
+                    type: NotificationType.Course,
+                    courseId,
+                    description: `User ${username} has enrolled in your course: ${title}`,
+                    referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`,
+                })
             }
             promises.push(promise())
         }
+
         await Promise.all(promises)
+
+        const notificationPromises = Object.entries(earningsMap).map(([creatorId, totalEarnings]) => {
+            return this.notificationMySqlRepository.save({
+                receiverId: creatorId,
+                title: "You have a new update on your balance!",
+                type: NotificationType.Transaction,
+                description: `You have received ${totalEarnings} STARCI(s)`,
+            })
+        })
+
+        await Promise.all(notificationPromises)
+
 
         await this.cartCourseMySqlRepository.delete(cartCourseIds)
 
