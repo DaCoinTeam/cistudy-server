@@ -1,6 +1,4 @@
 import {
-    computeDenomination,
-    computeRaw,
     CourseVerifyStatus,
     existKeyNotUndefined,
     NotificationType,
@@ -11,6 +9,7 @@ import {
     SectionContentType,
     shuffleArray,
     SystemRoles,
+    TransactionType,
     VideoType,
 } from "@common"
 import {
@@ -40,6 +39,7 @@ import {
     ResourceMySqlEntity,
     SectionContentMySqlEntity,
     SectionMySqlEntity,
+    TransactionMySqlEntity,
 } from "@database"
 import { MailerService, StorageService } from "@global"
 import {
@@ -202,6 +202,8 @@ export class CoursesService {
         private readonly orderMySqlRepository: Repository<OrderMySqlEntity>,
         @InjectRepository(OrderCourseMySqlEntity)
         private readonly orderCoursesMySqlRepository: Repository<OrderCourseMySqlEntity>,
+        @InjectRepository(TransactionMySqlEntity)
+        private readonly transactionMySqlEntity: Repository<TransactionMySqlEntity>,
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
         private readonly storageService: StorageService,
         private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
@@ -267,20 +269,19 @@ export class CoursesService {
             )
         }
 
-        const price = computeRaw(enableDiscount ? discountPrice : coursePrice)
-        const minimumBalanceRequired = computeDenomination(price)
-        const courseCreatorShares = computeDenomination(price / BigInt(2))
+        const price = enableDiscount ? discountPrice : coursePrice
+        const courseCreatorShares = price / 2
 
         const { username, balance } = account
 
-        if (balance < minimumBalanceRequired) {
+        if (balance < price) {
             throw new ConflictException(
                 "Your account does not have sufficient balance to enroll in this course.",
             )
         }
 
         await this.accountMySqlRepository.update(accountId, {
-            balance: balance - minimumBalanceRequired,
+            balance: balance - price,
         })
         await this.accountMySqlRepository.increment(
             { accountId: creatorId },
@@ -296,7 +297,7 @@ export class CoursesService {
             courseId,
             accountId,
             enrolled: true,
-            priceAtEnrolled: minimumBalanceRequired,
+            priceAtEnrolled: price,
             endDate,
         })
 
@@ -348,6 +349,20 @@ export class CoursesService {
         ]
 
         await this.notificationMySqlRepository.save(notifications)
+
+        const transactions: Array<DeepPartial<TransactionMySqlEntity>> = [
+            {
+                amountDepositedChange: -price,
+                accountId,
+                type: TransactionType.CheckOut
+            },
+            {
+                amountDepositedChange: price,
+                accountId: creatorId,
+                type: TransactionType.Received
+            },
+        ]
+        await this.transactionMySqlEntity.save(transactions)
 
         return {
             message: "Enrolled successfully",

@@ -1,10 +1,10 @@
-import { AccountMySqlEntity, CartCourseMySqlEntity, CartMySqlEntity, EnrolledInfoMySqlEntity, NotificationMySqlEntity, OrderCourseMySqlEntity, OrderMySqlEntity } from "@database"
+import { AccountMySqlEntity, CartCourseMySqlEntity, CartMySqlEntity, EnrolledInfoMySqlEntity, NotificationMySqlEntity, OrderCourseMySqlEntity, OrderMySqlEntity, TransactionMySqlEntity } from "@database"
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { In, Repository } from "typeorm"
 import { AddToCartInput, CheckOutInput, DeleteFromCartInput } from "./cart.input"
 import { AddToCartOutput, CheckOutOutput, DeleteFromCartOutput } from "./cart.output"
-import { NotificationType, OrderStatus } from "@common"
+import { NotificationType, OrderStatus, TransactionType } from "@common"
 import { appConfig } from "@config"
 
 @Injectable()
@@ -24,6 +24,8 @@ export class CartService {
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
         @InjectRepository(NotificationMySqlEntity)
         private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+        @InjectRepository(TransactionMySqlEntity)
+        private readonly transactionMySqlEntity: Repository<TransactionMySqlEntity>
     ) { }
 
 
@@ -153,17 +155,41 @@ export class CartService {
 
         await Promise.all(promises)
 
-        const notificationPromises = Object.entries(earningsMap).map(([creatorId, totalEarnings]) => {
-            return this.notificationMySqlRepository.save({
-                receiverId: creatorId,
-                title: "You have a new update on your balance!",
-                type: NotificationType.Transaction,
-                description: `You have received ${totalEarnings} STARCI(s)`,
-            })
-        })
+        const notificationPromises : Array<Promise<void>> = []
+
+        for (const [creatorId, totalEarnings] of Object.entries(earningsMap)) {
+            const promise = async () => {
+                await this.notificationMySqlRepository.save({
+                    receiverId: creatorId,
+                    title: "You have a new update on your balance!",
+                    type: NotificationType.Transaction,
+                    description: `You have received ${totalEarnings} STARCI(s)`,
+                })
+
+                await this.transactionMySqlEntity.save({
+                    accountId: creatorId,
+                    amountDepositedChange: totalEarnings,
+                    type: TransactionType.Received
+                })
+
+                await this.accountMySqlRepository.increment(
+                    {
+                        accountId: creatorId
+                    },
+                    "balance",
+                    totalEarnings
+                )
+            }
+            notificationPromises.push(promise())
+        }
 
         await Promise.all(notificationPromises)
 
+        await this.transactionMySqlEntity.save({
+            accountId,
+            amountDepositedChange: totalPay,
+            type: TransactionType.CheckOut
+        })
 
         await this.cartCourseMySqlRepository.delete(cartCourseIds)
 
