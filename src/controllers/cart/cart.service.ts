@@ -187,7 +187,7 @@ export class CartService {
 
         await this.transactionMySqlEntity.save({
             accountId,
-            amountDepositedChange: totalPay,
+            amountDepositedChange: -totalPay,
             type: TransactionType.CheckOut
         })
 

@@ -63,8 +63,7 @@ import { WebsocketsModule } from "@websockets"
             poolSize: 1000000,    
             timezone: "Z",
             driver: require("mysql2"),
-            connectorPackage: "mysql2",
-            
+            connectorPackage: "mysql2", 
         }),
 
         GraphQLModule.forRoot<ApolloDriverConfig>({
