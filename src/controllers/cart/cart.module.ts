@@ -4,6 +4,7 @@ import {
     CartMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
+    NotificationMySqlEntity,
     OrderCourseMySqlEntity,
     OrderMySqlEntity,
     RoleMySqlEntity,
@@ -28,7 +29,8 @@ import { CartService } from "./cart.service"
             OrderCourseMySqlEntity,
             AccountMySqlEntity,
             RoleMySqlEntity,
-            EnrolledInfoMySqlEntity
+            EnrolledInfoMySqlEntity,
+            NotificationMySqlEntity
         ]),
     ],
     controllers: [CartController],
