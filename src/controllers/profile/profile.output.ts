@@ -29,3 +29,10 @@ export class MarkAllNotificationsAsReadOutput implements Output {
 export class DeleteNotificationOutput implements Output {
     message: string
 }
+
+export class IsSastifyCommunityStandardOutput {
+    data: {
+        result: boolean
+        reason?: string
+    }
+}

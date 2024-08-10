@@ -28,6 +28,7 @@ import {
     StorageService
 } from "./services"
 import { JwtStrategy } from "./strategies"
+import { OpenApiService } from "./services/openapi.service"
 
 @Global()
 @Module({
@@ -60,7 +61,8 @@ import { JwtStrategy } from "./strategies"
         StorageService,
         JwtStrategy,
         BlockchainService,
-        PaypalService
+        PaypalService,
+        OpenApiService
     ],
     providers: [
         JwtService,
@@ -74,7 +76,8 @@ import { JwtStrategy } from "./strategies"
         StorageService,
         JwtStrategy,
         BlockchainService,
-        PaypalService
-    ],
+        PaypalService,
+        OpenApiService
+    ], 
 })
 export class GlobalModule { }

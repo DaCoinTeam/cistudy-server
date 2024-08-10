@@ -520,6 +520,7 @@ type CourseEntity {
   courseCategories: [CourseCategoryEntity!]
   courseTargets: [CourseTargetEntity!]
   posts: [PostEntity!]
+  enrolledInfos: [EnrolledInfoEntity!]
   sections: [SectionEntity!]
   cartCourses: [CartCourseEntity!]!
   certificates: [CertificateEntity!]!

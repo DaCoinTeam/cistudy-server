@@ -7,6 +7,7 @@ export const keysConfig = () => (
         paypal: {
             clientId: process.env.PAYPAL_CLIENT_ID,
             secretKey: process.env.PAYPAL_SECRET_KEY
-        }
+        },
+        openapi: process.env.OPENAPI_KEY
     }
 )

@@ -73,3 +73,7 @@ export class MarkAllNotificationsAsReadInput implements AuthEmptyDataInput {
     accountId: string
 }
 
+export class IsSastifyCommunityStandardInput {
+    @ApiProperty()
+        message: string
+}
