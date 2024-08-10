@@ -90,21 +90,21 @@ export class AccountsService {
             })
 
             const { followId, followed } = created
+
+            await this.notificationMySqlRepository.save({
+                senderId: accountId,
+                receiverId: followedAccountId,
+                title: "You have new follower!",
+                type: NotificationType.Interact,
+                description: `User ${found.follower.username} has followed you`,
+                referenceLink: `/accounts/${accountId}`
+            })
             return responseMessage(followId, followed)
         }
 
         const { followId, followed } = found
         await this.followMySqlRepository.update(followId, {
             followed: !followed,
-        })
-
-        await this.notificationMySqlRepository.save({
-            senderId: accountId,
-            receiverId: followedAccountId,
-            title: "You have new follower!",
-            type: NotificationType.Interact,
-            description: `User ${found.follower.username} has followed you`,
-            referenceLink: `/accounts/${accountId}`
         })
 
         return responseMessage(followId, !followed)

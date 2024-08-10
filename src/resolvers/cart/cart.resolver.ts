@@ -1,8 +1,8 @@
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { Args, Query, Resolver } from "@nestjs/graphql"
 import { AccountId, AuthInterceptor, JwtAuthGuard } from "../shared"
-import { FindManyAccountOrdersInputData, FindOneOrderInputData } from "./cart.input"
-import { FindManyAccountOrdersOutput, FindOneCartOutput, FindOneOrderOutput } from "./cart.output"
+import { FindManyOrdersInputData, FindOneOrderInputData } from "./cart.input"
+import { FindManyOrdersOutput, FindOneCartOutput, FindOneOrderOutput } from "./cart.output"
 import { CartService } from "./cart.service"
 
 @Resolver()
@@ -32,11 +32,11 @@ export class CartResolver {
 
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(AuthInterceptor)
-    @Query(() => FindManyAccountOrdersOutput)
-    async findManyAccountOrders(
+    @Query(() => FindManyOrdersOutput)
+    async findManyOrders(
         @AccountId() accountId : string,
-        @Args("data") data: FindManyAccountOrdersInputData) {
-        return await this.cartService.findManyAccountOrders({ accountId, data })
+        @Args("data") data: FindManyOrdersInputData) {
+        return await this.cartService.findManyOrders({ accountId, data })
     }
 
     

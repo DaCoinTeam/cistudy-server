@@ -520,6 +520,7 @@ type CourseEntity {
   courseCategories: [CourseCategoryEntity!]
   courseTargets: [CourseTargetEntity!]
   posts: [PostEntity!]
+  enrolledInfos: [EnrolledInfoEntity!]
   sections: [SectionEntity!]
   cartCourses: [CartCourseEntity!]!
   certificates: [CertificateEntity!]!
@@ -942,6 +943,20 @@ type FindOneCertificateOutput {
   tokens: AuthTokens
 }
 
+type FindManyAccountOrdersOutputMetadata {
+  count: Int
+}
+
+type FindManyAccountOrdersOutputData {
+  results: [OrderEntity!]!
+  metadata: FindManyAccountOrdersOutputMetadata
+}
+
+type FindManyAccountOrdersOutput {
+  data: FindManyAccountOrdersOutputData!
+  tokens: AuthTokens
+}
+
 type InitOutput {
   data: AccountEntity!
   tokens: AuthTokens
@@ -976,17 +991,17 @@ type FindOneOrderOutput {
   tokens: AuthTokens
 }
 
-type FindManyAccountOrdersOutputMetadata {
+type FindManyOrdersOutputMetadata {
   count: Int
 }
 
-type FindManyAccountOrdersOutputData {
+type FindManyOrdersOutputData {
   results: [OrderEntity!]!
-  metadata: FindManyAccountOrdersOutputMetadata
+  metadata: FindManyOrdersOutputMetadata
 }
 
-type FindManyAccountOrdersOutput {
-  data: FindManyAccountOrdersOutputData!
+type FindManyOrdersOutput {
+  data: FindManyOrdersOutputData!
   tokens: AuthTokens
 }
 
@@ -1026,9 +1041,10 @@ type Query {
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
   findManyReceivedNotifications(data: FindManyReceivedNotificationsInputData!): FindManyReceivedNotificationsOutput!
   findOneCertificate(data: FindOneCertificateInputData!): FindOneCertificateOutput!
+  findManyAccountOrders(data: FindManyAccountOrdersInputData!): FindManyAccountOrdersOutput!
   findOneCart: FindOneCartOutput!
   findOneOrder(data: FindOneOrderInputData!): FindOneOrderOutput!
-  findManyAccountOrders(data: FindManyAccountOrdersInputData!): FindManyAccountOrdersOutput!
+  findManyOrders(data: FindManyOrdersInputData!): FindManyOrdersOutput!
 }
 
 input SignInInputData {
@@ -1352,6 +1368,16 @@ input FindOneCertificateInputData {
   certificateId: ID!
 }
 
+input FindManyAccountOrdersInputData {
+  options: FindManyAccountOrdersInputOptions
+}
+
+input FindManyAccountOrdersInputOptions {
+  take: Int
+  skip: Int
+  orderStatus: String
+}
+
 input FindOneOrderInputData {
   params: FindOneOrderInputParams!
 }
@@ -1360,12 +1386,12 @@ input FindOneOrderInputParams {
   orderId: ID!
 }
 
-input FindManyAccountOrdersInputData {
-  options: FindManyAccountOrdersInputOptions
+input FindManyOrdersInputData {
+  options: FindManyOrdersInputOptions
 }
 
-input FindManyAccountOrdersInputOptions {
+input FindManyOrdersInputOptions {
   take: Int
   skip: Int
-  orderStatus: String!
+  orderStatus: String
 }

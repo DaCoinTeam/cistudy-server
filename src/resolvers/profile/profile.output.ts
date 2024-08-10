@@ -1,5 +1,5 @@
 import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
-import { CertificateMySqlEntity, CourseMySqlEntity, NotificationMySqlEntity, TransactionMySqlEntity } from "@database"
+import { CertificateMySqlEntity, CourseMySqlEntity, NotificationMySqlEntity, OrderMySqlEntity, TransactionMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
@@ -117,6 +117,30 @@ export class FindManyReceivedNotificationsOutput implements AuthOutput<FindManyR
 export class FindOneCertificateOutput implements AuthOutput<CertificateMySqlEntity>{
     @Field(() => CertificateMySqlEntity)
         data?: CertificateMySqlEntity
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
+}
+
+@ObjectType()
+export class FindManyAccountOrdersOutputMetadata {
+    @Field(() => Int, { nullable: true })
+        count?: number
+}
+
+@ObjectType()
+export class FindManyAccountOrdersOutputData
+implements ResultsWithMetadata<OrderMySqlEntity, FindManyAccountOrdersOutputMetadata>
+{
+    @Field(() => [OrderMySqlEntity])
+        results: Array<OrderMySqlEntity>
+    @Field(() => FindManyAccountOrdersOutputMetadata, { nullable: true })
+        metadata: FindManyAccountOrdersOutputMetadata
+}
+
+@ObjectType()
+export class FindManyAccountOrdersOutput implements AuthOutput<FindManyAccountOrdersOutputData> {
+    @Field(() => FindManyAccountOrdersOutputData)
+        data: FindManyAccountOrdersOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }
