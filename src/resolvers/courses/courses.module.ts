@@ -22,6 +22,7 @@ import {
     SectionContentMySqlEntity,
     SectionMySqlEntity,
     SessionMySqlEntity,
+    TransactionDetailMySqlEntity,
 } from "@database"
 import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
@@ -55,7 +56,8 @@ import { CoursesService } from "./courses.service"
             FollowMySqlEnitity,
             CompleteResourceMySqlEntity,
             CertificateMySqlEntity,
-            CartCourseMySqlEntity
+            CartCourseMySqlEntity,
+            TransactionDetailMySqlEntity
         ]),
     ],
     providers: [CoursesResolver, CoursesService],

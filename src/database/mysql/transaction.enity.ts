@@ -6,10 +6,12 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm"
 import { AccountEntity } from "./account.entity"
+import { TransactionDetailEntity } from "./transaction-detail.entity"
 
 @ObjectType()
 @Entity("transaction")
@@ -48,12 +50,20 @@ export class TransactionEntity {
   })
   @JoinColumn({ name: "accountId" })
       account: AccountEntity
- 
+
+  @Field(() => [TransactionDetailEntity])
+  @OneToMany(
+      () => TransactionDetailEntity,
+      (transactionDetail) => transactionDetail.transaction,
+      { nullable: true, cascade: true },
+  ) 
+      transactionDetails?: Array<TransactionDetailEntity>
+
   @Field(() => Date)
   @CreateDateColumn()
       createdAt: Date
 
   @Field(() => Date)
-  @UpdateDateColumn() 
+  @UpdateDateColumn()
       updatedAt: Date
-}  
+}

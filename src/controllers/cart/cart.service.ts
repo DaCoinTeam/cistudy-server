@@ -1,4 +1,4 @@
-import { AccountMySqlEntity, CartCourseMySqlEntity, CartMySqlEntity, EnrolledInfoMySqlEntity, NotificationMySqlEntity, OrderCourseMySqlEntity, OrderMySqlEntity, TransactionMySqlEntity } from "@database"
+import { AccountMySqlEntity, CartCourseMySqlEntity, CartMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, NotificationMySqlEntity, OrderCourseMySqlEntity, OrderMySqlEntity, TransactionMySqlEntity } from "@database"
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { In, Repository } from "typeorm"
@@ -113,41 +113,40 @@ export class CartService {
         })
 
         const promises: Array<Promise<void>> = []
-        const earningsMap: { [creatorId: string]: number } = {}
+        const earningsMap: { [creatorId: string]: Array<CourseMySqlEntity> } = {}
 
-        for (const { course: { price, discountPrice, enableDiscount, courseId, duration, creatorId, title } } of cartCourses) {
+        for (const { course } of cartCourses) {
             const promise = async () => {
-                now.setMonth(now.getMonth() + duration)
-                const priceAtEnrolled = enableDiscount ? discountPrice : price
+                now.setMonth(now.getMonth() + course.duration)
+                const priceAtEnrolled = course.enableDiscount ? course.discountPrice : course.price
         
                 await this.enrolledInfoMySqlRepository.save({
                     priceAtEnrolled,
-                    courseId,
+                    courseId: course.courseId,
                     accountId,
                     endDate: now
                 })
 
                 await this.orderCoursesMySqlRepository.save({
                     orderId,
-                    courseId,
-                    price,
-                    discountedPrice: discountPrice,
+                    courseId: course.courseId,
+                    price: course.price,
+                    discountedPrice: course.discountPrice,
                 })
 
-                if (earningsMap[creatorId]) {
-                    earningsMap[creatorId] += priceAtEnrolled / 2
-                } else {
-                    earningsMap[creatorId] = priceAtEnrolled / 2
+                if (!earningsMap[course.creatorId]) {
+                    earningsMap[course.creatorId] = []
                 }
+                earningsMap[course.creatorId].push(course)
 
                 await this.notificationMySqlRepository.save({
                     senderId: accountId,
-                    receiverId: creatorId,
+                    receiverId: course.creatorId,
                     title: "You have a new enrollment in your course",
                     type: NotificationType.Course,
-                    courseId,
-                    description: `User ${username} has enrolled in your course: ${title}`,
-                    referenceLink: `${appConfig().frontendUrl}/courses/${courseId}`,
+                    courseId: course.courseId,
+                    description: `User ${username} has enrolled in your course: ${course.title}`,
+                    referenceLink: `${appConfig().frontendUrl}/courses/${course.courseId}`,
                 })
             }
             promises.push(promise())
@@ -157,7 +156,11 @@ export class CartService {
 
         const notificationPromises : Array<Promise<void>> = []
 
-        for (const [creatorId, totalEarnings] of Object.entries(earningsMap)) {
+        for (const [creatorId, courses] of Object.entries(earningsMap)) {
+            const totalEarnings = courses.reduce((accumulator, course) => {
+                return accumulator + (course.enableDiscount ? course.discountPrice : course.price)
+            }, 0)
+
             const promise = async () => {
                 await this.notificationMySqlRepository.save({
                     receiverId: creatorId,
@@ -169,7 +172,13 @@ export class CartService {
                 await this.transactionMySqlEntity.save({
                     accountId: creatorId,
                     amountDepositedChange: totalEarnings,
-                    type: TransactionType.Received
+                    type: TransactionType.Received,
+                    transactionDetails: earningsMap[creatorId].map(({ courseId, enableDiscount, discountPrice, price }) => ({
+                        accountId,
+                        courseId,
+                        payAmount: enableDiscount ? discountPrice : price,
+                        directIn: true,
+                    }))
                 })
 
                 await this.accountMySqlRepository.increment(
@@ -188,7 +197,12 @@ export class CartService {
         await this.transactionMySqlEntity.save({
             accountId,
             amountDepositedChange: -totalPay,
-            type: TransactionType.CheckOut
+            type: TransactionType.CheckOut,
+            transactionDetails: cartCourses.map(({course}) => ({
+                courseId: course.courseId,
+                payAmount: course.enableDiscount ? course.discountPrice : course.price,
+                directIn: false,
+            }))
         })
 
         await this.cartCourseMySqlRepository.delete(cartCourseIds)

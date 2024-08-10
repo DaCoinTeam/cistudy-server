@@ -38,7 +38,8 @@ import {
     QuizAttemptQuestionMySqlEntity,
     OrderMySqlEntity,
     OrderCourseMySqlEntity,
-    TransactionMySqlEntity
+    TransactionMySqlEntity,
+    TransactionDetailMySqlEntity
 } from "@database"
 import { CoursesService } from "./courses.service"
 import { MongooseModule } from "@nestjs/mongoose"
@@ -85,7 +86,8 @@ import { CourseCategoryEntity } from "src/database/mysql/course-category.entity"
             QuizAttemptQuestionMySqlEntity,
             OrderMySqlEntity,
             OrderCourseMySqlEntity,
-            TransactionMySqlEntity
+            TransactionMySqlEntity,
+            TransactionDetailMySqlEntity
         ]),
     ],
     controllers: [CoursesController],
