@@ -49,6 +49,9 @@ export class ProfileService {
             skip,
             order: {
                 updatedAt: "DESC"
+            },
+            relations:{
+                enrolledInfos: true
             }
         })
 
