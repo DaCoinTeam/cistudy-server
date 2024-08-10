@@ -117,6 +117,7 @@ export class CourseEntity {
     @OneToMany(() => PostEntity, (post) => post.course)
         posts: Array<PostEntity>
 
+    @Field(() => [EnrolledInfoEntity], {nullable: true})
     @OneToMany(() => EnrolledInfoEntity, (enrolled) => enrolled.course)
         enrolledInfos: Array<EnrolledInfoEntity>
 
