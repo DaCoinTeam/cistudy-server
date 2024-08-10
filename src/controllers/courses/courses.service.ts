@@ -142,6 +142,7 @@ import {
 import { appConfig, blockchainConfig } from "@config"
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager"
 import numeral from "numeral"
+import { v4 as uuidv4 } from "uuid"
 
 @Injectable()
 export class CoursesService {
@@ -1364,8 +1365,13 @@ export class CoursesService {
             answers: [
                 {
                     isCorrect: true,
-                    content: "This is a correct anwser.",
+                    content: `This is a correct anwser ${uuidv4()}.`,
                     position: 1,
+                },
+                {
+                    isCorrect: false,
+                    content: `This is a wrong anwser ${uuidv4()}.`,
+                    position: 2,
                 },
             ],
         })
@@ -1387,6 +1393,8 @@ export class CoursesService {
             questionMedia,
             deleteMedia,
         } = data
+
+        console.log(point)
 
         const quizQuestion = await this.quizQuestionMySqlRepository.findOneBy({
             quizQuestionId,
@@ -1556,8 +1564,8 @@ export class CoursesService {
 
         await this.quizQuestionAnswerMySqlRepository.save({
             content: hasTrueAnwser
-                ? "This is a wrong awnser."
-                : "This is a correct awnser.",
+                ? `This is a wrong awnser ${uuidv4()}.`
+                : `This is a correct awnser ${uuidv4()}.`,
             quizQuestionId,
             isCorrect: !hasTrueAnwser,
             position: answers.length ? answers[0].position + 1 : 1,
@@ -1591,6 +1599,18 @@ export class CoursesService {
 
         if (!answer) {
             throw new NotFoundException("Quiz Question Not Found.")
+        }
+
+        if (isCorrect === false) {
+            const numCorrects = await this.quizQuestionAnswerMySqlRepository.count({
+                where: {
+                    isCorrect: true,
+                    quizQuestionId: answer.quizQuestionId
+                }
+            })
+            if (numCorrects <= 1) {
+                throw new ConflictException("Must have at least one correct answers")
+            }
         }
 
         let tempPosition: number
@@ -1661,8 +1681,14 @@ export class CoursesService {
         const { data } = input
         const { quizQuestionAnswerId } = data
 
-        const answer = await this.quizQuestionAnswerMySqlRepository.findOneBy({
-            quizQuestionAnswerId,
+        const answer = await this.quizQuestionAnswerMySqlRepository.findOne({
+            where: {
+                quizQuestionAnswerId,
+            },
+            relations: {
+                quizQuestion: true
+            }
+           
         })
 
         if (!answer) {
