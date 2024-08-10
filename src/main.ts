@@ -76,6 +76,6 @@ const bootstrap = async () => {
     })
 
     await app.listen(appConfig().port || 3001)
-}
-
+} 
+ 
 generateSchema().then(() => bootstrap())

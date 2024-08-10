@@ -5,6 +5,7 @@ import {
     Delete,
     Param,
     Patch,
+    Post,
     Put,
     UploadedFiles,
     UseGuards,
@@ -13,7 +14,7 @@ import {
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { AccountId, AuthInterceptor, DataFromBody, JwtAuthGuard, Roles } from "../shared"
-import { DepositData, MarkNotificationAsReadInputData, UpdateProfileData, WithdrawData } from "./profile.input"
+import { DepositData, IsSastifyCommunityStandardInput, MarkNotificationAsReadInputData, UpdateProfileData, WithdrawData } from "./profile.input"
 import { updateProfileSchema } from "./profile.schema"
 import { ProfileService } from "./profile.service"
 
@@ -123,5 +124,12 @@ export class ProfileController{
                 notificationId
             }
         })
+    }
+
+    @Post("is-sastify-community-standard")
+    async isSastifyCommunityStandard(
+        @Body() body: IsSastifyCommunityStandardInput
+    ) {
+        return await this.profileService.isSastifyCommunityStandard(body)
     }
 }

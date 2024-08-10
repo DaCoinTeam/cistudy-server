@@ -25,6 +25,7 @@ import Web3 from "web3"
 import {
     DeleteNotificationInput,
     DepositInput,
+    IsSastifyCommunityStandardInput,
     MarkAllNotificationsAsReadInput,
     MarkNotificationAsReadInput,
     UpdateProfileInput,
@@ -33,11 +34,13 @@ import {
 import {
     DeleteNotificationOutput,
     DepositOutput,
+    IsSastifyCommunityStandardOutput,
     MarkAllNotificationsAsReadOutput,
     MarkNotificationAsReadOutput,
     UpdateProfileOutput,
     WithdrawOutput,
 } from "./profile.output"
+import { OpenApiService } from "src/global/services/openapi.service"
 
 @Injectable()
 export class ProfileService {
@@ -52,6 +55,7 @@ export class ProfileService {
         private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
         private readonly storageService: StorageService,
         private readonly blockchainService: BlockchainService,
+        private readonly openapiService: OpenApiService,
     ) { }
 
     async updateProfile(input: UpdateProfileInput): Promise<UpdateProfileOutput> {
@@ -267,6 +271,14 @@ export class ProfileService {
 
         return {
             message: "Notification deleted successfully"
+        }
+    }
+
+    async isSastifyCommunityStandard(input : IsSastifyCommunityStandardInput) : Promise<IsSastifyCommunityStandardOutput> {
+        const { message } = input
+        const data = await this.openapiService.isSatisfyCommunityStandard(message)
+        return {
+            data
         }
     }
 }
