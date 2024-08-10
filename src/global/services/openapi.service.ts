@@ -26,7 +26,7 @@ Does it feature inappropriate or offensive material?
 Does it contain harmful or dangerous content?
 Does it involve sexual content?
 ”
-        `
+        `   
         const chatCompletion = await this.client.chat.completions.create({
             messages: [{ role: "user", content }],
             model: "gpt-3.5-turbo",

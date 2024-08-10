@@ -53,6 +53,7 @@ jobs:
         FRONTEND_URL: ${{ vars.FRONTEND_URL }}
         PAYPAL_CLIENT_ID: ${{ vars.PAYPAL_CLIENT_ID }}
         PAYPAL_SECRET_KEY: ${{ secrets.PAYPAL_SECRET_KEY }}
+        OPENAPI_KEY: $${{ secrets.OPENAPI_KEY }}
         
       run: docker compose -f docker/github-compose.yaml -p cistudy-server up --build -d 
  
