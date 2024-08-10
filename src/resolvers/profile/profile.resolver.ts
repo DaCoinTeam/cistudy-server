@@ -1,8 +1,9 @@
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { Args, Query, Resolver } from "@nestjs/graphql"
 import { AccountId, AuthInterceptor, JwtAuthGuard } from "../shared"
-import { FindManyEnrolledCoursesInputData, FindManyReceivedNotificationsInputData, FindManySelfCreatedCoursesInputData, FindManyTransactionsInputData, FindOneCertificateInputData } from "./profile.input"
+import { FindManyAccountOrdersInputData, FindManyEnrolledCoursesInputData, FindManyReceivedNotificationsInputData, FindManySelfCreatedCoursesInputData, FindManyTransactionsInputData, FindOneCertificateInputData } from "./profile.input"
 import {
+    FindManyAccountOrdersOutput,
     FindManyEnrolledCoursesOutput, FindManyReceivedNotificationsOutput,
     FindManySelfCreatedCoursesOutput,
     FindManyTransactionsOutput,
@@ -70,5 +71,14 @@ export class ProfileResolver {
         @Args("data") data: FindOneCertificateInputData,
     ) {
         return this.profileService.findOneCertificate({ accountId, data })
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @Query(() => FindManyAccountOrdersOutput)
+    async findManyAccountOrders(
+        @AccountId() accountId : string,
+        @Args("data") data: FindManyAccountOrdersInputData) {
+        return await this.profileService.findManyAccountOrders({ accountId, data })
     }
 }

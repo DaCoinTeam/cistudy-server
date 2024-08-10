@@ -4,6 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { In, Repository } from "typeorm"
 import { AddToCartInput, CheckOutInput, DeleteFromCartInput } from "./cart.input"
 import { AddToCartOutput, CheckOutOutput, DeleteFromCartOutput } from "./cart.output"
+import { OrderStatus } from "@common"
 
 @Injectable()
 export class CartService {
@@ -85,30 +86,48 @@ export class CartService {
             }
         })
 
-        let totalPay = 0
-
-        for (const { course : { price, discountPrice, enableDiscount, courseId}} of cartCourses) {
-            const eachPrice = enableDiscount ? discountPrice : price
-            totalPay += eachPrice
-
-            const now = new Date()
-            now.setFullYear(now.getFullYear() + 1)
-            await this.enrolledInfoMySqlRepository.save({
-                priceAtEnrolled: eachPrice,
-                courseId,
-                accountId,
-                endDate: now
-            })
-        }
+        const totalPay = cartCourses.reduce((sum, { course: { price, discountPrice, enableDiscount } }) => {
+            return sum + (enableDiscount ? discountPrice : price)
+        }, 0)
 
         const { balance } = await this.accountMySqlRepository.findOne({ where: {
             accountId
         }})
 
         if (balance < totalPay) throw new ConflictException("Your balance is not enough.")
+
         await this.accountMySqlRepository.update(accountId, { 
             balance: balance - totalPay
         })
+        
+        const now = new Date()
+        const {orderId} = await this.orderMySqlRepository.save({
+            accountId,
+            orderStatus: OrderStatus.Completed,
+            completeDate: now,
+        })
+
+        const promises : Array<Promise<void>> = []
+        for (const { course : { price, discountPrice, enableDiscount, courseId, duration}} of cartCourses) {
+            const promise = async () => {
+                now.setMonth(now.getMonth() + duration)
+                await this.enrolledInfoMySqlRepository.save({
+                    priceAtEnrolled: enableDiscount ? discountPrice : price,
+                    courseId,
+                    accountId,
+                    endDate: now
+                })
+
+                await this.orderCoursesMySqlRepository.save({
+                    orderId,
+                    courseId,
+                    price,
+                    discountedPrice: discountPrice,
+                })
+            }
+            promises.push(promise())
+        }
+        await Promise.all(promises)
 
         await this.cartCourseMySqlRepository.delete(cartCourseIds)
 

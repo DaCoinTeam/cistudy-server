@@ -1,4 +1,4 @@
-import { AuthEmptyDataInput, AuthInput, OptionsOnly } from "@common"
+import { AuthEmptyDataInput, AuthInput, OptionsOnly, OrderStatus } from "@common"
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
 
 
@@ -110,4 +110,27 @@ export class FindOneCertificateInputData {
 export class FindOneCertificateInput implements AuthInput<FindOneCertificateInputData> {
     accountId: string
     data: FindOneCertificateInputData
+}
+
+@InputType()
+export class FindManyAccountOrdersInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+    @Field(() => String, {nullable: true})
+        orderStatus?: OrderStatus
+}
+
+@InputType()
+export class FindManyAccountOrdersInputData
+implements
+    OptionsOnly<FindManyAccountOrdersInputOptions> {
+    @Field(() => FindManyAccountOrdersInputOptions, { nullable: true })
+        options?: FindManyAccountOrdersInputOptions
+}
+
+export class FindManyAccountOrdersInput implements AuthInput<FindManyAccountOrdersInputData> {
+    accountId: string
+    data: FindManyAccountOrdersInputData
 }

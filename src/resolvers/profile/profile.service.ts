@@ -1,15 +1,17 @@
 
-import { CertificateMySqlEntity, CourseMySqlEntity, CourseRating, CourseReviewMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, NotificationMySqlEntity, PostMySqlEntity, TransactionMySqlEntity } from "@database"
+import { CertificateMySqlEntity, CourseMySqlEntity, CourseRating, CourseReviewMySqlEntity, EnrolledInfoMySqlEntity, FollowMySqlEnitity, NotificationMySqlEntity, OrderMySqlEntity, PostMySqlEntity, TransactionMySqlEntity } from "@database"
 import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository } from "typeorm"
 import {
+    FindManyAccountOrdersInput,
     FindManyEnrolledCoursesInput,
     FindManyReceivedNotificationsInput,
     FindManySelfCreatedCoursesInput, FindManyTransactionsInput,
     FindOneCertificateInput
 } from "./profile.input"
-import { FindManyEnrolledCoursesOutputData, FindManyReceivedNotificationsOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData } from "./profile.output"
+import { FindManyAccountOrdersOutputData, FindManyEnrolledCoursesOutputData, FindManyReceivedNotificationsOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData } from "./profile.output"
+import { OrderStatus } from "@common"
 
 @Injectable()
 export class ProfileService {
@@ -30,6 +32,8 @@ export class ProfileService {
         private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
         @InjectRepository(EnrolledInfoMySqlEntity)
         private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
+        @InjectRepository(OrderMySqlEntity)
+        private readonly orderMySqlEntity: Repository<OrderMySqlEntity>,
         private readonly dataSource: DataSource,
     ) { }
 
@@ -369,5 +373,39 @@ export class ProfileService {
         certificate.course.numberOfEnrollments = courseEnrollments
 
         return certificate
+    }
+
+    async findManyAccountOrders(input: FindManyAccountOrdersInput): Promise<FindManyAccountOrdersOutputData> {
+        const { accountId, data } = input
+        const { options } = data
+        const { skip, take, orderStatus } = { ...options }
+
+        const results = await this.orderMySqlEntity.find(
+            {
+                where: {
+                    accountId,
+                    orderStatus : orderStatus ? orderStatus : OrderStatus.Completed
+                },
+                skip,
+                take,
+                relations: {
+                    orderCourses: {
+                        course: true
+                    },
+                    account: true
+                },
+            })
+        const numberOfAccountOrdersResult = await this.orderMySqlEntity.count({
+            where:{
+                orderStatus,
+                accountId
+            }
+        })
+        return {
+            results,
+            metadata: {
+                count: numberOfAccountOrdersResult,
+            }
+        }
     }
 }

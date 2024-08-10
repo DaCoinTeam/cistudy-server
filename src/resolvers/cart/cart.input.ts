@@ -25,25 +25,25 @@ export class FindOneOrderInput implements AuthInput<FindOneOrderInputData> {
 
 
 @InputType()
-export class FindManyAccountOrdersInputOptions {
+export class FindManyOrdersInputOptions {
     @Field(() => Int, { nullable: true })
         take?: number
     @Field(() => Int, { nullable: true })
         skip?: number
-    @Field(() => String)
-        orderStatus: OrderStatus
+    @Field(() => String, {nullable: true})
+        orderStatus?: OrderStatus
 }
 
 @InputType()
-export class FindManyAccountOrdersInputData
+export class FindManyOrdersInputData
 implements
-    OptionsOnly<FindManyAccountOrdersInputOptions> {
-    @Field(() => FindManyAccountOrdersInputOptions, { nullable: true })
-        options?: FindManyAccountOrdersInputOptions
+    OptionsOnly<FindManyOrdersInputOptions> {
+    @Field(() => FindManyOrdersInputOptions, { nullable: true })
+        options?: FindManyOrdersInputOptions
 }
 
-export class FindManyAccountOrdersInput implements AuthInput<FindManyAccountOrdersInputData> {
+export class FindManyOrdersInput implements AuthInput<FindManyOrdersInputData> {
     accountId: string
-    data: FindManyAccountOrdersInputData
+    data: FindManyOrdersInputData
 }
 
