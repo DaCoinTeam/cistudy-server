@@ -397,7 +397,9 @@ export class ProfileService {
                 take,
                 relations: {
                     orderCourses: {
-                        course: true
+                        course: {
+                            creator: true
+                        },
                     },
                     account: true
                 },
