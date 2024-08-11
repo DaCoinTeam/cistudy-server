@@ -103,7 +103,9 @@ export class PostsService {
 
         const isEnrolled = await this.enrolledInfoMySqlRepository.findOneBy({ accountId, courseId })
 
-        if (!isEnrolled) {
+        const { creatorId } = await this.courseMySqlRepository.findOneBy({ courseId })
+
+        if (accountId !== creatorId && !isEnrolled) {
             throw new ConflictException("You must be enrolled to this course before creating a post inside. ")
         }
 
@@ -150,27 +152,30 @@ export class PostsService {
         })
 
         if (numberOfUserPost.length < 3) {
-            post.isRewardable = true
-            const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOneBy({ accountId, courseId })
+            if (accountId !== creatorId) {
+                post.isRewardable = true
+                const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOneBy({ accountId, courseId })
 
-            earnAmount = computeFixedFloor(
-                priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient
-            )
+                earnAmount = computeFixedFloor(
+                    priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient
+                )
 
-            await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+                await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
 
-            await this.transactionMySqlRepository.save({
-                accountId,
-                type: TransactionType.Earn,
-                amountDepositedChange: earnAmount
-            })
+                await this.transactionMySqlRepository.save({
+                    accountId,
+                    type: TransactionType.Earn,
+                    amountDepositedChange: earnAmount
+                })
 
-            await this.notificationMySqlRepository.save({
-                receiverId: accountId,
-                title: "You have new update on your balance!",
-                type: NotificationType.Transaction,
-                description: `You have received ${earnAmount} STARCI(s)`,
-            })
+                await this.notificationMySqlRepository.save({
+                    receiverId: accountId,
+                    title: "You have new update on your balance!",
+                    type: NotificationType.Transaction,
+                    description: `You have received ${earnAmount} STARCI(s)`,
+                })
+            }
+
         }
 
         const { postId } = await this.postMySqlRepository.save(post)
@@ -301,7 +306,7 @@ export class PostsService {
                 accountId,
                 courseId
             },
-            relations:{
+            relations: {
                 account: true
             }
         })
@@ -716,7 +721,7 @@ export class PostsService {
                 referenceLink: `/posts/${postComment.post.postId}`
             },)
         }
-      
+
         return {
             message: "Reply created successfully",
             others: { postCommentReplyId }
@@ -1000,7 +1005,7 @@ export class PostsService {
         const { reportedPost, reporterAccount, createdAt, title, description, postId } = found
 
         if (processStatus === ReportProcessStatus.Approved) {
-            await this.postMySqlRepository.update(postId , { isDisabled: true })
+            await this.postMySqlRepository.update(postId, { isDisabled: true })
         }
 
         await this.mailerService.sendReportPostMail(
@@ -1047,7 +1052,7 @@ export class PostsService {
         const { reportedPostComment, reporterAccount, createdAt, title, description, postCommentId } = found
 
         if (processStatus === ReportProcessStatus.Approved) {
-            await this.postCommentMySqlRepository.update(postCommentId , { isDisabled: true })
+            await this.postCommentMySqlRepository.update(postCommentId, { isDisabled: true })
         }
         await this.mailerService.sendReportPostCommentMail(
             reportedPostComment.creator.email,
