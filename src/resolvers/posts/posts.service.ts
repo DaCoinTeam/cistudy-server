@@ -124,7 +124,7 @@ export class PostsService {
         post.numberOfRewardableCommentsLeft = numberOfRewardableCommentsLeft
         post.liked = liked ? true : false
         post.isPostOwner = (accountId === post.creatorId)
-
+        post.isInstructor = (accountId === post.course.creatorId)
         return {
             data: post,
         }
