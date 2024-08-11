@@ -70,7 +70,9 @@ export class CartService {
                 take,
                 relations: {
                     orderCourses: {
-                        course: true
+                        course: {
+                            creator: true
+                        }
                     },
                     account: true
                 },
