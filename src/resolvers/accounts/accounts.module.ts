@@ -3,10 +3,12 @@ import {
     AccountReviewMySqlEntity,
     CourseMySqlEntity,
     FollowMySqlEnitity,
+    NotificationMySqlEntity,
     ReportAccountMySqlEntity,
     ReportCourseMySqlEntity,
     ReportPostCommentMySqlEntity,
     ReportPostMySqlEntity,
+    TransactionMySqlEntity,
 } from "@database"
 import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
@@ -23,7 +25,9 @@ import { AccountsService } from "./accounts.service"
             ReportAccountMySqlEntity,
             ReportCourseMySqlEntity,
             ReportPostMySqlEntity,
-            ReportPostCommentMySqlEntity
+            ReportPostCommentMySqlEntity,
+            TransactionMySqlEntity,
+            NotificationMySqlEntity
         ]),
     ],
     providers: [AccountsResolver, AccountsService],

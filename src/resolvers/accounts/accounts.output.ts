@@ -1,5 +1,5 @@
 import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
-import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, ReportAccountMySqlEntity } from "@database"
+import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, NotificationMySqlEntity, ReportAccountMySqlEntity, TransactionMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
@@ -96,3 +96,50 @@ export class FindManyPendingCourseOutput implements AuthOutput<FindManyPendingCo
         tokens?: AuthTokens
 }
 
+@ObjectType()
+export class FindManyAdminTransactionsOutputMetadata {
+    @Field(() => Int, { nullable: true })
+        count?: number
+}
+
+@ObjectType()
+export class FindManyAdminTransactionsOutputData
+implements ResultsWithMetadata<TransactionMySqlEntity, FindManyAdminTransactionsOutputMetadata>
+{
+    @Field(() => [TransactionMySqlEntity])
+        results: Array<TransactionMySqlEntity>
+    @Field(() => FindManyAdminTransactionsOutputMetadata, { nullable: true })
+        metadata: FindManyAdminTransactionsOutputMetadata
+}
+
+@ObjectType()
+export class FindManyAdminTransactionsOutput implements AuthOutput<FindManyAdminTransactionsOutputData> {
+    @Field(() => FindManyAdminTransactionsOutputData)
+        data: FindManyAdminTransactionsOutputData
+    @Field(() => AuthTokens, { nullable: true })
+        tokens: AuthTokens
+}
+
+@ObjectType()
+export class FindManyNotificationsOutputMetadata {
+    @Field(() => Int, { nullable: true })
+        count?: number
+}
+
+@ObjectType()
+export class FindManyNotificationsOutputData
+implements ResultsWithMetadata<NotificationMySqlEntity, FindManyNotificationsOutputMetadata>
+{
+    @Field(() => [NotificationMySqlEntity])
+        results: Array<NotificationMySqlEntity>
+    @Field(() => FindManyNotificationsOutputMetadata, { nullable: true })
+        metadata: FindManyNotificationsOutputMetadata
+}
+
+@ObjectType()
+export class FindManyNotificationsOutput implements AuthOutput<FindManyNotificationsOutputData> {
+    @Field(() => FindManyNotificationsOutputData)
+        data: FindManyNotificationsOutputData
+    @Field(() => AuthTokens, { nullable: true })
+        tokens: AuthTokens
+}
