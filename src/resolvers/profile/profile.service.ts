@@ -97,6 +97,9 @@ export class ProfileService {
                     accountId,
                     enrolled: true
                 }
+            },
+            order:{
+                createdAt: "DESC"
             }
         })
     
