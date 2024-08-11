@@ -2,8 +2,8 @@ import { AccountMySqlEntity } from "@database"
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { Args, Query, Resolver } from "@nestjs/graphql"
 import { AccountId, AuthInterceptor, JwtAuthGuard } from "../shared"
-import { FindManyAccountReportsInputData, FindManyAccountReviewsInputData, FindManyAccountsInputData, FindManyFollowersInputData, FindManyPendingCourseInputData, FindOneAccountInputData } from "./accounts.input"
-import { FindManyAccountReportsOutput, FindManyAccountReviewsOutputData, FindManyAccountsOutput, FindManyPendingCourseOutput } from "./accounts.output"
+import { FindManyAccountReportsInputData, FindManyAccountReviewsInputData, FindManyAccountsInputData, FindManyAdminTransactionsInputData, FindManyFollowersInputData, FindManyNotificationsInputData, FindManyPendingCourseInputData, FindOneAccountInputData } from "./accounts.input"
+import { FindManyAccountReportsOutput, FindManyAccountReviewsOutputData, FindManyAccountsOutput, FindManyAdminTransactionsOutput, FindManyNotificationsOutput, FindManyPendingCourseOutput } from "./accounts.output"
 import { AccountsService } from "./accounts.service"
 
 @Resolver()
@@ -44,6 +44,20 @@ export class AccountsResolver {
     @Query(() => FindManyPendingCourseOutput)
     async findManyPendingCourses(@Args("data") data: FindManyPendingCourseInputData, @AccountId() accountId: string) {
         return await this.accountsService.findManyPendingCourse({ accountId, data })
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @Query(() => FindManyAdminTransactionsOutput)
+    async findManyAdminTransactions(@Args("data") data: FindManyAdminTransactionsInputData, @AccountId() accountId: string) {
+        return await this.accountsService.findManyAdminTransactions({ accountId, data })
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @Query(() => FindManyNotificationsOutput)
+    async findManyNotifications(@Args("data") data: FindManyNotificationsInputData, @AccountId() accountId: string) {
+        return await this.accountsService.findManyNotifications({ accountId, data })
     }
 }
 

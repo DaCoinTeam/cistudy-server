@@ -896,6 +896,34 @@ type FindManyPendingCourseOutput {
   tokens: AuthTokens
 }
 
+type FindManyAdminTransactionsOutputMetadata {
+  count: Int
+}
+
+type FindManyAdminTransactionsOutputData {
+  results: [TransactionEntity!]!
+  metadata: FindManyAdminTransactionsOutputMetadata
+}
+
+type FindManyAdminTransactionsOutput {
+  data: FindManyAdminTransactionsOutputData!
+  tokens: AuthTokens
+}
+
+type FindManyNotificationsOutputMetadata {
+  count: Int
+}
+
+type FindManyNotificationsOutputData {
+  results: [NotificationEntity!]!
+  metadata: FindManyNotificationsOutputMetadata
+}
+
+type FindManyNotificationsOutput {
+  data: FindManyNotificationsOutputData!
+  tokens: AuthTokens
+}
+
 type FindManySelfCreatedCoursesOutputMetadata {
   count: Int
 }
@@ -1051,6 +1079,8 @@ type Query {
   findManyAccountReviews(data: FindManyAccountReviewsInputData!): FindManyAccountReviewsOutputData!
   findManyAccountReports(data: FindManyAccountReportsInputData!): FindManyAccountReportsOutput!
   findManyPendingCourses(data: FindManyPendingCourseInputData!): FindManyPendingCourseOutput!
+  findManyAdminTransactions(data: FindManyAdminTransactionsInputData!): FindManyAdminTransactionsOutput!
+  findManyNotifications(data: FindManyNotificationsInputData!): FindManyNotificationsOutput!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
@@ -1341,6 +1371,26 @@ input FindManyPendingCourseInputData {
 input FindManyPendingCourseInputOptions {
   take: Int
   skip: Int
+}
+
+input FindManyAdminTransactionsInputData {
+  options: FindManyAdminTransactionsInputOptions
+}
+
+input FindManyAdminTransactionsInputOptions {
+  take: Int
+  skip: Int
+  searchValue: String
+}
+
+input FindManyNotificationsInputData {
+  options: FindManyNotificationsInputOptions
+}
+
+input FindManyNotificationsInputOptions {
+  take: Int
+  skip: Int
+  searchValue: String
 }
 
 input FindManySelfCreatedCoursesInputData {

@@ -1,10 +1,10 @@
 import { CourseVerifyStatus } from "@common"
-import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, FollowMySqlEnitity, ReportAccountMySqlEntity } from "@database"
+import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, FollowMySqlEnitity, NotificationMySqlEntity, ReportAccountMySqlEntity, TransactionMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository } from "typeorm"
-import { FindManyAccountReportsInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindManyFollowersInput, FindManyPendingCourseInput, FindOneAccountInput } from "./accounts.input"
-import { FindManyAccountReportsOutputData, FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyPendingCourseOutputData } from "./accounts.output"
+import { FindManyAccountReportsInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindManyAdminTransactionsInput, FindManyFollowersInput, FindManyNotificationsInput, FindManyPendingCourseInput, FindOneAccountInput } from "./accounts.input"
+import { FindManyAccountReportsOutputData, FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyAdminTransactionsOutputData, FindManyNotificationsOutputData, FindManyPendingCourseOutputData } from "./accounts.output"
 
 @Injectable()
 export class AccountsService {
@@ -19,6 +19,10 @@ export class AccountsService {
         private readonly reportAccountMySqlRepository: Repository<ReportAccountMySqlEntity>,
         @InjectRepository(CourseMySqlEntity)
         private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(NotificationMySqlEntity)
+        private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+        @InjectRepository(TransactionMySqlEntity)
+        private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
         private readonly dataSource: DataSource,
     ) { }
 
@@ -192,7 +196,65 @@ export class AccountsService {
                 count: numberOfPendingCourse
             }
         }
+    }
+
+    async findManyAdminTransactions(input: FindManyAdminTransactionsInput): Promise<FindManyAdminTransactionsOutputData> {
+        const { data } = input
+        const { options } = data
+        const { skip, take } = { ...options }
+
+        const results = await this.transactionMySqlRepository.find(
+            {
+                skip,
+                take,
+                relations: {
+                    transactionDetails: {
+                        account: true,
+                        course: true
+                    }
+                },
+                order: {
+                    createdAt: "DESC"
+                }
+            })
+
+        const count = await this.transactionMySqlRepository.count()
+
+        return {
+            results,
+            metadata: {
+                count,
+            }
+        }
 
     }
 
+    async findManyNotifications(input: FindManyNotificationsInput): Promise<FindManyNotificationsOutputData> {
+        const { data } = input
+        const { options } = data
+        const { skip, take } = { ...options }
+
+        const results = await this.notificationMySqlRepository.find(
+            {
+                skip,
+                take,
+                relations: {
+                    sender: true,
+                    receiver: true
+                },
+                order: {
+                    createdAt: "DESC"
+                }
+            })
+
+        const count = await this.notificationMySqlRepository.count()
+
+        return {
+            results,
+            metadata: {
+                count,
+            }
+        }
+
+    }
 }

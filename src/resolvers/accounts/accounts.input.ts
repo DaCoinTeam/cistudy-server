@@ -88,6 +88,49 @@ export class FindManyAccountsInputOptions {
 }
 
 @InputType()
+export class FindManyAdminTransactionsInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+    @Field(() => String, { nullable: true })
+        searchValue?: string
+}
+
+@InputType()
+export class FindManyAdminTransactionsInputData implements OptionsOnly<FindManyAdminTransactionsInputOptions> {
+    @Field(() => FindManyAdminTransactionsInputOptions, { nullable: true })
+        options: FindManyAdminTransactionsInputOptions
+}
+
+export class FindManyAdminTransactionsInput implements AuthInput<FindManyAdminTransactionsInputData> {
+    accountId: string
+    data: FindManyAdminTransactionsInputData
+}
+
+
+@InputType()
+export class FindManyNotificationsInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+    @Field(() => String, { nullable: true })
+        searchValue?: string
+}
+
+@InputType()
+export class FindManyNotificationsInputData implements OptionsOnly<FindManyNotificationsInputOptions> {
+    @Field(() => FindManyNotificationsInputOptions, { nullable: true })
+        options: FindManyNotificationsInputOptions
+}
+
+export class FindManyNotificationsInput implements AuthInput<FindManyNotificationsInputData> {
+    accountId: string
+    data: FindManyNotificationsInputData
+}
+
+@InputType()
 export class FindManyAccountsInputData implements OptionsOnly<FindManyAccountsInputOptions> {
     @Field(() => FindManyAccountsInputOptions, { nullable: true })
         options: FindManyAccountsInputOptions
