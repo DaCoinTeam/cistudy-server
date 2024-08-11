@@ -211,3 +211,21 @@ export class FindManyPendingCourseInput implements AuthInput<FindManyPendingCour
 export class GetAdminAnalyticsInput implements AuthEmptyDataInput {
     accountId: string
 }
+
+@InputType()
+export class FindOneAdminAccountInputParams {
+    @Field(() => ID)
+    @IsUUID()
+        accountId: string
+}
+
+@InputType()
+export class FindOneAdminAccountInputData implements ParamsOnly<FindOneAdminAccountInputParams> {
+    @Field(() => FindOneAdminAccountInputParams, { nullable: true })
+        params: FindOneAdminAccountInputParams
+}
+
+export class FindOneAdminAccountInput implements AuthInput<FindOneAdminAccountInputData> {
+    accountId: string
+    data: FindOneAdminAccountInputData
+}

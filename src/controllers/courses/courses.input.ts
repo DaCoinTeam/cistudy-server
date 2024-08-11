@@ -853,3 +853,13 @@ implements AuthInput<DeleteCourseInputData>
     data: DeleteCourseInputData
 }
 
+export class DeleteAdminCourseInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        courseId: string
+}
+
+export class DeleteAdminCourseInput implements AuthInput<DeleteAdminCourseInputData> {
+    accountId: string
+    data: DeleteAdminCourseInputData
+}

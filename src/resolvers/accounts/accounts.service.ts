@@ -21,7 +21,8 @@ import {
     FindManyFollowersInput,
     FindManyNotificationsInput,
     FindManyPendingCourseInput,
-    FindOneAccountInput
+    FindOneAccountInput,
+    FindOneAdminAccountInput
 } from "./accounts.input"
 import {
     FindManyAccountReportsOutputData,
@@ -248,6 +249,7 @@ export class AccountsService {
             skip,
             take,
             relations: {
+                account: true,
                 transactionDetails: {
                     account: true,
                     course: true,
@@ -324,5 +326,24 @@ export class AccountsService {
             }
         })
         return configurations.at(0)
+    }
+
+    async findOneAdminAccount(
+        input: FindOneAdminAccountInput,
+    ): Promise<AccountMySqlEntity> {
+        const { data } = input
+        const { params } = data
+        const { accountId } = params
+
+        const account = await this.accountMySqlRepository.findOne({
+            where: {
+                accountId,
+            },
+            relations: {
+                roles: true
+            }
+        })
+
+        return account
     }
 }

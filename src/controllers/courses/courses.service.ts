@@ -66,6 +66,7 @@ import {
     CreateQuizQuestionInput,
     CreateSectionContentInput,
     CreateSectionInput,
+    DeleteAdminCourseInput,
     DeleteCategoryInput,
     DeleteCourseCategoryInput,
     DeleteCourseInput,
@@ -111,6 +112,7 @@ import {
     CreateQuizQuestionOutput,
     CreateSectionContentOutput,
     CreateSectionOutput,
+    DeleteAdminCourseOutput,
     DeleteCategoryOutput,
     DeleteCourseCategoryOutput,
     DeleteCourseOutput,
@@ -2302,6 +2304,15 @@ export class CoursesService {
 
         await this.courseMySqlRepository.update(courseId, { isDeleted: true })
 
+        return {
+            message: "Course has been deleted"
+        }
+    }
+
+    async deleteAdminCourse(input: DeleteAdminCourseInput): Promise<DeleteAdminCourseOutput> {
+        const { data } = input
+        const { courseId } = data
+        await this.courseMySqlRepository.update(courseId, { isDeleted: true })
         return {
             message: "Course has been deleted"
         }

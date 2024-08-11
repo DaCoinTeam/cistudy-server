@@ -106,6 +106,10 @@ export class AccountEntity {
     @Field(() => Boolean)
     @Column({ type: "boolean", default: false })
         verified: boolean
+    
+    @Field(() => Boolean)
+    @Column({ type: "boolean", default: false })
+        isDisabled: boolean
 
     @Field(() => String)
     @Column({

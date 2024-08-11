@@ -25,6 +25,7 @@ import {
     ResolveAccountReportInput,
     ToggleFollowInput,
     ToggleRoleInput,
+    UpdateAccountInput,
     UpdateAccountReportInput,
     UpdateAccountReviewInput,
     UpdateAccountRoleInput,
@@ -37,6 +38,7 @@ import {
     CreateConfigurationOutput,
     ResolveAccountReportOutput,
     ToggleRoleOutput,
+    UpdateAccountOutput,
     UpdateAccountReportOutput,
     UpdateAccountRoleOutput,
     VerifyCourseOuput
@@ -500,6 +502,27 @@ export class AccountsService {
         })
         return {
             message: "Create configuration successfully"
+        }
+    }
+
+    async updateAccount(input: UpdateAccountInput): Promise<UpdateAccountOutput> {
+        const { data } = input
+        const { accountId, birthdate, firstName, isDisabled, lastName, roles, username } = data
+
+        await this.accountMySqlRepository.update(accountId, { birthdate, firstName, lastName, username, isDisabled })
+        
+        if (roles) {
+            await this.roleMySqlRepository.delete({
+                accountId
+            })
+            await this.roleMySqlRepository.save(roles.map((name) => ({
+                name,
+                accountId,
+            })))
+        }
+        
+        return {
+            message: "Updated successfully",
         }
     }
 }

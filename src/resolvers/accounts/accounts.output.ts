@@ -174,3 +174,11 @@ export class FindLatestConfigurationOutput implements AuthOutput<ConfigurationMy
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }
+
+@ObjectType()
+export class FindOneAdminAccountOutput implements AuthOutput<AccountMySqlEntity> {
+    @Field(() => AccountMySqlEntity, { nullable: true })
+        data: AccountMySqlEntity
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
+}

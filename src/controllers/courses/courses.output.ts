@@ -278,3 +278,7 @@ export class UpdateLessonProgressOutput implements Output {
 export class DeleteCourseOutput implements Output {
     message: string
 }
+
+export class DeleteAdminCourseOutput implements Output{
+    message: string   
+}

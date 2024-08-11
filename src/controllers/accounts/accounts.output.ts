@@ -67,3 +67,7 @@ export class ResolveAccountReportOutput implements Output{
 export class CreateConfigurationOutput implements Output{
     message: string   
 }
+
+export class UpdateAccountOutput implements Output{
+    message: string   
+}

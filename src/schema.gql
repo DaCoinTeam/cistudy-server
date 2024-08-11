@@ -465,6 +465,7 @@ type PostEntity {
   numberOfRewardableCommentsLeft: Int
   isReported: Boolean
   numberOfReports: Int
+  isInstructor: Boolean
 }
 
 type ReportCourseEntity {
@@ -656,6 +657,7 @@ type AccountEntity {
   lastName: String
   birthdate: DateTime
   verified: Boolean!
+  isDisabled: Boolean!
   kind: String!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -953,6 +955,11 @@ type FindLatestConfigurationOutput {
   tokens: AuthTokens
 }
 
+type FindOneAdminAccountOutput {
+  data: AccountEntity
+  tokens: AuthTokens
+}
+
 type FindManySelfCreatedCoursesOutputMetadata {
   count: Int
 }
@@ -1112,6 +1119,7 @@ type Query {
   findManyNotifications(data: FindManyNotificationsInputData!): FindManyNotificationsOutput!
   getAdminAnalytics: GetAdminAnalyticsOutput!
   findLatestConfiguration: FindLatestConfigurationOutput!
+  findOneAdminAccount(data: FindOneAdminAccountInputData!): FindOneAdminAccountOutput!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
@@ -1422,6 +1430,14 @@ input FindManyNotificationsInputOptions {
   take: Int
   skip: Int
   searchValue: String
+}
+
+input FindOneAdminAccountInputData {
+  params: FindOneAdminAccountInputParams
+}
+
+input FindOneAdminAccountInputParams {
+  accountId: ID!
 }
 
 input FindManySelfCreatedCoursesInputData {

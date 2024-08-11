@@ -221,3 +221,27 @@ export class CreateConfigurationInput implements AuthInput<CreateConfigurationIn
     accountId: string
     data: CreateConfigurationInputData
 }
+
+export class UpdateAccountInputData {
+    @ApiProperty()
+        accountId: string
+    @ApiProperty()
+        username?: string
+    @ApiProperty()
+        firstName?: string
+    @ApiProperty()
+        lastName?: string
+    @ApiProperty()
+        birthdate?: Date
+    @ApiProperty()
+        roles?: Array<SystemRoles>
+    @ApiProperty()
+        isDisabled?: boolean
+}
+
+export class UpdateAccountInput implements AuthInput<UpdateAccountInputData> {
+    accountId: string
+    data: UpdateAccountInputData
+}
+
+

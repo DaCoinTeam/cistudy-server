@@ -755,4 +755,18 @@ export class CoursesController {
             data: { courseId },
         })
     }
+
+    @ApiBearerAuth()
+    @Delete("delete-admin-course/:courseId")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async deleteAdminCourse(
+        @AccountId() accountId: string,
+        @Param("courseId") courseId: string,
+    ) {
+        return this.coursesService.deleteAdminCourse({
+            accountId,
+            data: { courseId },
+        })
+    }
 }
