@@ -173,6 +173,19 @@ export class CoursesService {
             },
         })
 
+        const enrolledInfos = await this.enrolledInfoMySqlRepository.find({
+            where: {
+                courseId: course.courseId
+            },
+            relations: {
+                account: true
+            },
+            order: {
+                createdAt: "DESC"
+            }
+        })
+        course.enrolledInfos = enrolledInfos
+
         const enrolledInfo = accountId
             ? await this.enrolledInfoMySqlRepository.findOneBy({
                 courseId,

@@ -214,6 +214,10 @@ export class ProfileService {
         const transactions = await this.transactionMySqlRepository.find({
             relations: {
                 account: true,
+                transactionDetails: {
+                    account: true,
+                    course: true
+                }
             },
             take,
             skip,

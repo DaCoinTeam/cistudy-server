@@ -30,6 +30,7 @@ import { SessionEntity } from "./session.entity"
 import { CompleteResourceEntity } from "./complete-resource.entity"
 import { ProgressEntity } from "./progress.entity"
 import { NotificationEntity } from "./notification.entity"
+import { TransactionDetailEntity } from "./transaction-detail.entity"
 
 
 @ObjectType()
@@ -217,6 +218,11 @@ export class AccountEntity {
     @Field(() => [NotificationEntity])
     @OneToMany(() => NotificationEntity, (notification) => notification.receiver, { nullable: true })
         receiveNotifications?: Array<NotificationEntity>
+    
+    @Field(() => [TransactionDetailEntity], { nullable: true },)
+    @OneToMany(() => TransactionDetailEntity, (transactionDetail) => transactionDetail.account, { nullable: true })
+        transactionDetails?: Array<TransactionDetailEntity>
+
     //graphql
     @Field(() => Boolean)
         followed?: boolean

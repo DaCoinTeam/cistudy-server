@@ -354,12 +354,27 @@ export class CoursesService {
             {
                 amountDepositedChange: -price,
                 accountId,
-                type: TransactionType.CheckOut
+                type: TransactionType.CheckOut,
+                transactionDetails: [
+                    {
+                        courseId: course.courseId,
+                        payAmount: price,
+                        directIn: false,
+                    }
+                ]
             },
             {
                 amountDepositedChange: price,
                 accountId: creatorId,
-                type: TransactionType.Received
+                type: TransactionType.Received,
+                transactionDetails: [
+                    {
+                        courseId: course.courseId,
+                        payAmount: courseCreatorShares,
+                        directIn: true,
+                        accountId
+                    }
+                ]
             },
         ]
         await this.transactionMySqlEntity.save(transactions)

@@ -499,6 +499,32 @@ type NotificationEntity {
   course: CourseEntity
 }
 
+type TransactionEntity {
+  transactionId: ID!
+  type: String!
+  accountId: ID!
+  amountDepositedChange: Float!
+  amountOnChainChange: Float!
+  transactionHash: String
+  payPalOrderId: String
+  account: AccountEntity!
+  transactionDetails: [TransactionDetailEntity!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type TransactionDetailEntity {
+  transactionDetailId: ID
+  accountId: ID
+  courseId: ID
+  transactionId: ID
+  directIn: Boolean!
+  payAmount: Float
+  account: AccountEntity
+  course: CourseEntity
+  transaction: TransactionEntity
+}
+
 type CourseEntity {
   courseId: ID!
   title: String
@@ -528,6 +554,7 @@ type CourseEntity {
   courseReviews: [CourseReviewEntity!]
   courseReports: [ReportCourseEntity!]
   courseNotifications: [NotificationEntity!]
+  transactionDetails: [TransactionDetailEntity!]
   numberOfEnrollments: Int
   enrolled: Boolean
   isReviewed: Boolean
@@ -652,24 +679,12 @@ type AccountEntity {
   courseProgress: [ProgressEntity!]!
   sentNotifications: [NotificationEntity!]!
   receiveNotifications: [NotificationEntity!]!
+  transactionDetails: [TransactionDetailEntity!]
   followed: Boolean!
   numberOfFollowers: Int!
   accountRatings: AccountRating
   isReported: Boolean
   numberOfReports: Int
-}
-
-type TransactionEntity {
-  transactionId: ID!
-  type: String!
-  accountId: ID!
-  amountDepositedChange: Float!
-  amountOnChainChange: Float!
-  transactionHash: String
-  payPalOrderId: String
-  account: AccountEntity!
-  createdAt: DateTime!
-  updatedAt: DateTime!
 }
 
 type FindManyCoursesOutputMetadata {
