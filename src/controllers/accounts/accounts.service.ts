@@ -2,6 +2,7 @@ import { CourseVerifyStatus, NotificationType, ReportProcessStatus, SystemRoles 
 import {
     AccountMySqlEntity,
     AccountReviewMySqlEntity,
+    ConfigurationMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
@@ -18,6 +19,7 @@ import {
     CreateAccountReportInput,
     CreateAccountReviewInput,
     CreateAccountRoleInput,
+    CreateConfigurationInput,
     DeleteAccountReviewInput,
     DeleteCourseInput,
     ResolveAccountReportInput,
@@ -32,6 +34,7 @@ import {
     CreateAccountReportOutput,
     CreateAccountReviewOutput,
     CreateAccountRoleOutput,
+    CreateConfigurationOutput,
     ResolveAccountReportOutput,
     ToggleRoleOutput,
     UpdateAccountReportOutput,
@@ -58,6 +61,8 @@ export class AccountsService {
         private readonly reportAccountMySqlRepository: Repository<ReportAccountMySqlEntity>,
         @InjectRepository(NotificationMySqlEntity)
         private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+        @InjectRepository(ConfigurationMySqlEntity)
+        private readonly configurationMySqlRepository: Repository<ConfigurationMySqlEntity>,
         private readonly mailerService: MailerService,
         private readonly dataSource: DataSource,
         private readonly jwtService: JwtService
@@ -487,4 +492,14 @@ export class AccountsService {
         }
     }
 
+    async createConfiguration(input: CreateConfigurationInput): Promise<CreateConfigurationOutput> {
+        const { data } = input
+        await this.configurationMySqlRepository.save({
+            appliedAt: new Date("2024-09-01"),
+            ...data
+        })
+        return {
+            message: "Create configuration successfully"
+        }
+    }
 }

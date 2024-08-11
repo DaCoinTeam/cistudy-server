@@ -1,5 +1,5 @@
 import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
-import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, NotificationMySqlEntity, ReportAccountMySqlEntity, TransactionMySqlEntity } from "@database"
+import { AccountMySqlEntity, AccountReviewMySqlEntity, ConfigurationMySqlEntity, CourseMySqlEntity, EnrolledInfoMySqlEntity, NotificationMySqlEntity, ReportAccountMySqlEntity, TransactionMySqlEntity } from "@database"
 import { Field, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
@@ -142,4 +142,35 @@ export class FindManyNotificationsOutput implements AuthOutput<FindManyNotificat
         data: FindManyNotificationsOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens: AuthTokens
+}
+
+
+@ObjectType()
+export class GetAdminAnalyticsOutputData {
+    @Field(() => Int)
+        numberOfAccounts: number
+    @Field(() => Int)
+        numberOfCourses: number
+    @Field(() => Int)
+        numberOfTransactions: number
+    @Field(() => Int)
+        numberOfOrders: number
+    @Field(() => [EnrolledInfoMySqlEntity])
+        enrolledInfos: Array<EnrolledInfoMySqlEntity>
+}
+
+@ObjectType()
+export class GetAdminAnalyticsOutput implements AuthOutput<GetAdminAnalyticsOutputData> {
+    @Field(() => GetAdminAnalyticsOutputData)
+        data: GetAdminAnalyticsOutputData
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
+}
+
+@ObjectType()
+export class FindLatestConfigurationOutput implements AuthOutput<ConfigurationMySqlEntity> {
+    @Field(() => ConfigurationMySqlEntity, { nullable: true })
+        data: ConfigurationMySqlEntity
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
 }

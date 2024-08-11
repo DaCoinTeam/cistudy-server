@@ -687,6 +687,17 @@ type AccountEntity {
   numberOfReports: Int
 }
 
+type ConfigurationEntity {
+  configurationId: ID
+  earn: Float
+  instructor: Float
+  completed: Float
+  foundation: Float
+  appliedAt: DateTime!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type FindManyCoursesOutputMetadata {
   count: Int
   relativeTopics: [CategoryEntity!]
@@ -924,6 +935,24 @@ type FindManyNotificationsOutput {
   tokens: AuthTokens
 }
 
+type GetAdminAnalyticsOutputData {
+  numberOfAccounts: Int!
+  numberOfCourses: Int!
+  numberOfTransactions: Int!
+  numberOfOrders: Int!
+  enrolledInfos: [EnrolledInfoEntity!]!
+}
+
+type GetAdminAnalyticsOutput {
+  data: GetAdminAnalyticsOutputData!
+  tokens: AuthTokens
+}
+
+type FindLatestConfigurationOutput {
+  data: ConfigurationEntity
+  tokens: AuthTokens
+}
+
 type FindManySelfCreatedCoursesOutputMetadata {
   count: Int
 }
@@ -1081,6 +1110,8 @@ type Query {
   findManyPendingCourses(data: FindManyPendingCourseInputData!): FindManyPendingCourseOutput!
   findManyAdminTransactions(data: FindManyAdminTransactionsInputData!): FindManyAdminTransactionsOutput!
   findManyNotifications(data: FindManyNotificationsInputData!): FindManyNotificationsOutput!
+  getAdminAnalytics: GetAdminAnalyticsOutput!
+  findLatestConfiguration: FindLatestConfigurationOutput!
   findManySelfCreatedCourses(data: FindManySelfCreatedCoursesInputData!): FindManySelfCreatedCoursesOutput!
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!

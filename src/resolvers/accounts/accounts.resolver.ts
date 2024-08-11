@@ -3,7 +3,7 @@ import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { Args, Query, Resolver } from "@nestjs/graphql"
 import { AccountId, AuthInterceptor, JwtAuthGuard } from "../shared"
 import { FindManyAccountReportsInputData, FindManyAccountReviewsInputData, FindManyAccountsInputData, FindManyAdminTransactionsInputData, FindManyFollowersInputData, FindManyNotificationsInputData, FindManyPendingCourseInputData, FindOneAccountInputData } from "./accounts.input"
-import { FindManyAccountReportsOutput, FindManyAccountReviewsOutputData, FindManyAccountsOutput, FindManyAdminTransactionsOutput, FindManyNotificationsOutput, FindManyPendingCourseOutput } from "./accounts.output"
+import { FindLatestConfigurationOutput, FindManyAccountReportsOutput, FindManyAccountReviewsOutputData, FindManyAccountsOutput, FindManyAdminTransactionsOutput, FindManyNotificationsOutput, FindManyPendingCourseOutput, GetAdminAnalyticsOutput } from "./accounts.output"
 import { AccountsService } from "./accounts.service"
 
 @Resolver()
@@ -58,6 +58,20 @@ export class AccountsResolver {
     @Query(() => FindManyNotificationsOutput)
     async findManyNotifications(@Args("data") data: FindManyNotificationsInputData, @AccountId() accountId: string) {
         return await this.accountsService.findManyNotifications({ accountId, data })
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @Query(() => GetAdminAnalyticsOutput)
+    async getAdminAnalytics() {
+        return await this.accountsService.getAdminAnalytics()
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @Query(() => FindLatestConfigurationOutput)
+    async findLatestConfiguration() {
+        return await this.accountsService.findLatestConfiguration()
     }
 }
 

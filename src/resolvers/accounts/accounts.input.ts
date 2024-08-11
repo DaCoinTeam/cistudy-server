@@ -1,4 +1,4 @@
-import { AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@common"
+import { AuthEmptyDataInput, AuthInput, Input, OptionsOnly, ParamsOnly, ParamsWithOptions } from "@common"
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
 import { IsOptional, IsUUID } from "class-validator"
 
@@ -208,3 +208,6 @@ export class FindManyPendingCourseInput implements AuthInput<FindManyPendingCour
     data: FindManyPendingCourseInputData
 }
 
+export class GetAdminAnalyticsInput implements AuthEmptyDataInput {
+    accountId: string
+}

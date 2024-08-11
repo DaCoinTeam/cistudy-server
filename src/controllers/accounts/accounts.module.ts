@@ -3,6 +3,7 @@ import {
     AccountReviewMySqlEntity,
     CartMySqlEntity,
     CertificateMySqlEntity,
+    ConfigurationMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
@@ -52,7 +53,7 @@ import { AccountsService } from "./accounts.service"
             ReportPostMySqlEntity,
             ReportPostCommentMySqlEntity,
             NotificationMySqlEntity,
-            NotificationMySqlEntity
+            ConfigurationMySqlEntity
         ]),
     ],
     controllers: [AccountsController],

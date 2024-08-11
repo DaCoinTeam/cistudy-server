@@ -1,56 +1,89 @@
 import { CourseVerifyStatus } from "@common"
-import { AccountMySqlEntity, AccountReviewMySqlEntity, CourseMySqlEntity, FollowMySqlEnitity, NotificationMySqlEntity, ReportAccountMySqlEntity, TransactionMySqlEntity } from "@database"
+import {
+    AccountMySqlEntity,
+    AccountReviewMySqlEntity,
+    ConfigurationMySqlEntity,
+    CourseMySqlEntity,
+    EnrolledInfoMySqlEntity,
+    FollowMySqlEnitity,
+    NotificationMySqlEntity,
+    ReportAccountMySqlEntity,
+    TransactionMySqlEntity,
+} from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, Repository } from "typeorm"
-import { FindManyAccountReportsInput, FindManyAccountReviewsInput, FindManyAccountsInput, FindManyAdminTransactionsInput, FindManyFollowersInput, FindManyNotificationsInput, FindManyPendingCourseInput, FindOneAccountInput } from "./accounts.input"
-import { FindManyAccountReportsOutputData, FindManyAccountReviewsOutputData, FindManyAccountsOutputData, FindManyAdminTransactionsOutputData, FindManyNotificationsOutputData, FindManyPendingCourseOutputData } from "./accounts.output"
+import {
+    FindManyAccountReportsInput,
+    FindManyAccountReviewsInput,
+    FindManyAccountsInput,
+    FindManyAdminTransactionsInput,
+    FindManyFollowersInput,
+    FindManyNotificationsInput,
+    FindManyPendingCourseInput,
+    FindOneAccountInput
+} from "./accounts.input"
+import {
+    FindManyAccountReportsOutputData,
+    FindManyAccountReviewsOutputData,
+    FindManyAccountsOutputData,
+    FindManyAdminTransactionsOutputData,
+    FindManyNotificationsOutputData,
+    FindManyPendingCourseOutputData,
+    GetAdminAnalyticsOutputData,
+} from "./accounts.output"
 
 @Injectable()
 export class AccountsService {
     constructor(
-        @InjectRepository(AccountMySqlEntity)
-        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
-        @InjectRepository(FollowMySqlEnitity)
-        private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
-        @InjectRepository(AccountReviewMySqlEntity)
-        private readonly accountReviewMySqlRepository: Repository<AccountReviewMySqlEntity>,
-        @InjectRepository(ReportAccountMySqlEntity)
-        private readonly reportAccountMySqlRepository: Repository<ReportAccountMySqlEntity>,
-        @InjectRepository(CourseMySqlEntity)
-        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-        @InjectRepository(NotificationMySqlEntity)
-        private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
-        @InjectRepository(TransactionMySqlEntity)
-        private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
-        private readonly dataSource: DataSource,
-    ) { }
+    @InjectRepository(AccountMySqlEntity)
+    private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+    @InjectRepository(FollowMySqlEnitity)
+    private readonly followMySqlRepository: Repository<FollowMySqlEnitity>,
+    @InjectRepository(AccountReviewMySqlEntity)
+    private readonly accountReviewMySqlRepository: Repository<AccountReviewMySqlEntity>,
+    @InjectRepository(ReportAccountMySqlEntity)
+    private readonly reportAccountMySqlRepository: Repository<ReportAccountMySqlEntity>,
+    @InjectRepository(CourseMySqlEntity)
+    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+    @InjectRepository(NotificationMySqlEntity)
+    private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+    @InjectRepository(TransactionMySqlEntity)
+    private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
+    @InjectRepository(EnrolledInfoMySqlEntity)
+    private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
+    @InjectRepository(ConfigurationMySqlEntity)
+    private readonly configurationMySqlRepository: Repository<ConfigurationMySqlEntity>,
+    private readonly dataSource: DataSource,
+    ) {}
 
-    async findOneAccount(input: FindOneAccountInput): Promise<AccountMySqlEntity> {
+    async findOneAccount(
+        input: FindOneAccountInput,
+    ): Promise<AccountMySqlEntity> {
         const { data } = input
         const { params, options } = data
         const { accountId } = params
         const { followerId } = options
 
         const account = await this.accountMySqlRepository.findOne({
-            where:{
-                accountId
-            }
+            where: {
+                accountId,
+            },
         })
 
         const follow = await this.followMySqlRepository.findOne({
-            where:{
+            where: {
                 followerId,
                 followedAccountId: accountId,
-                followed: true
-            }
+                followed: true,
+            },
         })
 
         const numberOfFollowersResult = await this.followMySqlRepository.count({
-            where:{
+            where: {
                 followedAccountId: accountId,
-                followed: true
-            }
+                followed: true,
+            },
         })
 
         account.numberOfFollowers = numberOfFollowersResult
@@ -58,38 +91,38 @@ export class AccountsService {
         account.followed = followed ?? false
 
         return account
-
     }
 
-    async findManyFollowers(input: FindManyFollowersInput): Promise<Array<AccountMySqlEntity>> {
+    async findManyFollowers(
+        input: FindManyFollowersInput,
+    ): Promise<Array<AccountMySqlEntity>> {
         const { data } = input
         const { params } = data
         const { accountId } = params
 
-        const followRelations = await this.followMySqlRepository.find(
-            {
-                where: {
-                    followedAccountId: accountId,
-                    followed: true
-                },
-                relations: {
-                    follower: true
-                }
-            }
-        )
-        return followRelations.map(followRelation => followRelation.follower)
+        const followRelations = await this.followMySqlRepository.find({
+            where: {
+                followedAccountId: accountId,
+                followed: true,
+            },
+            relations: {
+                follower: true,
+            },
+        })
+        return followRelations.map((followRelation) => followRelation.follower)
     }
 
-    async findManyAccounts(input: FindManyAccountsInput): Promise<FindManyAccountsOutputData> {
+    async findManyAccounts(
+        input: FindManyAccountsInput,
+    ): Promise<FindManyAccountsOutputData> {
         const { data } = input
         const { options } = data
         const { skip, take } = { ...options }
 
-        const results = await this.accountMySqlRepository.find(
-            {
-                skip,
-                take,
-            })
+        const results = await this.accountMySqlRepository.find({
+            skip,
+            take,
+        })
 
         const count = await this.accountMySqlRepository.count()
 
@@ -97,12 +130,13 @@ export class AccountsService {
             results,
             metadata: {
                 count,
-            }
+            },
         }
-
     }
 
-    async findManyAccountReviews(input: FindManyAccountReviewsInput): Promise<FindManyAccountReviewsOutputData> {
+    async findManyAccountReviews(
+        input: FindManyAccountReviewsInput,
+    ): Promise<FindManyAccountReviewsOutputData> {
         const { data } = input
         const { params, options } = data
         const { accountId } = params
@@ -112,25 +146,27 @@ export class AccountsService {
             where: { accountId },
             relations: {
                 account: true,
-                reviewedAccount: true
+                reviewedAccount: true,
             },
             skip,
             take,
-            order: { createdAt: "DESC" }
+            order: { createdAt: "DESC" },
         })
 
-        const numberOfAccountReviewsResult = await this.accountReviewMySqlRepository.count()
+        const numberOfAccountReviewsResult =
+      await this.accountReviewMySqlRepository.count()
 
         return {
             results,
             metadata: {
                 count: numberOfAccountReviewsResult,
-            }
+            },
         }
-
     }
 
-    async findManyAccountReports(input: FindManyAccountReportsInput): Promise<FindManyAccountReportsOutputData> {
+    async findManyAccountReports(
+        input: FindManyAccountReportsInput,
+    ): Promise<FindManyAccountReportsOutputData> {
         const { data } = input
         const { options } = data
         const { skip, take } = options
@@ -141,82 +177,86 @@ export class AccountsService {
                 reportedAccount: true,
             },
             skip,
-            take
+            take,
         })
 
-        const numberOfAccountReports = await this.reportAccountMySqlRepository.count()
+        const numberOfAccountReports =
+      await this.reportAccountMySqlRepository.count()
 
         const promises: Array<Promise<void>> = []
-        for (const {reportedAccount} of results) {
+        for (const { reportedAccount } of results) {
             const promise = async () => {
-                reportedAccount.numberOfReports = await this.reportAccountMySqlRepository.count({
-                    where:{
-                        reportedId: reportedAccount.accountId
-                    }
-                })
+                reportedAccount.numberOfReports =
+          await this.reportAccountMySqlRepository.count({
+              where: {
+                  reportedId: reportedAccount.accountId,
+              },
+          })
             }
             promises.push(promise())
         }
         await Promise.all(promises)
-        
+
         return {
             results,
             metadata: {
-                count: numberOfAccountReports
-            }
+                count: numberOfAccountReports,
+            },
         }
-        
     }
 
-    async findManyPendingCourse(input: FindManyPendingCourseInput): Promise<FindManyPendingCourseOutputData> {
+    async findManyPendingCourse(
+        input: FindManyPendingCourseInput,
+    ): Promise<FindManyPendingCourseOutputData> {
         const { data } = input
         const { options } = data
         const { skip, take } = options
 
         const results = await this.courseMySqlRepository.find({
             where: {
-                verifyStatus: CourseVerifyStatus.Pending
+                verifyStatus: CourseVerifyStatus.Pending,
             },
             skip,
             take,
-            relations:{
-                creator : true
-            }
+            relations: {
+                creator: true,
+            },
         })
 
         const numberOfPendingCourse = await this.courseMySqlRepository.count({
-            where:{
-                verifyStatus : CourseVerifyStatus.Pending
-            }
+            where: {
+                verifyStatus: CourseVerifyStatus.Pending,
+            },
         })
 
         return {
             results,
             metadata: {
-                count: numberOfPendingCourse
-            }
+                count: numberOfPendingCourse,
+            },
         }
     }
 
-    async findManyAdminTransactions(input: FindManyAdminTransactionsInput): Promise<FindManyAdminTransactionsOutputData> {
+    async findManyAdminTransactions(
+        input: FindManyAdminTransactionsInput,
+    ): Promise<FindManyAdminTransactionsOutputData> {
         const { data } = input
         const { options } = data
         const { skip, take } = { ...options }
 
-        const results = await this.transactionMySqlRepository.find(
-            {
-                skip,
-                take,
-                relations: {
-                    transactionDetails: {
-                        account: true,
-                        course: true
-                    }
+        const results = await this.transactionMySqlRepository.find({
+            skip,
+            take,
+            relations: {
+                transactionDetails: {
+                    account: true,
+                    course: true,
                 },
-                order: {
-                    createdAt: "DESC"
-                }
-            })
+            },
+            order: {
+                createdAt: "DESC",
+            },
+        })
 
         const count = await this.transactionMySqlRepository.count()
 
@@ -224,28 +264,28 @@ export class AccountsService {
             results,
             metadata: {
                 count,
-            }
+            },
         }
-
     }
 
-    async findManyNotifications(input: FindManyNotificationsInput): Promise<FindManyNotificationsOutputData> {
+    async findManyNotifications(
+        input: FindManyNotificationsInput,
+    ): Promise<FindManyNotificationsOutputData> {
         const { data } = input
         const { options } = data
         const { skip, take } = { ...options }
 
-        const results = await this.notificationMySqlRepository.find(
-            {
-                skip,
-                take,
-                relations: {
-                    sender: true,
-                    receiver: true
-                },
-                order: {
-                    createdAt: "DESC"
-                }
-            })
+        const results = await this.notificationMySqlRepository.find({
+            skip,
+            take,
+            relations: {
+                sender: true,
+                receiver: true,
+            },
+            order: {
+                createdAt: "DESC",
+            },
+        })
 
         const count = await this.notificationMySqlRepository.count()
 
@@ -253,8 +293,36 @@ export class AccountsService {
             results,
             metadata: {
                 count,
-            }
+            },
         }
+    }
 
+    async getAdminAnalytics(): Promise<GetAdminAnalyticsOutputData> {
+        const numberOfAccounts = await this.accountMySqlRepository.count()
+        const numberOfCourses = await this.courseMySqlRepository.count({
+            where: {
+                isDeleted: false,
+            },
+        })
+        const numberOfTransactions = await this.transactionMySqlRepository.count()
+
+        const enrolledInfos = await this.enrolledInfoMySqlRepository.find()
+
+        return {
+            numberOfAccounts,
+            numberOfCourses,
+            numberOfTransactions,
+            numberOfOrders: 0,
+            enrolledInfos
+        }
+    }
+
+    async findLatestConfiguration(): Promise<ConfigurationMySqlEntity> {
+        const configurations = await this.configurationMySqlRepository.find({
+            order: {
+                createdAt: "DESC"
+            }
+        })
+        return configurations.at(0)
     }
 }

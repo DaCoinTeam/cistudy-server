@@ -205,3 +205,19 @@ export class ResolveAccountReportInput implements AuthInput<ResolveAccountReport
     accountId: string
     data: ResolveAccountReportInputData
 }
+
+export class CreateConfigurationInputData {
+    @ApiProperty()
+        instructor: number
+    @ApiProperty()
+        earn: number
+    @ApiProperty()
+        completed: number
+    @ApiProperty()
+        foundation: number
+}
+
+export class CreateConfigurationInput implements AuthInput<CreateConfigurationInputData> {
+    accountId: string
+    data: CreateConfigurationInputData
+}
