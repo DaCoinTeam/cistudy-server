@@ -124,7 +124,7 @@ export class PostsService {
         post.numberOfRewardableCommentsLeft = numberOfRewardableCommentsLeft
         post.liked = liked ? true : false
         post.isPostOwner = (accountId === post.creatorId)
-
+        post.isInstructor = (accountId === post.course.creatorId)
         return {
             data: post,
         }
@@ -219,6 +219,7 @@ export class PostsService {
                 const numberOfComments = numberOfCommentsResults.find(result => result.postId === post.postId)?.count ?? 0
                 const liked = likedResults.some(result => result.postId === post.postId)
                 const isPostOwner = (post.creatorId === accountId)
+                const isInstructor = (post.creatorId === post.course.creatorId)
                 post.isReported = (await this.reportPostMySqlRepository.findOneBy({ postId: post.postId, accountId, processStatus: ReportProcessStatus.Processing })) ? true : false
                 let numberOfRewardableLikesLeft: number
                 let numberOfRewardableCommentsLeft: number
@@ -254,6 +255,7 @@ export class PostsService {
                     numberOfComments,
                     numberOfRewardableLikesLeft,
                     numberOfRewardableCommentsLeft,
+                    isInstructor
                 }
             }))
 

@@ -104,4 +104,6 @@ export class PostEntity {
         isReported? : boolean
     @Field(() => Int, { nullable: true })
         numberOfReports?: number
+    @Field(() => Boolean, {nullable : true})
+        isInstructor? : boolean
 }
