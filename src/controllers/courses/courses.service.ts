@@ -1656,7 +1656,7 @@ export class CoursesService {
                     quizQuestionId: answer.quizQuestionId
                 }
             })
-            if (numCorrects <= 1) {
+            if (numCorrects < 1) {
                 throw new ConflictException("Must have at least one correct answers")
             }
         }
