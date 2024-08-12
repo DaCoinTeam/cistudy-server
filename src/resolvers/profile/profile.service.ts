@@ -8,10 +8,11 @@ import {
     FindManyEnrolledCoursesInput,
     FindManyReceivedNotificationsInput,
     FindManySelfCreatedCoursesInput, FindManyTransactionsInput,
-    FindOneCertificateInput
+    FindOneCertificateInput,
+    GetCourseStatisticInput
 } from "./profile.input"
-import { FindManyAccountOrdersOutputData, FindManyEnrolledCoursesOutputData, FindManyReceivedNotificationsOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData } from "./profile.output"
-import { OrderStatus } from "@common"
+import { FindManyAccountOrdersOutputData, FindManyEnrolledCoursesOutputData, FindManyReceivedNotificationsOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData, GetCourseStatisticOutputData } from "./profile.output"
+import { OrderStatus, TransactionType } from "@common"
 
 @Injectable()
 export class ProfileService {
@@ -415,6 +416,75 @@ export class ProfileService {
             metadata: {
                 count: numberOfAccountOrdersResult,
             }
+        }
+    }
+
+    async getCourseStatistic(input: GetCourseStatisticInput): Promise<GetCourseStatisticOutputData> {
+        const { accountId, data } = input
+        const { params: { courseId } } = data
+
+        let course: CourseMySqlEntity | undefined
+        
+        const enrolledInfo = await this.enrolledInfoMySqlRepository.findOne({
+            where: {
+                accountId,
+                courseId
+            },
+            relations: {
+                course: {
+                    posts: {
+                        postReacts: true,
+                        postComments: true
+                    }
+                }
+            } 
+        })
+
+        if (enrolledInfo) {
+            course = enrolledInfo.course
+        } else {
+            course = await this.courseMySqlRepository.findOne({
+                where: {
+                    courseId,
+                    creatorId: accountId
+                },
+                relations: {
+                    posts: {
+                        postReacts: true,
+                        postComments: true
+                    }
+                } 
+            }
+            )
+        }
+
+        const { posts } = course
+
+        const numberOfRewardablePostsLeft = enrolledInfo ? 3 - posts.filter(({ isRewardable }) => isRewardable).length : undefined
+        
+        const likePosts = posts.filter(({ postReacts }) => {
+            return postReacts.some((postReact) => postReact.accountId === accountId)
+        })
+        const commentPosts = posts.filter(({ postComments }) => {
+            return postComments.some((postComment) => postComment.creatorId === accountId)
+        })
+        const markedPosts = posts.filter(({ postComments }) => {
+            return postComments.some((postComment) => postComment.isSolution === true && postComment.creatorId === accountId)
+        })
+        const earnTransactions = await this.transactionMySqlRepository.find({
+            where: {
+                type: TransactionType.Earn,
+                accountId,
+                courseId
+            },
+        })
+
+        return {
+            numberOfRewardablePostsLeft,
+            likePosts,
+            commentPosts,
+            markedPosts,
+            totalEarning: earnTransactions.reduce((sum, transaction) => { return sum + transaction.amountDepositedChange}, 0)
         }
     }
 }

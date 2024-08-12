@@ -504,11 +504,13 @@ type TransactionEntity {
   transactionId: ID!
   type: String!
   accountId: ID!
+  courseId: ID
   amountDepositedChange: Float!
   amountOnChainChange: Float!
   transactionHash: String
   payPalOrderId: String
   account: AccountEntity!
+  course: CourseEntity!
   transactionDetails: [TransactionDetailEntity!]!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -556,6 +558,7 @@ type CourseEntity {
   courseReports: [ReportCourseEntity!]
   courseNotifications: [NotificationEntity!]
   transactionDetails: [TransactionDetailEntity!]
+  transactions: [TransactionEntity!]
   numberOfEnrollments: Int
   enrolled: Boolean
   isReviewed: Boolean
@@ -1036,6 +1039,19 @@ type FindManyAccountOrdersOutput {
   tokens: AuthTokens
 }
 
+type GetCourseStatisticOutputData {
+  numberOfRewardablePostsLeft: Int
+  totalEarning: Float
+  likePosts: [PostEntity!]
+  commentPosts: [PostEntity!]
+  markedPosts: [PostEntity!]
+}
+
+type GetCourseStatisticOutput {
+  data: GetCourseStatisticOutputData!
+  tokens: AuthTokens
+}
+
 type InitOutput {
   data: AccountEntity!
   tokens: AuthTokens
@@ -1126,6 +1142,7 @@ type Query {
   findManyReceivedNotifications(data: FindManyReceivedNotificationsInputData!): FindManyReceivedNotificationsOutput!
   findOneCertificate(data: FindOneCertificateInputData!): FindOneCertificateOutput!
   findManyAccountOrders(data: FindManyAccountOrdersInputData!): FindManyAccountOrdersOutput!
+  getCourseStatistic(data: GetCourseStatisticInputData!): GetCourseStatisticOutput!
   findOneCart: FindOneCartOutput!
   findOneOrder(data: FindOneOrderInputData!): FindOneOrderOutput!
   findManyOrders(data: FindManyOrdersInputData!): FindManyOrdersOutput!
@@ -1488,6 +1505,14 @@ input FindManyAccountOrdersInputOptions {
   take: Int
   skip: Int
   orderStatus: String
+}
+
+input GetCourseStatisticInputData {
+  params: GetCourseStatisticParams
+}
+
+input GetCourseStatisticParams {
+  courseId: ID!
 }
 
 input FindOneOrderInputData {

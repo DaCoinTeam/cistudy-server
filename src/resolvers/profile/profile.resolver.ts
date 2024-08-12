@@ -1,13 +1,14 @@
 import { UseGuards, UseInterceptors } from "@nestjs/common"
 import { Args, Query, Resolver } from "@nestjs/graphql"
 import { AccountId, AuthInterceptor, JwtAuthGuard } from "../shared"
-import { FindManyAccountOrdersInputData, FindManyEnrolledCoursesInputData, FindManyReceivedNotificationsInputData, FindManySelfCreatedCoursesInputData, FindManyTransactionsInputData, FindOneCertificateInputData } from "./profile.input"
+import { FindManyAccountOrdersInputData, FindManyEnrolledCoursesInputData, FindManyReceivedNotificationsInputData, FindManySelfCreatedCoursesInputData, FindManyTransactionsInputData, FindOneCertificateInputData, GetCourseStatisticInputData } from "./profile.input"
 import {
     FindManyAccountOrdersOutput,
     FindManyEnrolledCoursesOutput, FindManyReceivedNotificationsOutput,
     FindManySelfCreatedCoursesOutput,
     FindManyTransactionsOutput,
-    FindOneCertificateOutput
+    FindOneCertificateOutput,
+    GetCourseStatisticOutput
 } from "./profile.output"
 import { ProfileService } from "./profile.service"
 
@@ -80,5 +81,14 @@ export class ProfileResolver {
         @AccountId() accountId : string,
         @Args("data") data: FindManyAccountOrdersInputData) {
         return await this.profileService.findManyAccountOrders({ accountId, data })
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    @Query(() => GetCourseStatisticOutput)
+    async getCourseStatistic(
+        @AccountId() accountId : string,
+        @Args("data") data: GetCourseStatisticInputData) {
+        return await this.profileService.getCourseStatistic({ accountId, data })
     }
 }

@@ -12,6 +12,7 @@ import {
 } from "typeorm"
 import { AccountEntity } from "./account.entity"
 import { TransactionDetailEntity } from "./transaction-detail.entity"
+import { CourseEntity } from "./course.entity"
 
 @ObjectType()
 @Entity("transaction")
@@ -27,6 +28,10 @@ export class TransactionEntity {
   @Field(() => ID)
   @Column({ type: "uuid", length: 36 })
       accountId: string
+
+  @Field(() => ID, { nullable: true })
+  @Column({ type: "uuid", length: 36, nullable: true })
+      courseId?: string
 
   @Field(() => Float)
   @Column({ type: "float", default: 0 })
@@ -51,12 +56,19 @@ export class TransactionEntity {
   @JoinColumn({ name: "accountId" })
       account: AccountEntity
 
+  @Field(() => CourseEntity)
+  @ManyToOne(() => CourseEntity, (course) => course.transactions, {
+      nullable: true,
+  })
+  @JoinColumn({ name: "courseId" })
+      course?: CourseEntity
+
   @Field(() => [TransactionDetailEntity])
   @OneToMany(
       () => TransactionDetailEntity,
       (transactionDetail) => transactionDetail.transaction,
       { nullable: true, cascade: true },
-  ) 
+  )
       transactionDetails?: Array<TransactionDetailEntity>
 
   @Field(() => Date)
