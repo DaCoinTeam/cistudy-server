@@ -30,7 +30,7 @@ export class TransactionEntity {
       accountId: string
 
   @Field(() => ID, { nullable: true })
-  @Column({ type: "uuid", length: 36 })
+  @Column({ type: "uuid", length: 36, nullable: true })
       courseId?: string
 
   @Field(() => Float)

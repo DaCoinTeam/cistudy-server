@@ -1512,7 +1512,7 @@ input GetCourseStatisticInputData {
 }
 
 input GetCourseStatisticParams {
-  courseId: String!
+  courseId: ID!
 }
 
 input FindOneOrderInputData {
