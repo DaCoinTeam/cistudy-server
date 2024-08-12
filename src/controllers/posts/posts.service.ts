@@ -367,7 +367,7 @@ export class PostsService {
                 senderId: accountId,
                 receiverId: creatorId,
                 title: `You have new react on your post: ${title}`,
-                description: `User ${isEnrolled.account.username} has reaccted to your post ${title}`,
+                description: `User ${isEnrolled.account.username} has reacted to your post ${title}`,
                 referenceLink: `${appConfig().frontendUrl}/courses/${courseId}/home`
             })
         }
@@ -482,8 +482,6 @@ export class PostsService {
 
         const numberOfRewardedComments = filteredComments.length
 
-
-
         if (!isInstructor) {
             if (isRewardable) {
                 if (creatorId !== accountId) {
@@ -514,24 +512,19 @@ export class PostsService {
                     } else {
                         alreadyRewarded = true
                     }
-
+                    await this.notificationMySqlRepository.save({
+                        senderId: isEnrolled.account.accountId,
+                        receiverId: post.creatorId,
+                        type: NotificationType.Interact,
+                        title: "You have new comment on your post",
+                        description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`,
+                        referenceLink: `/posts/${post.postId}`,
+                    })
                 }
             }
         }
 
-
         const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
-
-        if (creatorId !== accountId) {
-            await this.notificationMySqlRepository.save({
-                senderId: isEnrolled.account.accountId,
-                receiverId: post.creatorId,
-                type: NotificationType.Interact,
-                title: "You have new comment on your post",
-                description: `User ${isEnrolled.account.username} has commented to your post ${post.title}`,
-                referenceLink: `/posts/${post.postId}`,
-            })
-        }
 
         return {
             message: "Comment Posted Successfully",

@@ -285,6 +285,7 @@ export class CoursesService {
         await this.accountMySqlRepository.update(accountId, {
             balance: balance - price,
         })
+        
         await this.accountMySqlRepository.increment(
             { accountId: creatorId },
             "balance",
