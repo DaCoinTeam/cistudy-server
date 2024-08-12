@@ -157,6 +157,8 @@ export class GetCourseStatisticOutputData {
       commentPosts?: Array<PostMySqlEntity>
   @Field(() => [PostMySqlEntity], { nullable: true })
       markedPosts?: Array<PostMySqlEntity>
+  @Field(() => [PostMySqlEntity], { nullable: true })
+      createdPosts?: Array<PostMySqlEntity>
 }
 
 @ObjectType()

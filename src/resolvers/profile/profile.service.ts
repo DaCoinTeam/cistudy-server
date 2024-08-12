@@ -434,9 +434,13 @@ export class ProfileService {
                 course: {
                     posts: {
                         postReacts: true,
-                        postComments: true
-                    }
+                        postComments: true,
+                        creator: true
+                    },
                 }
+            },
+            order: {
+                updatedAt: "DESC"
             } 
         })
 
@@ -451,16 +455,16 @@ export class ProfileService {
                 relations: {
                     posts: {
                         postReacts: true,
-                        postComments: true
-                    }
-                } 
+                        postComments: true,
+                        creator: true
+                    },
+                }
             }
             )
         }
 
         const { posts } = course
-
-        const numberOfRewardablePostsLeft = enrolledInfo ? 3 - posts.filter(({ isRewardable }) => isRewardable).length : undefined
+        posts.sort((prev, next) => next.updatedAt.getTime() - prev.updatedAt.getTime())
         
         const likePosts = posts.filter(({ postReacts }) => {
             return postReacts.some((postReact) => postReact.accountId === accountId)
@@ -471,6 +475,12 @@ export class ProfileService {
         const markedPosts = posts.filter(({ postComments }) => {
             return postComments.some((postComment) => postComment.isSolution === true && postComment.creatorId === accountId)
         })
+        const createdPosts = posts.filter(({ creatorId }) => {
+            return creatorId === accountId
+        })
+
+        const numberOfRewardablePostsLeft = enrolledInfo ? (3 - (createdPosts.filter(({ isRewardable }) => isRewardable).length)) : undefined
+
         const earnTransactions = await this.transactionMySqlRepository.find({
             where: {
                 type: TransactionType.Earn,
@@ -478,12 +488,13 @@ export class ProfileService {
                 courseId
             },
         })
-        
+
         return {
             numberOfRewardablePostsLeft,
             likePosts,
             commentPosts,
             markedPosts,
+            createdPosts,
             totalEarning: earnTransactions.reduce((sum, transaction) => { return sum + transaction.amountDepositedChange}, 0)
         }
     }

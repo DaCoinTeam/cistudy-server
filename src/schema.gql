@@ -1045,6 +1045,7 @@ type GetCourseStatisticOutputData {
   likePosts: [PostEntity!]
   commentPosts: [PostEntity!]
   markedPosts: [PostEntity!]
+  createdPosts: [PostEntity!]
 }
 
 type GetCourseStatisticOutput {
