@@ -105,10 +105,10 @@ export class PostsService {
 
         const { creatorId } = await this.courseMySqlRepository.findOneBy({ courseId })
 
-        if (accountId !== creatorId && !isEnrolled) {
+        if (accountId !== creatorId || !isEnrolled) {
             throw new ConflictException("You must be enrolled to this course before creating a post inside. ")
         }
-
+        
         const post: DeepPartial<PostMySqlEntity> = {
             title,
             courseId,
@@ -289,7 +289,7 @@ export class PostsService {
 
         let earnAmount: number
 
-        const { courseId, creatorId, isRewardable, course, isCompleted, title } = await this.postMySqlRepository.findOne({
+        const { courseId, creatorId, isRewardable, course, isCompleted, title, } = await this.postMySqlRepository.findOne({
             where: {
                 postId
             },
@@ -311,8 +311,9 @@ export class PostsService {
                 account: true
             }
         })
+        const isInstructor = (accountId === course.creatorId)
 
-        if (!isEnrolled) {
+        if (!isInstructor || !isEnrolled) {
             throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
         }
 
@@ -331,26 +332,29 @@ export class PostsService {
 
         const numberOfRewardedLike = numberOfPostLike.filter(likeCount => likeCount.accountId !== creatorId)
 
+        
 
         if (isRewardable) {
             if (creatorId !== accountId) {
-                const { priceAtEnrolled } = isEnrolled
-                if (numberOfRewardedLike.length < 20) {
-                    earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient)
-                    await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
-                    await this.notificationMySqlRepository.save({
-                        receiverId: accountId,
-                        title: "You have new update on your balance!",
-                        type: NotificationType.Transaction,
-                        description: `You have received ${earnAmount} STARCI(s)`,
-                    })
-                    await this.transactionMySqlRepository.save({
-                        accountId,
-                        type: TransactionType.Earn,
-                        amountDepositedChange: earnAmount,
-                        courseId
-                    })
+                if(!isInstructor){
+                    const { priceAtEnrolled } = isEnrolled
+                    if (numberOfRewardedLike.length < 20) {
+                        earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient)
+                        await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+                        await this.notificationMySqlRepository.save({
+                            receiverId: accountId,
+                            title: "You have new update on your balance!",
+                            type: NotificationType.Transaction,
+                            description: `You have received ${earnAmount} STARCI(s)`,
+                        })
+                        await this.transactionMySqlRepository.save({
+                            accountId,
+                            type: TransactionType.Earn,
+                            amountDepositedChange: earnAmount
+                        })
+                    }
                 }
+                
             }
         }
 
@@ -451,8 +455,9 @@ export class PostsService {
                 account: true
             }
         })
-
-        if (!isEnrolled) {
+        const isInstructor = (accountId === course.creatorId)
+        
+        if (!isInstructor || !isEnrolled) {
             throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
         }
 
@@ -471,40 +476,44 @@ export class PostsService {
         })
 
         const numberOfRewardedComments = filteredComments.length
+        
 
-        if (isRewardable) {
-            if (creatorId !== accountId) {
-                const isCommented = await this.postCommentMySqlRepository.find({
-                    where: {
-                        creatorId: accountId,
-                        postId
-                    }
-                })
-                if (!isCommented || isCommented.length < 1) {
-                    const { priceAtEnrolled } = isEnrolled
-                    if (numberOfRewardedComments < 20) {
-                        earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient)
-                        await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
-                        await this.notificationMySqlRepository.save({
-                            receiverId: accountId,
-                            title: "You have new update on your balance!",
-                            type: NotificationType.Transaction,
-                            description: `You have received ${earnAmount} STARCI(s)`,
-                        })
 
-                        await this.transactionMySqlRepository.save({
-                            accountId,
-                            type: TransactionType.Earn,
-                            amountDepositedChange: earnAmount,
-                            courseId
-                        })
+        if(!isInstructor){
+            if (isRewardable) {
+                if (creatorId !== accountId) {
+                    const isCommented = await this.postCommentMySqlRepository.find({
+                        where: {
+                            creatorId: accountId,
+                            postId
+                        }
+                    })
+                    if (!isCommented || isCommented.length < 1) {
+                        const { priceAtEnrolled } = isEnrolled
+                        if (numberOfRewardedComments < 20) {
+                            earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient)
+                            await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+                            await this.notificationMySqlRepository.save({
+                                receiverId: accountId,
+                                title: "You have new update on your balance!",
+                                type: NotificationType.Transaction,
+                                description: `You have received ${earnAmount} STARCI(s)`,
+                            })
+    
+                            await this.transactionMySqlRepository.save({
+                                accountId,
+                                type: TransactionType.Earn,
+                                amountDepositedChange: earnAmount
+                            })
+                        }
+                    } else {
+                        alreadyRewarded = true
                     }
-                } else {
-                    alreadyRewarded = true
+    
                 }
-
             }
         }
+        
 
         const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
 
