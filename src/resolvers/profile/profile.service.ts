@@ -478,7 +478,7 @@ export class ProfileService {
                 courseId
             },
         })
-
+        
         return {
             numberOfRewardablePostsLeft,
             likePosts,

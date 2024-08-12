@@ -835,7 +835,7 @@ export class PostsService {
             await this.accountMySqlRepository.increment({ accountId: postComment.creatorId }, "balance", earnAmount)
 
             await this.transactionMySqlRepository.save({
-                accountId,
+                accountId: postComment.creatorId,
                 type: TransactionType.Earn,
                 amountDepositedChange: earnAmount,
                 courseId
