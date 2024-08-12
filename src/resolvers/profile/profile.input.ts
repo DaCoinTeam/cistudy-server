@@ -1,19 +1,26 @@
-import { AuthEmptyDataInput, AuthInput, OptionsOnly, OrderStatus } from "@common"
+import {
+    AuthEmptyDataInput,
+    AuthInput,
+    OptionsOnly,
+    OrderStatus,
+    ParamsOnly,
+} from "@common"
 import { Field, ID, InputType, Int } from "@nestjs/graphql"
-
 
 @InputType()
 export class FindManySelfCreatedCoursesInputOptions {
-    @Field(() => Int, { nullable: true })
-        take?: number
-    @Field(() => Int, { nullable: true })
-        skip?: number
+  @Field(() => Int, { nullable: true })
+      take?: number
+  @Field(() => Int, { nullable: true })
+      skip?: number
 }
 
 @InputType()
-export class FindManySelfCreatedCoursesInputData implements OptionsOnly<FindManySelfCreatedCoursesInputOptions>{
-    @Field(() => FindManySelfCreatedCoursesInputOptions, { nullable: true })
-        options?: FindManySelfCreatedCoursesInputOptions
+export class FindManySelfCreatedCoursesInputData
+implements OptionsOnly<FindManySelfCreatedCoursesInputOptions>
+{
+  @Field(() => FindManySelfCreatedCoursesInputOptions, { nullable: true })
+      options?: FindManySelfCreatedCoursesInputOptions
 }
 
 export class FindManySelfCreatedCoursesInput
@@ -23,56 +30,61 @@ implements AuthInput<FindManySelfCreatedCoursesInputData>
     data: FindManySelfCreatedCoursesInputData
 }
 
-export class FindManySelfCreatedCoursesMetadataInput implements AuthEmptyDataInput {
+export class FindManySelfCreatedCoursesMetadataInput
+implements AuthEmptyDataInput
+{
     accountId: string
 }
 
-
 @InputType()
 export class FindManyEnrolledCoursesInputOptions {
-    @Field(() => Int, { nullable: true })
-        take?: number
-    @Field(() => Int, { nullable: true })
-        skip?: number
+  @Field(() => Int, { nullable: true })
+      take?: number
+  @Field(() => Int, { nullable: true })
+      skip?: number
 }
 
 @InputType()
-export class FindManyEnrolledCoursesInputData implements OptionsOnly<FindManyEnrolledCoursesInputOptions> {
-    @Field(() => FindManyEnrolledCoursesInputOptions, { nullable: true })
-        options?: FindManyEnrolledCoursesInputOptions
+export class FindManyEnrolledCoursesInputData
+implements OptionsOnly<FindManyEnrolledCoursesInputOptions>
+{
+  @Field(() => FindManyEnrolledCoursesInputOptions, { nullable: true })
+      options?: FindManyEnrolledCoursesInputOptions
 }
 
 export class FindManyEnrolledCoursesInput
 implements AuthInput<FindManyEnrolledCoursesInputData>
-{   
+{
     accountId: string
     data: FindManyEnrolledCoursesInputData
 }
 
 export class GenerateReportInput implements AuthEmptyDataInput {
-    accountId: string  
+    accountId: string
 }
 
 @InputType()
 export class FindManySubmittedReportsInputOptions {
-    @Field(() => Int, { nullable: true })
-        take?: number
-    @Field(() => Int, { nullable: true })
-        skip?: number
+  @Field(() => Int, { nullable: true })
+      take?: number
+  @Field(() => Int, { nullable: true })
+      skip?: number
 }
 
 @InputType()
 export class FindManyTransactionsInputOptions {
-    @Field(() => Int, { nullable: true })
-        take?: number
-    @Field(() => Int, { nullable: true })
-        skip?: number
+  @Field(() => Int, { nullable: true })
+      take?: number
+  @Field(() => Int, { nullable: true })
+      skip?: number
 }
 
 @InputType()
-export class FindManyTransactionsInputData implements OptionsOnly<FindManyTransactionsInputOptions> {
-    @Field(() => FindManyTransactionsInputOptions, { nullable: true })
-        options?: FindManyTransactionsInputOptions
+export class FindManyTransactionsInputData
+implements OptionsOnly<FindManyTransactionsInputOptions>
+{
+  @Field(() => FindManyTransactionsInputOptions, { nullable: true })
+      options?: FindManyTransactionsInputOptions
 }
 
 export class FindManyTransactionsInput
@@ -84,53 +96,82 @@ implements AuthInput<FindManyTransactionsInputData>
 
 @InputType()
 export class FindManyReceivedNotificationsInputOptions {
-    @Field(() => Int, { nullable: true })
-        take?: number
-    @Field(() => Int, { nullable: true })
-        skip?: number
+  @Field(() => Int, { nullable: true })
+      take?: number
+  @Field(() => Int, { nullable: true })
+      skip?: number
 }
 
 @InputType()
-export class FindManyReceivedNotificationsInputData implements OptionsOnly<FindManyReceivedNotificationsInputOptions>{
-    @Field(() => FindManyReceivedNotificationsInputOptions, { nullable: true })
-        options?: FindManyReceivedNotificationsInputOptions
+export class FindManyReceivedNotificationsInputData
+implements OptionsOnly<FindManyReceivedNotificationsInputOptions>
+{
+  @Field(() => FindManyReceivedNotificationsInputOptions, { nullable: true })
+      options?: FindManyReceivedNotificationsInputOptions
 }
 
-export class FindManyReceivedNotificationsInput implements AuthInput<FindManyReceivedNotificationsInputData>{
+export class FindManyReceivedNotificationsInput
+implements AuthInput<FindManyReceivedNotificationsInputData>
+{
     accountId: string
     data: FindManyReceivedNotificationsInputData
 }
 
 @InputType()
 export class FindOneCertificateInputData {
-    @Field(() => ID)
-        certificateId : string
+  @Field(() => ID)
+      certificateId: string
 }
 
-export class FindOneCertificateInput implements AuthInput<FindOneCertificateInputData> {
+export class FindOneCertificateInput
+implements AuthInput<FindOneCertificateInputData>
+{
     accountId: string
     data: FindOneCertificateInputData
 }
 
 @InputType()
 export class FindManyAccountOrdersInputOptions {
-    @Field(() => Int, { nullable: true })
-        take?: number
-    @Field(() => Int, { nullable: true })
-        skip?: number
-    @Field(() => String, {nullable: true})
-        orderStatus?: OrderStatus
+  @Field(() => Int, { nullable: true })
+      take?: number
+  @Field(() => Int, { nullable: true })
+      skip?: number
+  @Field(() => String, { nullable: true })
+      orderStatus?: OrderStatus
 }
 
 @InputType()
 export class FindManyAccountOrdersInputData
-implements
-    OptionsOnly<FindManyAccountOrdersInputOptions> {
-    @Field(() => FindManyAccountOrdersInputOptions, { nullable: true })
-        options?: FindManyAccountOrdersInputOptions
+implements OptionsOnly<FindManyAccountOrdersInputOptions>
+{
+  @Field(() => FindManyAccountOrdersInputOptions, { nullable: true })
+      options?: FindManyAccountOrdersInputOptions
 }
 
-export class FindManyAccountOrdersInput implements AuthInput<FindManyAccountOrdersInputData> {
+export class FindManyAccountOrdersInput
+implements AuthInput<FindManyAccountOrdersInputData>
+{
     accountId: string
     data: FindManyAccountOrdersInputData
+}
+
+@InputType()
+export class GetCourseStatisticParams {
+  @Field(() => ID)
+      courseId: string
+}
+
+@InputType()
+export class GetCourseStatisticInputData
+implements ParamsOnly<GetCourseStatisticParams>
+{
+    @Field(() => GetCourseStatisticParams, { nullable: true })
+        params: GetCourseStatisticParams
+}
+
+export class GetCourseStatisticInput
+implements AuthInput<GetCourseStatisticInputData>
+{
+    accountId: string
+    data: GetCourseStatisticInputData
 }

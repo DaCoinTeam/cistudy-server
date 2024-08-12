@@ -165,7 +165,8 @@ export class PostsService {
                 await this.transactionMySqlRepository.save({
                     accountId,
                     type: TransactionType.Earn,
-                    amountDepositedChange: earnAmount
+                    amountDepositedChange: earnAmount,
+                    courseId
                 })
 
                 await this.notificationMySqlRepository.save({
@@ -346,7 +347,8 @@ export class PostsService {
                     await this.transactionMySqlRepository.save({
                         accountId,
                         type: TransactionType.Earn,
-                        amountDepositedChange: earnAmount
+                        amountDepositedChange: earnAmount,
+                        courseId
                     })
                 }
             }
@@ -493,7 +495,8 @@ export class PostsService {
                         await this.transactionMySqlRepository.save({
                             accountId,
                             type: TransactionType.Earn,
-                            amountDepositedChange: earnAmount
+                            amountDepositedChange: earnAmount,
+                            courseId
                         })
                     }
                 } else {
@@ -820,7 +823,8 @@ export class PostsService {
             await this.transactionMySqlRepository.save({
                 accountId,
                 type: TransactionType.Earn,
-                amountDepositedChange: earnAmount
+                amountDepositedChange: earnAmount,
+                courseId
             })
 
             await this.notificationMySqlRepository.save({

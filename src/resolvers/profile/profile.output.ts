@@ -1,6 +1,6 @@
 import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
-import { CertificateMySqlEntity, CourseMySqlEntity, NotificationMySqlEntity, OrderMySqlEntity, TransactionMySqlEntity } from "@database"
-import { Field, Int, ObjectType } from "@nestjs/graphql"
+import { CertificateMySqlEntity, CourseMySqlEntity, NotificationMySqlEntity, OrderMySqlEntity, PostMySqlEntity, TransactionMySqlEntity } from "@database"
+import { Field, Float, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
 export class FindManySelfCreatedCoursesOutputMetadata {
@@ -141,6 +141,28 @@ implements ResultsWithMetadata<OrderMySqlEntity, FindManyAccountOrdersOutputMeta
 export class FindManyAccountOrdersOutput implements AuthOutput<FindManyAccountOrdersOutputData> {
     @Field(() => FindManyAccountOrdersOutputData)
         data: FindManyAccountOrdersOutputData
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
+}
+
+@ObjectType()
+export class GetCourseStatisticOutputData {
+  @Field(() => Int, { nullable: true })
+      numberOfRewardablePostsLeft?: number
+  @Field(() => Float, { nullable: true })
+      totalEarning?: number
+  @Field(() => [PostMySqlEntity], { nullable: true })
+      likePosts?: Array<PostMySqlEntity>
+  @Field(() => [PostMySqlEntity], { nullable: true })
+      commentPosts?: Array<PostMySqlEntity>
+  @Field(() => [PostMySqlEntity], { nullable: true })
+      markedPosts?: Array<PostMySqlEntity>
+}
+
+@ObjectType()
+export class GetCourseStatisticOutput implements AuthOutput<GetCourseStatisticOutputData> {
+    @Field(() => GetCourseStatisticOutputData)
+        data: GetCourseStatisticOutputData
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }

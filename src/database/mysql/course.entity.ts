@@ -24,6 +24,7 @@ import { ReportCourseEntity } from "./report-course.entity"
 import { SectionEntity } from "./section.entity"
 import { NotificationEntity } from "./notification.entity"
 import { TransactionDetailEntity } from "./transaction-detail.entity"
+import { TransactionEntity } from "./transaction.enity"
 
 interface CourseIncludes {
   time: number
@@ -171,6 +172,12 @@ export class CourseEntity {
       { nullable: true },
   )
       transactionDetails?: Array<TransactionDetailEntity>
+
+  @Field(() => [TransactionEntity], { nullable: true })
+  @OneToMany(() => TransactionEntity, (transaction) => transaction.course, {
+      nullable: true,
+  })
+      transactions?: Array<TransactionEntity>
 
   //graphql
   @Field(() => Int, { nullable: true })
