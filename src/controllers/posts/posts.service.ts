@@ -101,14 +101,17 @@ export class PostsService {
         const { data, files, accountId } = input
         const { postMedias, title, courseId, html } = data
 
-        const isEnrolled = await this.enrolledInfoMySqlRepository.findOneBy({ accountId, courseId })
-
         const { creatorId } = await this.courseMySqlRepository.findOneBy({ courseId })
 
-        if (accountId !== creatorId || !isEnrolled) {
-            throw new ConflictException("You must be enrolled to this course before creating a post inside. ")
+        const isInstructor = accountId === creatorId
+
+        if (!isInstructor) {
+            const isEnrolled = await this.enrolledInfoMySqlRepository.findOneBy({ accountId, courseId })
+            if (!isEnrolled) {
+                throw new ConflictException("You must be enrolled to this course before creating a post inside. ")
+            }
         }
-        
+
         const post: DeepPartial<PostMySqlEntity> = {
             title,
             courseId,
@@ -313,8 +316,10 @@ export class PostsService {
         })
         const isInstructor = (accountId === course.creatorId)
 
-        if (!isInstructor || !isEnrolled) {
-            throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
+        if (!isInstructor) {
+            if (!isEnrolled) {
+                throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
+            }
         }
 
         const isLiked = await this.postLikeMySqlRepository.findOne({
@@ -332,11 +337,9 @@ export class PostsService {
 
         const numberOfRewardedLike = numberOfPostLike.filter(likeCount => likeCount.accountId !== creatorId)
 
-        
-
         if (isRewardable) {
             if (creatorId !== accountId) {
-                if(!isInstructor){
+                if (!isInstructor) {
                     const { priceAtEnrolled } = isEnrolled
                     if (numberOfRewardedLike.length < 20) {
                         earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient)
@@ -354,7 +357,7 @@ export class PostsService {
                         })
                     }
                 }
-                
+
             }
         }
 
@@ -456,9 +459,11 @@ export class PostsService {
             }
         })
         const isInstructor = (accountId === course.creatorId)
-        
-        if (!isInstructor || !isEnrolled) {
-            throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
+
+        if (!isInstructor ) {
+            if(!isEnrolled){
+                throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
+            }
         }
 
         const numberOfPostComments = await this.postCommentMySqlRepository.findBy({ postId })
@@ -476,10 +481,10 @@ export class PostsService {
         })
 
         const numberOfRewardedComments = filteredComments.length
-        
 
 
-        if(!isInstructor){
+
+        if (!isInstructor) {
             if (isRewardable) {
                 if (creatorId !== accountId) {
                     const isCommented = await this.postCommentMySqlRepository.find({
@@ -499,7 +504,7 @@ export class PostsService {
                                 type: NotificationType.Transaction,
                                 description: `You have received ${earnAmount} STARCI(s)`,
                             })
-    
+
                             await this.transactionMySqlRepository.save({
                                 accountId,
                                 type: TransactionType.Earn,
@@ -509,11 +514,11 @@ export class PostsService {
                     } else {
                         alreadyRewarded = true
                     }
-    
+
                 }
             }
         }
-        
+
 
         const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
 
