@@ -174,4 +174,4 @@ implements AuthInput<GetCourseStatisticInputData>
 {
     accountId: string
     data: GetCourseStatisticInputData
-}
+} 
