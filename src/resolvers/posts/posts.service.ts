@@ -295,7 +295,9 @@ export class PostsService {
                 relations: {
                     creator: true,
                     postCommentMedias: true,
-                    post: true
+                    post: {
+                        course: true
+                    }
                 },
                 take,
                 skip,
@@ -389,6 +391,7 @@ export class PostsService {
                 ) : false
                 const isReported = await this.reportPostCommentMySqlRepository.findOneBy({ accountId, postCommentId: postComment.postCommentId, processStatus: ReportProcessStatus.Processing })
                 postComment.isReported = isReported ? true : false
+                postComment.post.isInstructor = (postComment.creatorId === postComment.post.course.creatorId)
 
                 return {
                     ...postComment,

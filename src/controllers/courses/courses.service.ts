@@ -219,10 +219,6 @@ export class CoursesService {
 
         const account = await this.accountMySqlRepository.findOneBy({ accountId })
 
-        if (!account || account.verified == false) {
-            throw new ConflictException("Account not found or not verified.")
-        }
-
         const course = await this.courseMySqlRepository.findOne({
             where: {
                 courseId,
@@ -285,7 +281,7 @@ export class CoursesService {
         await this.accountMySqlRepository.update(accountId, {
             balance: balance - price,
         })
-        
+
         await this.accountMySqlRepository.increment(
             { accountId: creatorId },
             "balance",

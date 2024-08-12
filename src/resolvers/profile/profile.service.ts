@@ -435,7 +435,8 @@ export class ProfileService {
                     posts: {
                         postReacts: true,
                         postComments: true,
-                        creator: true
+                        creator: true,
+                        course: true
                     },
                 }
             },
@@ -456,7 +457,8 @@ export class ProfileService {
                     posts: {
                         postReacts: true,
                         postComments: true,
-                        creator: true
+                        creator: true,
+                        course: true
                     },
                 }
             }
@@ -466,8 +468,9 @@ export class ProfileService {
         const { posts } = course
         posts.sort((prev, next) => next.updatedAt.getTime() - prev.updatedAt.getTime())
         
-        const likePosts = posts.filter(({ postReacts }) => {
-            return postReacts.some((postReact) => postReact.accountId === accountId)
+        const likePosts = posts.filter((post) => {
+            post.isInstructor = post.creatorId === post.course.creatorId
+            return post.postReacts.some((postReact) => postReact.accountId === accountId)
         })
         const commentPosts = posts.filter(({ postComments }) => {
             return postComments.some((postComment) => postComment.creatorId === accountId)
