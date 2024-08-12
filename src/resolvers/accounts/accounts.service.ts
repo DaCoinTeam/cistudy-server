@@ -7,6 +7,7 @@ import {
     EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
     NotificationMySqlEntity,
+    OrderMySqlEntity,
     ReportAccountMySqlEntity,
     TransactionMySqlEntity,
 } from "@database"
@@ -55,6 +56,8 @@ export class AccountsService {
     private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
     @InjectRepository(ConfigurationMySqlEntity)
     private readonly configurationMySqlRepository: Repository<ConfigurationMySqlEntity>,
+    @InjectRepository(OrderMySqlEntity)
+    private readonly orderMySqlRepository: Repository<OrderMySqlEntity>,
     private readonly dataSource: DataSource,
     ) {}
 
@@ -310,6 +313,7 @@ export class AccountsService {
             },
         })
         const numberOfTransactions = await this.transactionMySqlRepository.count()
+        const numberOfOrders = await this.orderMySqlRepository.count()
 
         const enrolledInfos = await this.enrolledInfoMySqlRepository.find()
 
@@ -317,7 +321,7 @@ export class AccountsService {
             numberOfAccounts,
             numberOfCourses,
             numberOfTransactions,
-            numberOfOrders: 0,
+            numberOfOrders,
             enrolledInfos
         }
     }

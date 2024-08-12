@@ -144,7 +144,7 @@ import {
     UpdateSectionContentOuput,
     UpdateSectionOuput,
 } from "./courses.output"
-import { appConfig, blockchainConfig } from "@config"
+import { appConfig } from "@config"
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager"
 import numeral from "numeral"
 import { v4 as uuidv4 } from "uuid"
@@ -1273,7 +1273,7 @@ export class CoursesService {
             }
         })
 
-        const earnAmount = blockchainConfig().earns.percentage * activeEnrollment.priceAtEnrolled
+        const earnAmount = 0.1 * activeEnrollment.priceAtEnrolled
 
         await this.accountMySqlRepository.update(accountId, {
             balance: balance + earnAmount

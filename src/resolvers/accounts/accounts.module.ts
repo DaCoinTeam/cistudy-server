@@ -6,6 +6,7 @@ import {
     EnrolledInfoMySqlEntity,
     FollowMySqlEnitity,
     NotificationMySqlEntity,
+    OrderMySqlEntity,
     ReportAccountMySqlEntity,
     ReportCourseMySqlEntity,
     ReportPostCommentMySqlEntity,
@@ -31,7 +32,8 @@ import { AccountsService } from "./accounts.service"
             TransactionMySqlEntity,
             NotificationMySqlEntity,
             EnrolledInfoMySqlEntity,
-            ConfigurationMySqlEntity
+            ConfigurationMySqlEntity,
+            OrderMySqlEntity
         ]),
     ],
     providers: [AccountsResolver, AccountsService],

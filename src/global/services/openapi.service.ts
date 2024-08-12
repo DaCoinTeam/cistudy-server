@@ -18,18 +18,14 @@ export class OpenApiService implements OnModuleInit {
   }> {
         const content = `
             ${message}
-         “Please evaluate whether the sentence meets the following criteria and respond with format "{yes or no}.{reason}":
+         “Please evaluate whether the sentence meets the following criteria and respond with format "{yes|no}.{reason}":
 Does it include violent content?
-Does it include spam or scam content?
-Does it have hate speech or personal attacks?
-Does it feature inappropriate or offensive material?
-Does it contain harmful or dangerous content?
-Does it involve sexual content?
 ”
         `   
         const chatCompletion = await this.client.chat.completions.create({
             messages: [{ role: "user", content }],
-            model: "gpt-3.5-turbo",
+            model: "gpt-4o-mini",
+            temperature: 0.3
         })
 
         return {
