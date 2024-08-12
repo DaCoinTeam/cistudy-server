@@ -421,9 +421,11 @@ export class ProfileService {
 
     async getCourseStatistic(input: GetCourseStatisticInput): Promise<GetCourseStatisticOutputData> {
         const { accountId, data } = input
-        const { params: { courseId} } = data
+        const { params: { courseId } } = data
 
-        const { course : { posts } } = await this.enrolledInfoMySqlRepository.findOne({
+        let course: CourseMySqlEntity | undefined
+        
+        const enrolledInfo = await this.enrolledInfoMySqlRepository.findOne({
             where: {
                 accountId,
                 courseId
@@ -438,7 +440,27 @@ export class ProfileService {
             } 
         })
 
-        const numberOfRewardablePostsLeft = 3 - posts.filter(({ isRewardable }) => isRewardable).length
+        if (enrolledInfo) {
+            course = enrolledInfo.course
+        } else {
+            course = await this.courseMySqlRepository.findOne({
+                where: {
+                    courseId,
+                    creatorId: accountId
+                },
+                relations: {
+                    posts: {
+                        postReacts: true,
+                        postComments: true
+                    }
+                } 
+            }
+            )
+        }
+
+        const { posts } = course
+
+        const numberOfRewardablePostsLeft = enrolledInfo ? 3 - posts.filter(({ isRewardable }) => isRewardable).length : undefined
         
         const likePosts = posts.filter(({ postReacts }) => {
             return postReacts.some((postReact) => postReact.accountId === accountId)
