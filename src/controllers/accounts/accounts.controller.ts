@@ -13,7 +13,7 @@ import {
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { AccountId, AuthInterceptor, JwtAuthGuard, Roles } from "../shared"
 import { RolesGuard } from "../shared/guards/role.guard"
-import { CreateAccountReportInputData, CreateAccountReviewInputData, CreateAccountRoleInputData, CreateConfigurationInputData, DeleteCourseInputData, ResolveAccountReportInputData, ToggleFollowInputData, ToggleRoleInputData, UpdateAccountInputData, UpdateAccountReportInputData, UpdateAccountReviewInputData, UpdateAccountRoleInputData, VerifyCourseInputData } from "./accounts.input"
+import { CreateAccountInputData, CreateAccountReportInputData, CreateAccountReviewInputData, CreateAccountRoleInputData, CreateConfigurationInputData, DeleteCourseInputData, ResolveAccountReportInputData, ToggleFollowInputData, ToggleRoleInputData, UpdateAccountInputData, UpdateAccountReportInputData, UpdateAccountReviewInputData, UpdateAccountRoleInputData, VerifyCourseInputData } from "./accounts.input"
 import { AccountsService } from "./accounts.service"
 
 @ApiTags("Accounts")
@@ -220,6 +220,20 @@ export class AccountsController {
         @Body() body: UpdateAccountInputData,
     ) {
         return this.accountsService.updateAccount({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-account")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async createAccount(
+        @AccountId() accountId: string,
+        @Body() body: CreateAccountInputData,
+    ) {
+        return this.accountsService.createAccount({
             accountId,
             data: body,
         })

@@ -123,6 +123,9 @@ export class AccountsService {
         const results = await this.accountMySqlRepository.find({
             skip,
             take,
+            order: {
+                createdAt: "DESC"
+            }
         })
 
         const count = await this.accountMySqlRepository.count()

@@ -16,6 +16,7 @@ import { JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DataSource, In, Repository } from "typeorm"
 import {
+    CreateAccountInput,
     CreateAccountReportInput,
     CreateAccountReviewInput,
     CreateAccountRoleInput,
@@ -32,6 +33,7 @@ import {
     VerifyCourseInput
 } from "./accounts.input"
 import {
+    CreateAccountOutput,
     CreateAccountReportOutput,
     CreateAccountReviewOutput,
     CreateAccountRoleOutput,
@@ -525,4 +527,41 @@ export class AccountsService {
             message: "Updated successfully",
         }
     }
+
+    async createAccount(input: CreateAccountInput): Promise<CreateAccountOutput> {
+        const { data } = input
+        const { email, birthdate, firstName, lastName, roles, username } = data
+
+
+        const existUsername = await this.accountMySqlRepository.findOne({ 
+            where: {
+                username
+            }
+        })
+        if (existUsername) throw new ConflictException("User with this username has been existed.")
+
+        const existEmail = await this.accountMySqlRepository.findOne({ 
+            where: {
+                email
+            }
+        })
+        if (existEmail) throw new ConflictException("User with this email has been existed.")
+
+        await this.accountMySqlRepository.save({
+            email,
+            birthdate: new Date(birthdate),
+            firstName,
+            lastName,
+            username,
+            roles: roles.map((name) => ({
+                name
+            })),
+            verified: true
+        })
+ 
+        return {
+            message: "Create account successfully",
+        }
+    }
+
 }

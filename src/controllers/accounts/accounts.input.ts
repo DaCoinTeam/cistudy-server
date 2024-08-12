@@ -244,4 +244,22 @@ export class UpdateAccountInput implements AuthInput<UpdateAccountInputData> {
     data: UpdateAccountInputData
 }
 
+export class CreateAccountInputData {
+    @ApiProperty()
+        email: string
+    @ApiProperty()
+        username?: string
+    @ApiProperty()
+        firstName?: string
+    @ApiProperty()
+        lastName?: string
+    @ApiProperty()
+        birthdate?: Date
+    @ApiProperty()
+        roles?: Array<SystemRoles>
+}
 
+export class CreateAccountInput implements AuthInput<CreateAccountInputData> {
+    accountId: string
+    data: CreateAccountInputData
+}

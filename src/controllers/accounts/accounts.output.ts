@@ -71,3 +71,7 @@ export class CreateConfigurationOutput implements Output{
 export class UpdateAccountOutput implements Output{
     message: string   
 }
+
+export class CreateAccountOutput implements Output{
+    message: string   
+}
