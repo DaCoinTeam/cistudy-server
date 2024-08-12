@@ -105,10 +105,10 @@ export class PostsService {
 
         const { creatorId } = await this.courseMySqlRepository.findOneBy({ courseId })
 
-        if (accountId !== creatorId && !isEnrolled) {
+        if (accountId !== creatorId || !isEnrolled) {
             throw new ConflictException("You must be enrolled to this course before creating a post inside. ")
         }
-
+        
         const post: DeepPartial<PostMySqlEntity> = {
             title,
             courseId,
@@ -311,8 +311,9 @@ export class PostsService {
                 account: true
             }
         })
+        const isInstructor = (accountId === course.creatorId)
 
-        if (!isEnrolled) {
+        if (!isInstructor || !isEnrolled) {
             throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
         }
 
@@ -331,7 +332,7 @@ export class PostsService {
 
         const numberOfRewardedLike = numberOfPostLike.filter(likeCount => likeCount.accountId !== creatorId)
 
-        const isInstructor = (accountId === course.creatorId)
+        
 
         if (isRewardable) {
             if (creatorId !== accountId) {
@@ -454,8 +455,9 @@ export class PostsService {
                 account: true
             }
         })
-
-        if (!isEnrolled) {
+        const isInstructor = (accountId === course.creatorId)
+        
+        if (!isInstructor || !isEnrolled) {
             throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
         }
 
@@ -475,7 +477,7 @@ export class PostsService {
 
         const numberOfRewardedComments = filteredComments.length
         
-        const isInstructor = (accountId === course.creatorId)
+
 
         if(!isInstructor){
             if (isRewardable) {
