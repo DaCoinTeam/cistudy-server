@@ -147,15 +147,15 @@ export class PostsService {
 
         let earnAmount: number
 
-        const numberOfUserPost = await this.postMySqlRepository.find({
-            where: {
-                creatorId: accountId,
-                courseId
-            }
-        })
+        if (!isInstructor) {
+            const numberOfUserPost = await this.postMySqlRepository.find({
+                where: {
+                    creatorId: accountId,
+                    courseId
+                }
+            })
 
-        if (numberOfUserPost.length < 3) {
-            if (accountId !== creatorId) {
+            if (numberOfUserPost.length < 3) {
                 post.isRewardable = true
                 const { priceAtEnrolled } = await this.enrolledInfoMySqlRepository.findOneBy({ accountId, courseId })
 
@@ -178,8 +178,8 @@ export class PostsService {
                     type: NotificationType.Transaction,
                     description: `You have received ${earnAmount} STARCI(s)`,
                 })
-            }
 
+            }
         }
 
         const { postId } = await this.postMySqlRepository.save(post)
@@ -460,8 +460,8 @@ export class PostsService {
         })
         const isInstructor = (accountId === course.creatorId)
 
-        if (!isInstructor ) {
-            if(!isEnrolled){
+        if (!isInstructor) {
+            if (!isEnrolled) {
                 throw new ConflictException(`You must be enrolled to course: ${course.title} to interact with this post`)
             }
         }
@@ -856,8 +856,7 @@ export class PostsService {
             receiverId: postComment.creatorId,
             referenceLink: `/posts/${postId}`,
             title: "Your comment has been marked as post's solution",
-            description: `
-                        Your comment on the post "${postComment.post.title}" has been marked as the solution by the post owner. 
+            description: `Your comment on the post "${postComment.post.title}" has been marked as the solution by the post owner. 
                         ${isRewardable ? "You will receive an amount of STARCI for this." : null} Keep up the great work!`
         })
 
