@@ -643,6 +643,29 @@ type RoleEntity {
   accountRoles: AccountEntity!
 }
 
+type AccountQualificationEntity {
+  accountQualificationId: ID!
+  accountId: ID!
+  name: String!
+  fileId: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  account: AccountEntity!
+}
+
+type AccountJobEntity {
+  accountJobId: ID!
+  accountId: ID!
+  companyName: String!
+  companyThumbnailId: ID!
+  role: String!
+  startDate: DateTime!
+  endDate: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  account: AccountEntity!
+}
+
 type AccountEntity {
   accountId: ID!
   email: String!
@@ -651,7 +674,6 @@ type AccountEntity {
   avatarUrl: String
   coverPhotoId: ID
   phoneNumber: String
-  job: String
   username: String
   balance: Float
   walletAddress: String
@@ -680,11 +702,14 @@ type AccountEntity {
   selfReviews: [AccountReviewEntity!]!
   reportAccounts: [ReportAccountEntity!]!
   accountReports: [ReportAccountEntity!]!
+  accountJobs: [AccountJobEntity!]!
+  accountQualifications: [AccountQualificationEntity!]!
   completeResources: [CompleteResourceEntity!]!
   courseProgress: [ProgressEntity!]!
   sentNotifications: [NotificationEntity!]!
   receiveNotifications: [NotificationEntity!]!
   transactionDetails: [TransactionDetailEntity!]
+  instructorStatus: String!
   followed: Boolean!
   numberOfFollowers: Int!
   accountRatings: AccountRating

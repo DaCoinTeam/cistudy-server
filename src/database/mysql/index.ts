@@ -45,9 +45,13 @@ import { CompleteResourceEntity as CompleteResourceMySqlEntity } from "./complet
 import { NotificationEntity as NotificationMySqlEntity } from "./notification.entity"
 import { TransactionDetailEntity as TransactionDetailMySqlEntity } from "./transaction-detail.entity"
 import { ConfigurationEntity as ConfigurationMySqlEntity } from "./configuration.entity"
+import { AccountQualificationEntity as AccountQualificationMySqlEntity } from "./account-qualification.entity"
+import { AccountJobEntity as AccountJobMySqlEntity } from "./account-job.entity"
 
 export {
     AccountMySqlEntity,
+    AccountQualificationMySqlEntity,
+    AccountJobMySqlEntity,
     RoleMySqlEntity,
     AccountReviewMySqlEntity,
     PostMySqlEntity,

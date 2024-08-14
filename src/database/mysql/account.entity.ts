@@ -1,4 +1,4 @@
-import { AccountKind } from "@common"
+import { AccountKind, InstructorStatus } from "@common"
 import { Field, Float, ID, Int, ObjectType } from "@nestjs/graphql"
 import { 
     Column, 
@@ -31,6 +31,8 @@ import { CompleteResourceEntity } from "./complete-resource.entity"
 import { ProgressEntity } from "./progress.entity"
 import { NotificationEntity } from "./notification.entity"
 import { TransactionDetailEntity } from "./transaction-detail.entity"
+import { AccountQualificationEntity } from "./account-qualification.entity"
+import { AccountJobEntity } from "./account-job.entity"
 
 
 @ObjectType()
@@ -63,10 +65,6 @@ export class AccountEntity {
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 12, default: null })
         phoneNumber: string
-
-    @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", length: 60, default: null })
-        job: string
 
     @Field(() => String, { nullable: true })
     @Column({ type: "varchar", length: 60, default: null })
@@ -206,6 +204,14 @@ export class AccountEntity {
     @Field(() => [ReportAccountEntity])
     @OneToMany(() => ReportAccountEntity, (accountReports) => accountReports.reporterAccount, { nullable: true })
         accountReports?: Array<ReportAccountEntity>
+
+    @Field(() => [AccountJobEntity])
+    @OneToMany(() => AccountJobEntity, (accountJobs) => accountJobs.account, { nullable: true })
+        accountJobs?: Array<AccountJobEntity>
+    
+    @Field(() => [AccountQualificationEntity])
+    @OneToMany(() => AccountQualificationEntity, (accounQualifications) => accounQualifications.account, { nullable: true })
+        accountQualifications?: Array<AccountQualificationEntity>
     
     @Field(() => [CompleteResourceEntity])
     @OneToMany(() => CompleteResourceEntity, (completeResource) => completeResource.account, { nullable: true })
@@ -226,6 +232,10 @@ export class AccountEntity {
     @Field(() => [TransactionDetailEntity], { nullable: true },)
     @OneToMany(() => TransactionDetailEntity, (transactionDetail) => transactionDetail.account, { nullable: true })
         transactionDetails?: Array<TransactionDetailEntity>
+
+    @Field(() => String)
+    @Column({ type: "enum", enum: InstructorStatus, default: InstructorStatus.NotRegistered })
+        instructorStatus: InstructorStatus
 
     //graphql
     @Field(() => Boolean)

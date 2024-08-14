@@ -14,8 +14,8 @@ import {
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { AccountId, AuthInterceptor, DataFromBody, JwtAuthGuard, Roles } from "../shared"
-import { DepositData, IsSastifyCommunityStandardInput, MarkNotificationAsReadInputData, UpdateProfileData, WithdrawData } from "./profile.input"
-import { updateProfileSchema } from "./profile.schema"
+import { AddJobInputData, DepositData, IsSastifyCommunityStandardInput, MarkNotificationAsReadInputData, UpdateJobInputData, UpdateProfileData, WithdrawData } from "./profile.input"
+import { addJobSchema, addQualificationSchema, updateJobSchema, updateProfileSchema } from "./profile.schema"
 import { ProfileService } from "./profile.service"
 
 @ApiTags("Profile")
@@ -46,6 +46,95 @@ export class ProfileController{
             data,
     		files
     	}) 
+    }
+
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: addJobSchema })
+    @Post("add-job")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+        AuthInterceptor,
+        FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
+    )
+    async addJob(
+        @AccountId() accountId: string,
+        @DataFromBody() data: AddJobInputData,
+        @UploadedFiles() { files }: Files,
+    ) {     
+    	return this.profileService.addJob({
+    		accountId,
+            data,
+    		files
+    	}) 
+    }
+
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: updateJobSchema })
+    @Put("update-account-job")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+        AuthInterceptor,
+        FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
+    )
+    async updateJob(
+        @AccountId() accountId: string,
+        @DataFromBody() data: UpdateJobInputData,
+        @UploadedFiles() { files }: Files,
+    ) {     
+    	return this.profileService.updateJob({
+    		accountId,
+            data,
+    		files
+    	}) 
+    }
+
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: addQualificationSchema })
+    @Post("add-qualification")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+        AuthInterceptor,
+        FileFieldsInterceptor([{ name: "files" }]),
+    )
+    async addQualification(
+        @AccountId() accountId: string,
+        @DataFromBody() data: null,
+        @UploadedFiles() { files }: Files,
+    ) {     
+    	return this.profileService.addQualification({
+    		accountId,
+            data,
+    		files
+    	}) 
+    }
+
+    @ApiBearerAuth()
+    @Delete("delete-job/:accountJobId")
+    @UseGuards(JwtAuthGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async deletePost(@AccountId() accountId: string, @Param("accountJobId") accountJobId: string) {
+        return await this.profileService.deleteJob({
+            accountId, data: {
+                accountJobId
+            }
+        })
+    }
+
+    @ApiBearerAuth()
+    @Delete("delete-qualification/:accountQualificationId")
+    @UseGuards(JwtAuthGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async deleteAccountQualification(@AccountId() accountId: string, @Param("accountQualificationId") accountQualificationId: string) {
+        return await this.profileService.deleteQualification({
+            accountId, data: {
+                accountQualificationId
+            }
+        })
     }
 
     @ApiBearerAuth()

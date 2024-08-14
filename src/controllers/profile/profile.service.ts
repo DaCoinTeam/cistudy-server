@@ -1,12 +1,16 @@
 import {
+    InstructorStatus,
     NotificationType,
+    SystemRoles,
     TransactionType,
     computeDenomination,
     computeRaw,
     existKeyNotUndefined,
 } from "@common"
 import {
+    AccountJobMySqlEntity,
     AccountMySqlEntity,
+    AccountQualificationMySqlEntity,
     NotificationMySqlEntity,
     TransactionMongoEntity,
     TransactionMySqlEntity,
@@ -23,20 +27,32 @@ import { Model } from "mongoose"
 import { DeepPartial, In, Repository } from "typeorm"
 import Web3 from "web3"
 import {
+    AddJobInput,
+    AddQualificationInput,
+    DeleteJobInput,
     DeleteNotificationInput,
+    DeleteQualificationInput,
     DepositInput,
     IsSastifyCommunityStandardInput,
     MarkAllNotificationsAsReadInput,
     MarkNotificationAsReadInput,
+    RegisterInstructorInput,
+    UpdateJobInput,
     UpdateProfileInput,
     WithdrawInput,
 } from "./profile.input"
 import {
+    AddJobOutput,
+    AddQualificationInputOutput,
+    DeleteJobOutput,
     DeleteNotificationOutput,
+    DeleteQualificationOutput,
     DepositOutput,
     IsSastifyCommunityStandardOutput,
     MarkAllNotificationsAsReadOutput,
     MarkNotificationAsReadOutput,
+    RegisterInstructorOutput,
+    UpdateJobOutput,
     UpdateProfileOutput,
     WithdrawOutput,
 } from "./profile.output"
@@ -47,6 +63,10 @@ export class ProfileService {
     constructor(
         @InjectRepository(AccountMySqlEntity)
         private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+        @InjectRepository(AccountJobMySqlEntity)
+        private readonly accountJobMySqlRepository: Repository<AccountJobMySqlEntity>,
+        @InjectRepository(AccountQualificationMySqlEntity)
+        private readonly accountQualificationMySqlRepository: Repository<AccountQualificationMySqlEntity>,
         @InjectRepository(TransactionMySqlEntity)
         private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
         @InjectModel(TransactionMongoEntity.name)
@@ -105,6 +125,170 @@ export class ProfileService {
 
         return {
             message: "Profile Updated Successfully",
+        }
+    }
+
+    async addJob(input: AddJobInput): Promise<AddJobOutput> {
+        const { accountId, data, files } = input
+        const { companyName, role, startDate, endDate, companyLogoIndex } = data
+
+        const accountJob: DeepPartial<AccountJobMySqlEntity> = {
+            accountId,
+            companyName,
+            role,
+            startDate
+        }
+
+        const file = files.at(companyLogoIndex)
+        const { assetId } = await this.storageService.upload({
+            rootFile: file,
+        })
+        accountJob.companyThumbnailId = assetId
+
+        if (endDate) accountJob.endDate = endDate
+
+        await this.accountJobMySqlRepository.save(accountJob)
+
+        return {
+            message: "Account job added successfully"
+        }
+
+    }
+
+    async updateJob(input: UpdateJobInput): Promise<UpdateJobOutput> {
+        const { data , files } = input
+        const { accountJobId , companyName, role, startDate, endDate, companyLogoIndex } = data
+
+        const accountJob: DeepPartial<AccountJobMySqlEntity> = {
+            companyName,
+            role,
+            startDate
+        }
+
+        if (files) {
+            const file = files.at(companyLogoIndex)
+            const { assetId } = await this.storageService.upload({
+                rootFile: file,
+            })
+            accountJob.companyThumbnailId = assetId
+        }
+
+        if (endDate) accountJob.endDate = endDate
+
+        await this.accountJobMySqlRepository.update(accountJobId, accountJob)
+
+        return {
+            message: "Account job updated successfully"
+        }
+    }
+
+    async deleteJob(input: DeleteJobInput): Promise<DeleteJobOutput> {
+        const { data } = input
+        const { accountJobId } = data
+
+        const found = await this.accountJobMySqlRepository.findOneBy({accountJobId})
+        
+        if(!found){
+            throw new NotFoundException("Account's job not found")
+        }
+        const {companyThumbnailId} = found
+        await this.storageService.delete(companyThumbnailId)
+        await this.accountJobMySqlRepository.delete({ accountJobId })
+
+        return { message: "Account's job deleted successfully" }
+    }
+
+    async addQualification(input : AddQualificationInput) : Promise<AddQualificationInputOutput> {
+        const {accountId, files} = input
+
+        const promises: Array<Promise<void>> = []
+        for (const file of files) {
+            const promise = async () => {
+                const { assetId } = await this.storageService.upload({
+                    rootFile: file,
+                })
+                await this.accountQualificationMySqlRepository.save({
+                    accountId,
+                    fileId: assetId,
+                    name: file.originalname
+                })
+            }
+            promises.push(promise())
+        }
+        await Promise.all(promises)
+        
+        return {
+            message: "Qualification(s) has been added successfully"
+        }
+    }
+
+    async deleteQualification(
+        input: DeleteQualificationInput,
+    ): Promise<DeleteQualificationOutput> {
+        const { data } = input
+        const { accountQualificationId } = data
+
+        const qualification = await this.accountQualificationMySqlRepository.findOneBy({
+            accountQualificationId,
+        })
+
+        if (!qualification) {
+            throw new NotFoundException("Account's qualification not found")
+        }
+
+        await this.storageService.delete(qualification.fileId)
+        await this.accountQualificationMySqlRepository.delete({
+            accountQualificationId,
+        })
+
+        return {
+            message: "Account's qualification has been deleted successfully.",
+        }
+    }
+
+    async registerInstructor(input: RegisterInstructorInput): Promise<RegisterInstructorOutput> {
+        const { accountId } = input
+
+        const course = await this.accountMySqlRepository.findOneBy({ accountId })
+
+        if (!course) {
+            throw new NotFoundException("Course not found or has been deleted")
+        }
+
+        await this.accountMySqlRepository.update(accountId, {
+            instructorStatus: InstructorStatus.Pending,
+        })
+
+        await this.notificationMySqlRepository.save({
+            receiverId: accountId,
+            title: "Your request to become an instructor has been submitted",
+            type: NotificationType.Interact,
+            description: "Your request to become an instructor at CiStudy has been submitted. Thanks for choosing CiStudy.",
+        })
+
+        const moderators = (
+            await this.accountMySqlRepository.find({
+                relations: {
+                    roles: true,
+                },
+            })
+        ).filter(({ roles }) =>
+            roles.map(({ name }) => name).includes(SystemRoles.Moderator),
+        )
+
+        const notificationsToModerator: Array<
+            DeepPartial<NotificationMySqlEntity>
+        > = moderators.map(({ accountId }) => ({
+            receiverId: accountId,
+            title: "New instructor request has been submitted for verification",
+            type: NotificationType.Interact,
+            description: ""
+        }))
+
+        await this.notificationMySqlRepository.save(notificationsToModerator)
+
+        return {
+            message: "Your course has been submitted for review, thank you.",
         }
     }
 
@@ -253,7 +437,7 @@ export class ProfileService {
         })
 
         await this.notificationMySqlRepository.save(notifications.map(notification => {
-            notification.viewed = true 
+            notification.viewed = true
             return notification
         }))
 
@@ -263,9 +447,9 @@ export class ProfileService {
     }
 
 
-    async deleteNotification(input : DeleteNotificationInput) : Promise<DeleteNotificationOutput> {
+    async deleteNotification(input: DeleteNotificationInput): Promise<DeleteNotificationOutput> {
         const { data } = input
-        const {notificationId } = data
+        const { notificationId } = data
 
         await this.notificationMySqlRepository.delete({ notificationId })
 
@@ -274,7 +458,7 @@ export class ProfileService {
         }
     }
 
-    async isSastifyCommunityStandard(input : IsSastifyCommunityStandardInput) : Promise<IsSastifyCommunityStandardOutput> {
+    async isSastifyCommunityStandard(input: IsSastifyCommunityStandardInput): Promise<IsSastifyCommunityStandardOutput> {
         const { message } = input
         const data = await this.openapiService.isSatisfyCommunityStandard(message)
         return {

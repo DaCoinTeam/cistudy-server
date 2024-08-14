@@ -18,6 +18,8 @@ import {
     TransactionMongoEntity,
     TransactionMySqlEntity,
     NotificationMySqlEntity,
+    AccountJobMySqlEntity,
+    AccountQualificationMySqlEntity,
 } from "@database"
 import { ProfileService } from "./profile.service"
 import { MongooseModule } from "@nestjs/mongoose"
@@ -27,6 +29,8 @@ import { MongooseModule } from "@nestjs/mongoose"
         TypeOrmModule.forFeature([
             SessionMySqlEntity,
             AccountMySqlEntity,
+            AccountJobMySqlEntity,
+            AccountQualificationMySqlEntity,
             PostMySqlEntity,
             CourseMySqlEntity,
             EnrolledInfoMySqlEntity,

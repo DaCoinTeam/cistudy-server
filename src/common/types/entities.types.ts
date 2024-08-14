@@ -158,3 +158,14 @@ export enum NotificationType {
   Course = "course",
   Certificate = "certificate"
 }
+
+export enum InstructorStatus {
+  NotRegistered = "notRegistered",
+  Rejected = "rejected",
+  Pending = "pending",
+  Approved = "approved"
+}
+
+registerEnumType(InstructorStatus,{
+    name: "InstructorStatus"
+})

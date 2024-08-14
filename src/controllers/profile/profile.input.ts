@@ -17,7 +17,7 @@ export class UpdateProfileData {
 }
 export class UpdateProfileInput implements AuthInput<UpdateProfileData> {
     @IsUUID("4")
-    	accountId: string
+        accountId: string
     data: UpdateProfileData
     files: Array<Express.Multer.File>
 }
@@ -28,7 +28,7 @@ export class WithdrawData {
 }
 export class WithdrawInput implements AuthInput<WithdrawData> {
     @IsUUID("4")
-    	accountId: string
+        accountId: string
     data: WithdrawData
 }
 
@@ -38,18 +38,18 @@ export class DepositData {
     @ApiProperty()
         maxQueries?: number
     @ApiProperty()
-        queryIntervalMs?: number  
+        queryIntervalMs?: number
 }
 
 export class DepositInput implements AuthInput<DepositData> {
     @IsUUID("4")
-    	accountId: string
+        accountId: string
     data: DepositData
 }
 
 export class MarkNotificationAsReadInputData {
     @ApiProperty()
-        notificationIds : Array<string>
+        notificationIds: Array<string>
 }
 
 export class MarkNotificationAsReadInput implements AuthInput<MarkNotificationAsReadInputData> {
@@ -60,7 +60,7 @@ export class MarkNotificationAsReadInput implements AuthInput<MarkNotificationAs
 
 export class DeleteNotificationInputData {
     @ApiProperty()
-        notificationId : string
+        notificationId: string
 }
 
 export class DeleteNotificationInput implements AuthInput<DeleteNotificationInputData> {
@@ -76,4 +76,78 @@ export class MarkAllNotificationsAsReadInput implements AuthEmptyDataInput {
 export class IsSastifyCommunityStandardInput {
     @ApiProperty()
         message: string
+}
+
+export class AddJobInputData {
+    @ApiProperty()
+        companyName: string
+    @ApiProperty()
+        role: string
+    @ApiProperty()
+        startDate: Date
+    @ApiProperty()
+        endDate?: Date
+    @ApiProperty()
+        companyLogoIndex: number
+}
+
+export class AddJobInput implements AuthInput<AddJobInputData> {
+    accountId: string
+    data: AddJobInputData
+    files: Express.Multer.File[]
+}
+
+export class UpdateJobInputData {
+    @IsUUID("4")
+    @ApiProperty()
+        accountJobId?: string
+    @ApiProperty()
+        companyName?: string
+    @ApiProperty()
+        role?: string
+    @ApiProperty()
+        startDate?: Date
+    @ApiProperty()
+        endDate?: Date
+    @ApiProperty()
+        companyLogoIndex?: number
+}
+
+export class UpdateJobInput implements AuthInput<UpdateJobInputData> {
+    accountId: string
+    data: UpdateJobInputData
+    files?: Express.Multer.File[]
+}
+
+export class DeleteJobInputData {
+    @IsUUID()
+    @ApiProperty()
+        accountJobId : string
+}
+
+export class DeleteJobInput implements AuthInput<DeleteJobInputData> {
+    accountId: string
+    data: DeleteJobInputData
+}
+
+export class AddQualificationInput implements AuthInput<null> {
+    accountId: string
+    data: null
+    files: Express.Multer.File[]
+}
+
+export class DeleteQualificationInputData {
+    @IsUUID()
+    @ApiProperty()
+        accountQualificationId : string
+}
+
+export class DeleteQualificationInput implements AuthInput<DeleteQualificationInputData>{
+    accountId: string
+    data: DeleteQualificationInputData
+}
+
+export class RegisterInstructorInput implements AuthInput<null> {
+    accountId: string
+    data: null
 }

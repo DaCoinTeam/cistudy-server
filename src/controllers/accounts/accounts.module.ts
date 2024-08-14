@@ -1,5 +1,7 @@
 import {
+    AccountJobMySqlEntity,
     AccountMySqlEntity,
+    AccountQualificationMySqlEntity,
     AccountReviewMySqlEntity,
     CartMySqlEntity,
     CertificateMySqlEntity,
@@ -33,6 +35,8 @@ import { AccountsService } from "./accounts.service"
         TypeOrmModule.forFeature([
             SessionMySqlEntity,
             AccountMySqlEntity,
+            AccountJobMySqlEntity,
+            AccountQualificationMySqlEntity,
             PostMySqlEntity,
             CourseMySqlEntity,
             EnrolledInfoMySqlEntity,
