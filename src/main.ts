@@ -1,6 +1,6 @@
 import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
-import { appConfig, keysConfig } from "@config"
+import { appConfig, databaseConfig, keysConfig } from "@config"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 import {
     CoursesResolver,
@@ -20,6 +20,7 @@ import { join } from "path"
 import { getEnvValue } from "@common"
 import { RedisIoAdapter } from "@adapters"
 import { HttpsOptions } from "@nestjs/common/interfaces/external/https-options.interface"
+import { DataSource } from "typeorm"
 
 const generateSchema = async () => {
     const app = await NestFactory.create(GraphQLSchemaBuilderModule)
@@ -42,6 +43,30 @@ const generateSchema = async () => {
         printSchema(schema),
     )
 }
+
+const createDatabase = async () => {
+    const master = new DataSource({
+        type: "mysql",
+        host: databaseConfig().mysql.host,
+        port: databaseConfig().mysql.port,
+        username: databaseConfig().mysql.username,
+        password: databaseConfig().mysql.password,
+    })
+
+    const promises: Array<Promise<void>> = []
+
+    promises.push(
+        (async () => {
+            const dataSource = await master.initialize()
+            await dataSource
+                .createQueryRunner()
+                .createDatabase(databaseConfig().mysql.schema, true)
+        })(),
+    )
+
+    await Promise.all(promises)
+}
+
 
 const bootstrap = async () => {
     const httpsOptions: HttpsOptions = getEnvValue({
@@ -78,4 +103,4 @@ const bootstrap = async () => {
     await app.listen(appConfig().port || 3001)
 } 
  
-generateSchema().then(() => bootstrap())
+generateSchema().then(() => createDatabase().then(() => bootstrap()))
