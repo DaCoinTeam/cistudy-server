@@ -1,4 +1,4 @@
-import { AuthInput, CourseVerifyStatus, ReportProcessStatus, SystemRoles } from "@common"
+import { AuthInput, CourseVerifyStatus, InstructorStatus, ReportProcessStatus, SystemRoles } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsUUID, Max, Min, MinLength } from "class-validator"
 
@@ -262,4 +262,20 @@ export class CreateAccountInputData {
 export class CreateAccountInput implements AuthInput<CreateAccountInputData> {
     accountId: string
     data: CreateAccountInputData
+}
+
+export class VerifyInstructorInputData {
+    @ApiProperty()
+    @IsUUID("4")
+        instructorId: string
+    @ApiProperty()
+        verifyStatus: InstructorStatus
+    @ApiProperty()
+    @MinLength(20)
+        note: string
+}
+
+export class VerifyInstructorInput implements AuthInput<VerifyInstructorInputData> {
+    accountId: string
+    data: VerifyInstructorInputData
 }

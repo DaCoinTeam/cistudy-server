@@ -10,6 +10,7 @@ import {
     FindManyFollowersInputData,
     FindManyNotificationsInputData,
     FindManyPendingCourseInputData,
+    FindManyPendingInstructorInputData,
     FindOneAccountInputData,
     FindOneAdminAccountInputData,
 } from "./accounts.input"
@@ -21,6 +22,7 @@ import {
     FindManyAdminTransactionsOutput,
     FindManyNotificationsOutput,
     FindManyPendingCourseOutput,
+    FindManyPendingInstructorOutput,
     FindOneAdminAccountOutput,
     GetAdminAnalyticsOutput,
 } from "./accounts.output"
@@ -78,6 +80,16 @@ export class AccountsResolver {
     @AccountId() accountId: string,
   ) {
       return await this.accountsService.findManyPendingCourse({ accountId, data })
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(AuthInterceptor)
+  @Query(() => FindManyPendingInstructorOutput)
+  async findManyPendingInstructors(
+    @Args("data") data: FindManyPendingInstructorInputData,
+    @AccountId() accountId: string,
+  ) {
+      return await this.accountsService.findManyPendingInstructor({ accountId, data })
   }
 
   @UseGuards(JwtAuthGuard)

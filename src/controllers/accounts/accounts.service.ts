@@ -1,4 +1,4 @@
-import { CourseVerifyStatus, NotificationType, ReportProcessStatus, SystemRoles } from "@common"
+import { CourseVerifyStatus, InstructorStatus, NotificationType, ReportProcessStatus, SystemRoles } from "@common"
 import {
     AccountMySqlEntity,
     AccountReviewMySqlEntity,
@@ -30,7 +30,8 @@ import {
     UpdateAccountReportInput,
     UpdateAccountReviewInput,
     UpdateAccountRoleInput,
-    VerifyCourseInput
+    VerifyCourseInput,
+    VerifyInstructorInput
 } from "./accounts.input"
 import {
     CreateAccountOutput,
@@ -43,7 +44,8 @@ import {
     UpdateAccountOutput,
     UpdateAccountReportOutput,
     UpdateAccountRoleOutput,
-    VerifyCourseOuput
+    VerifyCourseOuput,
+    VerifyInstructorOuput
 } from "./accounts.output"
 
 @Injectable()
@@ -119,6 +121,54 @@ export class AccountsService {
         return responseMessage(followId, !followed)
     }
 
+    async verifyInstructor(input: VerifyInstructorInput): Promise<VerifyInstructorOuput> {
+        const { data } = input
+        const { instructorId, verifyStatus, note } = data
+
+        const account = await this.accountMySqlRepository.findOne({
+            where: {
+                accountId: instructorId,
+                verified: true
+            }
+        })
+
+        if (!account) {
+            throw new ConflictException("Account not found or has not been verified")
+        }
+
+        if(account.instructorStatus !== InstructorStatus.Pending){
+            throw new ConflictException("Instructor request is not submitted for verifying or it has been verified")
+        }
+
+        await this.mailerService.sendVerifyInstructorMail(account.email, account.username, note, verifyStatus)
+
+        await this.accountMySqlRepository.update({accountId: instructorId}, { instructorStatus: verifyStatus })
+
+        if (verifyStatus === InstructorStatus.Approved) {
+            await this.roleMySqlRepository.save({
+                accountId: instructorId,
+                name: SystemRoles.Instructor
+            })
+            
+            await this.notificationMySqlRepository.save({
+                receiverId: instructorId,
+                title: "You have new updates on your instructor request",
+                type: NotificationType.Instructor,
+                description: "Your request to be an instructor has been accepted, you can now starting to create courses. Thanks for choosing CiStudy!"
+            })
+        } else {
+            await this.notificationMySqlRepository.save({
+                receiverId: instructorId,
+                title: "You have new updates on your instructor request",
+                type: NotificationType.Instructor,
+                description: "Your request to be an instructor has been rejected due to issues identified by our moderation team. Please check your email for more details."
+            })
+        }
+
+        return {
+            message: "Account's Instructor Status Updated",
+        }
+    }
 
     async verifyCourse(input: VerifyCourseInput): Promise<VerifyCourseOuput> {
         const { data } = input
@@ -146,12 +196,6 @@ export class AccountsService {
         await this.courseMySqlRepository.update(courseId, { verifyStatus })
 
         if (verifyStatus === CourseVerifyStatus.Approved) {
-            if (creator.courses && creator.courses.every(course => course.verifyStatus !== CourseVerifyStatus.Approved)) {
-                await this.roleMySqlRepository.save({
-                    accountId: creator.accountId,
-                    name: SystemRoles.Instructor
-                })
-            }
             await this.notificationMySqlRepository.save({
                 receiverId: course.creatorId,
                 title: "You have new updates on your created course",

@@ -40,16 +40,16 @@ export const acceptCourseMail = (username: string, email: string, title: string)
         </div>
         <div class="content">
             <h3>Dear ${username ? username : email},</h3>
-            <p>We are pleased to inform you that your course submission on <span style="color: #14B8A6;">Ci</span><span style="color: #116761;">Study</span> has been successfully reviewed and approved. Your course has met all the necessary criteria and standards set by our team.</p>
+            <p>We are pleased to inform you that your course submission on <span style="color: #60A5FA;">Ci</span><span style="color: #116761;">Study</span> has been successfully reviewed and approved. Your course has met all the necessary criteria and standards set by our team.</p>
             <p>Your course titled <strong>"${title ?? "Untitled"}"</strong> has been thoroughly evaluated and we are delighted to inform you that it has been approved. You can now see your course live on our platform and accessible to all users.</p>
             <p>We appreciate the effort and dedication you have put into creating this course. We believe it will be a valuable resource for learners on our platform.</p>
             <p>Should you have any questions or need further assistance, please do not hesitate to contact our support team.</p>
-            <p>Thank you for being a part of <span style="color: #14B8A6;">Ci</span><span style="color: #116761;">Study</span>.</p>
+            <p>Thank you for being a part of <span style="color: #60A5FA;">Ci</span><span style="color: #006FEE;">Study</span>.</p>
             <p>Best regards,</p>
             Cistudy Support Team</p>
         </div>
         <div class="footer">
-            <p>&copy; 2024 <span style="color: #14B8A6;">Ci</span><span style="color: #116761;">Study</span>. All rights reserved.</p>
+            <p>&copy; 2024 <span style="color: #60A5FA;">Ci</span><span style="color: #006FEE;">Study</span>. All rights reserved.</p>
             <p>This email was sent from an automated system, please do not reply to this email.</p>
         </div>
     </div>
@@ -95,7 +95,7 @@ export const rejectCourseMail = (username: string, email: string, title: string,
             padding: 10px 20px;
             margin: 10px 0;
             color: white;
-            background-color: #14B8A6;
+            background-color: #60A5FA;
             text-decoration: none;
             border-radius: 5px;
         }
@@ -108,7 +108,7 @@ export const rejectCourseMail = (username: string, email: string, title: string,
         </div>
         <div class="content">
             <h3>Dear ${username ?? email},</h3>
-            <p>Thank you for your recent course submission on <span style="color: #14B8A6, font-weight:900">Ci</span><span style="color: #116761, font-weight:900">Study</span>. We appreciate your effort in contributing to our learning community.</p>
+            <p>Thank you for your recent course submission on <span style="color: #60A5FA, font-weight:900">Ci</span><span style="color: #006FEE, font-weight:900">Study</span>. We appreciate your effort in contributing to our learning community.</p>
             <p>After a thorough review of your course titled <strong>"${title}"</strong>, we regret to inform you that it does not meet the necessary criteria and standards for approval.</p>
             ${note ? `
             <p>We also gives you a note about your course's content that require improvement: </p>
@@ -121,17 +121,151 @@ export const rejectCourseMail = (username: string, email: string, title: string,
             <p style="text-align: center;">
                 <a href="https://cistudy-client-2.vercel.app/courses/${courseId}/management" class="button">Go to this course management</a>
             </p>
-            <p>Thank you for your understanding and continued support of <span style="color: #14B8A6;">Ci</span><span style="color: #116761;">Study</span>.</p>
+            <p>Thank you for your understanding and continued support of <span style="color: #60A5FA;">Ci</span><span style="color: #006FEE;">Study</span>.</p>
             <p>Best regards,</p>
             Cistudy Support Team</p>
         </div>
         <div class="footer">
-            <p>&copy; 2024 <span style="color: #14B8A6;">Ci</span><span style="color: #116761;">Study</span>. All rights reserved.</p>
+            <p>&copy; 2024 <span style="color: #60A5FA;">Ci</span><span style="color: #006FEE;">Study</span>. All rights reserved.</p>
             <p>This email was sent from an automated system, please do not reply to this email.</p>
         </div>
     </div>
 </body>
 </html>
+        `
+
+export const acceptInstructorMail = (username: string, email: string) => `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    margin: 0;
+                    padding: 0;
+                }
+                .container {
+                    padding: 20px;
+                    background-color: #f9f9f9;
+                }
+                .header {
+                    background-color: #D9D9DB;
+                    padding: 10px 20px;
+                    color: black;
+                    text-align: center;
+                }
+                .content {
+                    margin: 20px 0;
+                }
+                .footer {
+                    margin-top: 20px;
+                    font-size: 0.9em;
+                    color: #777;
+                    text-align: center;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>INSTRUCTOR REGISTRATION RESULT</h1>
+                </div>
+                <div class="content">
+                    <h3>Dear ${username ?? email},</h3>
+                    <p>We are pleased to inform you that your application to become an instructor on <span style="color: #60A5FA;">Ci</span><span style="color: #116761;">Study</span> has been successfully reviewed and approved.</p>
+                    <p>Congratulations! You are now officially an instructor on our platform. You can start creating and managing your courses immediately.</p>
+                    <p>We are excited to see the valuable content you will bring to our learners.</p>
+                    <p>Should you have any questions or need further assistance, please do not hesitate to contact our support team.</p>
+                    <p>Thank you for being a part of <span style="color: #60A5FA;">Ci</span><span style="color: #006FEE;">Study</span>.</p>
+                    <p>Best regards,</p>
+                    CiStudy Support Team</p>
+                </div>
+                <div class="footer">
+                    <p>&copy; 2024 <span style="color: #60A5FA;">Ci</span><span style="color: #006FEE;">Study</span>. All rights reserved.</p>
+                    <p>This email was sent from an automated system, please do not reply to this email.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        `
+
+export const rejectInstructorMail = (username: string, email: string, note: string) => `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Your Instructor Application Status on CiStudy</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    margin: 0;
+                    padding: 0;
+                }
+                .container {
+                    padding: 20px;
+                    background-color: #f9f9f9;
+                }
+                .header {
+                    background-color: #D9D9DB;
+                    padding: 10px 20px;
+                    color: black;
+                    text-align: center;
+                }
+                .content {
+                    margin: 20px 0;
+                }
+                .footer {
+                    margin-top: 20px;
+                    font-size: 0.9em;
+                    color: #777;
+                    text-align: center;
+                }
+                .button {
+                    display: inline-block;
+                    padding: 10px 20px;
+                    margin: 10px 0;
+                    color: white;
+                    background-color: #60A5FA;
+                    text-decoration: none;
+                    border-radius: 5px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>INSTRUCTOR REGISTRATION RESULT</h1>
+                </div>
+                <div class="content">
+                    <h3>Dear ${username ?? email},</h3>
+                    <p>Thank you for your recent application to become an instructor on <span style="color: #60A5FA;">Ci</span><span style="color: #006FEE;">Study</span>. We appreciate your effort in wanting to contribute to our learning community.</p>
+                    <p>After careful consideration, we regret to inform you that your application does not meet the necessary criteria for approval at this time.</p>
+                    ${note ? `
+                    <p>Here are some points that you may want to consider for improvement: </p>
+                    <ul>
+                        <p>${note}</p>
+                    </ul>        
+                    ` : null}
+                    <p>We encourage you to review the feedback and reapply after making the necessary adjustments. We value your commitment and would love to see you succeed as an instructor on our platform.</p>
+                    <p>If you have any questions or need further guidance, please feel free to contact our support team.</p>
+                    <p>Thank you for your understanding and continued support of <span style="color: #60A5FA;">Ci</span><span style="color: #006FEE;">Study</span>.</p>
+                    <p>Best regards,</p>
+                    CiStudy Support Team</p>
+                </div>
+                <div class="footer">
+                    <p>&copy; 2024 <span style="color: #60A5FA;">Ci</span><span style="color: #006FEE;">Study</span>. All rights reserved.</p>
+                    <p>This email was sent from an automated system, please do not reply to this email.</p>
+                </div>
+            </div>
+        </body>
+        </html>
         `
 export const verifyAccountMail = (username: string, email: string, frontendUrl: string, token: string) => `
             <!DOCTYPE html>
@@ -228,7 +362,7 @@ export const reportAccountMail = (reporterUsername: string, reportedUsername:str
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .header {
-            background-color: #116761;
+            background-color: #006FEE;
             padding: 20px;
             color: white;
             text-align: center;
@@ -247,7 +381,7 @@ export const reportAccountMail = (reporterUsername: string, reportedUsername:str
             margin: 5px 0;
         }
         .highlight {
-            color: #14B8A6;
+            color: #60A5FA;
         }
         h1 {
             font-size: 1.5em;
@@ -297,7 +431,7 @@ export const reportAccountMail = (reporterUsername: string, reportedUsername:str
             <p>Best regards,</p>
             <p>CiStudy Support Team</p>
             <p>support@cistudy.com</p>
-            <p>&copy; 2024 <span class="highlight">Ci</span><span style="color: #116761;">Study</span>. All rights reserved.</p>
+            <p>&copy; 2024 <span class="#60A5FA">Ci</span><span style="color: #006FEE;">Study</span>. All rights reserved.</p>
             <p>This email was sent from an automated system, please do not reply to this email.</p>
         </div>
     </div>
@@ -328,7 +462,7 @@ export const reportCourseMail = (reportedCourseCreatorEmail: string, reporterUse
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .header {
-            background-color: #116761;
+            background-color: #006FEE;
             padding: 20px;
             color: white;
             text-align: center;
@@ -347,7 +481,7 @@ export const reportCourseMail = (reportedCourseCreatorEmail: string, reporterUse
             margin: 5px 0;
         }
         .highlight {
-            color: #14B8A6;
+            color: #60A5FA;
         }
         h1 {
             font-size: 1.5em;
@@ -397,7 +531,7 @@ export const reportCourseMail = (reportedCourseCreatorEmail: string, reporterUse
             <p>Best regards,</p>
             <p>CiStudy Support Team</p>
             <p>support@cistudy.com</p>
-            <p>&copy; 2024 <span class="highlight">Ci</span><span style="color: #116761;">Study</span>. All rights reserved.</p>
+            <p>&copy; 2024 <span class="#60A5FA">Ci</span><span style="color: #006FEE;">Study</span>. All rights reserved.</p>
             <p>This email was sent from an automated system, please do not reply to this email.</p>
         </div>
     </div>
@@ -428,7 +562,7 @@ export const reportPostMail = (reportedPostCreatorEmail: string, reporterUsernam
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .header {
-            background-color: #116761;
+            background-color: #006FEE;
             padding: 20px;
             color: white;
             text-align: center;
@@ -447,7 +581,7 @@ export const reportPostMail = (reportedPostCreatorEmail: string, reporterUsernam
             margin: 5px 0;
         }
         .highlight {
-            color: #14B8A6;
+            color: #60A5FA;
         }
         h1 {
             font-size: 1.5em;
@@ -497,7 +631,7 @@ export const reportPostMail = (reportedPostCreatorEmail: string, reporterUsernam
             <p>Best regards,</p>
             <p>CiStudy Support Team</p>
             <p>support@cistudy.com</p>
-            <p>&copy; 2024 <span class="highlight">Ci</span><span style="color: #116761;">Study</span>. All rights reserved.</p>
+            <p>&copy; 2024 <span class="#60A5FA">Ci</span><span style="color: #006FEE;">Study</span>. All rights reserved.</p>
             <p>This email was sent from an automated system, please do not reply to this email.</p>
         </div>
     </div>
@@ -527,7 +661,7 @@ export const reportPostCommentMail = (reportedPostCommentCreatorEmail: string, r
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .header {
-            background-color: #116761;
+            background-color: #006FEE;
             padding: 20px;
             color: white;
             text-align: center;
@@ -546,7 +680,7 @@ export const reportPostCommentMail = (reportedPostCommentCreatorEmail: string, r
             margin: 5px 0;
         }
         .highlight {
-            color: #14B8A6;
+            color: #60A5FA;
         }
         h1 {
             font-size: 1.5em;
@@ -596,7 +730,7 @@ export const reportPostCommentMail = (reportedPostCommentCreatorEmail: string, r
             <p>Best regards,</p>
             <p>CiStudy Support Team</p>
             <p>support@cistudy.com</p>
-            <p>&copy; 2024 <span class="highlight">Ci</span><span style="color: #116761;">Study</span>. All rights reserved.</p>
+            <p>&copy; 2024 <span class="#60A5FA">Ci</span><span style="color: #006FEE;">Study</span>. All rights reserved.</p>
             <p>This email was sent from an automated system, please do not reply to this email.</p>
         </div>
     </div>

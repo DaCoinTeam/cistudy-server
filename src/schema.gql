@@ -988,6 +988,20 @@ type FindOneAdminAccountOutput {
   tokens: AuthTokens
 }
 
+type FindManyPendingInstructorOutputMetadata {
+  count: Int
+}
+
+type FindManyPendingInstructorOutputData {
+  results: [AccountEntity!]!
+  metadata: FindManyPendingInstructorOutputMetadata!
+}
+
+type FindManyPendingInstructorOutput {
+  data: FindManyPendingInstructorOutputData!
+  tokens: AuthTokens
+}
+
 type FindManySelfCreatedCoursesOutputMetadata {
   count: Int
 }
@@ -1157,6 +1171,7 @@ type Query {
   findManyAccountReviews(data: FindManyAccountReviewsInputData!): FindManyAccountReviewsOutputData!
   findManyAccountReports(data: FindManyAccountReportsInputData!): FindManyAccountReportsOutput!
   findManyPendingCourses(data: FindManyPendingCourseInputData!): FindManyPendingCourseOutput!
+  findManyPendingInstructors(data: FindManyPendingInstructorInputData!): FindManyPendingInstructorOutput!
   findManyAdminTransactions(data: FindManyAdminTransactionsInputData!): FindManyAdminTransactionsOutput!
   findManyNotifications(data: FindManyNotificationsInputData!): FindManyNotificationsOutput!
   getAdminAnalytics: GetAdminAnalyticsOutput!
@@ -1451,6 +1466,15 @@ input FindManyPendingCourseInputData {
 }
 
 input FindManyPendingCourseInputOptions {
+  take: Int
+  skip: Int
+}
+
+input FindManyPendingInstructorInputData {
+  options: FindManyPendingInstructorInputOptions
+}
+
+input FindManyPendingInstructorInputOptions {
   take: Int
   skip: Int
 }

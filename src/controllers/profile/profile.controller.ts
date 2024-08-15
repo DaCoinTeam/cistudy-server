@@ -101,12 +101,11 @@ export class ProfileController{
     )
     async addQualification(
         @AccountId() accountId: string,
-        @DataFromBody() data: null,
         @UploadedFiles() { files }: Files,
     ) {     
     	return this.profileService.addQualification({
     		accountId,
-            data,
+            data : undefined,
     		files
     	}) 
     }
@@ -114,7 +113,7 @@ export class ProfileController{
     @ApiBearerAuth()
     @Delete("delete-job/:accountJobId")
     @UseGuards(JwtAuthGuard)
-    @Roles(SystemRoles.User)
+    //@Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async deletePost(@AccountId() accountId: string, @Param("accountJobId") accountJobId: string) {
         return await this.profileService.deleteJob({
@@ -134,6 +133,19 @@ export class ProfileController{
             accountId, data: {
                 accountQualificationId
             }
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("register-instructor")
+    @UseGuards(JwtAuthGuard)
+    //@Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async registerInstructor(
+        @AccountId() accountId: string,
+    ) {
+        return await this.profileService.registerInstructor({
+            accountId
         })
     }
 

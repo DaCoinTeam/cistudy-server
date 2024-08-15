@@ -1,4 +1,4 @@
-import { CourseVerifyStatus } from "@common"
+import { CourseVerifyStatus, InstructorStatus } from "@common"
 import {
     AccountMySqlEntity,
     AccountReviewMySqlEntity,
@@ -22,6 +22,7 @@ import {
     FindManyFollowersInput,
     FindManyNotificationsInput,
     FindManyPendingCourseInput,
+    FindManyPendingInstructorInput,
     FindOneAccountInput,
     FindOneAdminAccountInput
 } from "./accounts.input"
@@ -32,6 +33,7 @@ import {
     FindManyAdminTransactionsOutputData,
     FindManyNotificationsOutputData,
     FindManyPendingCourseOutputData,
+    FindManyPendingInstructorOutputData,
     GetAdminAnalyticsOutputData,
 } from "./accounts.output"
 
@@ -73,6 +75,9 @@ export class AccountsService {
             where: {
                 accountId,
             },
+            relations:{
+                accountJobs: true
+            }
         })
 
         const follow = await this.followMySqlRepository.findOne({
@@ -240,6 +245,35 @@ export class AccountsService {
             results,
             metadata: {
                 count: numberOfPendingCourse,
+            },
+        }
+    }
+
+    async findManyPendingInstructor(
+        input: FindManyPendingInstructorInput,
+    ): Promise<FindManyPendingInstructorOutputData> {
+        const { data } = input
+        const { options } = data
+        const { skip, take } = options
+
+        const results = await this.accountMySqlRepository.find({
+            where: {
+                instructorStatus: InstructorStatus.Pending,
+            },
+            skip,
+            take,
+        })
+
+        const numberOfPendingInstructor = await this.accountMySqlRepository.count({
+            where: {
+                instructorStatus: InstructorStatus.Pending,
+            },
+        })
+
+        return {
+            results,
+            metadata: {
+                count: numberOfPendingInstructor,
             },
         }
     }

@@ -182,3 +182,25 @@ export class FindOneAdminAccountOutput implements AuthOutput<AccountMySqlEntity>
     @Field(() => AuthTokens, { nullable: true })
         tokens?: AuthTokens
 }
+
+@ObjectType()
+export class FindManyPendingInstructorOutputMetadata {
+    @Field(() => Int, { nullable: true })
+        count?: number
+}
+
+@ObjectType()
+export class FindManyPendingInstructorOutputData implements ResultsWithMetadata<AccountMySqlEntity, FindManyPendingInstructorOutputMetadata>{
+    @Field(() => [AccountMySqlEntity])
+        results: Array<AccountMySqlEntity>
+    @Field(() => FindManyPendingInstructorOutputMetadata)
+        metadata?: FindManyPendingInstructorOutputMetadata
+}
+
+@ObjectType()
+export class FindManyPendingInstructorOutput implements AuthOutput<FindManyPendingInstructorOutputData> {
+    @Field(() => FindManyPendingInstructorOutputData)
+        data: FindManyPendingInstructorOutputData
+    @Field(() => AuthTokens, { nullable: true })
+        tokens?: AuthTokens
+}

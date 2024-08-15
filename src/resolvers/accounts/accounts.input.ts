@@ -229,3 +229,22 @@ export class FindOneAdminAccountInput implements AuthInput<FindOneAdminAccountIn
     accountId: string
     data: FindOneAdminAccountInputData
 }
+
+@InputType()
+export class FindManyPendingInstructorInputOptions {
+    @Field(() => Int, { nullable: true })
+        take?: number
+    @Field(() => Int, { nullable: true })
+        skip?: number
+}
+@InputType()
+export class FindManyPendingInstructorInputData implements OptionsOnly<FindManyPendingInstructorInputOptions>{
+    @Field(() => FindManyPendingInstructorInputOptions, { nullable: true })
+    @IsOptional()
+        options?: FindManyPendingInstructorInputOptions
+}
+
+export class FindManyPendingInstructorInput implements AuthInput<FindManyPendingInstructorInputData> {
+    accountId: string
+    data: FindManyPendingInstructorInputData
+}

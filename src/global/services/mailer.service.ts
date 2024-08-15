@@ -1,10 +1,10 @@
-import { CourseVerifyStatus, TokenType } from "@common"
+import { CourseVerifyStatus, InstructorStatus, TokenType } from "@common"
 import { appConfig, jwtConfig, servicesConfig } from "@config"
 import { CourseMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
 import { createTransport } from "nodemailer"
-import { acceptCourseMail, rejectCourseMail, reportAccountMail, reportCourseMail, reportPostCommentMail, reportPostMail, verifyAccountMail } from "../templates/mail.template"
+import { acceptCourseMail, acceptInstructorMail, rejectCourseMail, rejectInstructorMail, reportAccountMail, reportCourseMail, reportPostCommentMail, reportPostMail, verifyAccountMail } from "../templates/mail.template"
 
 @Injectable()
 export class MailerService {
@@ -21,13 +21,11 @@ export class MailerService {
 
     private verifyCourseMailOptions = (email: string, username: string, course: CourseMySqlEntity, note: string, verifyStatus: CourseVerifyStatus) => {
         const { title, courseId } = course
-        const acceptHTML = acceptCourseMail(username, email, title)
-        const rejectHTML = rejectCourseMail(username, email, title, note, courseId)
         return {
             from: servicesConfig().mailer.user,
             to: email,
             subject: "YOU HAVE NEW UPDATES ON YOUR SUBMITTED COURSE",
-            html: (verifyStatus === CourseVerifyStatus.Approved) ? acceptHTML : rejectHTML,
+            html: (verifyStatus === CourseVerifyStatus.Approved) ? acceptCourseMail(username, email, title) : rejectCourseMail(username, email, title, note, courseId),
 
         }
     }
@@ -44,6 +42,15 @@ export class MailerService {
             to: email,
             subject: "REGISTRATION CONFIRMATION - CISTUDY",
             html: verifyAccountMail(username, email, frontendUrl, token),
+        }
+    }
+
+    private verifyInstructorMailOptions = (email: string, username: string, note: string, verifyStatus: InstructorStatus) => {
+        return {
+            from: servicesConfig().mailer.user,
+            to: email,
+            subject: "INSTRUCTOR REGISTRATION RESULT",
+            html: (verifyStatus === InstructorStatus.Approved) ? acceptInstructorMail(username, email) : rejectInstructorMail(username,email,note),
         }
     }
 
@@ -73,7 +80,6 @@ export class MailerService {
             to: reportedPostCreatorEmail,
             subject: "You have received a report.",
             html: reportPostMail(reportedPostCreatorEmail, reporterUsername, postTitle, reportedDate, title, description, processStatus, processNote),
-
         }
     }
 
@@ -97,6 +103,21 @@ export class MailerService {
                 accountId, 
                 email, 
                 username
+            ))
+    }
+
+    async sendVerifyInstructorMail(
+        email: string, 
+        username: string,
+        note: string,
+        verifyStatus : InstructorStatus
+    ) {
+        return await this.transporter.sendMail(
+            this.verifyInstructorMailOptions(
+                email, 
+                username,
+                note,
+                verifyStatus
             ))
     }
 

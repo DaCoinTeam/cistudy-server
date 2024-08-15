@@ -13,7 +13,7 @@ import {
 import { ApiBearerAuth, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { AccountId, AuthInterceptor, JwtAuthGuard, Roles } from "../shared"
 import { RolesGuard } from "../shared/guards/role.guard"
-import { CreateAccountInputData, CreateAccountReportInputData, CreateAccountReviewInputData, CreateAccountRoleInputData, CreateConfigurationInputData, DeleteCourseInputData, ResolveAccountReportInputData, ToggleFollowInputData, ToggleRoleInputData, UpdateAccountInputData, UpdateAccountReportInputData, UpdateAccountReviewInputData, UpdateAccountRoleInputData, VerifyCourseInputData } from "./accounts.input"
+import { CreateAccountInputData, CreateAccountReportInputData, CreateAccountReviewInputData, CreateAccountRoleInputData, CreateConfigurationInputData, DeleteCourseInputData, ResolveAccountReportInputData, ToggleFollowInputData, ToggleRoleInputData, UpdateAccountInputData, UpdateAccountReportInputData, UpdateAccountReviewInputData, UpdateAccountRoleInputData, VerifyCourseInputData, VerifyInstructorInputData } from "./accounts.input"
 import { AccountsService } from "./accounts.service"
 
 @ApiTags("Accounts")
@@ -44,6 +44,18 @@ export class AccountsController {
     @UseInterceptors(AuthInterceptor)
     async verifyCourse(@AccountId() accountId: string, @Body() body: VerifyCourseInputData) {
         return this.accountsService.verifyCourse({
+            accountId,
+            data: body,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Patch("verify-instructor")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User, SystemRoles.Moderator)
+    @UseInterceptors(AuthInterceptor)
+    async verifyInstructor(@AccountId() accountId: string, @Body() body: VerifyInstructorInputData) {
+        return this.accountsService.verifyInstructor({
             accountId,
             data: body,
         })

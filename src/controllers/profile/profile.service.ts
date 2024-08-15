@@ -249,10 +249,14 @@ export class ProfileService {
     async registerInstructor(input: RegisterInstructorInput): Promise<RegisterInstructorOutput> {
         const { accountId } = input
 
-        const course = await this.accountMySqlRepository.findOneBy({ accountId })
+        const account = await this.accountMySqlRepository.findOneBy({ accountId })
 
-        if (!course) {
-            throw new NotFoundException("Course not found or has been deleted")
+        if (!account || !account.verified) {
+            throw new NotFoundException("Account not found or not have been verified")
+        }
+
+        if(account.instructorStatus === InstructorStatus.Pending){
+            throw new ConflictException("You have request is in resolving, please try again later")
         }
 
         await this.accountMySqlRepository.update(accountId, {
@@ -261,8 +265,8 @@ export class ProfileService {
 
         await this.notificationMySqlRepository.save({
             receiverId: accountId,
-            title: "Your request to become an instructor has been submitted",
-            type: NotificationType.Interact,
+            title: "Instructor request has been submitted",
+            type: NotificationType.Instructor,
             description: "Your request to become an instructor at CiStudy has been submitted. Thanks for choosing CiStudy.",
         })
 
@@ -282,13 +286,13 @@ export class ProfileService {
             receiverId: accountId,
             title: "New instructor request has been submitted for verification",
             type: NotificationType.Interact,
-            description: ""
+            description: `An instructor request by user ${account.username} has been submitted, please take a look to resolve.`
         }))
 
         await this.notificationMySqlRepository.save(notificationsToModerator)
 
         return {
-            message: "Your course has been submitted for review, thank you.",
+            message: "Your request has been submitted, thank you.",
         }
     }
 

@@ -75,3 +75,7 @@ export class UpdateAccountOutput implements Output{
 export class CreateAccountOutput implements Output{
     message: string   
 }
+
+export class VerifyInstructorOuput implements Output {
+    message: string
+}

@@ -156,6 +156,7 @@ export enum NotificationType {
   Transaction = "transaction",
   Interact = "interact",
   Course = "course",
+  Instructor = "instructor",
   Certificate = "certificate"
 }
 
