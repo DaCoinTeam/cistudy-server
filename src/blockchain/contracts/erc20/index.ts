@@ -77,7 +77,6 @@ export class ERC20Contract {
                 gasPrice: GAS_PRICE,
             })
         } catch (ex) {
-            console.log(ex)
             return null
         }
     }
