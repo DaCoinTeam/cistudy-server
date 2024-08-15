@@ -76,7 +76,8 @@ export class AccountsService {
                 accountId,
             },
             relations:{
-                accountJobs: true
+                accountJobs: true,
+                accountQualifications: true
             }
         })
 
