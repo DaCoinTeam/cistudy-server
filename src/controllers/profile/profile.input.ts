@@ -130,9 +130,8 @@ export class DeleteJobInput implements AuthInput<DeleteJobInputData> {
     data: DeleteJobInputData
 }
 
-export class AddQualificationInput implements AuthInput<undefined> {
+export class AddQualificationInput implements AuthEmptyDataInput {
     accountId: string
-    data: undefined
     files: Express.Multer.File[]
 }
 

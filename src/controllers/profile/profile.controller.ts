@@ -105,7 +105,6 @@ export class ProfileController{
     ) {     
     	return this.profileService.addQualification({
     		accountId,
-            data : undefined,
     		files
     	}) 
     }
