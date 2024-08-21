@@ -84,7 +84,7 @@ export class CoursesController {
     @ApiBearerAuth()
     @Post("create-course")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User, SystemRoles.Instructor)
+    @Roles(SystemRoles.User)
     @UseInterceptors(AuthInterceptor)
     async createCourse(@AccountId() accountId: string) {
         return await this.coursesService.createCourse({
