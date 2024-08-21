@@ -12,6 +12,7 @@ import {
     AccountMySqlEntity,
     AccountQualificationMySqlEntity,
     NotificationMySqlEntity,
+    RoleMySqlEntity,
     TransactionMongoEntity,
     TransactionMySqlEntity,
 } from "@database"
@@ -39,6 +40,7 @@ import {
     RegisterInstructorInput,
     UpdateJobInput,
     UpdateProfileInput,
+    UpdateQualificationInput,
     WithdrawInput,
 } from "./profile.input"
 import {
@@ -54,6 +56,7 @@ import {
     RegisterInstructorOutput,
     UpdateJobOutput,
     UpdateProfileOutput,
+    UpdateQualificationOutput,
     WithdrawOutput,
 } from "./profile.output"
 import { OpenApiService } from "src/global/services/openapi.service"
@@ -73,6 +76,8 @@ export class ProfileService {
         private readonly transactionMongoModel: Model<TransactionMongoEntity>,
         @InjectRepository(NotificationMySqlEntity)
         private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+        @InjectRepository(RoleMySqlEntity)
+        private readonly roleMySqlRepository: Repository<RoleMySqlEntity>,
         private readonly storageService: StorageService,
         private readonly blockchainService: BlockchainService,
         private readonly openapiService: OpenApiService,
@@ -156,8 +161,8 @@ export class ProfileService {
     }
 
     async updateJob(input: UpdateJobInput): Promise<UpdateJobOutput> {
-        const { data , files } = input
-        const { accountJobId , companyName, role, startDate, endDate, companyLogoIndex } = data
+        const { data, files } = input
+        const { accountJobId, companyName, role, startDate, endDate, companyLogoIndex } = data
 
         const accountJob: DeepPartial<AccountJobMySqlEntity> = {
             companyName,
@@ -186,42 +191,86 @@ export class ProfileService {
         const { data } = input
         const { accountJobId } = data
 
-        const found = await this.accountJobMySqlRepository.findOneBy({accountJobId})
-        
-        if(!found){
+        const found = await this.accountJobMySqlRepository.findOneBy({ accountJobId })
+
+        if (!found) {
             throw new NotFoundException("Account's job not found")
         }
-        const {companyThumbnailId} = found
+        const { companyThumbnailId } = found
         await this.storageService.delete(companyThumbnailId)
         await this.accountJobMySqlRepository.delete({ accountJobId })
 
         return { message: "Account's job deleted successfully" }
     }
 
-    async addQualification(input : AddQualificationInput) : Promise<AddQualificationInputOutput> {
-        const {accountId, files, data: { issuedAt, issuedFrom, name, url }} = input
+    async addQualification(input: AddQualificationInput): Promise<AddQualificationInputOutput> {
+        const { accountId, data, files } = input
+        const { fileIndex, issuedAt, issuedFrom, name, url } = data
 
-        const promises: Array<Promise<void>> = []
-        for (const file of files) {
-            const promise = async () => {
-                const { assetId } = await this.storageService.upload({
-                    rootFile: file,
-                })
-                await this.accountQualificationMySqlRepository.save({
-                    accountId,
-                    issuedAt,
-                    issuedFrom,
-                    name,
-                    url,
-                    fileId: assetId,
-                })
-            }
-            promises.push(promise())
-        }
-        await Promise.all(promises)
+        const { assetId } = await this.storageService.upload({
+            rootFile: files.at(fileIndex),
+        })
         
+        await this.accountQualificationMySqlRepository.save({
+            accountId,
+            issuedAt,
+            issuedFrom,
+            name,
+            url,
+            fileId: assetId,
+        })
+
+        const { roles } = await this.accountMySqlRepository.findOne({
+            where: {
+                accountId
+            },
+            relations: {
+                roles: true
+            }
+        })
+
+        if (!roles.some((role) => role.name === SystemRoles.Instructor)) {
+            await this.roleMySqlRepository.save({
+                accountId,
+                name: SystemRoles.Instructor
+            })
+        }
+
         return {
             message: "Qualification(s) has been added successfully"
+        }
+    }
+
+    async updateQualification(input: UpdateQualificationInput): Promise<UpdateQualificationOutput> {
+        const { accountId, files, data } = input
+        const { accountQualificationId, issuedAt, issuedFrom, name, url, fileIndex } = data
+
+        const exist = await this.accountQualificationMySqlRepository.findOneBy({ accountQualificationId })
+
+        if (!exist) {
+            throw new NotFoundException("Qualification not found or has been deleted.")
+        }
+
+        const qualification: DeepPartial<AccountQualificationMySqlEntity> = {
+            accountId,
+            issuedAt,
+            issuedFrom,
+            name,
+            url,
+        }
+
+        if (files) {
+            await this.storageService.delete(exist.fileId)
+            const { assetId } = await this.storageService.upload({
+                rootFile: files.at(fileIndex),
+            })
+            qualification.fileId = assetId
+        }
+
+        await this.accountQualificationMySqlRepository.update(accountQualificationId, qualification)
+
+        return {
+            message: "Qualification has been updated successfully"
         }
     }
 
@@ -231,12 +280,24 @@ export class ProfileService {
         const { data } = input
         const { accountQualificationId } = data
 
-        const qualification = await this.accountQualificationMySqlRepository.findOneBy({
-            accountQualificationId,
+        const qualification = await this.accountQualificationMySqlRepository.findOne({
+            where: {
+                accountQualificationId,
+            },
+            relations: {
+                account: {
+                    roles: true,
+                    accountQualifications: true
+                }
+            }
         })
 
         if (!qualification) {
             throw new NotFoundException("Account's qualification not found")
+        }
+
+        if (qualification.account.accountQualifications.length == 1) {
+            throw new ConflictException("You must have at least 1 qualification, try updating this qualification instead.")
         }
 
         await this.storageService.delete(qualification.fileId)
@@ -258,7 +319,7 @@ export class ProfileService {
             throw new NotFoundException("Account not found or not have been verified")
         }
 
-        if(account.instructorStatus === InstructorStatus.Pending){
+        if (account.instructorStatus === InstructorStatus.Pending) {
             throw new ConflictException("You have request is in resolving, please try again later")
         }
 

@@ -139,12 +139,35 @@ export class AddQualificationInputData {
         issuedAt : Date
     @ApiProperty()
         url? : string
+    @ApiProperty()
+        fileIndex: number
 }
 
 export class AddQualificationInput implements AuthInput<AddQualificationInputData> {
     data: AddQualificationInputData
     accountId: string
     files: Express.Multer.File[]
+}
+
+export class UpdateQualificationInputData {
+    @ApiProperty()
+        accountQualificationId? : string
+    @ApiProperty()
+        name? : string
+    @ApiProperty()
+        issuedFrom? : string
+    @ApiProperty()
+        issuedAt? : Date
+    @ApiProperty()
+        url? : string
+    @ApiProperty()
+        fileIndex? : number
+}
+
+export class UpdateQualificationInput implements AuthInput<UpdateQualificationInputData> {
+    data: UpdateQualificationInputData
+    accountId: string
+    files?: Express.Multer.File[]
 }
 
 export class DeleteQualificationInputData {

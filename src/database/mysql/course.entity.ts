@@ -102,6 +102,10 @@ export class CourseEntity {
   @Column({ type: "int", default: 12 })
       duration: number
 
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", length: 2000, nullable: true })
+      previousFeedback: string
+
   @Field(() => Date)
   @CreateDateColumn()
       createdAt: Date
