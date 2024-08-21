@@ -115,6 +115,12 @@ export enum TransactionType {
   Received = "received"
 }
 
+export enum TransactionStatus {
+  Pending = "pending",
+  Success = "success",
+  Failed = "failed",
+}
+
 export enum SectionContentType {
   Lesson = "lesson",
   Quiz = "quiz",

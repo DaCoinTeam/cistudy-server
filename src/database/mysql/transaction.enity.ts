@@ -1,4 +1,4 @@
-import { TransactionType } from "@common"
+import { TransactionStatus, TransactionType } from "@common"
 import { Field, Float, ID, ObjectType } from "@nestjs/graphql"
 import {
     Column,
@@ -25,6 +25,14 @@ export class TransactionEntity {
   @Column({ type: "enum", enum: TransactionType })
       type: TransactionType
 
+  @Field(() => String)
+  @Column({
+      type: "enum",
+      enum: TransactionStatus,
+      default: TransactionStatus.Success,
+  })
+      status: TransactionStatus
+
   @Field(() => ID)
   @Column({ type: "uuid", length: 36 })
       accountId: string
@@ -48,6 +56,10 @@ export class TransactionEntity {
   @Field(() => String, { nullable: true })
   @Column({ type: "varchar", length: 2000, nullable: true })
       payPalOrderId?: string
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: "varchar", length: 2000, nullable: true })
+      preTextEarn?: string
 
   @Field(() => AccountEntity)
   @ManyToOne(() => AccountEntity, (course) => course.courseReview, {

@@ -217,7 +217,11 @@ export class ProfileService {
                 account: true,
                 transactionDetails: {
                     account: true,
-                    course: true
+                    course: true,
+                    post: true,
+                    postComment: {
+                        post: true   
+                    }
                 }
             },
             take,

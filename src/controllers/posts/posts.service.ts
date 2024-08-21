@@ -1,4 +1,4 @@
-import { NotificationType, ReportProcessStatus, TransactionType, computeFixedFloor } from "@common"
+import { NotificationType, ReportProcessStatus, TransactionStatus, TransactionType, computeFixedFloor } from "@common"
 import { appConfig, blockchainConfig } from "@config"
 import {
     AccountMySqlEntity,
@@ -163,26 +163,30 @@ export class PostsService {
                     priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.createPostEarnCoefficient
                 )
 
-                await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
-
-                await this.transactionMySqlRepository.save({
-                    accountId,
-                    type: TransactionType.Earn,
-                    amountDepositedChange: earnAmount,
-                    courseId
-                })
-
                 await this.notificationMySqlRepository.save({
                     receiverId: accountId,
-                    title: "You have new update on your balance!",
+                    title: "You will have new update on your balance!",
                     type: NotificationType.Transaction,
-                    description: `You have received ${earnAmount} STARCI(s)`,
+                    description: `You will received ${earnAmount} STARCI(s) if your post is not being reported for 3 days.`,
                 })
 
             }
         }
 
         const { postId } = await this.postMySqlRepository.save(post)
+        await this.transactionMySqlRepository.save({
+            accountId,
+            type: TransactionType.Earn,
+            status: TransactionStatus.Pending,
+            amountDepositedChange: earnAmount,
+            preTextEarn: "Create post ",
+            courseId,
+            transactionDetails: [
+                {   
+                    postId
+                }
+            ]
+        })
 
         return {
             message: "Post has been created successfully.",
@@ -343,17 +347,25 @@ export class PostsService {
                     const { priceAtEnrolled } = isEnrolled
                     if (numberOfRewardedLike.length < 20) {
                         earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.likePostEarnCoefficient)
-                        await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
-                        await this.notificationMySqlRepository.save({
-                            receiverId: accountId,
-                            title: "You have new update on your balance!",
-                            type: NotificationType.Transaction,
-                            description: `You have received ${earnAmount} STARCI(s)`,
-                        })
                         await this.transactionMySqlRepository.save({
                             accountId,
                             type: TransactionType.Earn,
-                            amountDepositedChange: earnAmount
+                            status: TransactionStatus.Pending,
+                            amountDepositedChange: earnAmount,
+                            courseId,
+                            preTextEarn: "Like post ",
+                            transactionDetails: [
+                                {
+                                    postId
+                                }
+                            ]
+                        })
+
+                        await this.notificationMySqlRepository.save({
+                            receiverId: accountId,
+                            title: "You will have new update on your balance!",
+                            type: NotificationType.Transaction,
+                            description: `You will received ${earnAmount} STARCI(s) if the post you liked is not being reported for 3 days.`,
                         })
                     }
                 }
@@ -495,18 +507,12 @@ export class PostsService {
                         const { priceAtEnrolled } = isEnrolled
                         if (numberOfRewardedComments < 20) {
                             earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.commentPostEarnCoefficient)
-                            await this.accountMySqlRepository.increment({ accountId }, "balance", earnAmount)
+                
                             await this.notificationMySqlRepository.save({
                                 receiverId: accountId,
-                                title: "You have new update on your balance!",
+                                title: "You will have new update on your balance!",
                                 type: NotificationType.Transaction,
-                                description: `You have received ${earnAmount} STARCI(s)`,
-                            })
-
-                            await this.transactionMySqlRepository.save({
-                                accountId,
-                                type: TransactionType.Earn,
-                                amountDepositedChange: earnAmount
+                                description: `You will received ${earnAmount} STARCI(s) if your comment is not being reported for 3 days.`,
                             })
                         }
                     } else {
@@ -525,6 +531,19 @@ export class PostsService {
         }
 
         const { postCommentId } = await this.postCommentMySqlRepository.save(postComment)
+        await this.transactionMySqlRepository.save({
+            accountId,
+            type: TransactionType.Earn,
+            status: TransactionStatus.Pending,
+            amountDepositedChange: earnAmount,
+            courseId,
+            preTextEarn: "Create comment on post ",
+            transactionDetails: [
+                {
+                    postId
+                }
+            ]
+        })
 
         return {
             message: "Comment Posted Successfully",
@@ -825,20 +844,26 @@ export class PostsService {
             })
 
             const earnAmount = computeFixedFloor(priceAtEnrolled * blockchainConfig().earns.percentage * blockchainConfig().earns.rewardCommentPostEarnCoefficient)
-            await this.accountMySqlRepository.increment({ accountId: postComment.creatorId }, "balance", earnAmount)
-
+            
             await this.transactionMySqlRepository.save({
                 accountId: postComment.creatorId,
                 type: TransactionType.Earn,
+                status: TransactionStatus.Pending,
                 amountDepositedChange: earnAmount,
-                courseId
+                courseId,
+                preTextEarn: "Your solution is marked on post ",
+                transactionDetails: [
+                    {
+                        postId
+                    }
+                ]
             })
 
             await this.notificationMySqlRepository.save({
                 receiverId: postComment.creatorId,
-                title: "You have new update on your balance!",
+                title: "You will have new update on your balance!",
                 type: NotificationType.Transaction,
-                description: `You have received ${earnAmount} STARCI(s)`,
+                description: `You will received ${earnAmount} STARCI(s) if your post is not being reported for 3 days.`,
             })
         }
 

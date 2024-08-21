@@ -15,6 +15,7 @@ import { PostCommentMediaEntity } from "./post-comment-media.entity"
 import { PostCommentReplyEntity } from "./post-comment-reply.entity"
 import { PostEntity } from "./post.entity"
 import { ReportPostCommentEntity } from "./report-post-comment.entity"
+import { TransactionDetailEntity } from "./transaction-detail.entity"
 
 @ObjectType()
 @Entity("post_comment")
@@ -88,6 +89,14 @@ export class PostCommentEntity {
         { onDelete: "CASCADE" },
     )
         postCommentReports: Array<ReportPostCommentEntity>
+    
+    @Field(() => [TransactionDetailEntity], { nullable: true })
+    @OneToMany(
+        () => TransactionDetailEntity,
+        (transactionDetail) => transactionDetail.postComment,
+        { nullable: true },
+    )
+        transactionDetails?: Array<TransactionDetailEntity>
 
     //graphql
     @Field(() => Int, { nullable: true })
