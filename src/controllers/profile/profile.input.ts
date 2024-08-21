@@ -130,7 +130,19 @@ export class DeleteJobInput implements AuthInput<DeleteJobInputData> {
     data: DeleteJobInputData
 }
 
-export class AddQualificationInput implements AuthEmptyDataInput {
+export class AddQualificationInputData {
+    @ApiProperty()
+        name : string
+    @ApiProperty()
+        issuedFrom : string
+    @ApiProperty()
+        issuedAt : Date
+    @ApiProperty()
+        url? : string
+}
+
+export class AddQualificationInput implements AuthInput<AddQualificationInputData> {
+    data: AddQualificationInputData
     accountId: string
     files: Express.Multer.File[]
 }

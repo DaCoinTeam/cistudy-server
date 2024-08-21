@@ -322,6 +322,7 @@ export class AuthService {
             found = await this.accountMySqlRepository.save({
                 externalId: decoded.uid,
                 email: decoded.email,
+                username: decoded.email.split("@")[0],
                 phoneNumber: decoded.phone_number,
                 avatarUrl: decoded.picture,
                 kind: AccountKind.Google,

@@ -14,7 +14,7 @@ import {
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { AccountId, AuthInterceptor, DataFromBody, JwtAuthGuard, Roles } from "../shared"
-import { AddJobInputData, DepositData, IsSastifyCommunityStandardInput, MarkNotificationAsReadInputData, UpdateJobInputData, UpdateProfileData, WithdrawData } from "./profile.input"
+import { AddJobInputData, AddQualificationInputData, DepositData, IsSastifyCommunityStandardInput, MarkNotificationAsReadInputData, UpdateJobInputData, UpdateProfileData, WithdrawData } from "./profile.input"
 import { addJobSchema, addQualificationSchema, updateJobSchema, updateProfileSchema } from "./profile.schema"
 import { ProfileService } from "./profile.service"
 
@@ -101,9 +101,11 @@ export class ProfileController{
     )
     async addQualification(
         @AccountId() accountId: string,
+        @DataFromBody() data: AddQualificationInputData,
         @UploadedFiles() { files }: Files,
     ) {     
     	return this.profileService.addQualification({
+            data,
     		accountId,
     		files
     	}) 

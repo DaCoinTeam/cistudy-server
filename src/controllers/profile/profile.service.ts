@@ -199,7 +199,7 @@ export class ProfileService {
     }
 
     async addQualification(input : AddQualificationInput) : Promise<AddQualificationInputOutput> {
-        const {accountId, files} = input
+        const {accountId, files, data: { issuedAt, issuedFrom, name, url }} = input
 
         const promises: Array<Promise<void>> = []
         for (const file of files) {
@@ -209,8 +209,11 @@ export class ProfileService {
                 })
                 await this.accountQualificationMySqlRepository.save({
                     accountId,
+                    issuedAt,
+                    issuedFrom,
+                    name,
+                    url,
                     fileId: assetId,
-                    name: file.originalname
                 })
             }
             promises.push(promise())

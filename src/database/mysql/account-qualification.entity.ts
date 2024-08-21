@@ -22,8 +22,20 @@ export class AccountQualificationEntity {
         accountId: string
 
     @Field(() => String)
-    @Column({ type: "varchar", length: 36 })
+    @Column({ type: "varchar", length: 2000 })
         name: string
+    
+    @Field(() => String)
+    @Column({ type: "varchar", length: 1000 })
+        issuedFrom: string
+        
+    @Field(() => Date)
+    @Column({ type: "datetime" })
+        issuedAt: Date
+    
+    @Field(() => String, { nullable: true})
+    @Column({ type: "varchar", length: 1000, nullable: true })
+        url?: string
 
     @Field(() => ID)
     @Column({ type: "uuid", length: 36 })

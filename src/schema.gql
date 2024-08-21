@@ -647,6 +647,9 @@ type AccountQualificationEntity {
   accountQualificationId: ID!
   accountId: ID!
   name: String!
+  issuedFrom: String!
+  issuedAt: DateTime!
+  url: String
   fileId: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
