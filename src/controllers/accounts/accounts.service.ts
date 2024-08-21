@@ -213,6 +213,7 @@ export class AccountsService {
                 referenceLink: `/courses/${courseId}/management`,
                 description: `Your course, "${course.title}", has been rejected due to issues identified by our moderation team. Please check your email for more details.`
             })
+            await this.courseMySqlRepository.update(courseId,{previousFeedback: note})
         }
 
         return {

@@ -14,8 +14,8 @@ import {
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { AccountId, AuthInterceptor, DataFromBody, JwtAuthGuard, Roles } from "../shared"
-import { AddJobInputData, AddQualificationInputData, DepositData, IsSastifyCommunityStandardInput, MarkNotificationAsReadInputData, UpdateJobInputData, UpdateProfileData, WithdrawData } from "./profile.input"
-import { addJobSchema, addQualificationSchema, updateJobSchema, updateProfileSchema } from "./profile.schema"
+import { AddJobInputData, AddQualificationInputData, DepositData, IsSastifyCommunityStandardInput, MarkNotificationAsReadInputData, UpdateJobInputData, UpdateProfileData, UpdateQualificationInputData, WithdrawData } from "./profile.input"
+import { addJobSchema, addQualificationSchema, updateJobSchema, updateProfileSchema, updateQualificationSchema } from "./profile.schema"
 import { ProfileService } from "./profile.service"
 
 @ApiTags("Profile")
@@ -97,7 +97,7 @@ export class ProfileController{
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(
         AuthInterceptor,
-        FileFieldsInterceptor([{ name: "files" }]),
+        FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
     )
     async addQualification(
         @AccountId() accountId: string,
@@ -105,6 +105,27 @@ export class ProfileController{
         @UploadedFiles() { files }: Files,
     ) {     
     	return this.profileService.addQualification({
+            data,
+    		accountId,
+    		files
+    	}) 
+    }
+
+    @ApiBearerAuth()
+    @ApiConsumes("multipart/form-data")
+    @ApiBody({ schema: updateQualificationSchema })
+    @Put("update-qualification")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+        AuthInterceptor,
+        FileFieldsInterceptor([{ name: "files", maxCount: 1 }]),
+    )
+    async updateQualification(
+        @AccountId() accountId: string,
+        @DataFromBody() data: UpdateQualificationInputData,
+        @UploadedFiles() { files }: Files,
+    ) {     
+    	return this.profileService.updateQualification({
             data,
     		accountId,
     		files

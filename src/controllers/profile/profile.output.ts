@@ -60,3 +60,7 @@ export class AddQualificationInputOutput implements Output {
 export class RegisterInstructorOutput implements Output {
     message: string
 }
+
+export class UpdateQualificationOutput implements Output {
+    message: string
+}

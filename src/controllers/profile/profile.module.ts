@@ -20,6 +20,7 @@ import {
     NotificationMySqlEntity,
     AccountJobMySqlEntity,
     AccountQualificationMySqlEntity,
+    RoleMySqlEntity,
 } from "@database"
 import { ProfileService } from "./profile.service"
 import { MongooseModule } from "@nestjs/mongoose"
@@ -30,6 +31,7 @@ import { MongooseModule } from "@nestjs/mongoose"
             SessionMySqlEntity,
             AccountMySqlEntity,
             AccountJobMySqlEntity,
+            RoleMySqlEntity,
             AccountQualificationMySqlEntity,
             PostMySqlEntity,
             CourseMySqlEntity,

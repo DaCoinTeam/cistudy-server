@@ -109,6 +109,67 @@ export const updateJobSchema : SchemaObject = {
 export const addQualificationSchema : SchemaObject = {
     type: "object",
     properties: {
+        data: {
+            type: "object",
+            properties: {
+                name: {
+                    type: "string",
+                },
+                issuedFrom: {
+                    type: "string",
+                },
+                issuedAt: {
+                    type: "string",
+                    format: "date"
+                },
+                url:{
+                    type: "string",
+                    nullable: true
+                },
+                fileIndex:{
+                    type: "number"
+                }
+            },
+        },
+        files: {
+            type: "array",
+            items: {
+                type: "string",
+                format: "binary"
+            },
+        },
+    }
+}
+
+export const updateQualificationSchema : SchemaObject = {
+    type: "object",
+    properties: {
+        data: {
+            type: "object",
+            properties: {
+                accountQualificationId:{
+                    type: "string",
+                },
+                name: {
+                    type: "string",
+                },
+                issuedFrom: {
+                    type: "string",
+                },
+                issuedAt: {
+                    type: "string",
+                    format: "date"
+                },
+                url:{
+                    type: "string",
+                    nullable: true
+                },
+                fileIndex:{
+                    type: "number",
+                    nullable: true
+                }
+            },
+        },
         files: {
             type: "array",
             items: {
