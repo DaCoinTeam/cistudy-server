@@ -385,6 +385,40 @@ type ReportPostCommentEntity {
   reportedPostComment: PostCommentEntity!
 }
 
+type TransactionEntity {
+  transactionId: ID!
+  type: String!
+  status: String!
+  accountId: ID!
+  courseId: ID
+  amountDepositedChange: Float!
+  amountOnChainChange: Float!
+  transactionHash: String
+  payPalOrderId: String
+  preTextEarn: String
+  account: AccountEntity!
+  course: CourseEntity!
+  transactionDetails: [TransactionDetailEntity!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type TransactionDetailEntity {
+  transactionDetailId: ID
+  accountId: ID
+  courseId: ID
+  postId: ID
+  postCommentId: ID
+  transactionId: ID
+  directIn: Boolean!
+  payAmount: Float
+  account: AccountEntity
+  course: CourseEntity
+  post: PostEntity
+  postComment: PostCommentEntity
+  transaction: TransactionEntity
+}
+
 type PostCommentEntity {
   postCommentId: ID!
   creatorId: ID!
@@ -398,6 +432,7 @@ type PostCommentEntity {
   creator: AccountEntity!
   postCommentMedias: [PostCommentMediaEntity!]!
   postCommentReports: [ReportPostCommentEntity!]!
+  transactionDetails: [TransactionDetailEntity!]
   numberOfLikes: Int
   numberOfReplies: Int
   liked: Boolean
@@ -457,6 +492,7 @@ type PostEntity {
   postComments: [PostCommentEntity!]
   postReacts: [PostLikeEntity!]!
   postReports: [ReportPostEntity!]!
+  transactionDetails: [TransactionDetailEntity!]
   liked: Boolean
   isPostOwner: Boolean
   numberOfLikes: Int
@@ -498,34 +534,6 @@ type NotificationEntity {
   sender: AccountEntity
   receiver: AccountEntity
   course: CourseEntity
-}
-
-type TransactionEntity {
-  transactionId: ID!
-  type: String!
-  accountId: ID!
-  courseId: ID
-  amountDepositedChange: Float!
-  amountOnChainChange: Float!
-  transactionHash: String
-  payPalOrderId: String
-  account: AccountEntity!
-  course: CourseEntity!
-  transactionDetails: [TransactionDetailEntity!]!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type TransactionDetailEntity {
-  transactionDetailId: ID
-  accountId: ID
-  courseId: ID
-  transactionId: ID
-  directIn: Boolean!
-  payAmount: Float
-  account: AccountEntity
-  course: CourseEntity
-  transaction: TransactionEntity
 }
 
 type CourseEntity {

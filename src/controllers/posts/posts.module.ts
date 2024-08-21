@@ -17,6 +17,7 @@ import {
     RoleMySqlEntity,
     SectionMySqlEntity,
     SessionMySqlEntity,
+    TransactionDetailMySqlEntity,
     TransactionMySqlEntity,
 } from "@database"
 import { Module } from "@nestjs/common"
@@ -45,7 +46,8 @@ import { PostsService } from "./posts.service"
             ReportPostMySqlEntity,
             ReportPostCommentMySqlEntity,
             NotificationMySqlEntity,
-            TransactionMySqlEntity
+            TransactionMySqlEntity,
+            TransactionDetailMySqlEntity
         ]),
     ],
     controllers: [PostsController],
