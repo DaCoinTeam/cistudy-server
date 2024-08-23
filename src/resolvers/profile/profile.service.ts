@@ -114,18 +114,17 @@ export class ProfileService {
             .getRawMany()
     
         const followerCountMap = numberOfFollowersResults.reduce((map, item) => {
-            map[item.followedAccountId] = parseInt(item.count, 10)
+            map[item.followedAccountId] = parseInt(item.count ?? 0, 10)
             return map
         }, {})
     
 
-        const numberOfEnrolledCoursesResult = await this.courseMySqlRepository.createQueryBuilder()
-            .select("COUNT(*)", "count")
-            .innerJoin(CourseMySqlEntity, "course")
-            .innerJoin(EnrolledInfoMySqlEntity, "enrolledInfo", "course.courseId = enrolledInfo.courseId")
-            .where("enrolledInfo.accountId = :accountId", { accountId })
-            .andWhere("enrolledInfo.enrolled = :enrolled", { enrolled: true })
-            .getRawOne()
+        const numberOfEnrolledCoursesResult = await this.enrolledInfoMySqlRepository.count({
+            where:{
+                accountId,
+                enrolled: true
+            }
+        })
     
 
         const numberOfRewardedPosts = await this.postMySqlRepository.find({
@@ -147,7 +146,7 @@ export class ProfileService {
                 return course
             }),
             metadata: {
-                count: numberOfEnrolledCoursesResult.count
+                count: numberOfEnrolledCoursesResult
             }
         }
     }
