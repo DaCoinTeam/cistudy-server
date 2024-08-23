@@ -52,3 +52,24 @@ export const shuffleArray = <T>(array: Array<T>) : Array<T> => {
     }
     return array
 }
+
+export const randomPassword = () => {
+    const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    const lowerCase = "abcdefghijklmnopqrstuvwxyz"
+    const numbers = "0123456789"
+    const specialChars = "!@#$%^&*()_+-=[]{}|;:,.<>?"
+    const allCharsNoSpecial = upperCase + lowerCase + numbers
+  
+    let result = ""
+
+    result += upperCase[Math.floor(Math.random() * upperCase.length)]
+  
+
+    result += specialChars[Math.floor(Math.random() * specialChars.length)]
+
+    for (let i = 0; i < 6; i++) {
+        result += allCharsNoSpecial[Math.floor(Math.random() * allCharsNoSpecial.length)]
+    }
+
+    return result.split("").sort(() => Math.random() - 0.5).join("")
+}

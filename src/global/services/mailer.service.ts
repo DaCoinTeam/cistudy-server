@@ -4,7 +4,7 @@ import { CourseMySqlEntity } from "@database"
 import { Injectable } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
 import { createTransport } from "nodemailer"
-import { acceptCourseMail, acceptInstructorMail, rejectCourseMail, rejectInstructorMail, reportAccountMail, reportCourseMail, reportPostCommentMail, reportPostMail, verifyAccountMail } from "../templates/mail.template"
+import { acceptCourseMail, acceptInstructorMail, forgotPasswordMail, newPasswordMail, rejectCourseMail, rejectInstructorMail, reportAccountMail, reportCourseMail, reportPostCommentMail, reportPostMail, verifyAccountMail } from "../templates/mail.template"
 
 @Injectable()
 export class MailerService {
@@ -42,6 +42,15 @@ export class MailerService {
             to: email,
             subject: "REGISTRATION CONFIRMATION - CISTUDY",
             html: verifyAccountMail(username, email, frontendUrl, token),
+        }
+    }
+
+    private newPasswordMailOptions = (email: string, username: string, newPassword: string) => {
+        return {
+            from: servicesConfig().mailer.user,
+            to: email,
+            subject: "PASSWORD HAS BEEN CHANGED - CISTUDY",
+            html: newPasswordMail(email, username, newPassword),
         }
     }
 
@@ -93,6 +102,20 @@ export class MailerService {
         }
     }
 
+    private forgotPasswordMailOptions = (email : string, username : string, accountId : string) => {
+        const frontendUrl = appConfig().frontendUrl
+        const token = this.jwtService.sign(
+            { accountId, type: TokenType.ChangePassword },
+            { secret: jwtConfig().secret },
+        )
+        return {
+            from: servicesConfig().mailer.user,
+            to: email,
+            subject: "Password Changing Requested.",
+            html: forgotPasswordMail(email, username, frontendUrl, token),
+        }
+    }
+
     async sendVerifyRegistrationMail(
         accountId: string, 
         email: string, 
@@ -103,6 +126,32 @@ export class MailerService {
                 accountId, 
                 email, 
                 username
+            ))
+    }
+
+    async sendForgotPasswordMail(
+        email: string, 
+        username: string,
+        accountId: string
+    ) {
+        return await this.transporter.sendMail(
+            this.forgotPasswordMailOptions(
+                email, 
+                username,
+                accountId
+            ))
+    }
+
+    async sendNewPasswordMail(
+        email: string, 
+        username: string,
+        newPassword: string, 
+    ) {
+        return await this.transporter.sendMail(
+            this.newPasswordMailOptions(
+                email,
+                username,
+                newPassword
             ))
     }
 

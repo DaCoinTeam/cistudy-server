@@ -1,4 +1,4 @@
-import { CourseVerifyStatus, InstructorStatus } from "@common"
+import { CourseVerifyStatus, InstructorStatus, ReportProcessStatus } from "@common"
 import {
     AccountMySqlEntity,
     AccountReviewMySqlEntity,
@@ -13,7 +13,7 @@ import {
 } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { DataSource, Repository } from "typeorm"
+import { DataSource, Not, Repository } from "typeorm"
 import {
     FindManyAccountReportsInput,
     FindManyAccountReviewsInput,
@@ -184,14 +184,31 @@ export class AccountsService {
         const { options } = data
         const { skip, take } = options
 
-        const results = await this.reportAccountMySqlRepository.find({
+        const pendingReports = await this.reportAccountMySqlRepository.find({
+            where:{
+                processStatus: ReportProcessStatus.Processing
+            },
             relations: {
                 reporterAccount: true,
                 reportedAccount: true,
             },
-            skip,
-            take,
         })
+
+        const exceptPendingReports = await this.reportAccountMySqlRepository.find({
+            where:{
+                processStatus: Not(ReportProcessStatus.Processing)
+            },
+            relations: {
+                reporterAccount: true,
+                reportedAccount: true,
+            },
+        })
+
+        const results = [...pendingReports, ...exceptPendingReports]
+
+        if(skip && take){
+            results.slice(skip, skip + take)
+        }
 
         const numberOfAccountReports =
       await this.reportAccountMySqlRepository.count()

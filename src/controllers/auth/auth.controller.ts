@@ -7,7 +7,7 @@ import {
 } from "@nestjs/common"
 import { ApiHeader, ApiTags } from "@nestjs/swagger"
 import { GenerateAuthTokensInterceptor } from "../shared"
-import { SignInInputData, SignUpData, VerifyRegistrationInputData } from "./auth.input"
+import { ForgotPasswordInputData, ResetPasswordInputData, SignInInputData, SignUpData, VerifyRegistrationInputData } from "./auth.input"
 import { AuthService } from "./auth.service"
 
 @ApiTags("Auth")
@@ -30,10 +30,24 @@ export class AuthController {
         return this.authService.signUp({ data: body })
     }
 
+    @Post("forgot-password")
+    //@UseInterceptors(GenerateAuthTokensInterceptor)
+    async forgotPassword(@Body() body: ForgotPasswordInputData) {
+        return this.authService.forgotPassword({ data: body })
+    }
+
     @Patch("verify-registration")
     async verifyRegistration(
         @Body() data: VerifyRegistrationInputData,
     ){
         return this.authService.verifyRegistration({ data})
     }
+
+    @Patch("reset-password")
+    async resetPassword(
+        @Body() data: ResetPasswordInputData,
+    ){
+        return this.authService.resetPassword({ data})
+    }
+
 }

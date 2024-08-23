@@ -10,7 +10,7 @@ import {
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { PostCommentReplyEntity } from "src/database/mysql/post-comment-reply.entity"
-import { DataSource, Repository } from "typeorm"
+import { DataSource, Not, Repository } from "typeorm"
 import {
     FindManyPostCommentRepliesInput,
     FindManyPostCommentReportsInput,
@@ -460,7 +460,7 @@ export class PostsService {
         const { options } = data
         const { skip, take } = options
 
-        const results = await this.reportPostMySqlRepository.find({
+        const pendingReports = await this.reportPostMySqlRepository.find({
             where: {
                 processStatus: ReportProcessStatus.Processing
             },
@@ -472,13 +472,34 @@ export class PostsService {
                     course: true,
                 }
             },
-            skip,
-            take,
             order: {
                 createdAt: "DESC"
             }
         })
 
+        const exceptPendingReports = await this.reportPostMySqlRepository.find({
+            where: {
+                processStatus: Not(ReportProcessStatus.Processing)
+            },
+            relations: {
+                reporterAccount: true,
+                reportedPost: {
+                    postMedias: true,
+                    creator: true,
+                    course: true,
+                }
+            },
+            order: {
+                createdAt: "DESC"
+            }
+        })
+
+        const results = [...pendingReports, ...exceptPendingReports]
+        
+        if(skip && take){
+            results.slice(skip, skip + take)
+        }
+     
         const numberOfPostReports = await this.reportPostMySqlRepository.count({
             where: {
                 processStatus: ReportProcessStatus.Processing
@@ -528,7 +549,10 @@ export class PostsService {
         await queryRunner.startTransaction()
 
         try {
-            const results = await this.reportPostCommentMySqlRepository.find({
+            const pendingReports = await this.reportPostCommentMySqlRepository.find({
+                where:{
+                    processStatus: ReportProcessStatus.Processing
+                },
                 relations: {
                     reporterAccount: true,
                     reportedPostComment: {
@@ -541,6 +565,27 @@ export class PostsService {
                 skip,
                 take
             })
+            
+            const exceptPendingReports = await this.reportPostCommentMySqlRepository.find({
+                where:{
+                    processStatus: Not(ReportProcessStatus.Processing)
+                },
+                relations: {
+                    reporterAccount: true,
+                    reportedPostComment: {
+                        postCommentMedias: true,
+                        post: true,
+                        creator: true
+                    },
+
+                }
+            })
+
+            const results = [...pendingReports, ...exceptPendingReports]
+
+            if(skip && take){
+                results.slice(skip, skip + take)
+            }
 
             const numberOfPostCommentReports = await this.reportPostCommentMySqlRepository.count()
 

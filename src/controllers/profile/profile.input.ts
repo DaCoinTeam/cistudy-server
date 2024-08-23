@@ -1,6 +1,6 @@
 import { AuthEmptyDataInput, AuthInput } from "@common"
 import { ApiProperty } from "@nestjs/swagger"
-import { IsUUID } from "class-validator"
+import { IsStrongPassword, IsUUID, MinLength } from "class-validator"
 import { Address } from "web3"
 
 export class UpdateProfileData {
@@ -14,6 +14,9 @@ export class UpdateProfileData {
         birthdate?: Date
     @ApiProperty()
         walletAddress?: Address
+    @ApiProperty()
+    @MinLength(50)
+        bio?: string
 }
 export class UpdateProfileInput implements AuthInput<UpdateProfileData> {
     @IsUUID("4")
@@ -183,4 +186,17 @@ export class DeleteQualificationInput implements AuthInput<DeleteQualificationIn
 
 export class RegisterInstructorInput implements AuthEmptyDataInput {
     accountId: string
+}
+
+export class ChangePasswordInputData {
+    @ApiProperty()
+        currentPassword: string
+    @ApiProperty()
+    @IsStrongPassword()
+        newPassword: string
+}
+
+export class ChangePasswordInput implements AuthInput<ChangePasswordInputData>{
+    accountId: string
+    data: ChangePasswordInputData
 }

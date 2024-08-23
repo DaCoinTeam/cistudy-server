@@ -15,6 +15,7 @@ export enum TokenType {
   Access = "Access",
   Refresh = "Refresh",
   Verify = "Verify",
+  ChangePassword = "ChangePassword"
 }
 
 export enum AuthTokenType {

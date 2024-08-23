@@ -86,7 +86,7 @@ export class AccountEntity {
         walletAddress: string
 
     @Field(() => String, { nullable: true })
-    @Column({ type: "varchar", length: 200, default: null })
+    @Column({ type: "varchar", length: 2000, default: null })
         bio: string
 
     @Field(() => String, { nullable: true })

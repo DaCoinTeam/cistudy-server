@@ -339,6 +339,76 @@ export const verifyAccountMail = (username: string, email: string, frontendUrl: 
 </html>
             `
 
+export const newPasswordMail = (email: string, username: string, newPassword: string) => 
+    `
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #000 !important;
+        }
+        .header {
+            background-color: #D9D9DB;
+            padding: 10px 20px;
+            color: black;
+            text-align: center;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px 0;
+            color: #fff !important;
+            background-color: #006FEE;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Your new password at <strong style="color: #60A5FA;">Ci</strong><strong style="color: #006FEE;">Study</strong></h1>
+        </div>
+        <div class="content">
+            <p>Hello <strong>${username ?? email},</strong></p>
+            <p>Your password has been successfully changed for your CiStudy account.</p>
+            <p>Here is your new password:</p>
+            <p style="font-weight: bold; color: #006FEE;">${newPassword}</p>
+            <p>If you did not request this change, please secure your account immediately by contacting our support team or visiting our homepage to change your password again.</p>
+            <p>If you have any questions or need further assistance, do not hesitate to contact our support team.</p>
+            <p>Best regards,</p>
+            <p>The CiStudy Team</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 CiStudy. All rights reserved.</p>
+            <p>This email was sent from an automated system, please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>
+`
+
 export const reportAccountMail = (reporterUsername: string, reportedUsername:string, reportedDate: Date, title: string, description: string, processStatus: string, processNote: string) => `
                 <!DOCTYPE html>
 <html lang="en">
@@ -438,6 +508,80 @@ export const reportAccountMail = (reporterUsername: string, reportedUsername:str
 </body>
 </html>
 `
+
+export const forgotPasswordMail = (email : string, username : string, frontendUrl: string, token : string) => 
+    `
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #000 !important;
+        }
+        .header {
+            background-color: #D9D9DB;
+            padding: 10px 20px;
+            color: black;
+            text-align: center;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px 0;
+            color: #fff !important;
+            background-color: #006FEE;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Reset Your Password at <strong style="color: #60A5FA;">Ci</strong><strong style="color: #006FEE;">Study</strong></h1>
+        </div>
+        <div class="content">
+            <p>Hello <strong>${username ?? email},</strong></p>
+            <p>We received a request to reset the password for your account at <strong style="color: #60A5FA;">Ci</strong><strong style="color: #006FEE;">Study</strong>.</p>
+            <p>If you are attempting to change your password, please click the link below:</p>
+            <p style="text-align: center;">
+                <a href="${frontendUrl}/reset-password?token=${token}" class="button">Reset Password</a>
+            </p>
+            <p>If you did not request a password reset, please secure your account by visiting <a href="${frontendUrl}"><strong style="color: #60A5FA;">Ci</strong><strong style="color: #006FEE;">Study</strong></a> and changing your password.</p>
+            <p>If you have any questions or need further assistance, do not hesitate to contact our support team.</p>
+            <p>Best regards,</p>
+            <p>The CiStudy Team</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 CiStudy. All rights reserved.</p>
+            <p>This email was sent from an automated system, please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>
+
+    `
+
 
 export const reportCourseMail = (reportedCourseCreatorEmail: string, reporterUsername: string, courseTitle: string, reportedDate: Date, title: string, description: string, processStatus: string, processNote: string) => `
 <!DOCTYPE html>

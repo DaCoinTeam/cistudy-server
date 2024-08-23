@@ -30,7 +30,7 @@ import {
 } from "@database"
 import { Inject, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { DataSource, DeepPartial, Like, Repository } from "typeorm"
+import { DataSource, DeepPartial, Like, Not, Repository } from "typeorm"
 import {
     FindManyCourseReportsInput,
     FindManyCourseReviewsInput,
@@ -1284,7 +1284,7 @@ export class CoursesService {
         const { options } = data
         const { skip, take } = options
 
-        const results = await this.reportCourseMySqlRepository.find({
+        const pendingReports = await this.reportCourseMySqlRepository.find({
             where: {
                 processStatus: ReportProcessStatus.Processing
             },
@@ -1300,6 +1300,29 @@ export class CoursesService {
                 createdAt: "DESC"
             }
         })
+
+        const exceptPendingReports = await this.reportCourseMySqlRepository.find({
+            where: {
+                processStatus: Not(ReportProcessStatus.Processing)
+            },
+            relations: {
+                reporterAccount: true,
+                reportedCourse: {
+                    creator: true
+                }
+            },
+            skip,
+            take,
+            order: {
+                createdAt: "DESC"
+            }
+        })
+
+        const results = [...pendingReports, ...exceptPendingReports]
+
+        if(skip && take){
+            results.splice(skip, skip + take)
+        }
 
         const numberOfCourseReports = await this.reportCourseMySqlRepository.count()
 

@@ -16,11 +16,12 @@ import {
     TransactionMongoEntity,
     TransactionMySqlEntity,
 } from "@database"
-import { BlockchainService, StorageService } from "@global"
+import { BlockchainService, MailerService, Sha256Service, StorageService } from "@global"
 import {
     ConflictException,
     Injectable,
     NotFoundException,
+    UnauthorizedException,
 } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { InjectRepository } from "@nestjs/typeorm"
@@ -30,6 +31,7 @@ import Web3 from "web3"
 import {
     AddJobInput,
     AddQualificationInput,
+    ChangePasswordInput,
     DeleteJobInput,
     DeleteNotificationInput,
     DeleteQualificationInput,
@@ -46,6 +48,7 @@ import {
 import {
     AddJobOutput,
     AddQualificationInputOutput,
+    ChangePasswordOutput,
     DeleteJobOutput,
     DeleteNotificationOutput,
     DeleteQualificationOutput,
@@ -78,14 +81,16 @@ export class ProfileService {
         private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
         @InjectRepository(RoleMySqlEntity)
         private readonly roleMySqlRepository: Repository<RoleMySqlEntity>,
+        private readonly mailerService: MailerService,
         private readonly storageService: StorageService,
         private readonly blockchainService: BlockchainService,
         private readonly openapiService: OpenApiService,
+        private readonly sha256Service: Sha256Service,
     ) { }
 
     async updateProfile(input: UpdateProfileInput): Promise<UpdateProfileOutput> {
         const { accountId, data, files } = input
-        const { username, birthdate, avatarIndex, coverPhotoIndex, walletAddress } =
+        const { username, birthdate, avatarIndex, coverPhotoIndex, walletAddress, bio } =
             data
         //validate to ensure it is image
 
@@ -96,6 +101,7 @@ export class ProfileService {
             username,
             birthdate,
             walletAddress,
+            bio
         }
 
         if (Number.isInteger(avatarIndex)) {
@@ -531,6 +537,23 @@ export class ProfileService {
         const data = await this.openapiService.isSatisfyCommunityStandard(message)
         return {
             data
+        }
+    }
+    
+    async changePassword(input: ChangePasswordInput): Promise<ChangePasswordOutput> {
+        const { accountId, data } = input
+        const { currentPassword, newPassword } = data
+
+        const { password } = await this.accountMySqlRepository.findOneBy({ accountId })
+
+        if (!this.sha256Service.verifyHash(currentPassword, password))
+            throw new UnauthorizedException("Your previous password is incorrect.")
+
+        const changedPassword = this.sha256Service.createHash(newPassword)
+        await this.accountMySqlRepository.update(accountId, { password: changedPassword })
+
+        return {
+            message: "Password changed successfully."
         }
     }
 }
