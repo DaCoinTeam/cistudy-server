@@ -104,19 +104,19 @@ export class ProfileService {
             }
         })
     
-        const creatorIds = courses.map(course => course.creator.accountId) ?? []
+        //const creatorIds = courses.map(course => course.creator.accountId) ?? []
     
-        const numberOfFollowersResults = await this.followMySqlRepository
-            .createQueryBuilder("follow")
-            .select("follow.followedAccountId, COUNT(follow.followedAccountId) as count")
-            .where("follow.followedAccountId IN (:...creatorIds)", { creatorIds })
-            .groupBy("follow.followedAccountId")
-            .getRawMany()
+        // const numberOfFollowersResults = await this.followMySqlRepository
+        //     .createQueryBuilder("follow")
+        //     .select("follow.followedAccountId, COUNT(follow.followedAccountId) as count")
+        //     .where("follow.followedAccountId IN (:...creatorIds)", { creatorIds })
+        //     .groupBy("follow.followedAccountId")
+        //     .getRawMany()
     
-        const followerCountMap = numberOfFollowersResults?.reduce((map, item) => {
-            map[item.followedAccountId] = parseInt(item.count ?? 0, 10)
-            return map
-        }, {})
+        // const followerCountMap = numberOfFollowersResults?.reduce((map, item) => {
+        //     map[item.followedAccountId] = parseInt(item.count ?? 0, 10)
+        //     return map
+        // }, {})
     
 
         const numberOfEnrolledCoursesResult = await this.enrolledInfoMySqlRepository.count({
@@ -140,7 +140,7 @@ export class ProfileService {
     
         return {
             results: courses.map(course => {
-                course.creator.numberOfFollowers = followerCountMap[course.creator.accountId] || 0
+                // course.creator.numberOfFollowers = followerCountMap[course.creator.accountId] || 0
                 course.numberOfRewardedPostsLeft = numberOfRewardedPostsLeft
     
                 return course
