@@ -104,7 +104,7 @@ export class ProfileService {
             }
         })
     
-        const creatorIds = courses.map(course => course.creator.accountId)
+        const creatorIds = courses.map(course => course.creator.accountId) ?? []
     
         const numberOfFollowersResults = await this.followMySqlRepository
             .createQueryBuilder("follow")
@@ -113,7 +113,7 @@ export class ProfileService {
             .groupBy("follow.followedAccountId")
             .getRawMany()
     
-        const followerCountMap = numberOfFollowersResults.reduce((map, item) => {
+        const followerCountMap = numberOfFollowersResults?.reduce((map, item) => {
             map[item.followedAccountId] = parseInt(item.count ?? 0, 10)
             return map
         }, {})
