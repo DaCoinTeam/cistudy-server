@@ -72,7 +72,7 @@ export class ProfileController{
     @ApiBearerAuth()
     @ApiConsumes("multipart/form-data")
     @ApiBody({ schema: updateJobSchema })
-    @Put("update-account-job")
+    @Put("update-job")
     @UseGuards(JwtAuthGuard)
     @UseInterceptors(
         AuthInterceptor,

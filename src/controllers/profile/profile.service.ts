@@ -189,7 +189,11 @@ export class ProfileService {
             accountJob.companyThumbnailId = assetId
         }
 
-        if (endDate) accountJob.endDate = endDate
+        if (endDate){
+            accountJob.endDate = endDate
+        } else {
+            accountJob.endDate = null
+        }
 
         await this.accountJobMySqlRepository.update(accountJobId, accountJob)
 
