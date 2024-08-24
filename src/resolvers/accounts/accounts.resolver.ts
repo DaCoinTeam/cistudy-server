@@ -75,7 +75,7 @@ export class AccountsResolver {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(AuthInterceptor)
   @Query(() => FindManyPublishedCoursesOutput)
-  async findManyPendingCourses(
+  async findManyPublishedCourses(
     @Args("data") data: FindManyPublishedCoursesInputData,
     @AccountId() accountId: string,
   ) {
