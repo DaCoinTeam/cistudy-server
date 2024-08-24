@@ -200,3 +200,17 @@ export class ChangePasswordInput implements AuthInput<ChangePasswordInputData>{
     accountId: string
     data: ChangePasswordInputData
 }
+
+export class CreateCourseConfigurationInputData {
+    @ApiProperty()
+        courseId: string
+    @ApiProperty()
+        earn: number
+    @ApiProperty()
+        completed: number
+}
+
+export class CreateCourseConfigurationInput implements AuthInput<CreateCourseConfigurationInputData> {
+    accountId: string
+    data: CreateCourseConfigurationInputData
+}

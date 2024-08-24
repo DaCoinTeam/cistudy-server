@@ -68,3 +68,7 @@ export class UpdateQualificationOutput implements Output {
 export class ChangePasswordOutput implements Output {
     message: string
 }
+
+export class CreateCourseConfigurationOutput implements Output {
+    message: string
+}

@@ -14,7 +14,7 @@ import {
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiHeader, ApiTags } from "@nestjs/swagger"
 import { AccountId, AuthInterceptor, DataFromBody, JwtAuthGuard, Roles } from "../shared"
-import { AddJobInputData, AddQualificationInputData, ChangePasswordInputData, DepositData, IsSastifyCommunityStandardInput, MarkNotificationAsReadInputData, UpdateJobInputData, UpdateProfileData, UpdateQualificationInputData, WithdrawData } from "./profile.input"
+import { AddJobInputData, AddQualificationInputData, ChangePasswordInputData, CreateCourseConfigurationInputData, DepositData, IsSastifyCommunityStandardInput, MarkNotificationAsReadInputData, UpdateJobInputData, UpdateProfileData, UpdateQualificationInputData, WithdrawData } from "./profile.input"
 import { addJobSchema, addQualificationSchema, updateJobSchema, updateProfileSchema, updateQualificationSchema } from "./profile.schema"
 import { ProfileService } from "./profile.service"
 
@@ -265,5 +265,16 @@ export class ProfileController{
         @Body() data: ChangePasswordInputData
     ) {
         return this.profileService.changePassword({ accountId, data })
+    }
+
+    @ApiBearerAuth()
+    @Post("create-course-configuration")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(AuthInterceptor)
+    async createCourseConfiguration(
+        @AccountId() accountId : string,
+        @Body() data: CreateCourseConfigurationInputData
+    ) {
+        return this.profileService.createCourseConfiguration({ accountId, data })
     }
 }

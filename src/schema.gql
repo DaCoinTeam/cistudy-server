@@ -536,6 +536,16 @@ type NotificationEntity {
   course: CourseEntity
 }
 
+type CourseConfigurationEntity {
+  courseConfigurationId: ID
+  earn: Float
+  completed: Float
+  createdAt: DateTime!
+  courseId: ID
+  updatedAt: DateTime!
+  course: CourseEntity
+}
+
 type CourseEntity {
   courseId: ID!
   title: String
@@ -568,6 +578,7 @@ type CourseEntity {
   courseNotifications: [NotificationEntity!]
   transactionDetails: [TransactionDetailEntity!]
   transactions: [TransactionEntity!]
+  courseConfigurations: [CourseConfigurationEntity!]!
   numberOfEnrollments: Int
   enrolled: Boolean
   isReviewed: Boolean
@@ -587,6 +598,7 @@ type CourseEntity {
   completedContents: Int
   students: [AccountEntity!]
   isAddedToCart: Boolean
+  courseConfiguration: CourseConfigurationEntity
 }
 
 type CartCourseEntity {
@@ -731,11 +743,7 @@ type AccountEntity {
 
 type ConfigurationEntity {
   configurationId: ID
-  earn: Float
-  instructor: Float
-  completed: Float
   foundation: Float
-  appliedAt: DateTime!
   createdAt: DateTime!
   updatedAt: DateTime!
 }

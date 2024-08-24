@@ -5,6 +5,7 @@ import {
     CertificateMySqlEntity,
     CompleteResourceMySqlEntity,
     CourseCategoryMySqlEntity,
+    CourseConfigurationMySqlEntity,
     CourseMySqlEntity,
     CourseReviewMySqlEntity,
     CourseTargetMySqlEntity,
@@ -29,6 +30,7 @@ import { TypeOrmModule } from "@nestjs/typeorm"
 import { ResourceAttachmentEntity } from "src/database/mysql/resource-attachment.entity"
 import { CoursesResolver } from "./courses.resolver"
 import { CoursesService } from "./courses.service"
+
 
 @Module({
     imports: [
@@ -57,7 +59,8 @@ import { CoursesService } from "./courses.service"
             CompleteResourceMySqlEntity,
             CertificateMySqlEntity,
             CartCourseMySqlEntity,
-            TransactionDetailMySqlEntity
+            TransactionDetailMySqlEntity,
+            CourseConfigurationMySqlEntity
         ]),
     ],
     providers: [CoursesResolver, CoursesService],

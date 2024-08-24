@@ -1,5 +1,7 @@
 import {
     AccountMySqlEntity,
+    ConfigurationMySqlEntity,
+    CourseConfigurationMySqlEntity,
     CourseMySqlEntity,
     EnrolledInfoMySqlEntity,
     LessonMySqlEntity,
@@ -19,6 +21,7 @@ import {
     AuthManagerService,
     Bento4Service,
     BlockchainService,
+    ConfigurationService,
     FfmpegService,
     FirebaseService,
     MailerService,
@@ -46,7 +49,9 @@ import { OpenApiService } from "./services/openapi.service"
             PostLikeMySqlEntity,
             PostCommentMySqlEntity,
             PostCommentLikeMySqlEntity,
-            RoleMySqlEntity
+            RoleMySqlEntity,
+            ConfigurationMySqlEntity,
+            CourseConfigurationMySqlEntity
         ])
     ],
     exports: [
@@ -62,7 +67,8 @@ import { OpenApiService } from "./services/openapi.service"
         JwtStrategy,
         BlockchainService,
         PaypalService,
-        OpenApiService
+        OpenApiService,
+        ConfigurationService
     ],
     providers: [
         JwtService,
@@ -77,7 +83,8 @@ import { OpenApiService } from "./services/openapi.service"
         JwtStrategy,
         BlockchainService,
         PaypalService,
-        OpenApiService
+        OpenApiService,
+        ConfigurationService
     ], 
 })
 export class GlobalModule { }

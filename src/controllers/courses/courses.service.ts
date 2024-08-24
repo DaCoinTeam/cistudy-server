@@ -9,6 +9,7 @@ import {
     SectionContentType,
     shuffleArray,
     SystemRoles,
+    TransactionStatus,
     TransactionType,
     VideoType,
 } from "@common"
@@ -41,7 +42,7 @@ import {
     SectionMySqlEntity,
     TransactionMySqlEntity,
 } from "@database"
-import { MailerService, StorageService } from "@global"
+import { ConfigurationService, MailerService, StorageService } from "@global"
 import {
     ConflictException,
     Inject,
@@ -211,6 +212,7 @@ export class CoursesService {
         private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
         private readonly dataSource: DataSource,
         private readonly mailerService: MailerService,
+        private readonly configurationService: ConfigurationService
     ) { }
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
@@ -268,7 +270,8 @@ export class CoursesService {
         }
 
         const price = enableDiscount ? discountPrice : coursePrice
-        const courseCreatorShares = price / 2
+        const { instructor } = await this.configurationService.getConfiguration(courseId)
+        const courseCreatorShares = price * instructor / 100
 
         const { username, balance } = account
 
@@ -1273,7 +1276,8 @@ export class CoursesService {
             }
         })
 
-        const earnAmount = 0.1 * activeEnrollment.priceAtEnrolled
+        const { completed } = await this.configurationService.getConfiguration(courseId)
+        const earnAmount = completed / 100 * activeEnrollment.priceAtEnrolled
 
         await this.accountMySqlRepository.update(accountId, {
             balance: balance + earnAmount
@@ -1307,6 +1311,21 @@ export class CoursesService {
             type: NotificationType.Transaction,
             description: `You have received ${numeral(earnAmount).format("0.00")} STARCI(s)`,
         })
+
+        await this.transactionMySqlEntity.save({
+            amountDepositedChange: earnAmount,
+            accountId,
+            courseId,
+            preTextEarn: "Complete the course ",
+            transactionDetails: [
+                {
+                    courseId
+                }
+            ],
+            type: TransactionType.Earn,
+            status: TransactionStatus.Success
+        })
+
 
         return {
             message: "Certificate created successfully",

@@ -6,6 +6,7 @@ import { AddToCartInput, CheckOutInput, DeleteFromCartInput } from "./cart.input
 import { AddToCartOutput, CheckOutOutput, DeleteFromCartOutput } from "./cart.output"
 import { NotificationType, OrderStatus, TransactionType } from "@common"
 import { appConfig } from "@config"
+import { ConfigurationService } from "@global"
 
 @Injectable()
 export class CartService {
@@ -25,7 +26,8 @@ export class CartService {
         @InjectRepository(NotificationMySqlEntity)
         private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
         @InjectRepository(TransactionMySqlEntity)
-        private readonly transactionMySqlEntity: Repository<TransactionMySqlEntity>
+        private readonly transactionMySqlEntity: Repository<TransactionMySqlEntity>,
+        private readonly configurationService: ConfigurationService
     ) { }
 
 

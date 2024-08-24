@@ -23,7 +23,7 @@ import {
     TransactionDetailMySqlEntity,
     TransactionMySqlEntity,
 } from "@database"
-import { MailerService, StorageService } from "@global"
+import { ConfigurationService, MailerService, StorageService } from "@global"
 import {
     ConflictException,
     Injectable,
@@ -108,6 +108,7 @@ export class PostsService {
     private readonly storageService: StorageService,
     private readonly dataSource: DataSource,
     private readonly mailerService: MailerService,
+    private readonly configurationService: ConfigurationService,
     ) {}
 
     async createPost(input: CreatePostInput): Promise<CreatePostOutput> {
@@ -183,9 +184,11 @@ export class PostsService {
               courseId,
           })
 
+                const { earn } =
+          await this.configurationService.getConfiguration(courseId)
+
                 earnAmount = computeFixedFloor(
-                    priceAtEnrolled *
-            blockchainConfig().earns.percentage *
+                    ((priceAtEnrolled * earn) / 100) *
             blockchainConfig().earns.createPostEarnCoefficient,
                 )
 
@@ -375,9 +378,10 @@ export class PostsService {
                 if (!isInstructor) {
                     const { priceAtEnrolled } = isEnrolled
                     if (numberOfRewardedLike.length < 20) {
+                        const { earn } = await this.configurationService.getConfiguration(courseId)
                         earnAmount = computeFixedFloor(
                             priceAtEnrolled *
-                blockchainConfig().earns.percentage *
+                earn / 100 *
                 blockchainConfig().earns.likePostEarnCoefficient,
                         )
                         await this.transactionMySqlRepository.save({
@@ -544,9 +548,11 @@ export class PostsService {
                     if (!isCommented || isCommented.length < 1) {
                         const { priceAtEnrolled } = isEnrolled
                         if (numberOfRewardedComments < 20) {
+                            const { earn } =
+                await this.configurationService.getConfiguration(courseId)
+
                             earnAmount = computeFixedFloor(
-                                priceAtEnrolled *
-                  blockchainConfig().earns.percentage *
+                                ((priceAtEnrolled * earn) / 100) *
                   blockchainConfig().earns.commentPostEarnCoefficient,
                             )
 
@@ -898,10 +904,10 @@ export class PostsService {
                 courseId,
             },
         })
-
+            const { earn } = await this.configurationService.getConfiguration(courseId)
             const earnAmount = computeFixedFloor(
                 priceAtEnrolled *
-          blockchainConfig().earns.percentage *
+                earn / 100 *
           blockchainConfig().earns.rewardCommentPostEarnCoefficient,
             )
 

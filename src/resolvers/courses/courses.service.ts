@@ -12,6 +12,7 @@ import {
     CategoryMySqlEntity,
     CertificateMySqlEntity,
     CompleteResourceMySqlEntity,
+    CourseConfigurationMySqlEntity,
     CourseMySqlEntity,
     CourseRating,
     CourseReviewMySqlEntity,
@@ -81,6 +82,8 @@ export class CoursesService {
     private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
     @InjectRepository(QuizAttemptMySqlEntity)
     private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
+    @InjectRepository(CourseConfigurationMySqlEntity)
+    private readonly courseConfigurationMySqlRepository: Repository<CourseConfigurationMySqlEntity>,
     @InjectRepository(QuizQuestionMySqlEntity)
     private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
     @InjectRepository(ReportCourseMySqlEntity)
@@ -159,7 +162,7 @@ export class CoursesService {
                 },
                 courseReviews: {
                     account: true
-                }
+                },
             },
             order: {
                 courseTargets: {
@@ -308,6 +311,14 @@ export class CoursesService {
         course.numberOfResources = numberOfResources
         course.numberOfQuizzes = numberOfQuizzes
 
+        const courseConfigurations = await this.courseConfigurationMySqlRepository.find({
+            order: {
+                createdAt: "DESC"
+            }
+        })
+        if (courseConfigurations[0]) {
+            course.courseConfiguration = courseConfigurations[0]
+        }
         return course
     }
 
@@ -628,6 +639,16 @@ export class CoursesService {
         })
 
         course.students = enrolledInfos.map(({account}) => account)
+
+        const courseConfigurations = await this.courseConfigurationMySqlRepository.find({
+            order: {
+                createdAt: "DESC"
+            }
+        })
+        if (courseConfigurations[0]) {
+            course.courseConfiguration = courseConfigurations[0]
+        }
+        
         return course
     }
 

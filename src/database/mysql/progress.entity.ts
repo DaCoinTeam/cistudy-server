@@ -37,12 +37,12 @@ export class ProgressEntity {
         completeFirstWatch: boolean
 
     @Field(() => LessonEntity)
-    @ManyToOne(() => LessonEntity, (lesson) => lesson.progresses, {onDelete: "CASCADE"} )
+    @ManyToOne(() => LessonEntity, (lesson) => lesson.progresses )
     @JoinColumn({ name: "lessonId" })
         lesson: LessonEntity
 
     @Field(() => AccountEntity)
-    @ManyToOne(() => AccountEntity, (account) => account.courseProgress, {onDelete: "CASCADE"} )
+    @ManyToOne(() => AccountEntity, (account) => account.courseProgress)
     @JoinColumn({ name: "accountId" })
         account: AccountEntity
 

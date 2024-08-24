@@ -25,6 +25,7 @@ import { SectionEntity } from "./section.entity"
 import { NotificationEntity } from "./notification.entity"
 import { TransactionDetailEntity } from "./transaction-detail.entity"
 import { TransactionEntity } from "./transaction.enity"
+import { CourseConfigurationEntity } from "./course-configuration"
 
 interface CourseIncludes {
   time: number
@@ -183,6 +184,13 @@ export class CourseEntity {
   })
       transactions?: Array<TransactionEntity>
 
+  @Field(() => [CourseConfigurationEntity])
+  @OneToMany(
+      () => CourseConfigurationEntity,
+      (courseConfiguration) => courseConfiguration.course,
+  )
+      courseConfigurations: Array<CourseConfigurationEntity>
+
   //graphql
   @Field(() => Int, { nullable: true })
       numberOfEnrollments?: number
@@ -237,4 +245,6 @@ export class CourseEntity {
       students?: Array<AccountEntity>
   @Field(() => Boolean, { nullable: true })
       isAddedToCart?: boolean
+  @Field(() => CourseConfigurationEntity, { nullable: true })
+      courseConfiguration?: CourseConfigurationEntity
 }

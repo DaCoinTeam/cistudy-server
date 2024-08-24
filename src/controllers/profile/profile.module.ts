@@ -21,6 +21,7 @@ import {
     AccountJobMySqlEntity,
     AccountQualificationMySqlEntity,
     RoleMySqlEntity,
+    CourseConfigurationMySqlEntity,
 } from "@database"
 import { ProfileService } from "./profile.service"
 import { MongooseModule } from "@nestjs/mongoose"
@@ -44,7 +45,8 @@ import { MongooseModule } from "@nestjs/mongoose"
             PostCommentLikeMySqlEntity,
             FollowMySqlEnitity,
             TransactionMySqlEntity,
-            NotificationMySqlEntity
+            NotificationMySqlEntity,
+            CourseConfigurationMySqlEntity
         ]),
         MongooseModule.forFeature([
             {

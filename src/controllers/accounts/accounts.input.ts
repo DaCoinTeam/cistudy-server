@@ -50,7 +50,7 @@ export class CreateAccountReviewInputData {
     @ApiProperty()
         content: string
 
-    @Min(1)
+    @Min(1) 
     @Max(5)
     @ApiProperty()
         rating: number
@@ -207,12 +207,6 @@ export class ResolveAccountReportInput implements AuthInput<ResolveAccountReport
 }
 
 export class CreateConfigurationInputData {
-    @ApiProperty()
-        instructor: number
-    @ApiProperty()
-        earn: number
-    @ApiProperty()
-        completed: number
     @ApiProperty()
         foundation: number
 }

@@ -47,6 +47,7 @@ import { TransactionDetailEntity as TransactionDetailMySqlEntity } from "./trans
 import { ConfigurationEntity as ConfigurationMySqlEntity } from "./configuration.entity"
 import { AccountQualificationEntity as AccountQualificationMySqlEntity } from "./account-qualification.entity"
 import { AccountJobEntity as AccountJobMySqlEntity } from "./account-job.entity"
+import { CourseConfigurationEntity as CourseConfigurationMySqlEntity } from "./course-configuration"
 
 export {
     AccountMySqlEntity,
@@ -97,5 +98,6 @@ export {
     CompleteResourceMySqlEntity,
     NotificationMySqlEntity,
     TransactionDetailMySqlEntity,
-    ConfigurationMySqlEntity
+    ConfigurationMySqlEntity,
+    CourseConfigurationMySqlEntity
 }

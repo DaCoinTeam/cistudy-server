@@ -11,6 +11,7 @@ import {
     AccountJobMySqlEntity,
     AccountMySqlEntity,
     AccountQualificationMySqlEntity,
+    CourseConfigurationMySqlEntity,
     NotificationMySqlEntity,
     RoleMySqlEntity,
     TransactionMongoEntity,
@@ -32,6 +33,7 @@ import {
     AddJobInput,
     AddQualificationInput,
     ChangePasswordInput,
+    CreateCourseConfigurationInput,
     DeleteJobInput,
     DeleteNotificationInput,
     DeleteQualificationInput,
@@ -49,6 +51,7 @@ import {
     AddJobOutput,
     AddQualificationInputOutput,
     ChangePasswordOutput,
+    CreateCourseConfigurationOutput,
     DeleteJobOutput,
     DeleteNotificationOutput,
     DeleteQualificationOutput,
@@ -81,6 +84,8 @@ export class ProfileService {
         private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
         @InjectRepository(RoleMySqlEntity)
         private readonly roleMySqlRepository: Repository<RoleMySqlEntity>,
+        @InjectRepository(CourseConfigurationMySqlEntity)
+        private readonly courseConfigurationRepository: Repository<CourseConfigurationMySqlEntity>,
         private readonly mailerService: MailerService,
         private readonly storageService: StorageService,
         private readonly blockchainService: BlockchainService,
@@ -554,6 +559,21 @@ export class ProfileService {
 
         return {
             message: "Password changed successfully."
+        }
+    }
+
+    async createCourseConfiguration(input: CreateCourseConfigurationInput): Promise<CreateCourseConfigurationOutput> {
+        const { data } = input
+        const { courseId, completed, earn } = data
+
+        await this.courseConfigurationRepository.save({
+            courseId,
+            completed,
+            earn
+        })
+
+        return {
+            message: "Apply successfully"
         }
     }
 }
