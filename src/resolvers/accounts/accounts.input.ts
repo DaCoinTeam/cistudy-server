@@ -190,22 +190,22 @@ export class FindManyAccountReportsInput implements AuthInput<FindManyAccountRep
     data: FindManyAccountReportsInputData
 }
 @InputType()
-export class FindManyPendingCourseInputOptions {
+export class FindManyPublishedCoursesInputOptions {
     @Field(() => Int, { nullable: true })
         take?: number
     @Field(() => Int, { nullable: true })
         skip?: number
 }
 @InputType()
-export class FindManyPendingCourseInputData implements OptionsOnly<FindManyPendingCourseInputOptions>{
-    @Field(() => FindManyPendingCourseInputOptions, { nullable: true })
+export class FindManyPublishedCoursesInputData implements OptionsOnly<FindManyPublishedCoursesInputOptions>{
+    @Field(() => FindManyPublishedCoursesInputOptions, { nullable: true })
     @IsOptional()
-        options?: FindManyPendingCourseInputOptions
+        options?: FindManyPublishedCoursesInputOptions
 }
 
-export class FindManyPendingCourseInput implements AuthInput<FindManyPendingCourseInputData> {
+export class FindManyPublishedCoursesInput implements AuthInput<FindManyPublishedCoursesInputData> {
     accountId: string
-    data: FindManyPendingCourseInputData
+    data: FindManyPublishedCoursesInputData
 }
 
 export class GetAdminAnalyticsInput implements AuthEmptyDataInput {
