@@ -352,9 +352,9 @@ export class PostsService {
                 .getRawMany()
 
             const { isRewardable } = await this.postMySqlRepository.findOneBy({ postId })
-            
+
             const uniqueRewardedComments = []
-            
+
             if (isRewardable) {
                 const rewardedComments = await queryRunner.manager
                     .createQueryBuilder(PostCommentMySqlEntity, "post_comment")
@@ -495,11 +495,11 @@ export class PostsService {
         })
 
         const results = [...pendingReports, ...exceptPendingReports]
-        
-        if(skip && take){
+
+        if (skip && take) {
             results.slice(skip, skip + take)
         }
-     
+
         const numberOfPostReports = await this.reportPostMySqlRepository.count({
             where: {
                 processStatus: ReportProcessStatus.Processing
@@ -550,7 +550,7 @@ export class PostsService {
 
         try {
             const pendingReports = await this.reportPostCommentMySqlRepository.find({
-                where:{
+                where: {
                     processStatus: ReportProcessStatus.Processing
                 },
                 relations: {
@@ -560,14 +560,15 @@ export class PostsService {
                         post: true,
                         creator: true
                     },
-
                 },
-                skip,
-                take
+                order: {
+                    createdAt: "DESC"
+                }
+
             })
-            
+
             const exceptPendingReports = await this.reportPostCommentMySqlRepository.find({
-                where:{
+                where: {
                     processStatus: Not(ReportProcessStatus.Processing)
                 },
                 relations: {
@@ -577,13 +578,15 @@ export class PostsService {
                         post: true,
                         creator: true
                     },
-
+                },
+                order: {
+                    createdAt: "DESC"
                 }
             })
 
             const results = [...pendingReports, ...exceptPendingReports]
 
-            if(skip && take){
+            if (skip && take) {
                 results.slice(skip, skip + take)
             }
 

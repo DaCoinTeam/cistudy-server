@@ -1294,8 +1294,6 @@ export class CoursesService {
                     creator: true
                 }
             },
-            skip,
-            take,
             order: {
                 createdAt: "DESC"
             }
@@ -1311,8 +1309,6 @@ export class CoursesService {
                     creator: true
                 }
             },
-            skip,
-            take,
             order: {
                 createdAt: "DESC"
             }

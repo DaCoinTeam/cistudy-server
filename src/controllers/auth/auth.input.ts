@@ -6,8 +6,7 @@ export class SignInInputData {
   @IsEmail()
   @ApiProperty()
   	email: string
-    
-  @IsStrongPassword()
+
   @Length(6, 20)
   @ApiProperty()
   	password: string
