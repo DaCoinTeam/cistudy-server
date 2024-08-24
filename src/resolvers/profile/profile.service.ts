@@ -293,7 +293,7 @@ export class ProfileService {
     }
 
     async findOneCertificate(input: FindOneCertificateInput): Promise<CertificateMySqlEntity> {
-        const { data, accountId } = input
+        const { data } = input
         const { certificateId } = data
 
         const certificate = await this.certificateMySqlRepository.findOne({
@@ -323,7 +323,7 @@ export class ProfileService {
 
         const numberOfAccountFollowers = await this.followMySqlRepository.count({
             where:{
-                followedAccountId: accountId,
+                followedAccountId: certificate.accountId,
                 followed: true
             }
         })

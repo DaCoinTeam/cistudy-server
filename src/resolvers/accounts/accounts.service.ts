@@ -326,6 +326,10 @@ export class AccountsService {
                 transactionDetails: {
                     account: true,
                     course: true,
+                    post: true,
+                    postComment: {
+                        post: true,
+                    }
                 },
             },
             order: {

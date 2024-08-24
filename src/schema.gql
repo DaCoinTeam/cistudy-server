@@ -1079,11 +1079,6 @@ type FindManyReceivedNotificationsOutput {
   tokens: AuthTokens
 }
 
-type FindOneCertificateOutput {
-  data: CertificateEntity!
-  tokens: AuthTokens
-}
-
 type FindManyAccountOrdersOutputMetadata {
   count: Int
 }
@@ -1201,7 +1196,7 @@ type Query {
   findManyEnrolledCourses(data: FindManyEnrolledCoursesInputData!): FindManyEnrolledCoursesOutput!
   findManyTransactions(data: FindManyTransactionsInputData!): FindManyTransactionsOutput!
   findManyReceivedNotifications(data: FindManyReceivedNotificationsInputData!): FindManyReceivedNotificationsOutput!
-  findOneCertificate(data: FindOneCertificateInputData!): FindOneCertificateOutput!
+  findOneCertificate(data: FindOneCertificateInputData!): CertificateEntity!
   findManyAccountOrders(data: FindManyAccountOrdersInputData!): FindManyAccountOrdersOutput!
   getCourseStatistic(data: GetCourseStatisticInputData!): GetCourseStatisticOutput!
   findOneCart: FindOneCartOutput!
