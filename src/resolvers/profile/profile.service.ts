@@ -12,7 +12,7 @@ import {
     GetCourseStatisticInput
 } from "./profile.input"
 import { FindManyAccountOrdersOutputData, FindManyEnrolledCoursesOutputData, FindManyReceivedNotificationsOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData, GetCourseStatisticOutputData } from "./profile.output"
-import { OrderStatus, TransactionType } from "@common"
+import { OrderStatus, TransactionStatus, TransactionType } from "@common"
 
 @Injectable()
 export class ProfileService {
@@ -501,7 +501,8 @@ export class ProfileService {
             commentPosts,
             markedPosts,
             createdPosts,
-            totalEarning: earnTransactions.reduce((sum, transaction) => { return sum + transaction.amountDepositedChange}, 0)
+            totalEarning: earnTransactions.reduce((sum, transaction) => { return transaction.status === TransactionStatus.Success ? sum + transaction.amountDepositedChange : sum }, 0),
+            pendingEarning: earnTransactions.reduce((sum, transaction) => { return transaction.status === TransactionStatus.Pending ? sum + transaction.amountDepositedChange : sum}, 0),
         }
     }
 }
