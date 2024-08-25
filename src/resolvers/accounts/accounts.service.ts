@@ -276,9 +276,9 @@ export class AccountsService {
                 isDeleted: false
             }
         })
-
+        
         return {
-            results: (skip && take) ? results.slice(skip).slice(0, take) : results,
+            results: (skip !== null && take !== null) ? results.slice(skip).slice(0, take) : results,
             metadata: {
                 count: numberOfPublishedCourses,
             },
