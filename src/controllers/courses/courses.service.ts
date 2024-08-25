@@ -1277,7 +1277,7 @@ export class CoursesService {
         })
 
         const { completed } = await this.configurationService.getConfiguration(courseId)
-        const earnAmount = completed / 100 * activeEnrollment.priceAtEnrolled
+        const earnAmount = (completed / 100) * activeEnrollment.priceAtEnrolled
 
         await this.accountMySqlRepository.update(accountId, {
             balance: balance + earnAmount

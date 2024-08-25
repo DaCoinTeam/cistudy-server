@@ -1096,6 +1096,7 @@ type FindManyAccountOrdersOutput {
 type GetCourseStatisticOutputData {
   numberOfRewardablePostsLeft: Int
   totalEarning: Float
+  pendingEarning: Float
   likePosts: [PostEntity!]
   commentPosts: [PostEntity!]
   markedPosts: [PostEntity!]
