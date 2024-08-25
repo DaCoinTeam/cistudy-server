@@ -13,7 +13,7 @@ import {
 } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { DataSource, Not, Repository } from "typeorm"
+import { DataSource, In, Not, Repository } from "typeorm"
 import {
     FindManyAccountReportsInput,
     FindManyAccountReviewsInput,
@@ -245,6 +245,7 @@ export class AccountsService {
         const pendingCourses = await this.courseMySqlRepository.find({
             where: {
                 verifyStatus: CourseVerifyStatus.Pending,
+                isDeleted: false
             },
             relations: {
                 creator: true,
@@ -256,23 +257,29 @@ export class AccountsService {
 
         const exceptPendingCourses = await this.courseMySqlRepository.find({
             where: {
-                verifyStatus: Not(CourseVerifyStatus.Pending),
+                verifyStatus: Not(In([CourseVerifyStatus.Pending, CourseVerifyStatus.Draft])),
+                isDeleted: false
             },
             relations: {
                 creator: true,
             },
-            order:{
-                createdAt: "DESC"
-            }
+            order: {
+                createdAt: "DESC",
+            },
         })
-
+        
         const results = [...pendingCourses, ...exceptPendingCourses]
 
         if(skip && take){
             results.slice(skip, skip + take)
         }
 
-        const numberOfPublishedCourses = await this.courseMySqlRepository.count()
+        const numberOfPublishedCourses = await this.courseMySqlRepository.count({
+            where:{
+                verifyStatus: Not(CourseVerifyStatus.Draft),
+                isDeleted: false
+            }
+        })
 
         return {
             results,
@@ -329,7 +336,8 @@ export class AccountsService {
                     post: true,
                     postComment: {
                         post: true,
-                    }
+                    },
+                    
                 },
             },
             order: {
