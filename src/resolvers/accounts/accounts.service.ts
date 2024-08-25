@@ -278,7 +278,7 @@ export class AccountsService {
         })
 
         return {
-            results: (skip && take) ? results : results.slice(skip).slice(0, take),
+            results: (skip && take) ? results.slice(skip).slice(0, take) : results,
             metadata: {
                 count: numberOfPublishedCourses,
             },
