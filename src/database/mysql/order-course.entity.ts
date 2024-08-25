@@ -44,7 +44,7 @@ export class OrderCourseEntity {
         updatedAt: Date
         
     @Field(() => OrderEntity)
-    @ManyToOne(() => OrderEntity, (order) => order.orderCourses)
+    @ManyToOne(() => OrderEntity, (order) => order.orderCourses, {onDelete: "CASCADE"})
     @JoinColumn({ name: "orderId" })
         order: OrderEntity
 
