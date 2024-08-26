@@ -2221,6 +2221,7 @@ export class CoursesService {
         if (processStatus === ReportProcessStatus.Approved) {
             await this.courseMySqlRepository.update(reportCourseId, {
                 verifyStatus: CourseVerifyStatus.Rejected,
+                previousFeedback: processNote
             })
 
             await this.notificationMySqlRepository.save({
