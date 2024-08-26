@@ -1337,7 +1337,7 @@ export class CoursesService {
 
         const results = [...pendingReports, ...exceptPendingReports]
 
-        if(skip && take){
+        if(skip !== null && take !== null){
             results.splice(skip, skip + take)
         }
 

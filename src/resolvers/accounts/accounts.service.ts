@@ -206,7 +206,7 @@ export class AccountsService {
 
         const results = [...pendingReports, ...exceptPendingReports]
 
-        if(skip && take){
+        if(skip !== null && take !== null){
             results.slice(skip, skip + take)
         }
 
@@ -270,6 +270,10 @@ export class AccountsService {
         
         const results = [...pendingCourses, ...exceptPendingCourses]
 
+        if (skip !== null && take !== null){
+            results.slice(skip, skip + take)
+        } 
+
         const numberOfPublishedCourses = await this.courseMySqlRepository.count({
             where:{
                 verifyStatus: Not(CourseVerifyStatus.Draft),
@@ -278,7 +282,7 @@ export class AccountsService {
         })
         
         return {
-            results: (skip !== null && take !== null) ? results.slice(skip).slice(0, take) : results,
+            results,
             metadata: {
                 count: numberOfPublishedCourses,
             },

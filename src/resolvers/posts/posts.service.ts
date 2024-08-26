@@ -586,7 +586,7 @@ export class PostsService {
 
             const results = [...pendingReports, ...exceptPendingReports]
 
-            if (skip && take) {
+            if (skip !== null && take !== null) {
                 results.slice(skip, skip + take)
             }
 

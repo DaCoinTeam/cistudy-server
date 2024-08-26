@@ -75,41 +75,41 @@ import {
 @Injectable()
 export class PostsService {
     constructor(
-    @InjectRepository(PostMySqlEntity)
-    private readonly postMySqlRepository: Repository<PostMySqlEntity>,
-    @InjectRepository(PostMediaMySqlEntity)
-    private readonly postMediaMySqlRepository: Repository<PostMediaMySqlEntity>,
-    @InjectRepository(AccountMySqlEntity)
-    private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
-    @InjectRepository(CourseMySqlEntity)
-    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-    @InjectRepository(EnrolledInfoMySqlEntity)
-    private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
-    @InjectRepository(PostLikeMySqlEntity)
-    private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
-    @InjectRepository(PostCommentLikeMySqlEntity)
-    private readonly postCommentLikeMySqlRepository: Repository<PostCommentLikeMySqlEntity>,
-    @InjectRepository(PostCommentMySqlEntity)
-    private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
-    @InjectRepository(PostCommentMediaMySqlEntity)
-    private readonly postCommentMediaMySqlRepository: Repository<PostCommentMediaMySqlEntity>,
-    @InjectRepository(PostCommentReplyMySqlEntity)
-    private readonly postCommentReplyMySqlRepository: Repository<PostCommentReplyMySqlEntity>,
-    @InjectRepository(ReportPostMySqlEntity)
-    private readonly reportPostMySqlRepository: Repository<ReportPostMySqlEntity>,
-    @InjectRepository(ReportPostCommentMySqlEntity)
-    private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
-    @InjectRepository(NotificationMySqlEntity)
-    private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
-    @InjectRepository(TransactionMySqlEntity)
-    private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
-    @InjectRepository(TransactionDetailMySqlEntity)
-    private readonly transactionDetailMySqlRepository: Repository<TransactionDetailMySqlEntity>,
-    private readonly storageService: StorageService,
-    private readonly dataSource: DataSource,
-    private readonly mailerService: MailerService,
-    private readonly configurationService: ConfigurationService,
-    ) {}
+        @InjectRepository(PostMySqlEntity)
+        private readonly postMySqlRepository: Repository<PostMySqlEntity>,
+        @InjectRepository(PostMediaMySqlEntity)
+        private readonly postMediaMySqlRepository: Repository<PostMediaMySqlEntity>,
+        @InjectRepository(AccountMySqlEntity)
+        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+        @InjectRepository(CourseMySqlEntity)
+        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+        @InjectRepository(EnrolledInfoMySqlEntity)
+        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
+        @InjectRepository(PostLikeMySqlEntity)
+        private readonly postLikeMySqlRepository: Repository<PostLikeMySqlEntity>,
+        @InjectRepository(PostCommentLikeMySqlEntity)
+        private readonly postCommentLikeMySqlRepository: Repository<PostCommentLikeMySqlEntity>,
+        @InjectRepository(PostCommentMySqlEntity)
+        private readonly postCommentMySqlRepository: Repository<PostCommentMySqlEntity>,
+        @InjectRepository(PostCommentMediaMySqlEntity)
+        private readonly postCommentMediaMySqlRepository: Repository<PostCommentMediaMySqlEntity>,
+        @InjectRepository(PostCommentReplyMySqlEntity)
+        private readonly postCommentReplyMySqlRepository: Repository<PostCommentReplyMySqlEntity>,
+        @InjectRepository(ReportPostMySqlEntity)
+        private readonly reportPostMySqlRepository: Repository<ReportPostMySqlEntity>,
+        @InjectRepository(ReportPostCommentMySqlEntity)
+        private readonly reportPostCommentMySqlRepository: Repository<ReportPostCommentMySqlEntity>,
+        @InjectRepository(NotificationMySqlEntity)
+        private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+        @InjectRepository(TransactionMySqlEntity)
+        private readonly transactionMySqlRepository: Repository<TransactionMySqlEntity>,
+        @InjectRepository(TransactionDetailMySqlEntity)
+        private readonly transactionDetailMySqlRepository: Repository<TransactionDetailMySqlEntity>,
+        private readonly storageService: StorageService,
+        private readonly dataSource: DataSource,
+        private readonly mailerService: MailerService,
+        private readonly configurationService: ConfigurationService,
+    ) { }
 
     async createPost(input: CreatePostInput): Promise<CreatePostOutput> {
         const { data, files, accountId } = input
@@ -179,17 +179,17 @@ export class PostsService {
             if (numberOfUserPost.length < 3) {
                 post.isRewardable = true
                 const { priceAtEnrolled } =
-          await this.enrolledInfoMySqlRepository.findOneBy({
-              accountId,
-              courseId,
-          })
+                    await this.enrolledInfoMySqlRepository.findOneBy({
+                        accountId,
+                        courseId,
+                    })
 
                 const { earn } =
-          await this.configurationService.getConfiguration(courseId)
+                    await this.configurationService.getConfiguration(courseId)
 
                 earnAmount = computeFixedFloor(
                     ((priceAtEnrolled * earn) / 100) *
-            blockchainConfig().earns.createPostEarnCoefficient,
+                    blockchainConfig().earns.createPostEarnCoefficient,
                 )
 
                 await this.notificationMySqlRepository.save({
@@ -322,14 +322,14 @@ export class PostsService {
         let earnAmount: number
 
         const { courseId, creatorId, isRewardable, course, isCompleted, title } =
-      await this.postMySqlRepository.findOne({
-          where: {
-              postId,
-          },
-          relations: {
-              course: true,
-          },
-      })
+            await this.postMySqlRepository.findOne({
+                where: {
+                    postId,
+                },
+                relations: {
+                    course: true,
+                },
+            })
 
         if (isCompleted == true) {
             throw new ConflictException("This post is closed")
@@ -381,8 +381,8 @@ export class PostsService {
                         const { earn } = await this.configurationService.getConfiguration(courseId)
                         earnAmount = computeFixedFloor(
                             priceAtEnrolled *
-                earn / 100 *
-                blockchainConfig().earns.likePostEarnCoefficient,
+                            earn / 100 *
+                            blockchainConfig().earns.likePostEarnCoefficient,
                         )
                         await this.transactionMySqlRepository.save({
                             accountId,
@@ -549,11 +549,11 @@ export class PostsService {
                         const { priceAtEnrolled } = isEnrolled
                         if (numberOfRewardedComments < 20) {
                             const { earn } =
-                await this.configurationService.getConfiguration(courseId)
+                                await this.configurationService.getConfiguration(courseId)
 
                             earnAmount = computeFixedFloor(
                                 ((priceAtEnrolled * earn) / 100) *
-                  blockchainConfig().earns.commentPostEarnCoefficient,
+                                blockchainConfig().earns.commentPostEarnCoefficient,
                             )
 
                             await this.notificationMySqlRepository.save({
@@ -579,7 +579,7 @@ export class PostsService {
         }
 
         const { postCommentId } =
-      await this.postCommentMySqlRepository.save(postComment)
+            await this.postCommentMySqlRepository.save(postComment)
         await this.transactionMySqlRepository.save({
             accountId,
             type: TransactionType.Earn,
@@ -664,7 +664,7 @@ export class PostsService {
         }
 
         const deletedPostCommentMedias =
-      await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
+            await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
         await this.postCommentMediaMySqlRepository.delete({ postCommentId })
         await this.postCommentMySqlRepository.save(postComment)
 
@@ -683,7 +683,7 @@ export class PostsService {
         const { postCommentId } = data
 
         const deletedPostCommentMedias =
-      await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
+            await this.postCommentMediaMySqlRepository.findBy({ postCommentId })
         await this.postCommentMySqlRepository.delete({ postCommentId })
 
         const mediaIds = deletedPostCommentMedias.map(
@@ -780,11 +780,11 @@ export class PostsService {
         }
 
         const { postCommentReplyId } =
-      await this.postCommentReplyMySqlRepository.save({
-          content,
-          creatorId: accountId,
-          postCommentId,
-      })
+            await this.postCommentReplyMySqlRepository.save({
+                content,
+                creatorId: accountId,
+                postCommentId,
+            })
 
         const { username } = await this.accountMySqlRepository.findOneBy({
             accountId,
@@ -868,7 +868,7 @@ export class PostsService {
         }
 
         const { creatorId, isRewardable, courseId, postId } =
-      await this.postMySqlRepository.findOneBy({ postId: postComment.postId })
+            await this.postMySqlRepository.findOneBy({ postId: postComment.postId })
 
         if (creatorId !== accountId) {
             throw new ConflictException("You aren't the creator of the post.")
@@ -898,17 +898,17 @@ export class PostsService {
 
         if (isRewardable) {
             const { priceAtEnrolled } =
-        await this.enrolledInfoMySqlRepository.findOne({
-            where: {
-                accountId: postComment.creatorId,
-                courseId,
-            },
-        })
+                await this.enrolledInfoMySqlRepository.findOne({
+                    where: {
+                        accountId: postComment.creatorId,
+                        courseId,
+                    },
+                })
             const { earn } = await this.configurationService.getConfiguration(courseId)
             const earnAmount = computeFixedFloor(
                 priceAtEnrolled *
                 earn / 100 *
-          blockchainConfig().earns.rewardCommentPostEarnCoefficient,
+                blockchainConfig().earns.rewardCommentPostEarnCoefficient,
             )
 
             await this.transactionMySqlRepository.save({
@@ -946,7 +946,7 @@ export class PostsService {
 
         return {
             message:
-        "Comment has been marked as a solution and no more comments are allowed to this post",
+                "Comment has been marked as a solution and no more comments are allowed to this post",
         }
     }
 
@@ -972,10 +972,10 @@ export class PostsService {
 
         if (
             processing &&
-      processing.some(
-          (processing) =>
-              processing.processStatus === ReportProcessStatus.Processing,
-      )
+            processing.some(
+                (processing) =>
+                    processing.processStatus === ReportProcessStatus.Processing,
+            )
         ) {
             throw new ConflictException(
                 "You have reported this accout before and it is processing. Try update your report instead.",
@@ -1056,10 +1056,10 @@ export class PostsService {
 
         if (
             processing &&
-      processing.some(
-          (processing) =>
-              processing.processStatus === ReportProcessStatus.Processing,
-      )
+            processing.some(
+                (processing) =>
+                    processing.processStatus === ReportProcessStatus.Processing,
+            )
         ) {
             throw new ConflictException(
                 "You have reported this accout before and it is processing. Try update your report instead.",
@@ -1067,12 +1067,12 @@ export class PostsService {
         }
 
         const { reportPostCommentId } =
-      await this.reportPostCommentMySqlRepository.save({
-          accountId,
-          postCommentId,
-          title,
-          description,
-      })
+            await this.reportPostCommentMySqlRepository.save({
+                accountId,
+                postCommentId,
+                title,
+                description,
+            })
 
         return {
             message: `A report to a post's comment with id ${reportedPostComment.postCommentId} has been submitted.`,
@@ -1130,6 +1130,7 @@ export class PostsService {
             relations: {
                 reportedPost: {
                     creator: true,
+                    postComments: true
                 },
                 reporterAccount: true,
             },
@@ -1161,14 +1162,14 @@ export class PostsService {
             await this.postMySqlRepository.update(postId, { isDisabled: true })
 
             const relateTransactionDetails =
-        await this.transactionDetailMySqlRepository.find({
-            where: {
-                postId: postId,
-            },
-            relations: {
-                transaction: true,
-            },
-        })
+                await this.transactionDetailMySqlRepository.find({
+                    where: {
+                        postId: postId,
+                    },
+                    relations: {
+                        transaction: true,
+                    },
+                })
 
             const transactions = relateTransactionDetails
                 .map((transaction) => transaction.transaction)
@@ -1193,6 +1194,34 @@ export class PostsService {
             processStatus,
             processNote,
         )
+
+        const commentors = found.reportedPost.postComments
+        const uniqueNotifications = new Map<string, DeepPartial<NotificationMySqlEntity>>()
+
+        commentors.forEach(({ creatorId }) => {
+            if (!uniqueNotifications.has(creatorId)) {
+                uniqueNotifications.set(creatorId, {
+                    receiverId: creatorId,
+                    title: "New update on post you commented",
+                    type: NotificationType.System,
+                    description: `Post: ${found.reportedPost.title} you commented has been reported, so it has been removed from course forum.`,
+                })
+            }
+        })
+
+        const notificationsToCommentors = Array.from(uniqueNotifications.values())
+
+
+        // const notificationsToCommentors: Array<
+        //     DeepPartial<NotificationMySqlEntity>
+        // > = commentors.map(({ creatorId }) => ({
+        //     receiverId: creatorId,
+        //     title: "New update on post you commented",
+        //     type: NotificationType.System,
+        //     description: `Post: ${found.reportedPost.title} you commented has been reported, so it has been removed from course forum.`,
+        // }))
+
+        await this.notificationMySqlRepository.save(notificationsToCommentors)
 
         return {
             message: "Report successfully resolved and closed.",
