@@ -12,7 +12,7 @@ import {
     GetCourseStatisticInput
 } from "./profile.input"
 import { FindManyAccountOrdersOutputData, FindManyEnrolledCoursesOutputData, FindManyReceivedNotificationsOutputData, FindManySelfCreatedCoursesOutputData, FindManyTransactionsOutputData, GetCourseStatisticOutputData } from "./profile.output"
-import { OrderStatus, TransactionStatus, TransactionType } from "@common"
+import { CourseVerifyStatus, OrderStatus, TransactionStatus, TransactionType } from "@common"
 
 @Injectable()
 export class ProfileService {
@@ -94,6 +94,7 @@ export class ProfileService {
             skip,
             where: {
                 isDeleted: false,
+                verifyStatus: CourseVerifyStatus.Approved,
                 enrolledInfos: {
                     accountId,
                     enrolled: true

@@ -28,223 +28,227 @@ import { TransactionEntity } from "./transaction.enity"
 import { CourseConfigurationEntity } from "./course-configuration"
 
 interface CourseIncludes {
-  time: number
+    time: number
 }
 
 @ObjectType()
 @Entity("course")
 export class CourseEntity {
-  @Field(() => ID)
-  @PrimaryGeneratedColumn("uuid")
-      courseId: string
+    @Field(() => ID)
+    @PrimaryGeneratedColumn("uuid")
+        courseId: string
 
-  @Field(() => String, { nullable: true })
-  @Column({ type: "varchar", length: 1000, nullable: true })
-      title: string
+    @Field(() => String, { nullable: true })
+    @Column({ type: "varchar", length: 1000, nullable: true })
+        title: string
 
-  @Field(() => ID, { nullable: true })
-  @Column({
-      type: "uuid",
-      length: 36,
-      default: null,
-  })
-      thumbnailId: string
+    @Field(() => ID, { nullable: true })
+    @Column({
+        type: "uuid",
+        length: 36,
+        default: null,
+    })
+        thumbnailId: string
 
-  @Field(() => String, { nullable: true })
-  @Column({ type: "varchar", length: 5000, nullable: true })
-      description: string
+    @Field(() => String, { nullable: true })
+    @Column({ type: "varchar", length: 5000, nullable: true })
+        description: string
 
-  @Field(() => ID)
-  @Column({ type: "uuid", length: 36 })
-      creatorId: string
+    @Field(() => ID)
+    @Column({ type: "uuid", length: 36 })
+        creatorId: string
 
-  @Field(() => Float, { defaultValue: 0 })
-  @Column({ type: "float", default: 0 })
-      price: number
+    @Field(() => Float, { defaultValue: 0 })
+    @Column({ type: "float", default: 0 })
+        price: number
 
-  @Field(() => Float, { defaultValue: 0 })
-  @Column({ type: "float", default: 0 })
-      discountPrice: number
+    @Field(() => Float, { defaultValue: 0 })
+    @Column({ type: "float", default: 0 })
+        discountPrice: number
 
-  @Field(() => Boolean, { defaultValue: false })
-  @Column({ type: "boolean", default: false })
-      enableDiscount: boolean
+    @Field(() => Boolean, { defaultValue: false })
+    @Column({ type: "boolean", default: false })
+        enableDiscount: boolean
 
-  @Field(() => String)
-  @Column({
-      type: "enum",
-      enum: CourseVerifyStatus,
-      default: CourseVerifyStatus.Draft,
-  })
-      verifyStatus: CourseVerifyStatus
+    @Field(() => String)
+    @Column({
+        type: "enum",
+        enum: CourseVerifyStatus,
+        default: CourseVerifyStatus.Draft,
+    })
+        verifyStatus: CourseVerifyStatus
 
-  @Field(() => AccountEntity)
-  @ManyToOne(() => AccountEntity, (account) => account.courses)
-  @JoinColumn({ name: "creatorId" })
-      creator: AccountEntity
+    @Field(() => AccountEntity)
+    @ManyToOne(() => AccountEntity, (account) => account.courses)
+    @JoinColumn({ name: "creatorId" })
+        creator: AccountEntity
 
-  @Field(() => Boolean, { defaultValue: false })
-  @Column({ default: false })
-      isDeleted: boolean
+    @Field(() => Boolean, { defaultValue: false })
+    @Column({ default: false })
+        isDeleted: boolean
 
-  @Field(() => String, { nullable: true })
-  @Column({ nullable: true })
-      receivedWalletAddress: string
+    @Field(() => Boolean, { defaultValue: false })
+    @Column({ default: false })
+        reported: boolean
 
-  @Field(() => ID, { nullable: true })
-  @Column({ type: "uuid", length: 36, default: null })
-      previewVideoId: string
+    @Field(() => String, { nullable: true })
+    @Column({ nullable: true })
+        receivedWalletAddress: string
 
-  @Field(() => String, { nullable: true })
-  @Column({ type: "json", default: null })
-      includes: CourseIncludes
+    @Field(() => ID, { nullable: true })
+    @Column({ type: "uuid", length: 36, default: null })
+        previewVideoId: string
 
-  @Field(() => Int, { defaultValue: 12 })
-  @Column({ type: "int", default: 12 })
-      duration: number
+    @Field(() => String, { nullable: true })
+    @Column({ type: "json", default: null })
+        includes: CourseIncludes
 
-  @Field(() => String, { nullable: true })
-  @Column({ type: "varchar", length: 2000, nullable: true })
-      previousFeedback: string
+    @Field(() => Int, { defaultValue: 12 })
+    @Column({ type: "int", default: 12 })
+        duration: number
 
-  @Field(() => Date)
-  @CreateDateColumn()
-      createdAt: Date
+    @Field(() => String, { nullable: true })
+    @Column({ type: "varchar", length: 2000, nullable: true })
+        previousFeedback: string
 
-  @Field(() => Date)
-  @UpdateDateColumn()
-      updatedAt: Date
+    @Field(() => Date)
+    @CreateDateColumn()
+        createdAt: Date
 
-  @Field(() => [CourseCategoryEntity], { nullable: true })
-  @OneToMany(
-      () => CourseCategoryEntity,
-      (courseCategory) => courseCategory.course,
-  )
-      courseCategories: Array<CourseCategoryEntity>
+    @Field(() => Date)
+    @UpdateDateColumn()
+        updatedAt: Date
 
-  @Field(() => [CourseTargetEntity], { nullable: true })
-  @OneToMany(() => CourseTargetEntity, (courseTarget) => courseTarget.course)
-      courseTargets: Array<CourseTargetEntity>
+    @Field(() => [CourseCategoryEntity], { nullable: true })
+    @OneToMany(
+        () => CourseCategoryEntity,
+        (courseCategory) => courseCategory.course,
+    )
+        courseCategories: Array<CourseCategoryEntity>
 
-  @Field(() => [PostEntity], { nullable: true })
-  @OneToMany(() => PostEntity, (post) => post.course)
-      posts: Array<PostEntity>
+    @Field(() => [CourseTargetEntity], { nullable: true })
+    @OneToMany(() => CourseTargetEntity, (courseTarget) => courseTarget.course)
+        courseTargets: Array<CourseTargetEntity>
 
-  @Field(() => [EnrolledInfoEntity], { nullable: true })
-  @OneToMany(() => EnrolledInfoEntity, (enrolled) => enrolled.course)
-      enrolledInfos: Array<EnrolledInfoEntity>
+    @Field(() => [PostEntity], { nullable: true })
+    @OneToMany(() => PostEntity, (post) => post.course)
+        posts: Array<PostEntity>
 
-  @Field(() => [SectionEntity], { nullable: true })
-  @OneToMany(() => SectionEntity, (section) => section.course, {
-      onDelete: "CASCADE",
-  })
-      sections: Array<SectionEntity>
+    @Field(() => [EnrolledInfoEntity], { nullable: true })
+    @OneToMany(() => EnrolledInfoEntity, (enrolled) => enrolled.course)
+        enrolledInfos: Array<EnrolledInfoEntity>
 
-  @Field(() => [CartCourseEntity])
-  @OneToMany(() => CartCourseEntity, (cartCourse) => cartCourse.course)
-      cartCourses?: Array<CartCourseEntity>
+    @Field(() => [SectionEntity], { nullable: true })
+    @OneToMany(() => SectionEntity, (section) => section.course, {
+        onDelete: "CASCADE",
+    })
+        sections: Array<SectionEntity>
 
-  @Field(() => [CertificateEntity])
-  @OneToMany(() => CertificateEntity, (certificate) => certificate.course)
-      certificates?: Array<CertificateEntity>
+    @Field(() => [CartCourseEntity])
+    @OneToMany(() => CartCourseEntity, (cartCourse) => cartCourse.course)
+        cartCourses?: Array<CartCourseEntity>
 
-  @Field(() => [OrderCourseEntity])
-  @OneToMany(() => OrderCourseEntity, (orders) => orders.course)
-      orderCourses: Array<OrderCourseEntity>
+    @Field(() => [CertificateEntity])
+    @OneToMany(() => CertificateEntity, (certificate) => certificate.course)
+        certificates?: Array<CertificateEntity>
 
-  @Field(() => [CourseReviewEntity], { nullable: true })
-  @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.course)
-      courseReviews?: Array<CourseReviewEntity>
+    @Field(() => [OrderCourseEntity])
+    @OneToMany(() => OrderCourseEntity, (orders) => orders.course)
+        orderCourses: Array<OrderCourseEntity>
 
-  @Field(() => [ReportCourseEntity], { nullable: true })
-  @OneToMany(
-      () => ReportCourseEntity,
-      (reportCourse) => reportCourse.reportedCourse,
-      { nullable: true },
-  )
-      courseReports?: Array<ReportCourseEntity>
+    @Field(() => [CourseReviewEntity], { nullable: true })
+    @OneToMany(() => CourseReviewEntity, (courseReview) => courseReview.course)
+        courseReviews?: Array<CourseReviewEntity>
 
-  @Field(() => [NotificationEntity], { nullable: true })
-  @OneToMany(() => NotificationEntity, (notification) => notification.course, {
-      nullable: true,
-  })
-      courseNotifications?: Array<NotificationEntity>
+    @Field(() => [ReportCourseEntity], { nullable: true })
+    @OneToMany(
+        () => ReportCourseEntity,
+        (reportCourse) => reportCourse.reportedCourse,
+        { nullable: true },
+    )
+        courseReports?: Array<ReportCourseEntity>
 
-  @Field(() => [TransactionDetailEntity], { nullable: true })
-  @OneToMany(
-      () => TransactionDetailEntity,
-      (transactionDetail) => transactionDetail.course,
-      { nullable: true },
-  )
-      transactionDetails?: Array<TransactionDetailEntity>
+    @Field(() => [NotificationEntity], { nullable: true })
+    @OneToMany(() => NotificationEntity, (notification) => notification.course, {
+        nullable: true,
+    })
+        courseNotifications?: Array<NotificationEntity>
 
-  @Field(() => [TransactionEntity], { nullable: true })
-  @OneToMany(() => TransactionEntity, (transaction) => transaction.course, {
-      nullable: true,
-  })
-      transactions?: Array<TransactionEntity>
+    @Field(() => [TransactionDetailEntity], { nullable: true })
+    @OneToMany(
+        () => TransactionDetailEntity,
+        (transactionDetail) => transactionDetail.course,
+        { nullable: true },
+    )
+        transactionDetails?: Array<TransactionDetailEntity>
 
-  @Field(() => [CourseConfigurationEntity])
-  @OneToMany(
-      () => CourseConfigurationEntity,
-      (courseConfiguration) => courseConfiguration.course,
-  )
-      courseConfigurations: Array<CourseConfigurationEntity>
+    @Field(() => [TransactionEntity], { nullable: true })
+    @OneToMany(() => TransactionEntity, (transaction) => transaction.course, {
+        nullable: true,
+    })
+        transactions?: Array<TransactionEntity>
 
-  //graphql
-  @Field(() => Int, { nullable: true })
-      numberOfEnrollments?: number
+    @Field(() => [CourseConfigurationEntity])
+    @OneToMany(
+        () => CourseConfigurationEntity,
+        (courseConfiguration) => courseConfiguration.course,
+    )
+        courseConfigurations: Array<CourseConfigurationEntity>
 
-  @Field(() => Boolean, { nullable: true })
-      enrolled?: boolean
+    //graphql
+    @Field(() => Int, { nullable: true })
+        numberOfEnrollments?: number
 
-  @Field(() => Boolean, { nullable: true })
-      isReviewed?: boolean
+    @Field(() => Boolean, { nullable: true })
+        enrolled?: boolean
 
-  @Field(() => Boolean, { nullable: true })
-      isCreator?: boolean
+    @Field(() => Boolean, { nullable: true })
+        isReviewed?: boolean
 
-  @Field(() => Float, { nullable: true })
-      courseProgress?: number
+    @Field(() => Boolean, { nullable: true })
+        isCreator?: boolean
 
-  @Field(() => Int, { nullable: true })
-      numberOfRewardedPostsLeft?: number
+    @Field(() => Float, { nullable: true })
+        courseProgress?: number
 
-  @Field(() => CourseRating, { nullable: true })
-      courseRatings: CourseRating
+    @Field(() => Int, { nullable: true })
+        numberOfRewardedPostsLeft?: number
 
-  @Field(() => CourseCategoryLevel, { nullable: true })
-      courseCategoryLevels: CourseCategoryLevel
+    @Field(() => CourseRating, { nullable: true })
+        courseRatings: CourseRating
 
-  @Field(() => Int, { nullable: true })
-      numberOfQuizzes?: number
+    @Field(() => CourseCategoryLevel, { nullable: true })
+        courseCategoryLevels: CourseCategoryLevel
 
-  @Field(() => Int, { nullable: true })
-      numberOfLessons?: number
+    @Field(() => Int, { nullable: true })
+        numberOfQuizzes?: number
 
-  @Field(() => Int, { nullable: true })
-      numberOfResources?: number
+    @Field(() => Int, { nullable: true })
+        numberOfLessons?: number
 
-  @Field(() => String, { nullable: true })
-      certificateStatus?: CertificateStatus
+    @Field(() => Int, { nullable: true })
+        numberOfResources?: number
 
-  @Field(() => CertificateEntity, { nullable: true })
-      certificate?: CertificateEntity
+    @Field(() => String, { nullable: true })
+        certificateStatus?: CertificateStatus
 
-  @Field(() => Boolean, { nullable: true })
-      isReported?: boolean
+    @Field(() => CertificateEntity, { nullable: true })
+        certificate?: CertificateEntity
 
-  @Field(() => Int, { nullable: true })
-      numberOfReports?: number
+    @Field(() => Boolean, { nullable: true })
+        isReported?: boolean
 
-  @Field(() => Int, { nullable: true })
-      totalContents?: number
-  @Field(() => Int, { nullable: true })
-      completedContents?: number
-  @Field(() => [AccountEntity], { nullable: true })
-      students?: Array<AccountEntity>
-  @Field(() => Boolean, { nullable: true })
-      isAddedToCart?: boolean
-  @Field(() => CourseConfigurationEntity, { nullable: true })
-      courseConfiguration?: CourseConfigurationEntity
+    @Field(() => Int, { nullable: true })
+        numberOfReports?: number
+
+    @Field(() => Int, { nullable: true })
+        totalContents?: number
+    @Field(() => Int, { nullable: true })
+        completedContents?: number
+    @Field(() => [AccountEntity], { nullable: true })
+        students?: Array<AccountEntity>
+    @Field(() => Boolean, { nullable: true })
+        isAddedToCart?: boolean
+    @Field(() => CourseConfigurationEntity, { nullable: true })
+        courseConfiguration?: CourseConfigurationEntity
 }

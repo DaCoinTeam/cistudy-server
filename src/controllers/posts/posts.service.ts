@@ -188,8 +188,8 @@ export class PostsService {
                     await this.configurationService.getConfiguration(courseId)
 
                 earnAmount = computeFixedFloor(
-                    ((priceAtEnrolled * earn) / 100) *
-                    blockchainConfig().earns.createPostEarnCoefficient,
+                    ((priceAtEnrolled * earn) / 300) *
+            blockchainConfig().earns.createPostEarnCoefficient,
                 )
 
                 await this.notificationMySqlRepository.save({
@@ -381,8 +381,8 @@ export class PostsService {
                         const { earn } = await this.configurationService.getConfiguration(courseId)
                         earnAmount = computeFixedFloor(
                             priceAtEnrolled *
-                            earn / 100 *
-                            blockchainConfig().earns.likePostEarnCoefficient,
+                (earn / 300) *
+                blockchainConfig().earns.likePostEarnCoefficient,
                         )
                         await this.transactionMySqlRepository.save({
                             accountId,
@@ -552,8 +552,8 @@ export class PostsService {
                                 await this.configurationService.getConfiguration(courseId)
 
                             earnAmount = computeFixedFloor(
-                                ((priceAtEnrolled * earn) / 100) *
-                                blockchainConfig().earns.commentPostEarnCoefficient,
+                                ((priceAtEnrolled * earn) / 300) *
+                  blockchainConfig().earns.commentPostEarnCoefficient,
                             )
 
                             await this.notificationMySqlRepository.save({
@@ -907,8 +907,8 @@ export class PostsService {
             const { earn } = await this.configurationService.getConfiguration(courseId)
             const earnAmount = computeFixedFloor(
                 priceAtEnrolled *
-                earn / 100 *
-                blockchainConfig().earns.rewardCommentPostEarnCoefficient,
+                (earn / 300) *
+          blockchainConfig().earns.rewardCommentPostEarnCoefficient,
             )
 
             await this.transactionMySqlRepository.save({

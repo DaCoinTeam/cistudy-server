@@ -154,80 +154,80 @@ import { v4 as uuidv4 } from "uuid"
 @Injectable()
 export class CoursesService {
     constructor(
-        @InjectRepository(CourseMySqlEntity)
-        private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
-        @InjectRepository(SectionMySqlEntity)
-        private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
-        @InjectRepository(SectionContentMySqlEntity)
-        private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
-        @InjectRepository(LessonMySqlEntity)
-        private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
-        @InjectRepository(CourseTargetMySqlEntity)
-        private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
-        @InjectRepository(ResourceMySqlEntity)
-        private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
-        @InjectRepository(ResourceAttachmentMySqlEntity)
-        private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
-        @InjectRepository(EnrolledInfoMySqlEntity)
-        private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
-        @InjectRepository(CategoryMySqlEntity)
-        private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
-        @InjectRepository(CourseCategoryMySqlEntity)
-        private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
-        @InjectRepository(CourseReviewMySqlEntity)
-        private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
-        @InjectRepository(CertificateMySqlEntity)
-        private readonly courseCertificateMySqlEntity: Repository<CertificateMySqlEntity>,
-        @InjectRepository(QuizMySqlEntity)
-        private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
-        @InjectRepository(QuizQuestionMySqlEntity)
-        private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
-        @InjectRepository(QuizQuestionAnswerMySqlEntity)
-        private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
-        @InjectRepository(ProgressMySqlEntity)
-        private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
-        @InjectRepository(QuizAttemptMySqlEntity)
-        private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
-        @InjectRepository(QuizAttemptAnswerMySqlEntity)
-        private readonly quizAttemptAnswerMySqlRepository: Repository<QuizAttemptAnswerMySqlEntity>,
-        @InjectRepository(QuizAttemptQuestionMySqlEntity)
-        private readonly quizAttemptQuestionMySqlRepository: Repository<QuizAttemptQuestionMySqlEntity>,
-        @InjectRepository(AccountMySqlEntity)
-        private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
-        @InjectRepository(AccountGradeMySqlEntity)
-        private readonly accountGradeMySqlRepository: Repository<AccountGradeMySqlEntity>,
-        @InjectRepository(ReportCourseMySqlEntity)
-        private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
-        @InjectRepository(CompleteResourceMySqlEntity)
-        private readonly completeResourceMySqlRepository: Repository<CompleteResourceMySqlEntity>,
-        @InjectRepository(NotificationMySqlEntity)
-        private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
-        @InjectRepository(OrderMySqlEntity)
-        private readonly orderMySqlRepository: Repository<OrderMySqlEntity>,
-        @InjectRepository(OrderCourseMySqlEntity)
-        private readonly orderCoursesMySqlRepository: Repository<OrderCourseMySqlEntity>,
-        @InjectRepository(TransactionMySqlEntity)
-        private readonly transactionMySqlEntity: Repository<TransactionMySqlEntity>,
-        @Inject(CACHE_MANAGER) private cacheManager: Cache,
-        private readonly storageService: StorageService,
-        private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
-        private readonly dataSource: DataSource,
-        private readonly mailerService: MailerService,
-        private readonly configurationService: ConfigurationService
-    ) { }
+    @InjectRepository(CourseMySqlEntity)
+    private readonly courseMySqlRepository: Repository<CourseMySqlEntity>,
+    @InjectRepository(SectionMySqlEntity)
+    private readonly sectionMySqlRepository: Repository<SectionMySqlEntity>,
+    @InjectRepository(SectionContentMySqlEntity)
+    private readonly sectionContentMySqlRepository: Repository<SectionContentMySqlEntity>,
+    @InjectRepository(LessonMySqlEntity)
+    private readonly lessonMySqlRepository: Repository<LessonMySqlEntity>,
+    @InjectRepository(CourseTargetMySqlEntity)
+    private readonly courseTargetMySqlRepository: Repository<CourseTargetMySqlEntity>,
+    @InjectRepository(ResourceMySqlEntity)
+    private readonly resourceMySqlRepository: Repository<ResourceMySqlEntity>,
+    @InjectRepository(ResourceAttachmentMySqlEntity)
+    private readonly resourceAttachmentMySqlRepository: Repository<ResourceAttachmentMySqlEntity>,
+    @InjectRepository(EnrolledInfoMySqlEntity)
+    private readonly enrolledInfoMySqlRepository: Repository<EnrolledInfoMySqlEntity>,
+    @InjectRepository(CategoryMySqlEntity)
+    private readonly categoryMySqlRepository: Repository<CategoryMySqlEntity>,
+    @InjectRepository(CourseCategoryMySqlEntity)
+    private readonly courseCategoryMySqlRepository: Repository<CourseCategoryMySqlEntity>,
+    @InjectRepository(CourseReviewMySqlEntity)
+    private readonly courseReviewMySqlRepository: Repository<CourseReviewMySqlEntity>,
+    @InjectRepository(CertificateMySqlEntity)
+    private readonly courseCertificateMySqlEntity: Repository<CertificateMySqlEntity>,
+    @InjectRepository(QuizMySqlEntity)
+    private readonly quizMySqlRepository: Repository<QuizMySqlEntity>,
+    @InjectRepository(QuizQuestionMySqlEntity)
+    private readonly quizQuestionMySqlRepository: Repository<QuizQuestionMySqlEntity>,
+    @InjectRepository(QuizQuestionAnswerMySqlEntity)
+    private readonly quizQuestionAnswerMySqlRepository: Repository<QuizQuestionAnswerMySqlEntity>,
+    @InjectRepository(ProgressMySqlEntity)
+    private readonly progressMySqlRepository: Repository<ProgressMySqlEntity>,
+    @InjectRepository(QuizAttemptMySqlEntity)
+    private readonly quizAttemptMySqlRepository: Repository<QuizAttemptMySqlEntity>,
+    @InjectRepository(QuizAttemptAnswerMySqlEntity)
+    private readonly quizAttemptAnswerMySqlRepository: Repository<QuizAttemptAnswerMySqlEntity>,
+    @InjectRepository(QuizAttemptQuestionMySqlEntity)
+    private readonly quizAttemptQuestionMySqlRepository: Repository<QuizAttemptQuestionMySqlEntity>,
+    @InjectRepository(AccountMySqlEntity)
+    private readonly accountMySqlRepository: Repository<AccountMySqlEntity>,
+    @InjectRepository(AccountGradeMySqlEntity)
+    private readonly accountGradeMySqlRepository: Repository<AccountGradeMySqlEntity>,
+    @InjectRepository(ReportCourseMySqlEntity)
+    private readonly reportCourseMySqlRepository: Repository<ReportCourseMySqlEntity>,
+    @InjectRepository(CompleteResourceMySqlEntity)
+    private readonly completeResourceMySqlRepository: Repository<CompleteResourceMySqlEntity>,
+    @InjectRepository(NotificationMySqlEntity)
+    private readonly notificationMySqlRepository: Repository<NotificationMySqlEntity>,
+    @InjectRepository(OrderMySqlEntity)
+    private readonly orderMySqlRepository: Repository<OrderMySqlEntity>,
+    @InjectRepository(OrderCourseMySqlEntity)
+    private readonly orderCoursesMySqlRepository: Repository<OrderCourseMySqlEntity>,
+    @InjectRepository(TransactionMySqlEntity)
+    private readonly transactionMySqlEntity: Repository<TransactionMySqlEntity>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly storageService: StorageService,
+    private readonly mpegDashProcessorProducer: ProcessMpegDashProducer,
+    private readonly dataSource: DataSource,
+    private readonly mailerService: MailerService,
+    private readonly configurationService: ConfigurationService,
+    ) {}
 
     //ADD COURSE API FAST
     async addCourseAPI(input: AddCourseAPInput): Promise<string> {
         const { accountId, data } = input
         const { title, description, targets, courseOutline } = data
-    
+
         const { courseId } = await this.courseMySqlRepository.save({
             creatorId: accountId,
             title,
             description,
             verifyStatus: CourseVerifyStatus.Pending,
         })
-    
+
         // Save course targets concurrently
         await Promise.all(
             targets.map((target, index) =>
@@ -235,30 +235,34 @@ export class CoursesService {
                     courseId,
                     content: target,
                     position: index + 1,
-                })
-            )
+                }),
+            ),
         )
-    
+
         // Iterate over course outline sections
-        for (const [sectionIndex, { sectionName, sectionContents }] of courseOutline.entries()) {
+        for (const [
+            sectionIndex,
+            { sectionName, sectionContents },
+        ] of courseOutline.entries()) {
             const { sectionId } = await this.sectionMySqlRepository.save({
                 courseId,
                 title: sectionName,
                 position: sectionIndex + 1,
             })
-    
+
             // Save section contents concurrently
             await Promise.all(
                 sectionContents.map(async (content, contentIndex) => {
                     const { title, type, description } = content
-    
-                    const { sectionContentId } = await this.sectionContentMySqlRepository.save({
-                        sectionId,
-                        type,
-                        title,
-                        position: contentIndex + 1,
-                    })
-    
+
+                    const { sectionContentId } =
+            await this.sectionContentMySqlRepository.save({
+                sectionId,
+                type,
+                title,
+                position: contentIndex + 1,
+            })
+
                     let contentData
                     switch (type) {
                     case SectionContentType.Lesson:
@@ -280,24 +284,25 @@ export class CoursesService {
                         })
                         break
                     }
-    
+
                     // Update the section content with the related entity
                     if (contentData) {
                         await this.sectionContentMySqlRepository.update(
                             { sectionContentId },
                             {
-                                [`${type.toLowerCase()}Id`]: contentData[`${type.toLowerCase()}Id`],
+                                [`${type.toLowerCase()}Id`]:
+                  contentData[`${type.toLowerCase()}Id`],
                                 [type.toLowerCase()]: contentData,
-                            }
+                            },
                         )
                     }
-                })
+                }),
             )
         }
-    
+
         return "Added new course, open Management to check and edit"
     }
-    
+
     //
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
@@ -349,14 +354,13 @@ export class CoursesService {
         )
 
         if (enrolled) {
-            throw new ConflictException(
-                "You are already enrolled in that course.",
-            )
+            throw new ConflictException("You are already enrolled in that course.")
         }
 
         const price = enableDiscount ? discountPrice : coursePrice
-        const { instructor } = await this.configurationService.getConfiguration(courseId)
-        const courseCreatorShares = price * instructor / 100
+        const { instructor } =
+      await this.configurationService.getConfiguration(courseId)
+        const courseCreatorShares = (price * instructor) / 100
 
         const { username, balance } = account
 
@@ -407,14 +411,14 @@ export class CoursesService {
         const { orderId } = await this.orderMySqlRepository.save({
             accountId,
             orderStatus: OrderStatus.Completed,
-            completeDate: new Date()
+            completeDate: new Date(),
         })
 
         await this.orderCoursesMySqlRepository.save({
             orderId,
             courseId,
             price: coursePrice,
-            discountedPrice: enableDiscount ? coursePrice : discountPrice
+            discountedPrice: enableDiscount ? coursePrice : discountPrice,
         })
 
         const notifications = [
@@ -447,8 +451,8 @@ export class CoursesService {
                         courseId: course.courseId,
                         payAmount: price,
                         directIn: false,
-                    }
-                ]
+                    },
+                ],
             },
             {
                 amountDepositedChange: price,
@@ -459,9 +463,9 @@ export class CoursesService {
                         courseId: course.courseId,
                         payAmount: courseCreatorShares,
                         directIn: true,
-                        accountId
-                    }
-                ]
+                        accountId,
+                    },
+                ],
             },
         ]
         await this.transactionMySqlEntity.save(transactions)
@@ -516,7 +520,7 @@ export class CoursesService {
         const promises: Array<Promise<void>> = []
 
         const { previewVideoId, thumbnailId } =
-            await this.courseMySqlRepository.findOneBy({ courseId })
+      await this.courseMySqlRepository.findOneBy({ courseId })
 
         if (Number.isInteger(previewVideoIndex)) {
             const promise = async () => {
@@ -815,11 +819,17 @@ export class CoursesService {
 
     async updateLesson(input: UpdateLessonInput): Promise<UpdateLessonOutput> {
         const { data, files } = input
-        const { lessonId, description, lessonVideoIndex, thumbnailIndex, title, isTrial } =
-            data
+        const {
+            lessonId,
+            description,
+            lessonVideoIndex,
+            thumbnailIndex,
+            title,
+            isTrial,
+        } = data
 
         const { thumbnailId, lessonVideoId } =
-            await this.lessonMySqlRepository.findOneBy({ lessonId })
+      await this.lessonMySqlRepository.findOneBy({ lessonId })
 
         const promises: Array<Promise<void>> = []
 
@@ -1357,15 +1367,16 @@ export class CoursesService {
 
         const { balance } = await this.accountMySqlRepository.findOne({
             where: {
-                accountId
-            }
+                accountId,
+            },
         })
 
-        const { completed } = await this.configurationService.getConfiguration(courseId)
+        const { completed } =
+      await this.configurationService.getConfiguration(courseId)
         const earnAmount = (completed / 100) * activeEnrollment.priceAtEnrolled
 
         await this.accountMySqlRepository.update(accountId, {
-            balance: balance + earnAmount
+            balance: balance + earnAmount,
         })
 
         const achievedDate = new Date()
@@ -1404,13 +1415,12 @@ export class CoursesService {
             preTextEarn: "Complete the course ",
             transactionDetails: [
                 {
-                    courseId
-                }
+                    courseId,
+                },
             ],
             type: TransactionType.Earn,
-            status: TransactionStatus.Success
+            status: TransactionStatus.Success,
         })
-
 
         return {
             message: "Certificate created successfully",
@@ -1757,8 +1767,8 @@ export class CoursesService {
             const numCorrects = await this.quizQuestionAnswerMySqlRepository.count({
                 where: {
                     isCorrect: true,
-                    quizQuestionId: answer.quizQuestionId
-                }
+                    quizQuestionId: answer.quizQuestionId,
+                },
             })
             if (numCorrects < 1) {
                 throw new ConflictException("Must have at least one correct answers")
@@ -1789,11 +1799,11 @@ export class CoursesService {
 
         if (lastAnswer !== undefined) {
             const previousLastAnswer =
-                await this.quizQuestionAnswerMySqlRepository.findOne({
-                    where: {
-                        lastAnswer,
-                    },
-                })
+        await this.quizQuestionAnswerMySqlRepository.findOne({
+            where: {
+                lastAnswer,
+            },
+        })
             if (previousLastAnswer) {
                 await this.quizQuestionAnswerMySqlRepository.update(
                     previousLastAnswer.quizQuestionAnswerId,
@@ -1838,9 +1848,8 @@ export class CoursesService {
                 quizQuestionAnswerId,
             },
             relations: {
-                quizQuestion: true
-            }
-
+                quizQuestion: true,
+            },
         })
 
         if (!answer) {
@@ -2115,10 +2124,10 @@ export class CoursesService {
 
         if (
             processing &&
-            processing.some(
-                (processing) =>
-                    processing.processStatus === ReportProcessStatus.Processing,
-            )
+      processing.some(
+          (processing) =>
+              processing.processStatus === ReportProcessStatus.Processing,
+      )
         ) {
             throw new ConflictException(
                 "You have reported this course before and it is processing. Try update your report instead.",
@@ -2188,6 +2197,9 @@ export class CoursesService {
             relations: {
                 reportedCourse: {
                     creator: true,
+                    enrolledInfos: {
+                        account: true
+                    }
                 },
                 reporterAccount: true,
             },
@@ -2206,8 +2218,35 @@ export class CoursesService {
             processNote,
         })
 
+        if (processStatus === ReportProcessStatus.Approved) {
+            await this.courseMySqlRepository.update(reportCourseId, {
+                verifyStatus: CourseVerifyStatus.Rejected,
+                previousFeedback: processNote
+            })
+
+            await this.notificationMySqlRepository.save({
+                receiverId: found.reportedCourse.creatorId,
+                title: "You course has been reported!",
+                type: NotificationType.Course,
+                courseId: reportCourseId,
+                description: `Course ${found.reportedCourse.title} has been reported. Please check email to see reason, please edit and resubmit`,
+                referenceLink: `/courses/${reportCourseId}/management`,
+            })
+
+            const accounts = found.reportedCourse.enrolledInfos.map(({ account }) => account)
+            for (const account of accounts) {
+                await this.notificationMySqlRepository.save({
+                    receiverId: account.accountId,
+                    title: "You course you enrolled has been reported!",
+                    type: NotificationType.Course,
+                    courseId: reportCourseId,
+                    description: `The course '${found.reportedCourse.title}' you enrolled in has been reported. It will be hidden until it is compliant with regulations again.`,
+                })
+            }
+        }
+
         const { reportedCourse, reporterAccount, createdAt, title, description } =
-            found
+      found
 
         await this.mailerService.sendReportCourseMail(
             reportedCourse.creator.email,
@@ -2221,7 +2260,7 @@ export class CoursesService {
         )
 
         return {
-            message: "Report successfully resolved and closed.",
+            message: "Report successfully resolved.",
         }
     }
 
@@ -2259,15 +2298,15 @@ export class CoursesService {
         )
 
         const notificationsToModerator: Array<
-            DeepPartial<NotificationMySqlEntity>
-        > = moderators.map(({ accountId }) => ({
-            receiverId: accountId,
-            title: "Course Submitted for Verification",
-            type: NotificationType.Course,
-            courseId,
-            description: `A new course "${course.title}" has been submitted. Please take a look to resolve.`,
-            referenceLink: `/moderator/course-preview/${courseId}`,
-        }))
+      DeepPartial<NotificationMySqlEntity>
+    > = moderators.map(({ accountId }) => ({
+        receiverId: accountId,
+        title: "Course Submitted for Verification",
+        type: NotificationType.Course,
+        courseId,
+        description: `A new course "${course.title}" has been submitted. Please take a look to resolve.`,
+        referenceLink: `/moderator/course-preview/${courseId}`,
+    }))
 
         await this.notificationMySqlRepository.save(notificationsToModerator)
 
@@ -2392,30 +2431,39 @@ export class CoursesService {
         const course = await this.courseMySqlRepository.findOneBy({ courseId })
 
         if (!course) {
-            throw new NotFoundException("Course not found or have been already disabled")
+            throw new NotFoundException(
+                "Course not found or have been already disabled",
+            )
         }
 
         if (accountId !== course.creatorId) {
             throw new ConflictException("You are not the creator of the course")
         }
 
-        if (course.verifyStatus === CourseVerifyStatus.Approved || course.verifyStatus === CourseVerifyStatus.Pending) {
-            throw new ConflictException("You cannot delete course once it has been submitted for reviewing or are being approved")
+        if (
+            course.verifyStatus === CourseVerifyStatus.Approved ||
+      course.verifyStatus === CourseVerifyStatus.Pending
+        ) {
+            throw new ConflictException(
+                "You cannot delete course once it has been submitted for reviewing or are being approved",
+            )
         }
 
         await this.courseMySqlRepository.update(courseId, { isDeleted: true })
 
         return {
-            message: "Course has been deleted"
+            message: "Course has been deleted",
         }
     }
 
-    async deleteAdminCourse(input: DeleteAdminCourseInput): Promise<DeleteAdminCourseOutput> {
+    async deleteAdminCourse(
+        input: DeleteAdminCourseInput,
+    ): Promise<DeleteAdminCourseOutput> {
         const { data } = input
         const { courseId } = data
         await this.courseMySqlRepository.update(courseId, { isDeleted: true })
         return {
-            message: "Course has been deleted"
+            message: "Course has been deleted",
         }
     }
 }

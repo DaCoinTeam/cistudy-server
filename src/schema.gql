@@ -558,6 +558,7 @@ type CourseEntity {
   verifyStatus: String!
   creator: AccountEntity!
   isDeleted: Boolean!
+  reported: Boolean!
   receivedWalletAddress: String
   previewVideoId: ID
   includes: String
