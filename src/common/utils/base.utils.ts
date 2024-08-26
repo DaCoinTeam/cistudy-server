@@ -73,3 +73,9 @@ export const randomPassword = () => {
 
     return result.split("").sort(() => Math.random() - 0.5).join("")
 }
+
+export const skipAndTakeArray =  <T>(array: Array<T>, skip : number, take: number) : Array<T> => {
+    const skippedArray = array.slice(skip)
+    const resultArray = skippedArray.slice(0, take)
+    return resultArray
+}

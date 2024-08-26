@@ -1,5 +1,11 @@
 import { AuthOutput, AuthTokens, ResultsWithMetadata } from "@common"
-import { CertificateMySqlEntity, CourseMySqlEntity, NotificationMySqlEntity, OrderMySqlEntity, PostMySqlEntity, TransactionMySqlEntity } from "@database"
+import {
+    CourseMySqlEntity,
+    NotificationMySqlEntity,
+    OrderMySqlEntity,
+    PostMySqlEntity,
+    TransactionMySqlEntity,
+} from "@database"
 import { Field, Float, Int, ObjectType } from "@nestjs/graphql"
 
 @ObjectType()
@@ -91,58 +97,69 @@ implements AuthOutput<FindManyTransactionsOutputData>
 
 @ObjectType()
 export class FindManyReceivedNotificationsOutputMetadata {
-    @Field(() => Int, { nullable: true })
-        count?: number
-    @Field(() => Int, { nullable: true })
-        notViewedCount?: number
+  @Field(() => Int, { nullable: true })
+      count?: number
+  @Field(() => Int, { nullable: true })
+      notViewedCount?: number
 }
 
 @ObjectType()
-export class FindManyReceivedNotificationsOutputData implements ResultsWithMetadata<NotificationMySqlEntity, FindManyReceivedNotificationsOutputMetadata>{
-    @Field(() => [NotificationMySqlEntity])
-        results: Array<NotificationMySqlEntity>
-    @Field(() => FindManyReceivedNotificationsOutputMetadata, { nullable: true })
-        metadata: FindManyReceivedNotificationsOutputMetadata
+export class FindManyReceivedNotificationsOutputData
+implements
+    ResultsWithMetadata<
+      NotificationMySqlEntity,
+      FindManyReceivedNotificationsOutputMetadata
+    >
+{
+  @Field(() => [NotificationMySqlEntity])
+      results: Array<NotificationMySqlEntity>
+  @Field(() => FindManyReceivedNotificationsOutputMetadata, { nullable: true })
+      metadata: FindManyReceivedNotificationsOutputMetadata
 }
 
 @ObjectType()
-export class FindManyReceivedNotificationsOutput implements AuthOutput<FindManyReceivedNotificationsOutputData>{
-    @Field(() => FindManyReceivedNotificationsOutputData)
-        data: FindManyReceivedNotificationsOutputData
-    @Field(() => AuthTokens,{nullable: true})
-        tokens?: AuthTokens
+export class FindManyReceivedNotificationsOutput
+implements AuthOutput<FindManyReceivedNotificationsOutputData>
+{
+  @Field(() => FindManyReceivedNotificationsOutputData)
+      data: FindManyReceivedNotificationsOutputData
+  @Field(() => AuthTokens, { nullable: true })
+      tokens?: AuthTokens
 }
 
-@ObjectType()
-export class FindOneCertificateOutput implements AuthOutput<CertificateMySqlEntity>{
-    @Field(() => CertificateMySqlEntity)
-        data?: CertificateMySqlEntity
-    @Field(() => AuthTokens, { nullable: true })
-        tokens?: AuthTokens
-}
+// @ObjectType()
+// export class FindOneCertificateOutput implements AuthOutput<CertificateMySqlEntity>{
+//     @Field(() => CertificateMySqlEntity)
+//         data?: CertificateMySqlEntity
+//     @Field(() => AuthTokens, { nullable: true })
+//         tokens?: AuthTokens
+// }
 
 @ObjectType()
 export class FindManyAccountOrdersOutputMetadata {
-    @Field(() => Int, { nullable: true })
-        count?: number
+  @Field(() => Int, { nullable: true })
+      count?: number
 }
 
 @ObjectType()
 export class FindManyAccountOrdersOutputData
-implements ResultsWithMetadata<OrderMySqlEntity, FindManyAccountOrdersOutputMetadata>
+implements
+    ResultsWithMetadata<OrderMySqlEntity, FindManyAccountOrdersOutputMetadata>
 {
-    @Field(() => [OrderMySqlEntity])
-        results: Array<OrderMySqlEntity>
-    @Field(() => FindManyAccountOrdersOutputMetadata, { nullable: true })
-        metadata: FindManyAccountOrdersOutputMetadata
+  @Field(() => [OrderMySqlEntity])
+      results: Array<OrderMySqlEntity>
+  @Field(() => FindManyAccountOrdersOutputMetadata, { nullable: true })
+      metadata: FindManyAccountOrdersOutputMetadata
 }
 
 @ObjectType()
-export class FindManyAccountOrdersOutput implements AuthOutput<FindManyAccountOrdersOutputData> {
-    @Field(() => FindManyAccountOrdersOutputData)
-        data: FindManyAccountOrdersOutputData
-    @Field(() => AuthTokens, { nullable: true })
-        tokens?: AuthTokens
+export class FindManyAccountOrdersOutput
+implements AuthOutput<FindManyAccountOrdersOutputData>
+{
+  @Field(() => FindManyAccountOrdersOutputData)
+      data: FindManyAccountOrdersOutputData
+  @Field(() => AuthTokens, { nullable: true })
+      tokens?: AuthTokens
 }
 
 @ObjectType()
@@ -151,6 +168,8 @@ export class GetCourseStatisticOutputData {
       numberOfRewardablePostsLeft?: number
   @Field(() => Float, { nullable: true })
       totalEarning?: number
+  @Field(() => Float, { nullable: true })
+      pendingEarning?: number
   @Field(() => [PostMySqlEntity], { nullable: true })
       likePosts?: Array<PostMySqlEntity>
   @Field(() => [PostMySqlEntity], { nullable: true })
@@ -162,9 +181,11 @@ export class GetCourseStatisticOutputData {
 }
 
 @ObjectType()
-export class GetCourseStatisticOutput implements AuthOutput<GetCourseStatisticOutputData> {
-    @Field(() => GetCourseStatisticOutputData)
-        data: GetCourseStatisticOutputData
-    @Field(() => AuthTokens, { nullable: true })
-        tokens?: AuthTokens
+export class GetCourseStatisticOutput
+implements AuthOutput<GetCourseStatisticOutputData>
+{
+  @Field(() => GetCourseStatisticOutputData)
+      data: GetCourseStatisticOutputData
+  @Field(() => AuthTokens, { nullable: true })
+      tokens?: AuthTokens
 }

@@ -13,7 +13,7 @@ import {
 } from "@database"
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { DataSource, Not, Repository } from "typeorm"
+import { DataSource, In, Not, Repository } from "typeorm"
 import {
     FindManyAccountReportsInput,
     FindManyAccountReviewsInput,
@@ -21,8 +21,8 @@ import {
     FindManyAdminTransactionsInput,
     FindManyFollowersInput,
     FindManyNotificationsInput,
-    FindManyPendingCourseInput,
     FindManyPendingInstructorInput,
+    FindManyPublishedCoursesInput,
     FindOneAccountInput,
     FindOneAdminAccountInput
 } from "./accounts.input"
@@ -32,8 +32,8 @@ import {
     FindManyAccountsOutputData,
     FindManyAdminTransactionsOutputData,
     FindManyNotificationsOutputData,
-    FindManyPendingCourseOutputData,
     FindManyPendingInstructorOutputData,
+    FindManyPublishedCoursesOutputData,
     GetAdminAnalyticsOutputData,
 } from "./accounts.output"
 
@@ -235,34 +235,52 @@ export class AccountsService {
         }
     }
 
-    async findManyPendingCourse(
-        input: FindManyPendingCourseInput,
-    ): Promise<FindManyPendingCourseOutputData> {
+    async findManyPublishedCourses(
+        input: FindManyPublishedCoursesInput,
+    ): Promise<FindManyPublishedCoursesOutputData> {
         const { data } = input
         const { options } = data
         const { skip, take } = options
 
-        const results = await this.courseMySqlRepository.find({
+        const pendingCourses = await this.courseMySqlRepository.find({
             where: {
                 verifyStatus: CourseVerifyStatus.Pending,
+                isDeleted: false
             },
-            skip,
-            take,
             relations: {
                 creator: true,
             },
+            order:{
+                createdAt: "DESC"
+            }
         })
 
-        const numberOfPendingCourse = await this.courseMySqlRepository.count({
+        const exceptPendingCourses = await this.courseMySqlRepository.find({
             where: {
-                verifyStatus: CourseVerifyStatus.Pending,
+                verifyStatus: Not(In([CourseVerifyStatus.Pending, CourseVerifyStatus.Draft])),
+                isDeleted: false
+            },
+            relations: {
+                creator: true,
+            },
+            order: {
+                createdAt: "DESC",
             },
         })
+        
+        const results = [...pendingCourses, ...exceptPendingCourses]
 
+        const numberOfPublishedCourses = await this.courseMySqlRepository.count({
+            where:{
+                verifyStatus: Not(CourseVerifyStatus.Draft),
+                isDeleted: false
+            }
+        })
+        
         return {
-            results,
+            results: (skip !== null && take !== null) ? results.slice(skip).slice(0, take) : results,
             metadata: {
-                count: numberOfPendingCourse,
+                count: numberOfPublishedCourses,
             },
         }
     }
@@ -311,6 +329,11 @@ export class AccountsService {
                 transactionDetails: {
                     account: true,
                     course: true,
+                    post: true,
+                    postComment: {
+                        post: true,
+                    },
+                    
                 },
             },
             order: {

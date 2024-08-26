@@ -58,6 +58,7 @@ import {
     UpdateQuizAttemptAnswersInputData,
     MarkAsCompleteResourceInputData,
     UpdateLessonProgressInputData,
+    AddCourseAPInputData,
 } from "./courses.input"
 
 import {
@@ -89,6 +90,21 @@ export class CoursesController {
     async createCourse(@AccountId() accountId: string) {
         return await this.coursesService.createCourse({
             accountId,
+        })
+    }
+
+    @ApiBearerAuth()
+    @Post("add-course-api")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(SystemRoles.User)
+    @UseInterceptors(AuthInterceptor)
+    async addCourseAPI(
+        @AccountId() accountId: string,
+        @Body() data : AddCourseAPInputData
+    ) {
+        return await this.coursesService.addCourseAPI({
+            accountId,
+            data
         })
     }
 

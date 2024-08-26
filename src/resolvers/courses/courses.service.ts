@@ -679,7 +679,7 @@ export class CoursesService {
                 courseTargets: true,
             },
             order: {
-                updatedAt: "DESC"
+                createdAt: "DESC"
             }
         })
 

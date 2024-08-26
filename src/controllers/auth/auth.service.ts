@@ -142,7 +142,7 @@ export class AuthService {
 
         await this.accountMySqlRepository.update(accountId, { password: changedPassword })
         await this.mailerService.sendNewPasswordMail(account.email, account.username, newPassword)
-
+        
         return {
             data: {
                 message: "New password changed successfully"

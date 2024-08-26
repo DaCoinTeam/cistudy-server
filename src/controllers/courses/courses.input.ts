@@ -16,6 +16,38 @@ import {
     MinLength,
 } from "class-validator"
 
+export class AddSectionContentsInputData {
+    @ApiProperty()
+        type: SectionContentType
+    @ApiProperty()
+        title : string
+    @ApiProperty()
+        description : string
+}
+
+export class AddSectionInputData {
+    @ApiProperty()
+        sectionName: string
+    @ApiProperty()
+        sectionContents : Array<AddSectionContentsInputData>
+}
+
+export class AddCourseAPInputData {
+    @ApiProperty()
+        title: string
+    @ApiProperty()
+        description: string
+    @ApiProperty()
+        targets: Array<string>
+    @ApiProperty()
+        courseOutline : Array<AddSectionInputData>
+}
+
+export class AddCourseAPInput implements AuthInput<AddCourseAPInputData>{
+    accountId: string
+    data: AddCourseAPInputData
+}
+
 export class CreateCourseInput implements AuthEmptyDataInput {
   @IsUUID("4")
       accountId: string

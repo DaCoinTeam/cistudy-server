@@ -26,14 +26,25 @@ export class ConfigurationService {
                 createdAt: "DESC"
             }
         })
-        const { completed, earn } = courseConfigurations[0]
+        let completed = 10
+        let earn = 30
+        let foundation = 10
 
+        if (courseConfigurations.length > 0) {
+            const { completed : _completed, earn: _earn } = courseConfigurations[0]
+            completed = _completed
+            earn = _earn
+        }
+        
         const configurations = await this.configurationMySqlConfiguration.find({
             order: {
                 createdAt: "DESC"
             }
         })
-        const { foundation } = configurations[0]
+
+        if (configurations.length === 0) {
+            foundation = configurations[0].foundation
+        }
 
         return {
             completed,

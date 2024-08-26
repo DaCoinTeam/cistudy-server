@@ -55,6 +55,7 @@ import { ProcessMpegDashProducer } from "@workers"
 import { getVideoDurationInSeconds } from "get-video-duration"
 import { DataSource, DeepPartial, In, Repository } from "typeorm"
 import {
+    AddCourseAPInput,
     CreateCategoryInput,
     CreateCertificateInput,
     CreateCourseCategoriesInput,
@@ -214,6 +215,90 @@ export class CoursesService {
         private readonly mailerService: MailerService,
         private readonly configurationService: ConfigurationService
     ) { }
+
+    //ADD COURSE API FAST
+    async addCourseAPI(input: AddCourseAPInput): Promise<string> {
+        const { accountId, data } = input
+        const { title, description, targets, courseOutline } = data
+    
+        const { courseId } = await this.courseMySqlRepository.save({
+            creatorId: accountId,
+            title,
+            description,
+            verifyStatus: CourseVerifyStatus.Pending,
+        })
+    
+        // Save course targets concurrently
+        await Promise.all(
+            targets.map((target, index) =>
+                this.courseTargetMySqlRepository.save({
+                    courseId,
+                    content: target,
+                    position: index + 1,
+                })
+            )
+        )
+    
+        // Iterate over course outline sections
+        for (const [sectionIndex, { sectionName, sectionContents }] of courseOutline.entries()) {
+            const { sectionId } = await this.sectionMySqlRepository.save({
+                courseId,
+                title: sectionName,
+                position: sectionIndex + 1,
+            })
+    
+            // Save section contents concurrently
+            await Promise.all(
+                sectionContents.map(async (content, contentIndex) => {
+                    const { title, type, description } = content
+    
+                    const { sectionContentId } = await this.sectionContentMySqlRepository.save({
+                        sectionId,
+                        type,
+                        title,
+                        position: contentIndex + 1,
+                    })
+    
+                    let contentData
+                    switch (type) {
+                    case SectionContentType.Lesson:
+                        contentData = await this.lessonMySqlRepository.save({
+                            lessonId: sectionContentId,
+                            description,
+                        })
+                        break
+                    case SectionContentType.Quiz:
+                        contentData = await this.quizMySqlRepository.save({
+                            quizId: sectionContentId,
+                            description,
+                        })
+                        break
+                    case SectionContentType.Resource:
+                        contentData = await this.resourceMySqlRepository.save({
+                            resourceId: sectionContentId,
+                            description,
+                        })
+                        break
+                    }
+    
+                    // Update the section content with the related entity
+                    if (contentData) {
+                        await this.sectionContentMySqlRepository.update(
+                            { sectionContentId },
+                            {
+                                [`${type.toLowerCase()}Id`]: contentData[`${type.toLowerCase()}Id`],
+                                [type.toLowerCase()]: contentData,
+                            }
+                        )
+                    }
+                })
+            )
+        }
+    
+        return "Added new course, open Management to check and edit"
+    }
+    
+    //
 
     async enrollCourse(input: EnrollCourseInput): Promise<EnrollCourseOutput> {
         const { data, accountId } = input
@@ -1277,7 +1362,7 @@ export class CoursesService {
         })
 
         const { completed } = await this.configurationService.getConfiguration(courseId)
-        const earnAmount = completed / 100 * activeEnrollment.priceAtEnrolled
+        const earnAmount = (completed / 100) * activeEnrollment.priceAtEnrolled
 
         await this.accountMySqlRepository.update(accountId, {
             balance: balance + earnAmount

@@ -1,6 +1,7 @@
 import {
     AuthEmptyDataInput,
     AuthInput,
+    Input,
     OptionsOnly,
     OrderStatus,
     ParamsOnly,
@@ -124,9 +125,8 @@ export class FindOneCertificateInputData {
 }
 
 export class FindOneCertificateInput
-implements AuthInput<FindOneCertificateInputData>
+implements Input<FindOneCertificateInputData>
 {
-    accountId: string
     data: FindOneCertificateInputData
 }
 

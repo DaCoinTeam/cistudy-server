@@ -7,10 +7,10 @@ import {
     FindManyEnrolledCoursesOutput, FindManyReceivedNotificationsOutput,
     FindManySelfCreatedCoursesOutput,
     FindManyTransactionsOutput,
-    FindOneCertificateOutput,
     GetCourseStatisticOutput
 } from "./profile.output"
 import { ProfileService } from "./profile.service"
+import { CertificateMySqlEntity } from "@database"
 
 
 @Resolver()
@@ -64,14 +64,13 @@ export class ProfileResolver {
         return this.profileService.findManyReceivedNotifications({ accountId, data })
     }
 
-    @UseGuards(JwtAuthGuard)
-    @UseInterceptors(AuthInterceptor)
-    @Query(() => FindOneCertificateOutput)
+    // @UseGuards(JwtAuthGuard)
+    // @UseInterceptors(AuthInterceptor)
+    @Query(() => CertificateMySqlEntity)
     async findOneCertificate(
-        @AccountId() accountId: string,
         @Args("data") data: FindOneCertificateInputData,
     ) {
-        return this.profileService.findOneCertificate({ accountId, data })
+        return this.profileService.findOneCertificate({ data })
     }
 
     @UseGuards(JwtAuthGuard)
