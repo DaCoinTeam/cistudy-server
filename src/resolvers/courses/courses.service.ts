@@ -1336,8 +1336,10 @@ export class CoursesService {
         })
 
         const results = [...pendingReports, ...exceptPendingReports]
-       
-        results.splice(skip, skip + take)
+
+        if(skip !== undefined && take !== undefined){
+            results.splice(skip, skip + take)
+        }
 
         const numberOfCourseReports = await this.reportCourseMySqlRepository.count()
 
