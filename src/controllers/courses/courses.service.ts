@@ -2219,7 +2219,7 @@ export class CoursesService {
         })
 
         if (processStatus === ReportProcessStatus.Approved) {
-            await this.courseMySqlRepository.update(reportCourseId, {
+            await this.courseMySqlRepository.update(found.courseId, {
                 verifyStatus: CourseVerifyStatus.Rejected,
                 previousFeedback: processNote
             })
@@ -2228,9 +2228,9 @@ export class CoursesService {
                 receiverId: found.reportedCourse.creatorId,
                 title: "You course has been reported!",
                 type: NotificationType.Course,
-                courseId: reportCourseId,
+                courseId: found.courseId,
                 description: `Course ${found.reportedCourse.title} has been reported. Please check email to see reason, please edit and resubmit`,
-                referenceLink: `/courses/${reportCourseId}/management`,
+                referenceLink: `/courses/${found.courseId}/management`,
             })
 
             const accounts = found.reportedCourse.enrolledInfos.map(({ account }) => account)
@@ -2239,7 +2239,7 @@ export class CoursesService {
                     receiverId: account.accountId,
                     title: "You course you enrolled has been reported!",
                     type: NotificationType.Course,
-                    courseId: reportCourseId,
+                    courseId: found.courseId,
                     description: `The course '${found.reportedCourse.title}' you enrolled in has been reported. It will be hidden until it is compliant with regulations again.`,
                 })
             }
