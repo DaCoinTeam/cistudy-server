@@ -670,7 +670,6 @@ export class CoursesController {
     @ApiBearerAuth()
     @Patch("resolve-course-report")
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(SystemRoles.User, SystemRoles.Moderator)
     @UseInterceptors(AuthInterceptor)
     async resolveAccountReport(
         @AccountId() accountId: string,
